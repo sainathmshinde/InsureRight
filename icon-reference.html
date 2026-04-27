@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>InsureRight Icon Reference</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&family=DM+Mono:wght@400&display=swap');
+  *{box-sizing:border-box;margin:0;padding:0}
+  :root{
+    --brand:#7c3aed;--brand-light:#ede9fe;--brand-mid:#a78bfa;
+    --bg:#f5f4f9;--surface:#fff;--border:#e8e4f0;
+    --text:#1a1628;--text-2:#5c5573;--text-3:#9d94b8;
+    --r:10px;
+  }
+  body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);padding:32px 40px;}
+  h1{font-size:26px;font-weight:700;color:var(--text);margin-bottom:4px}
+  .sub{font-size:14px;color:var(--text-3);margin-bottom:32px}
+  .section{margin-bottom:36px}
+  .section-title{
+    font-size:11px;font-weight:700;color:var(--brand);
+    text-transform:uppercase;letter-spacing:.8px;
+    border-bottom:1.5px solid var(--brand-light);
+    padding-bottom:8px;margin-bottom:16px;
+  }
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(148px,1fr));gap:10px}
+  .icon-card{
+    background:var(--surface);border:1px solid var(--border);
+    border-radius:var(--r);padding:16px 12px;
+    display:flex;flex-direction:column;align-items:center;gap:10px;
+    cursor:pointer;transition:border-color .15s,background .15s;
+    user-select:none;
+  }
+  .icon-card:hover{border-color:var(--brand-mid);background:var(--brand-light)}
+  .icon-card:active{transform:scale(.97)}
+  .icon-wrap{
+    width:44px;height:44px;border-radius:8px;
+    background:var(--brand-light);
+    display:flex;align-items:center;justify-content:center;
+    flex-shrink:0;
+  }
+  .icon-name{font-size:11.5px;color:var(--text-2);text-align:center;line-height:1.3;font-family:'DM Mono',monospace}
+  .toast{
+    position:fixed;bottom:24px;left:50%;transform:translateX(-50%);
+    background:#1e1133;color:#fff;padding:10px 20px;
+    border-radius:8px;font-size:13px;font-weight:500;
+    opacity:0;transition:opacity .2s;pointer-events:none;z-index:100;
+  }
+  .toast.show{opacity:1}
+  .search-wrap{margin-bottom:24px}
+  .search-input{
+    width:320px;height:40px;padding:0 14px;
+    border:1.5px solid var(--border);border-radius:8px;
+    background:#fff;font-size:13.5px;font-family:inherit;
+    outline:none;color:var(--text);
+  }
+  .search-input:focus{border-color:var(--brand)}
+</style>
+</head>
+<body>
+
+<h1>InsureRight — Icon Reference</h1>
+<p class="sub">Click any icon to copy the import name • All icons are React SVG components from <code style="background:#f0eef7;padding:2px 6px;border-radius:4px;font-family:'DM Mono',monospace;font-size:12px">src/icons/index.jsx</code></p>
+
+<div class="search-wrap">
+  <input class="search-input" type="text" placeholder="Search icons..." id="search" oninput="filterIcons(this.value)"/>
+</div>
+
+<div id="root"></div>
+<div class="toast" id="toast"></div>
+
+<script>
+const ICONS = {
+  "Modules": [
+    ["BrokerIcon","broker","M2 7h20a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V9a2 2 0 0 1 2-2zm10-3V4m-3 0h6"],
+    ["InsuranceCompanyIcon","ic","M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z M9 22V12h6v10"],
+    ["AgentIcon","agent","M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2 M12 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8z"],
+    ["CustomerIcon","customer","M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2 M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8z M23 21v-2a4 4 0 0 0-3-3.87 M16 3.13a4 4 0 0 1 0 7.75"],
+    ["ProductIcon","product","M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"],
+    ["PolicyIcon","policy","M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z M14 2v6h6 M16 13H8 M16 17H8 M10 9H8"],
+    ["CampaignIcon","campaign","M22 12h-4l-3 9L9 3l-3 9H2"],
+    ["DashboardIcon","dashboard","M3 3h7v7H3z M14 3h7v7h-7z M14 14h7v7h-7z M3 14h7v7H3z"],
+    ["CRMIcon","crm","M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"],
+    ["IntegrationIcon","integration","M18 18a3 3 0 1 0 0-6 3 3 0 0 0 0 6z M6 6a3 3 0 1 0 0-6 3 3 0 0 0 0 6z M6 21V9a9 9 0 0 0 9 9"],
+    ["AdminIcon","admin","M12 12a3 3 0 1 0 0-6 3 3 0 0 0 0 6z M19.07 4.93a10 10 0 0 1 0 14.14 M4.93 4.93a10 10 0 0 0 0 14.14"],
+    ["ReportIcon","report","M18 20V10 M12 20V4 M6 20V14"],
+  ],
+  "Insurance Types": [
+    ["HealthIcon","health","M22 12h-4l-3 9L9 3l-3 9H2"],
+    ["MotorIcon","motor","M1 3h15a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H1z M16 8h4l3 3v5h-7 M5.5 18a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5z M18.5 18a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5z"],
+    ["LifeIcon","life","M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"],
+    ["TravelIcon","travel","M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 M5.46 5.11A19.5 19.5 0 0 1 12 2 M1 1l22 22"],
+    ["HomeInsuranceIcon","home","M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z M9 22V12h6v10"],
+    ["FireIcon","fire","M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"],
+    ["CropIcon","crop","M12 22V12 M2 17l10-5 10 5 M2 12l10-5 10 5 M2 7l10-5 10 5"],
+    ["MarineIcon","marine","M2 20h20 M5 20V10l7-7 7 7v10 M9 20v-6h6v6"],
+    ["LiabilityIcon","liability","M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"],
+    ["GroupIcon","group","M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2 M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8z M23 21v-2a4 4 0 0 0-3-3.87 M16 3.13a4 4 0 0 1 0 7.75"],
+  ],
+  "KYC & Compliance": [
+    ["KYCIcon","kyc","M2 5h20a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2z M8 12a2 2 0 1 0 0-4 2 2 0 0 0 0 4z M12 11h6 M12 13h4"],
+    ["AadhaarIcon","aadhaar","M2 4h20a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z M8.5 12a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5z M14 9h4 M14 12h4 M14 15h2"],
+    ["PANIcon","pan","M2 5h20a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2z M7 15V9h2a2 2 0 0 1 0 4H7"],
+    ["VerifiedIcon","verified","M22 11.08V12a10 10 0 1 1-5.93-9.14 M22 4L12 14.01l-3-3"],
+    ["ShieldIcon","shield","M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"],
+    ["ShieldCheckIcon","shield-check","M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z M9 12l2 2 4-4"],
+    ["ComplianceIcon","compliance","M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z M14 2v6h6 M9 15l2 2 4-4"],
+    ["LicenseIcon","license","M2 7h20a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V9a2 2 0 0 1 2-2z M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2 M12 14a2 2 0 1 0 0-4 2 2 0 0 0 0 4z M9 19h6"],
+    ["AgreementIcon","agreement","M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z M14 2v6h6 M8 13h8 M8 17h5"],
+    ["GSTIcon","gst","M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z M9 12h6 M9 9.5h3"],
+  ],
+  "Payment & Banking": [
+    ["PaymentIcon","payment","M1 4h22a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H1a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z M1 10h22"],
+    ["UPIIcon","upi","M12 2L2 7l10 5 10-5-10-5z M2 17l10 5 10-5 M2 12l10 5 10-5"],
+    ["BankIcon","bank","M3 22h18 M6 18V11 M10 18V11 M14 18V11 M18 18V11 M12 2L4 7h16z"],
+    ["WalletIcon","wallet","M20 12V22H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h14v4 M20 12a2 2 0 0 0-2-2h-2a2 2 0 0 0 0 4h2a2 2 0 0 0 2-2z"],
+    ["ChequeIcon","cheque","M2 6h20a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2z M6 10h4 M6 14h12 M14 10h4"],
+    ["CommissionIcon","commission","M12 1v22 M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"],
+    ["PremiumIcon","premium","M12 12a10 10 0 1 0 0-20 10 10 0 0 0 0 20z M12 8v4l3 3"],
+    ["SumInsuredIcon","sum","M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z M12 8v8 M8 12h8"],
+  ],
+  "Policy Lifecycle": [
+    ["ProposalIcon","proposal","M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z M14 2v6h6 M12 18v-6 M9 15h6"],
+    ["IssuanceIcon","issuance","M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z M14 2v6h6 M9 15l2 2 4-4"],
+    ["RenewalIcon","renewal","M23 4v6h-6 M1 20v-6h6 M3.51 9a9 9 0 0 1 14.85-3.36L23 10 M20.49 15a9 9 0 0 1-14.85 3.36L1 14"],
+    ["EndorsementIcon","endorsement","M12 20h9 M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"],
+    ["ClaimIcon","claim","M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z M12 9v4 M12 17h.01"],
+    ["DownloadPolicyIcon","download","M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4 M7 10l5 5 5-5 M12 15V3"],
+    ["ExpiryIcon","expiry","M12 12a10 10 0 1 0 0-20 10 10 0 0 0 0 20z M12 6v6l4 2"],
+    ["WaitingPeriodIcon","waiting","M12 12a10 10 0 1 0 0-20 10 10 0 0 0 0 20z M12 6v6l-3 3"],
+    ["NomineeIcon","nominee","M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2 M12 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8z M16 11l2 2 4-4"],
+    ["FamilyIcon","family","M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2 M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8z M23 21v-2a4 4 0 0 0-3-3.87 M16 3.13a4 4 0 0 1 0 7.75"],
+  ],
+  "Communication": [
+    ["SMSIcon","sms","M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z M9 10h.01 M12 10h.01 M15 10h.01"],
+    ["WhatsAppIcon","whatsapp","M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"],
+    ["EmailIcon","email","M4 4h16a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z M22 6L12 13 2 6"],
+    ["NotificationIcon","notification","M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9 M13.73 21a2 2 0 0 1-3.46 0"],
+    ["CallIcon","call","M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.61 3.38 2 2 0 0 1 3.6 1.18h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 9a16 16 0 0 0 6.08 6.08l.91-.91a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"],
+    ["ReminderIcon","reminder","M12 12a10 10 0 1 0 0-20 10 10 0 0 0 0 20z M12 6v6l4 2"],
+  ],
+  "General UI": [
+    ["SearchIcon","search","M21 21l-4.35-4.35 M11 19a8 8 0 1 0 0-16 8 8 0 0 0 0 16z"],
+    ["FilterIcon","filter","M22 3H2l8 9.46V19l4 2v-8.54L22 3z"],
+    ["AddIcon","add","M12 12a10 10 0 1 0 0-20 10 10 0 0 0 0 20z M12 8v8 M8 12h8"],
+    ["EditIcon","edit","M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7 M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"],
+    ["DeleteIcon","delete","M3 6h18 M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6 M10 11v6 M14 11v6 M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"],
+    ["ViewIcon","view","M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z M12 12a3 3 0 1 0 0-6 3 3 0 0 0 0 6z"],
+    ["UploadIcon","upload","M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4 M17 8l-5-5-5 5 M12 3v12"],
+    ["DocumentIcon","document","M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z M14 2v6h6 M16 13H8 M16 17H8 M10 9H8"],
+    ["BackIcon","back","M19 12H5 M12 19l-7-7 7-7"],
+    ["CheckIcon","check","M20 6L9 17l-5-5"],
+    ["CloseIcon","close","M18 6L6 18 M6 6l12 12"],
+    ["InfoIcon","info","M12 12a10 10 0 1 0 0-20 10 10 0 0 0 0 20z M12 16v-4 M12 8h.01"],
+    ["WarningIcon","warning","M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z M12 9v4 M12 17h.01"],
+    ["MenuIcon","menu","M3 12h18 M3 6h18 M3 18h18"],
+    ["ChevronRightIcon","chevron-right","M9 18l6-6-6-6"],
+    ["ChevronDownIcon","chevron-down","M6 9l6 6 6-6"],
+    ["CalendarIcon","calendar","M3 4h18a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z M16 2v4 M8 2v4 M3 10h18"],
+    ["LocationIcon","location","M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z M12 10a3 3 0 1 0 0-6 3 3 0 0 0 0 6z"],
+    ["UserIcon","user","M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2 M12 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8z"],
+    ["SettingsIcon","settings","M12 12a3 3 0 1 0 0-6 3 3 0 0 0 0 6z"],
+    ["LogoutIcon","logout","M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4 M16 17l5-5-5-5 M21 12H9"],
+  ],
+  "API & SaaS": [
+    ["APIIcon","api","M16 18l6-6-6-6 M8 6l-6 6 6 6"],
+    ["WebhookIcon","webhook","M18 16.98h-5.99c-1.1 0-1.95.68-2.23 1.61a3 3 0 0 1-2.91 2.23H6 M18 7A3 3 0 0 0 12 4a3 3 0 0 0-3 3 9 9 0 0 0 9 9"],
+    ["RetryIcon","retry","M21.5 2v6h-6 M2.5 12a10 10 0 0 1 17.01-7.09L21.5 8 M2.5 22v-6h6 M21.5 12a10 10 0 0 1-17.01 7.09L2.5 16"],
+    ["TenantIcon","tenant","M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z M9 14h6v8H9z"],
+    ["SubscriptionIcon","subscription","M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z M12 22V12 M3.27 6.96L12 12l8.73-5.04"],
+    ["FeatureToggleIcon","toggle","M1 5h22a7 7 0 0 1 0 14H1a7 7 0 0 1 0-14z M16 12a3 3 0 1 0 0-6 3 3 0 0 0 0 6z"],
+    ["AnalyticsIcon","analytics","M18 20V10 M12 20V4 M6 20V14 M3 20h18"],
+    ["TargetIcon","target","M12 12a10 10 0 1 0 0-20 10 10 0 0 0 0 20z M12 12a6 6 0 1 0 0-12 6 6 0 0 0 0 12z M12 12a2 2 0 1 0 0-4 2 2 0 0 0 0 4z"],
+    ["FunnelIcon","funnel","M22 3H2l8 9.46V19l4 2v-8.54L22 3z"],
+    ["StatusActiveIcon","active","M12 12a10 10 0 1 0 0-20 10 10 0 0 0 0 20z M8 12l3 3 5-5"],
+    ["StatusInactiveIcon","inactive","M12 12a10 10 0 1 0 0-20 10 10 0 0 0 0 20z M8 8l8 8 M16 8l-8 8"],
+  ],
+}
+
+function svgCard(name, key, path) {
+  const paths = path.split(' M ').map((p,i) => i===0?p:'M '+p)
+  const pathEls = paths.map(p => `<path d="${p}" fill="none" stroke="#7c3aed" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>`).join('')
+  return `
+    <div class="icon-card" data-name="${name.toLowerCase()} ${key}" onclick="copyName('${name}')">
+      <div class="icon-wrap">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          ${pathEls}
+        </svg>
+      </div>
+      <span class="icon-name">${name}</span>
+    </div>`
+}
+
+function render(filter='') {
+  const root = document.getElementById('root')
+  let html = ''
+  for (const [section, icons] of Object.entries(ICONS)) {
+    const filtered = filter
+      ? icons.filter(([n,k]) => n.toLowerCase().includes(filter) || k.includes(filter))
+      : icons
+    if (filtered.length === 0) continue
+    html += `<div class="section"><div class="section-title">${section} (${filtered.length})</div><div class="grid">`
+    filtered.forEach(([n,k,p]) => { html += svgCard(n,k,p) })
+    html += `</div></div>`
+  }
+  root.innerHTML = html || '<p style="color:var(--text-3);padding:20px">No icons match your search.</p>'
+}
+
+function filterIcons(v) { render(v.toLowerCase().trim()) }
+
+function copyName(name) {
+  navigator.clipboard.writeText(name).catch(()=>{})
+  const t = document.getElementById('toast')
+  t.textContent = `Copied: ${name}`
+  t.classList.add('show')
+  setTimeout(() => t.classList.remove('show'), 2000)
+}
+
+render()
+</script>
+</body>
+</html>
