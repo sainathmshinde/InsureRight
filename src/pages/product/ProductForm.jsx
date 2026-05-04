@@ -20,8 +20,34 @@ const POLICY_TOC = [
   { id: 'S10', icon: '🔄', title: '10. Renewal & No Claim Bonus',  content: 'Lifetime renewability. Grace period: 30 days. NCB: 10% SI increase per claim-free year up to 50%. Premium revision on anniversary per IRDAI approved rates. Portability as per IRDAI guidelines.' },
 ]
 
+const COVERED_MEMBERS = ['Self', 'Spouse', 'Child 1', 'Child 2', 'Child 3', 'Child 4', 'Mother', 'Father', 'Mother in Law', 'Father in Law']
+
 export default function ProductForm({ form, set, setFile, setArr, setPremium, onSubmit, onCancel, submitLabel = 'Save Product' }) {
   const [activeToc, setActiveToc] = useState(null)
+  const [coveredMembers, setCoveredMembers] = useState(new Set())
+  const [premiumRows, setPremiumRows] = useState([{ id: Date.now(), sumInsured: '', gst: '18', members: {} }])
+
+  const toggleMember = name => setCoveredMembers(prev => {
+    const next = new Set(prev)
+    next.has(name) ? next.delete(name) : next.add(name)
+    return next
+  })
+
+  const selectedMembers = COVERED_MEMBERS.filter(m => coveredMembers.has(m))
+
+  const addPremiumRow = () =>
+    setPremiumRows(prev => [...prev, { id: Date.now(), sumInsured: '', gst: '18', members: {} }])
+
+  const removePremiumRow = id =>
+    setPremiumRows(prev => prev.filter(r => r.id !== id))
+
+  const updatePremiumRow = (id, field, value) =>
+    setPremiumRows(prev => prev.map(r => r.id === id ? { ...r, [field]: value } : r))
+
+  const updateMemberPremium = (id, member, value) =>
+    setPremiumRows(prev => prev.map(r =>
+      r.id === id ? { ...r, members: { ...r.members, [member]: value } } : r
+    ))
 
   return (
     <form onSubmit={onSubmit}>
@@ -70,27 +96,97 @@ export default function ProductForm({ form, set, setFile, setArr, setPremium, on
         </div>
       </SectionBlock>
 
-      {/* ── 2. Financial Details ──────────────────── */}
+      {/* ── 2. Configuration ─────────────────────── */}
+      <SectionBlock icon="⚙️" title="Configuration">
+        <Field label="Covered Members">
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px 24px', paddingTop: 6 }}>
+            {COVERED_MEMBERS.map(member => (
+              <label key={member} style={{ display: 'flex', alignItems: 'center', gap: 7, cursor: 'pointer', fontSize: 14 }}>
+                <input
+                  type="checkbox"
+                  checked={coveredMembers.has(member)}
+                  onChange={() => toggleMember(member)}
+                />
+                {member}
+              </label>
+            ))}
+          </div>
+        </Field>
+      </SectionBlock>
+
+      {/* ── 3. Financial Details ──────────────────── */}
       <SectionBlock icon="💰" title="Financial Details">
-        <div className="form-grid">
-          <Field label="Base Premium (₹)" required>
-            <Input type="number" min="0" placeholder="e.g. 8500" value={form.basePremium} onChange={setPremium('basePremium')} required />
-          </Field>
-          <Field label="GST %" required>
-            <Select value={form.gstPercent} onChange={setPremium('gstPercent')} required>
-              <option value="0">0%</option>
-              <option value="5">5%</option>
-              <option value="12">12%</option>
-              <option value="18">18%</option>
-            </Select>
-          </Field>
-          <Field label="Total Premium (₹) — auto calculated">
-            <Input value={form.totalPremium} readOnly disabled placeholder="Auto-calculated" />
-          </Field>
-          <Field label="Sum Insured Options" required>
-            <Input placeholder="e.g. 3L, 5L, 10L, 15L, 25L, 50L" value={form.sumInsuredOptions} onChange={set('sumInsuredOptions')} required />
-          </Field>
-        </div>
+        {selectedMembers.length === 0 ? (
+          <p style={{ fontSize: 13, color: 'var(--text-3)', margin: 0 }}>
+            Select covered members in the Configuration section to build the premium table.
+          </p>
+        ) : (
+          <>
+            <div className="table-wrap">
+              <table style={{ fontSize: 13 }}>
+                <thead>
+                  <tr>
+                    <th style={{ minWidth: 130 }}>Sum Insured (₹)</th>
+                    <th style={{ minWidth: 90 }}>GST %</th>
+                    {selectedMembers.map(m => (
+                      <th key={m} style={{ minWidth: 110 }}>{m} (₹)</th>
+                    ))}
+                    <th style={{ width: 40 }}></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {premiumRows.map(row => (
+                    <tr key={row.id}>
+                      <td>
+                        <Input
+                          type="number" min="0" placeholder="e.g. 500000"
+                          value={row.sumInsured}
+                          onChange={e => updatePremiumRow(row.id, 'sumInsured', e.target.value)}
+                        />
+                      </td>
+                      <td>
+                        <Select
+                          value={row.gst}
+                          onChange={e => updatePremiumRow(row.id, 'gst', e.target.value)}
+                        >
+                          <option value="0">0%</option>
+                          <option value="5">5%</option>
+                          <option value="12">12%</option>
+                          <option value="18">18%</option>
+                        </Select>
+                      </td>
+                      {selectedMembers.map(m => (
+                        <td key={m}>
+                          <Input
+                            type="number" min="0" placeholder="0"
+                            value={row.members[m] || ''}
+                            onChange={e => updateMemberPremium(row.id, m, e.target.value)}
+                          />
+                        </td>
+                      ))}
+                      <td>
+                        <button
+                          type="button"
+                          onClick={() => removePremiumRow(row.id)}
+                          disabled={premiumRows.length === 1}
+                          style={{
+                            background: 'none', border: 'none', cursor: premiumRows.length === 1 ? 'not-allowed' : 'pointer',
+                            fontSize: 18, color: premiumRows.length === 1 ? 'var(--border)' : 'var(--text-3)', lineHeight: 1, padding: '2px 4px',
+                          }}
+                        >×</button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+            <div style={{ marginTop: 12 }}>
+              <button type="button" className="btn btn-ghost" style={{ fontSize: 13, padding: '5px 14px' }} onClick={addPremiumRow}>
+                + Add Sum Insured
+              </button>
+            </div>
+          </>
+        )}
       </SectionBlock>
 
       {/* ── 3. Documents ─────────────────────────── */}
