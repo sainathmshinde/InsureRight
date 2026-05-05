@@ -569,9 +569,14 @@ export function DocumentViewerModal({ value, onClose }) {
   }, [value, isFile])
 
   const DOC_TITLES = { pan: 'PAN Card', aadhaar: 'Aadhaar Card', photo: 'Passport Photo', cheque: 'Cancelled Cheque', agreement: 'Agreement Document' }
+  const isPlainUrl = typeof value === 'string' && !docInfo
   const title = isFile
     ? value.name
-    : (docInfo ? `${DOC_TITLES[docInfo.type] || docInfo.type} — ${docInfo.name}` : '')
+    : docInfo
+      ? `${DOC_TITLES[docInfo.type] || docInfo.type} — ${docInfo.name}`
+      : isPlainUrl
+        ? decodeURIComponent(value.split('/').pop().split('?')[0])
+        : ''
 
   const handleDownload = () => {
     if (!objectUrl) return
@@ -586,6 +591,9 @@ export function DocumentViewerModal({ value, onClose }) {
       if (objectUrl)
         return <iframe src={objectUrl} title={value.name} style={{ width: '100%', height: '74vh', border: 'none', display: 'block' }} />
     }
+
+    if (isPlainUrl)
+      return <iframe src={value} title={title} style={{ width: '100%', height: '74vh', border: 'none', display: 'block' }} />
 
     if (docInfo) {
       switch (docInfo.type) {
@@ -608,10 +616,14 @@ export function DocumentViewerModal({ value, onClose }) {
         <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '11px 16px', borderBottom: '1px solid #ddd', background: '#fff', flexShrink: 0 }}>
           <span style={{ fontSize: 17 }}>📄</span>
           <span style={{ flex: 1, fontWeight: 600, fontSize: 13, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', color: '#222' }}>{title}</span>
-          {isFile && (
-            <button onClick={handleDownload} style={{ fontSize: 12, padding: '4px 12px', borderRadius: 6, border: '1px solid #ccc', background: '#fff', cursor: 'pointer', color: '#555', marginRight: 4 }}>
+          {(isFile || isPlainUrl) && (
+            <a
+              href={isFile ? objectUrl : value}
+              download={isFile ? value.name : title}
+              style={{ fontSize: 12, padding: '4px 12px', borderRadius: 6, border: '1px solid #ccc', background: '#fff', cursor: 'pointer', color: '#555', marginRight: 4, textDecoration: 'none' }}
+            >
               ⬇ Download
-            </button>
+            </a>
           )}
           <button onClick={onClose} style={{ fontSize: 20, border: 'none', background: 'transparent', cursor: 'pointer', color: '#888', lineHeight: 1, padding: '2px 6px' }}>✕</button>
         </div>
