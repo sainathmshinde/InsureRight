@@ -48,6 +48,18 @@ const MOCK_USERS = [
 
 const PAGE_SIZE = 10
 
+const AGENTS = [
+  { id: 1,  name: 'Ravi Kulkarni', posLicense: 'POS-2023-001', broker: 'Mehta Insurance'   },
+  { id: 2,  name: 'Pooja Desai',   posLicense: 'POS-2023-019', broker: 'Priya Brokers'     },
+  { id: 4,  name: 'Kavita Sharma', posLicense: 'POS-2023-045', broker: 'Shah Financial'    },
+  { id: 5,  name: 'Amit Verma',    posLicense: 'POS-2023-067', broker: 'Mehta Insurance'   },
+  { id: 6,  name: 'Sneha Patil',   posLicense: 'POS-2022-133', broker: 'Nair & Co.'        },
+  { id: 8,  name: 'Priya Menon',   posLicense: 'POS-2023-088', broker: 'Shah Financial'    },
+  { id: 9,  name: 'Kiran Reddy',   posLicense: 'POS-2023-099', broker: 'Rao & Partners'    },
+  { id: 10, name: 'Neha Gupta',    posLicense: 'POS-2022-155', broker: 'Priya Brokers'     },
+  { id: 11, name: 'Ajay Tiwari',   posLicense: 'POS-2023-120', broker: 'Mehta Insurance'   },
+]
+
 const MOCK_PRODUCTS = [
   'Star Comprehensive Health', 'HDFC ERGO Optima', 'ICICI Lombard Health',
   'Bajaj Allianz Motor', 'New India Motor', 'LIC Jeevan Anand', 'HDFC Life Sanchay',
@@ -84,6 +96,22 @@ export default function CampaignCreate() {
   const set = f => e => setForm(p => ({ ...p, [f]: e.target.value }))
   const setDate = f => e => setForm(p => ({ ...p, [f]: fromInputDate(e.target.value) }))
   const setBool = f => val => setForm(p => ({ ...p, [f]: val }))
+
+  const [assignedAgents, setAssignedAgents] = useState(new Set())
+  const [agentSearch, setAgentSearch] = useState('')
+  const [agentDropdownOpen, setAgentDropdownOpen] = useState(false)
+
+  const filteredAgents = AGENTS.filter(a =>
+    a.name.toLowerCase().includes(agentSearch.toLowerCase()) ||
+    a.broker.toLowerCase().includes(agentSearch.toLowerCase()) ||
+    a.posLicense.toLowerCase().includes(agentSearch.toLowerCase())
+  )
+
+  const toggleAgent = id => setAssignedAgents(prev => {
+    const next = new Set(prev)
+    next.has(id) ? next.delete(id) : next.add(id)
+    return next
+  })
 
   const [filteredUsers, setFilteredUsers] = useState([])
   const [userPage, setUserPage] = useState(1)
@@ -434,7 +462,96 @@ export default function CampaignCreate() {
               </div>
             </SectionBlock>
 
-            {/* ── 6. Tracking ──────────────────────────── */}
+            {/* ── 6. Assign Agents ─────────────────────── */}
+            <SectionBlock icon="👤" title="Assign Agents">
+              {/* Selected agent chips */}
+              {assignedAgents.size > 0 && (
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginBottom: 12 }}>
+                  {AGENTS.filter(a => assignedAgents.has(a.id)).map(a => (
+                    <span key={a.id} style={{
+                      display: 'inline-flex', alignItems: 'center', gap: 6,
+                      background: 'var(--brand-light)', color: 'var(--brand)',
+                      border: '1px solid var(--brand-mid)', borderRadius: 20,
+                      padding: '4px 10px 4px 12px', fontSize: 13, fontWeight: 500,
+                    }}>
+                      {a.name}
+                      <button
+                        type="button"
+                        onClick={() => toggleAgent(a.id)}
+                        style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--brand)', fontSize: 15, lineHeight: 1, padding: 0 }}
+                      >×</button>
+                    </span>
+                  ))}
+                </div>
+              )}
+
+              {/* Dropdown trigger */}
+              <div style={{ position: 'relative' }}>
+                <div
+                  style={{
+                    display: 'flex', alignItems: 'center', gap: 8,
+                    border: '1px solid var(--border)', borderRadius: 'var(--r-md)',
+                    padding: '8px 12px', background: 'var(--surface)', cursor: 'text',
+                  }}
+                  onClick={() => setAgentDropdownOpen(true)}
+                >
+                  <input
+                    type="text"
+                    placeholder="Search agents by name, broker or license…"
+                    value={agentSearch}
+                    onChange={e => { setAgentSearch(e.target.value); setAgentDropdownOpen(true) }}
+                    onFocus={() => setAgentDropdownOpen(true)}
+                    style={{ flex: 1, border: 'none', outline: 'none', background: 'transparent', fontSize: 13 }}
+                  />
+                  <span style={{ fontSize: 11, color: 'var(--text-3)' }}>
+                    {assignedAgents.size > 0 ? `${assignedAgents.size} selected` : ''}
+                  </span>
+                  <span style={{ color: 'var(--text-3)', fontSize: 12 }}>{agentDropdownOpen ? '▲' : '▼'}</span>
+                </div>
+
+                {agentDropdownOpen && (
+                  <>
+                    {/* Backdrop to close on outside click */}
+                    <div
+                      style={{ position: 'fixed', inset: 0, zIndex: 10 }}
+                      onClick={() => { setAgentDropdownOpen(false); setAgentSearch('') }}
+                    />
+                    <div style={{
+                      position: 'absolute', top: 'calc(100% + 4px)', left: 0, right: 0, zIndex: 11,
+                      background: 'var(--surface)', border: '1px solid var(--border)',
+                      borderRadius: 'var(--r-md)', boxShadow: '0 4px 16px rgba(0,0,0,.1)',
+                      maxHeight: 260, overflowY: 'auto',
+                    }}>
+                      {filteredAgents.length === 0 ? (
+                        <div style={{ padding: '14px 16px', fontSize: 13, color: 'var(--text-3)' }}>No agents found.</div>
+                      ) : filteredAgents.map(a => (
+                        <label
+                          key={a.id}
+                          style={{
+                            display: 'flex', alignItems: 'center', gap: 10,
+                            padding: '10px 16px', cursor: 'pointer', fontSize: 13,
+                            background: assignedAgents.has(a.id) ? 'var(--brand-light)' : 'transparent',
+                            borderBottom: '1px solid var(--border)',
+                          }}
+                        >
+                          <input
+                            type="checkbox"
+                            checked={assignedAgents.has(a.id)}
+                            onChange={() => toggleAgent(a.id)}
+                          />
+                          <div>
+                            <div style={{ fontWeight: 500 }}>{a.name}</div>
+                            <div style={{ fontSize: 11.5, color: 'var(--text-3)' }}>{a.broker} · {a.posLicense}</div>
+                          </div>
+                        </label>
+                      ))}
+                    </div>
+                  </>
+                )}
+              </div>
+            </SectionBlock>
+
+            {/* ── 7. Tracking ──────────────────────────── */}
             <SectionBlock icon="📊" title="Tracking">
               <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
                 <Toggle checked={form.clickTracking} onChange={setBool('clickTracking')} label="Enable Click Tracking (UTM / link tracking)" />
