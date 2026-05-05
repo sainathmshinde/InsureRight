@@ -24,26 +24,117 @@ const CAMPAIGNS = [
   { id: 6, name: 'Festival Season Offer',       type: 'Seasonal',    assignedAgents: [2, 8, 9] },
 ]
 
-const EMPTY_CALLS = Array.from({ length: 5 }, (_, i) => ({
-  callNo: i + 1, time: '', response: '', comment: '',
-}))
+function calls(filled) {
+  return Array.from({ length: 5 }, (_, i) => {
+    const f = filled[i] || {}
+    return { callNo: i + 1, time: f.t || '', response: f.r || '', comment: f.c || '' }
+  })
+}
 
 const INITIAL_LEADS = [
-  { id:1,  campaignId:1, name:'Aarav Sharma',   mobile:'9876543210', enrollmentStatus:'Enrolled',  enrollmentDate:'10/04/2025', purchaseStatus:'Purchased',      purchaseDate:'18/04/2025', calls: EMPTY_CALLS.map(c => ({...c})) },
-  { id:2,  campaignId:1, name:'Priya Mehta',    mobile:'9812345678', enrollmentStatus:'Enrolled',  enrollmentDate:'11/04/2025', purchaseStatus:'Interested',     purchaseDate:'',           calls: EMPTY_CALLS.map(c => ({...c})) },
-  { id:3,  campaignId:1, name:'Rohan Verma',    mobile:'9800112233', enrollmentStatus:'Pending',   enrollmentDate:'',           purchaseStatus:'Pending',        purchaseDate:'',           calls: EMPTY_CALLS.map(c => ({...c})) },
-  { id:4,  campaignId:1, name:'Sneha Iyer',     mobile:'9898989898', enrollmentStatus:'Enrolled',  enrollmentDate:'12/04/2025', purchaseStatus:'Not Interested', purchaseDate:'',           calls: EMPTY_CALLS.map(c => ({...c})) },
-  { id:5,  campaignId:1, name:'Karan Patel',    mobile:'9090909090', enrollmentStatus:'Enrolled',  enrollmentDate:'13/04/2025', purchaseStatus:'Purchased',      purchaseDate:'20/04/2025', calls: EMPTY_CALLS.map(c => ({...c})) },
-  { id:6,  campaignId:2, name:'Divya Nair',     mobile:'9911223344', enrollmentStatus:'Enrolled',  enrollmentDate:'01/05/2025', purchaseStatus:'Purchased',      purchaseDate:'08/05/2025', calls: EMPTY_CALLS.map(c => ({...c})) },
-  { id:7,  campaignId:2, name:'Arjun Singh',    mobile:'9922334455', enrollmentStatus:'Enrolled',  enrollmentDate:'02/05/2025', purchaseStatus:'Interested',     purchaseDate:'',           calls: EMPTY_CALLS.map(c => ({...c})) },
-  { id:8,  campaignId:2, name:'Meera Joshi',    mobile:'9933445566', enrollmentStatus:'Pending',   enrollmentDate:'',           purchaseStatus:'Pending',        purchaseDate:'',           calls: EMPTY_CALLS.map(c => ({...c})) },
-  { id:9,  campaignId:2, name:'Vikram Rao',     mobile:'9944556677', enrollmentStatus:'Enrolled',  enrollmentDate:'03/05/2025', purchaseStatus:'Purchased',      purchaseDate:'10/05/2025', calls: EMPTY_CALLS.map(c => ({...c})) },
-  { id:10, campaignId:2, name:'Anjali Desai',   mobile:'9955667788', enrollmentStatus:'Enrolled',  enrollmentDate:'04/05/2025', purchaseStatus:'Not Interested', purchaseDate:'',           calls: EMPTY_CALLS.map(c => ({...c})) },
-  { id:11, campaignId:3, name:'Rahul Gupta',    mobile:'9966778899', enrollmentStatus:'Enrolled',  enrollmentDate:'15/03/2025', purchaseStatus:'Purchased',      purchaseDate:'22/03/2025', calls: EMPTY_CALLS.map(c => ({...c})) },
-  { id:12, campaignId:3, name:'Pooja Reddy',    mobile:'9977889900', enrollmentStatus:'Pending',   enrollmentDate:'',           purchaseStatus:'Pending',        purchaseDate:'',           calls: EMPTY_CALLS.map(c => ({...c})) },
-  { id:13, campaignId:4, name:'Suresh Kumar',   mobile:'9988001122', enrollmentStatus:'Enrolled',  enrollmentDate:'20/04/2025', purchaseStatus:'Interested',     purchaseDate:'',           calls: EMPTY_CALLS.map(c => ({...c})) },
-  { id:14, campaignId:4, name:'Kavita Pillai',  mobile:'9899112233', enrollmentStatus:'Enrolled',  enrollmentDate:'21/04/2025', purchaseStatus:'Purchased',      purchaseDate:'28/04/2025', calls: EMPTY_CALLS.map(c => ({...c})) },
-  { id:15, campaignId:4, name:'Nikhil Bansal',  mobile:'9800223344', enrollmentStatus:'Pending',   enrollmentDate:'',           purchaseStatus:'Pending',        purchaseDate:'',           calls: EMPTY_CALLS.map(c => ({...c})) },
+  { id:1,  campaignId:1, name:'Aarav Sharma',   mobile:'9876543210', enrollmentStatus:'Enrolled',  enrollmentDate:'10/04/2025', purchaseStatus:'Purchased',      purchaseDate:'18/04/2025',
+    calls: calls([
+      { t:'2025-04-08T10:30', r:'Connected',       c:'Introduced Summer Health Drive benefits. Customer showed keen interest in the plan.' },
+      { t:'2025-04-10T14:00', r:'Connected',       c:'Explained premium slabs and sum insured options. Customer requested policy document.' },
+      { t:'2025-04-15T11:30', r:'Connected',       c:'Shared policy document via WhatsApp. Customer reviewed and agreed to proceed.' },
+      { t:'2025-04-17T16:00', r:'Connected',       c:'Confirmed purchase. Shared payment link. Payment received and policy issued.' },
+    ]) },
+
+  { id:2,  campaignId:1, name:'Priya Mehta',    mobile:'9812345678', enrollmentStatus:'Enrolled',  enrollmentDate:'11/04/2025', purchaseStatus:'Interested',     purchaseDate:'',
+    calls: calls([
+      { t:'2025-04-09T09:30', r:'Connected',       c:'Introduced campaign. Customer is interested but wants time to compare plans.' },
+      { t:'2025-04-11T15:00', r:'Connected',       c:'Sent brochure on WhatsApp. Customer comparing with existing policy.' },
+      { t:'2025-04-14T11:00', r:'Call Back Later', c:'Customer asked to call back after the weekend.' },
+    ]) },
+
+  { id:3,  campaignId:1, name:'Rohan Verma',    mobile:'9800112233', enrollmentStatus:'Pending',   enrollmentDate:'',           purchaseStatus:'Pending',        purchaseDate:'',
+    calls: calls([
+      { t:'2025-04-10T10:00', r:'No Answer',       c:'No response. Will retry tomorrow.' },
+      { t:'2025-04-11T12:30', r:'Busy',            c:'Line busy. Retry scheduled.' },
+    ]) },
+
+  { id:4,  campaignId:1, name:'Sneha Iyer',     mobile:'9898989898', enrollmentStatus:'Enrolled',  enrollmentDate:'12/04/2025', purchaseStatus:'Not Interested', purchaseDate:'',
+    calls: calls([
+      { t:'2025-04-10T09:00', r:'Connected',       c:'Introduced plan. Customer said she already has adequate coverage.' },
+      { t:'2025-04-12T14:30', r:'Connected',       c:'Followed up with better offer. Customer firmly not interested in switching.' },
+      { t:'2025-04-15T10:00', r:'Connected',       c:'Final follow-up. Customer declined and requested no further calls.' },
+    ]) },
+
+  { id:5,  campaignId:1, name:'Karan Patel',    mobile:'9090909090', enrollmentStatus:'Enrolled',  enrollmentDate:'13/04/2025', purchaseStatus:'Purchased',      purchaseDate:'20/04/2025',
+    calls: calls([
+      { t:'2025-04-11T11:00', r:'Connected',       c:'First call. Explained campaign offer and family floater benefits.' },
+      { t:'2025-04-13T15:30', r:'Connected',       c:'Customer enrolled. Discussed sum insured options for family of 4.' },
+      { t:'2025-04-18T10:00', r:'Connected',       c:'Customer finalised ₹10L family floater plan. Payment link shared.' },
+      { t:'2025-04-20T09:30', r:'Connected',       c:'Payment confirmed. Policy document shared. Customer satisfied.' },
+    ]) },
+
+  { id:6,  campaignId:2, name:'Divya Nair',     mobile:'9911223344', enrollmentStatus:'Enrolled',  enrollmentDate:'01/05/2025', purchaseStatus:'Purchased',      purchaseDate:'08/05/2025',
+    calls: calls([
+      { t:'2025-04-29T10:00', r:'Connected',       c:'Introduced Renewal Reminder campaign. Customer has existing policy due in May.' },
+      { t:'2025-05-01T14:30', r:'Connected',       c:'Customer confirmed renewal. Shared revised premium with loyalty discount.' },
+      { t:'2025-05-06T11:00', r:'Connected',       c:'Customer agreed to renew with enhanced SI. Sent payment link.' },
+      { t:'2025-05-08T09:00', r:'Connected',       c:'Payment received. Renewal policy issued. Customer confirmed receipt.' },
+    ]) },
+
+  { id:7,  campaignId:2, name:'Arjun Singh',    mobile:'9922334455', enrollmentStatus:'Enrolled',  enrollmentDate:'02/05/2025', purchaseStatus:'Interested',     purchaseDate:'',
+    calls: calls([
+      { t:'2025-04-30T09:30', r:'Connected',       c:'Renewal reminder call. Customer acknowledged renewal is due.' },
+      { t:'2025-05-02T16:00', r:'Connected',       c:'Customer interested in upgrading SI at renewal. Requested quote.' },
+      { t:'2025-05-06T14:00', r:'Call Back Later', c:'Customer travelling. Requested callback next week after return.' },
+    ]) },
+
+  { id:8,  campaignId:2, name:'Meera Joshi',    mobile:'9933445566', enrollmentStatus:'Pending',   enrollmentDate:'',           purchaseStatus:'Pending',        purchaseDate:'',
+    calls: calls([
+      { t:'2025-05-01T10:30', r:'No Answer',       c:'No response on first attempt.' },
+      { t:'2025-05-02T13:00', r:'Not Reachable',   c:'Number not reachable. Will retry in 2 days.' },
+    ]) },
+
+  { id:9,  campaignId:2, name:'Vikram Rao',     mobile:'9944556677', enrollmentStatus:'Enrolled',  enrollmentDate:'03/05/2025', purchaseStatus:'Purchased',      purchaseDate:'10/05/2025',
+    calls: calls([
+      { t:'2025-05-01T11:00', r:'Connected',       c:'Renewal call. Customer happy with existing policy and keen to renew.' },
+      { t:'2025-05-03T15:00', r:'Connected',       c:'Shared renewal quote. Customer asked for NCB details and confirmed.' },
+      { t:'2025-05-09T10:30', r:'Connected',       c:'Customer paid renewal premium. Policy renewed with 25% cumulative bonus.' },
+    ]) },
+
+  { id:10, campaignId:2, name:'Anjali Desai',   mobile:'9955667788', enrollmentStatus:'Enrolled',  enrollmentDate:'04/05/2025', purchaseStatus:'Not Interested', purchaseDate:'',
+    calls: calls([
+      { t:'2025-05-02T09:00', r:'Connected',       c:'Renewal reminder. Customer mentioned she switched to a different IC last month.' },
+      { t:'2025-05-04T14:00', r:'Connected',       c:'Offered retention discount. Customer declined and confirmed switching.' },
+    ]) },
+
+  { id:11, campaignId:3, name:'Rahul Gupta',    mobile:'9966778899', enrollmentStatus:'Enrolled',  enrollmentDate:'15/03/2025', purchaseStatus:'Purchased',      purchaseDate:'22/03/2025',
+    calls: calls([
+      { t:'2025-03-13T10:00', r:'Connected',       c:'Onboarding call. New customer referred by existing policyholder.' },
+      { t:'2025-03-15T14:30', r:'Connected',       c:'Completed KYC and health declaration. Customer enrolled.' },
+      { t:'2025-03-20T11:00', r:'Connected',       c:'Customer selected ₹5L individual plan. Payment link sent.' },
+      { t:'2025-03-22T09:30', r:'Connected',       c:'Payment received. Policy document emailed. Welcome call done.' },
+    ]) },
+
+  { id:12, campaignId:3, name:'Pooja Reddy',    mobile:'9977889900', enrollmentStatus:'Pending',   enrollmentDate:'',           purchaseStatus:'Pending',        purchaseDate:'',
+    calls: calls([
+      { t:'2025-03-14T10:30', r:'Busy',            c:'Line busy during first attempt.' },
+      { t:'2025-03-16T12:00', r:'No Answer',       c:'No answer. SMS sent with campaign details.' },
+    ]) },
+
+  { id:13, campaignId:4, name:'Suresh Kumar',   mobile:'9988001122', enrollmentStatus:'Enrolled',  enrollmentDate:'20/04/2025', purchaseStatus:'Interested',     purchaseDate:'',
+    calls: calls([
+      { t:'2025-04-18T09:30', r:'Connected',       c:'Introduced Motor Insurance Awareness campaign. Customer owns two vehicles.' },
+      { t:'2025-04-20T15:00', r:'Connected',       c:'Shared comprehensive motor plan details. Customer interested in comparing.' },
+      { t:'2025-04-24T11:30', r:'Call Back Later', c:'Customer said he will decide after getting competitor quotes. Callback in 5 days.' },
+    ]) },
+
+  { id:14, campaignId:4, name:'Kavita Pillai',  mobile:'9899112233', enrollmentStatus:'Enrolled',  enrollmentDate:'21/04/2025', purchaseStatus:'Purchased',      purchaseDate:'28/04/2025',
+    calls: calls([
+      { t:'2025-04-19T10:00', r:'Connected',       c:'Motor awareness call. Customer vehicle insurance expires next month.' },
+      { t:'2025-04-21T14:00', r:'Connected',       c:'Customer enrolled. Explained zero-dep and engine protect add-ons.' },
+      { t:'2025-04-25T11:00', r:'Connected',       c:'Customer selected comprehensive plan with zero-dep. Payment link sent.' },
+      { t:'2025-04-28T09:00', r:'Connected',       c:'Payment done. Policy certificate emailed. RC-linked policy confirmed.' },
+    ]) },
+
+  { id:15, campaignId:4, name:'Nikhil Bansal',  mobile:'9800223344', enrollmentStatus:'Pending',   enrollmentDate:'',           purchaseStatus:'Pending',        purchaseDate:'',
+    calls: calls([
+      { t:'2025-04-20T10:00', r:'Wrong Number',    c:'Number appears to be incorrect. Need to verify contact details.' },
+    ]) },
 ]
 
 const CURRENT_USER_ID = 1
