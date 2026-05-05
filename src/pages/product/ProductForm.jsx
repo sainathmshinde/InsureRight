@@ -350,7 +350,8 @@ export default function ProductForm({
         </div>
       </SectionBlock>
 
-      {/* ── 2. Configuration ─────────────────────── */}
+      {/* ── 2. Configuration (Health only) ───────── */}
+      {form.insuranceType === "Health" && (
       <SectionBlock icon="⚙️" title="Configuration">
         <Field label="Covered Members">
           <div
@@ -401,10 +402,31 @@ export default function ProductForm({
           </div>
         </Field>
       </SectionBlock>
+      )}
 
       {/* ── 3. Financial Details ──────────────────── */}
       <SectionBlock icon="💰" title="Financial Details">
-        {selectedMembers.length === 0 ? (
+        {form.insuranceType !== "Health" ? (
+          <div className="form-grid">
+            <Field label="Base Premium (₹)" required>
+              <Input type="number" min="0" placeholder="e.g. 8500" value={form.basePremium} onChange={setPremium("basePremium")} required />
+            </Field>
+            <Field label="GST %" required>
+              <Select value={form.gstPercent} onChange={setPremium("gstPercent")} required>
+                <option value="0">0%</option>
+                <option value="5">5%</option>
+                <option value="12">12%</option>
+                <option value="18">18%</option>
+              </Select>
+            </Field>
+            <Field label="Total Premium (₹) — auto calculated">
+              <Input value={form.totalPremium} readOnly disabled placeholder="Auto-calculated" />
+            </Field>
+            <Field label="Sum Insured Options" required>
+              <Input placeholder="e.g. 3L, 5L, 10L, 15L, 25L, 50L" value={form.sumInsuredOptions} onChange={set("sumInsuredOptions")} required />
+            </Field>
+          </div>
+        ) : selectedMembers.length === 0 ? (
           <p style={{ fontSize: 13, color: "var(--text-3)", margin: 0 }}>
             Select covered members in the Configuration section to build the
             premium table.
