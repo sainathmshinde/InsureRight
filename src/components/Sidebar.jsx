@@ -4,6 +4,7 @@ import {
   AgentIcon,
   BrokerIcon,
   CampaignIcon,
+  CRMIcon,
   CustomerIcon,
   InsuranceCompanyIcon,
   ProductIcon,
@@ -64,6 +65,14 @@ const NAV = [
     children: [
       { label: "All Campaigns", path: "/campaign" },
       { label: "Add Campaign",  path: "/campaign/create" },
+    ],
+  },
+  {
+    key: "crm",
+    label: "CRM",
+    icon: CRMIcon,
+    children: [
+      { label: "CRM", path: "/crm" },
     ],
   },
   {

@@ -39,6 +39,9 @@ import ProductEdit from "./pages/product/ProductEdit";
 import PolicyList from "./pages/policy/PolicyList";
 import BuyPolicy from "./pages/policy/BuyPolicy";
 
+// CRM pages
+import CrmPage from "./pages/crm/CrmPage";
+
 export default function App() {
   return (
     <BrowserRouter>
@@ -92,6 +95,11 @@ export default function App() {
             <Route index element={<CampaignList />} />
             <Route path="create" element={<CampaignCreate />} />
             <Route path=":id/edit" element={<CampaignEdit />} />
+          </Route>
+
+          {/* ── CRM ── */}
+          <Route path="crm">
+            <Route index element={<CrmPage />} />
           </Route>
 
           {/* ── POLICY ── */}
