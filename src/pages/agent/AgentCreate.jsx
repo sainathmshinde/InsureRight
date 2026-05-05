@@ -7,6 +7,7 @@ import {
   UploadBox,
   SectionBlock,
 } from "../../components/Field";
+import { AgentIcon } from "../../icons";
 
 const INITIAL = {
   // Basic
@@ -67,7 +68,7 @@ export default function AgentCreate() {
       <div className="card">
         <div className="card-body">
           <form onSubmit={handleSubmit}>
-            <SectionBlock icon=<AgentIcon /> title="Basic Information">
+            <SectionBlock icon={<AgentIcon />} title="Basic Information">
               <div className="form-grid">
                 <Field label="Full Name" required>
                   <Input

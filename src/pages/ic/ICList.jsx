@@ -4,18 +4,16 @@ import Pagination from '../../components/Pagination'
 import usePagination from '../../components/usePagination'
 import { Table, PageHeader, StatusBadge, Button, EmptyState } from '../../components/UI'
 import { InsuranceCompanyIcon } from '../../icons'
+import { ICS } from './icData'
 
-const MOCK = [
-  { id: 1, name: 'Star Health Insurance',  code: 'SHI', contact: 'Ravi Sharma',   email: 'api@starhealth.in',         status: 'Active'   },
-  { id: 2, name: 'HDFC ERGO',              code: 'HER', contact: 'Neha Joshi',    email: 'api@hdfcergo.com',          status: 'Active'   },
-  { id: 3, name: 'ICICI Lombard',          code: 'ICL', contact: 'Amit Patel',    email: 'api@icicilombard.com',      status: 'Active'   },
-  { id: 4, name: 'Bajaj Allianz',          code: 'BAJ', contact: 'Sunita Rao',    email: 'api@bajajallianz.com',      status: 'Inactive' },
-  { id: 5, name: 'New India Assurance',    code: 'NIA', contact: 'Prakash Mehta', email: 'api@newindia.co.in',        status: 'Active'   },
-  { id: 6, name: 'United India Insurance', code: 'UII', contact: 'Rekha Nair',    email: 'api@uiic.co.in',            status: 'Active'   },
-  { id: 7, name: 'Reliance General',       code: 'RGI', contact: 'Suresh Kumar',  email: 'api@reliancegeneral.in',    status: 'Active'   },
-  { id: 8, name: 'Tata AIG',               code: 'TAI', contact: 'Aarti Singh',   email: 'api@tataaig.com',           status: 'Inactive' },
-  { id: 9, name: 'Oriental Insurance',     code: 'OIC', contact: 'Vijay Sharma',  email: 'api@orientalinsurance.in',  status: 'Active'   },
-]
+const MOCK = ICS.map(ic => ({
+  id:      ic.id,
+  name:    ic.icName,
+  code:    ic.code,
+  contact: ic.contactPerson,
+  email:   ic.email,
+  status:  ic.status,
+}))
 
 export default function ICList() {
   const navigate = useNavigate()

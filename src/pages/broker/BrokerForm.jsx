@@ -42,10 +42,10 @@ export default function BrokerForm({ form, set, setFile, onSubmit, onCancel, sub
             <Input placeholder="XXXX XXXX XXXX" value={form.aadhaarNumber} onChange={set('aadhaarNumber')} required />
           </Field>
           <Field label="Upload PAN">
-            <UploadBox label="Upload PAN card" hint="JPG, PNG or PDF" onChange={setFile('panFile')} />
+            <UploadBox label="Upload PAN card" hint="JPG, PNG or PDF" value={form.panFile} onChange={setFile('panFile')} />
           </Field>
           <Field label="Upload Aadhaar">
-            <UploadBox label="Upload Aadhaar card" hint="JPG, PNG or PDF" onChange={setFile('aadhaarFile')} />
+            <UploadBox label="Upload Aadhaar card" hint="JPG, PNG or PDF" value={form.aadhaarFile} onChange={setFile('aadhaarFile')} />
           </Field>
           <Field label="KYC Status" required>
             <Select value={form.kycStatus} onChange={set('kycStatus')}>
@@ -92,7 +92,7 @@ export default function BrokerForm({ form, set, setFile, onSubmit, onCancel, sub
           <Field label="State" required>
             <Select value={form.state} onChange={set('state')} required>
               <option value="">Select state</option>
-              {['Maharashtra','Delhi','Karnataka','Tamil Nadu','Gujarat','Rajasthan','Uttar Pradesh','West Bengal'].map(s => (
+              {['Maharashtra','Delhi','Karnataka','Tamil Nadu','Gujarat','Rajasthan','Uttar Pradesh','West Bengal','Telangana','Kerala'].map(s => (
                 <option key={s}>{s}</option>
               ))}
             </Select>
@@ -119,7 +119,7 @@ export default function BrokerForm({ form, set, setFile, onSubmit, onCancel, sub
             <Input placeholder="HDFC0001234" value={form.ifscCode} onChange={set('ifscCode')} required />
           </Field>
           <Field label="Cancelled Cheque">
-            <UploadBox label="Upload cancelled cheque" hint="JPG, PNG or PDF" onChange={setFile('cancelledCheque')} />
+            <UploadBox label="Upload cancelled cheque" hint="JPG, PNG or PDF" value={form.cancelledCheque} onChange={setFile('cancelledCheque')} />
           </Field>
         </div>
       </SectionBlock>
@@ -128,7 +128,7 @@ export default function BrokerForm({ form, set, setFile, onSubmit, onCancel, sub
       <SectionBlock icon="📄" title="Agreement & Compliance">
         <div className="form-grid">
           <Field label="Agreement Upload">
-            <UploadBox label="Upload agreement (PDF)" hint="PDF only" onChange={setFile('agreementFile')} />
+            <UploadBox label="Upload agreement (PDF)" hint="PDF only" value={form.agreementFile} onChange={setFile('agreementFile')} />
           </Field>
           <Field label="Compliance Notes">
             <Textarea placeholder="Enter compliance notes..." value={form.complianceNotes} onChange={set('complianceNotes')} />

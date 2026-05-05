@@ -7,31 +7,13 @@ import {
   UploadBox,
   SectionBlock,
 } from "../../components/Field";
-
-const MOCK_DATA = {
-  1: {
-    name: "Ravi Kulkarni",
-    mobile: "9876543210",
-    email: "ravi@email.com",
-    dob: "1990-05-15",
-    gender: "Male",
-    pan: "ABCDE1234F",
-    aadhaar: "1234 5678 9012",
-    posLicense: "POS-2023-001",
-    qualification: "Graduate",
-    experience: "4",
-    accountNumber: "50100XXXXXX",
-    ifsc: "HDFC0001234",
-    assignedBroker: "Mehta Insurance",
-    reportingManager: "Sunil Mehta",
-    status: "Active",
-  },
-};
+import { AgentIcon } from "../../icons";
+import { AGENT_MAP } from "./agentData";
 
 export default function AgentEdit() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const [form, setForm] = useState(MOCK_DATA[id] ?? {});
+  const [form, setForm] = useState(AGENT_MAP[Number(id)] ?? {});
   const set = (f) => (e) => setForm((p) => ({ ...p, [f]: e.target.value }));
   const setF = (f) => (e) =>
     setForm((p) => ({ ...p, [f]: e.target.files[0] ?? null }));
@@ -62,7 +44,7 @@ export default function AgentEdit() {
       <div className="card">
         <div className="card-body">
           <form onSubmit={handleSubmit}>
-            <SectionBlock icon=<AgentIcon /> title="Basic Information">
+            <SectionBlock icon={<AgentIcon />} title="Basic Information">
               <div className="form-grid">
                 <Field label="Full Name" required>
                   <Input
@@ -121,18 +103,28 @@ export default function AgentEdit() {
                     required
                   />
                 </Field>
-                <Field label="Re-upload PAN">
+                <Field label="PAN Document">
                   <UploadBox
                     label="Upload PAN card"
                     hint="JPG, PNG or PDF"
+                    value={form.panFile}
                     onChange={setF("panFile")}
                   />
                 </Field>
-                <Field label="Re-upload Aadhaar">
+                <Field label="Aadhaar Document">
                   <UploadBox
                     label="Upload Aadhaar"
                     hint="JPG, PNG or PDF"
+                    value={form.aadhaarFile}
                     onChange={setF("aadhaarFile")}
+                  />
+                </Field>
+                <Field label="Photo">
+                  <UploadBox
+                    label="Upload passport photo"
+                    hint="JPG or PNG, max 2MB"
+                    value={form.photo}
+                    onChange={setF("photo")}
                   />
                 </Field>
               </div>
@@ -201,6 +193,10 @@ export default function AgentEdit() {
                     <option>Priya Brokers</option>
                     <option>AK Associates</option>
                     <option>Shah Financial</option>
+                    <option>Nair & Co.</option>
+                    <option>Joshi Brokers</option>
+                    <option>Rao & Partners</option>
+                    <option>Pillai Associates</option>
                   </Select>
                 </Field>
                 <Field label="Reporting Manager">

@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Document Preview</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:Arial,sans-serif;background:#d0d0d0;min-height:100vh;display:flex;justify-content:center;align-items:flex-start;padding:28px}
+
+/* ── PAN CARD ─────────────────────────────────────── */
+.pan-card{width:360px;background:linear-gradient(140deg,#f9e4b0,#e9c96a,#f5d98a);border-radius:14px;padding:20px 22px;box-shadow:0 6px 28px rgba(0,0,0,.25);border:1.5px solid #c9a84c}
+.pan-header{display:flex;align-items:center;gap:10px;margin-bottom:14px}
+.pan-emblem{width:44px;height:44px;background:#00296b;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#ffd700;font-size:11px;font-weight:900;text-align:center;line-height:1.2;padding:4px}
+.pan-titles{flex:1}
+.pan-title1{font-size:10px;color:#00296b;font-weight:900;letter-spacing:.5px}
+.pan-title2{font-size:9px;color:#333;letter-spacing:.3px}
+.pan-body{display:flex;gap:12px;align-items:flex-start}
+.pan-photo{width:64px;height:80px;border:1.5px solid #999;background:#e8e8e8;display:flex;align-items:center;justify-content:center;font-size:28px;border-radius:4px;flex-shrink:0;color:#555}
+.pan-details{flex:1}
+.pan-number{font-size:20px;letter-spacing:3px;color:#00296b;font-weight:900;margin-bottom:10px;font-family:monospace}
+.pan-field{margin-bottom:6px}
+.pan-field label{font-size:8px;color:#555;text-transform:uppercase;letter-spacing:.6px;display:block}
+.pan-field span{font-size:13px;color:#111;font-weight:700}
+.pan-footer{display:flex;justify-content:space-between;align-items:flex-end;margin-top:14px;border-top:1px solid #c9a84c;padding-top:10px}
+.pan-sign{font-size:9px;color:#555;border-top:1px solid #999;padding-top:4px}
+.pan-it{font-size:9px;color:#00296b;font-weight:700;text-align:right}
+
+/* ── AADHAAR CARD ──────────────────────────────────── */
+.aadh-card{width:380px}
+.aadh-front{background:linear-gradient(135deg,#1a56a0,#0a3372);border-radius:14px;padding:18px 20px;color:#fff;box-shadow:0 6px 28px rgba(0,0,0,.3)}
+.aadh-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}
+.aadh-brand{font-size:24px;font-weight:900;font-style:italic;letter-spacing:1px}
+.aadh-brand-hindi{font-size:11px;opacity:.8;margin-top:1px}
+.aadh-govt{text-align:right;font-size:9px;opacity:.75;line-height:1.6}
+.aadh-body{display:flex;gap:14px;align-items:flex-start}
+.aadh-photo{width:72px;height:88px;background:rgba(255,255,255,.18);border:2px solid rgba(255,255,255,.4);border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:36px;flex-shrink:0}
+.aadh-info{flex:1;padding-top:4px}
+.aadh-name{font-size:18px;font-weight:700;margin-bottom:5px}
+.aadh-row{font-size:12px;opacity:.85;margin-bottom:3px}
+.aadh-num{font-size:24px;font-weight:900;letter-spacing:5px;text-align:center;margin-top:14px;background:rgba(255,255,255,.12);padding:8px 12px;border-radius:8px;font-family:monospace}
+.aadh-bars{height:30px;background:repeating-linear-gradient(90deg,#fff 0,#fff 2px,transparent 2px,transparent 5px);border-radius:3px;margin-top:10px;opacity:.5}
+.aadh-qr{display:inline-block;width:48px;height:48px;background:repeating-conic-gradient(#fff 0% 25%,transparent 0% 50%) 0 0/8px 8px;float:right;margin-top:-40px;opacity:.7}
+
+/* ── CANCELLED CHEQUE ──────────────────────────────── */
+.cheque{width:500px;background:#fff;border:2px solid #bbb;border-radius:10px;overflow:hidden;box-shadow:0 6px 28px rgba(0,0,0,.15)}
+.cheque-top{background:linear-gradient(90deg,#00296b,#1565c0);padding:14px 20px;color:#fff;display:flex;justify-content:space-between;align-items:center}
+.cheque-bank-name{font-size:18px;font-weight:900;letter-spacing:.5px}
+.cheque-branch{font-size:10px;opacity:.8;margin-top:2px}
+.cheque-date-box{text-align:right;font-size:11px}
+.cheque-body{padding:18px 20px}
+.cheque-row{display:flex;gap:8px;margin:9px 0;align-items:flex-end}
+.c-lbl{font-size:11px;color:#555;white-space:nowrap}
+.c-line{flex:1;border-bottom:1px solid #444;padding-bottom:2px;font-size:13px;font-weight:600;color:#111}
+.cheque-amount{border:2px solid #333;padding:5px 14px;font-size:16px;font-weight:900;font-family:monospace;margin-left:8px;min-width:80px;text-align:center}
+.cheque-stamp{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%) rotate(-18deg);font-size:40px;font-weight:900;color:rgba(200,0,0,.15);letter-spacing:6px;border:5px solid rgba(200,0,0,.15);padding:4px 14px;border-radius:4px;pointer-events:none}
+.cheque-sig-row{display:flex;justify-content:space-between;align-items:flex-end;margin-top:18px}
+.c-sig{font-size:10px;color:#666;border-top:1px solid #999;padding-top:4px;width:160px;text-align:center}
+.cheque-micr{background:#f2f2f2;padding:10px 20px;border-top:1px dashed #ccc;font-family:'Courier New',monospace;font-size:12px;color:#333;display:flex;justify-content:space-between}
+.cheque-rel{position:relative}
+
+/* ── AGREEMENT ─────────────────────────────────────── */
+.agreement{width:595px;background:#fff;padding:52px 64px;box-shadow:0 6px 28px rgba(0,0,0,.15);min-height:842px}
+.ag-header{text-align:center;padding-bottom:18px;margin-bottom:22px;border-bottom:3px double #00296b}
+.ag-logo{font-size:24px;font-weight:900;color:#00296b;letter-spacing:2px}
+.ag-tagline{font-size:10px;color:#666;margin-top:3px;letter-spacing:.5px}
+.ag-title{font-size:16px;font-weight:900;text-align:center;color:#00296b;margin:18px 0 8px;text-transform:uppercase;letter-spacing:1.5px}
+.ag-period{text-align:center;margin-bottom:22px}
+.ag-badge{display:inline-block;background:#e8f0fe;color:#1a56a0;font-size:11px;padding:4px 14px;border-radius:12px;border:1px solid #b3c9f5;font-weight:600}
+.ag-body{font-size:12px;line-height:1.9;color:#333}
+.ag-para{margin-bottom:14px;text-align:justify}
+.ag-clause{margin:16px 0 8px;font-weight:700;font-size:12.5px;color:#00296b}
+.ag-sigs{display:flex;justify-content:space-between;margin-top:52px}
+.ag-sig{width:44%}
+.ag-sig-line{border-top:1px solid #444;margin-bottom:5px}
+.ag-sig-lbl{font-size:11px;color:#555;line-height:1.7}
+.ag-watermark{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%) rotate(-35deg);font-size:56px;font-weight:900;color:rgba(0,41,107,.04);pointer-events:none;white-space:nowrap}
+.ag-rel{position:relative}
+
+/* ── PHOTO ─────────────────────────────────────────── */
+.photo-box{background:#fff;padding:28px;border-radius:10px;box-shadow:0 6px 28px rgba(0,0,0,.15);text-align:center;width:220px}
+.photo-img{width:160px;height:196px;background:linear-gradient(135deg,#e0e0e0,#c0c0c0);border:2.5px solid #aaa;display:flex;align-items:center;justify-content:center;font-size:72px;margin:0 auto 14px;color:#666}
+.photo-name{font-size:14px;font-weight:700;color:#222}
+.photo-sub{font-size:11px;color:#888;margin-top:4px}
+.photo-spec{font-size:9px;color:#bbb;margin-top:8px;border-top:1px dashed #e0e0e0;padding-top:8px}
+</style>
+</head>
+<body>
+<script>
+const q = new URLSearchParams(location.search);
+const type    = q.get('type')    || 'pan';
+const name    = q.get('name')    || 'Sample Name';
+const number  = q.get('number')  || 'XXXXX0000X';
+const dob     = q.get('dob')     || '01/01/1985';
+const gender  = q.get('gender')  || 'Male';
+const bank    = q.get('bank')    || 'Sample Bank';
+const account = q.get('account') || '00000000000000';
+const ifsc    = q.get('ifsc')    || 'SAMP0001234';
+const company = q.get('company') || 'Sample Company';
+const start   = q.get('start')   || '2023-01-01';
+const end     = q.get('end')     || '2025-12-31';
+const init    = name.charAt(0).toUpperCase();
+const masked  = number.replace(/\d(?=.{4})/g,'X');
+
+function fmtDate(d){
+  try{ return new Date(d).toLocaleDateString('en-IN',{day:'2-digit',month:'long',year:'numeric'}); }
+  catch(e){ return d; }
+}
+
+const today = new Date().toLocaleDateString('en-IN');
+
+const html = {
+  pan:`
+    <div class="pan-card">
+      <div class="pan-header">
+        <div class="pan-emblem">INCOME<br>TAX</div>
+        <div class="pan-titles">
+          <div class="pan-title1">INCOME TAX DEPARTMENT · GOVT. OF INDIA</div>
+          <div class="pan-title2">Permanent Account Number Card</div>
+        </div>
+      </div>
+      <div class="pan-body">
+        <div class="pan-photo">${init}</div>
+        <div class="pan-details">
+          <div class="pan-number">${number}</div>
+          <div class="pan-field"><label>Name</label><span>${name.toUpperCase()}</span></div>
+          <div class="pan-field"><label>Date of Birth</label><span>${dob}</span></div>
+        </div>
+      </div>
+      <div class="pan-footer">
+        <div class="pan-sign">Signature / Thumb Impression</div>
+        <div class="pan-it">INCOME TAX INDIA</div>
+      </div>
+    </div>`,
+
+  aadhaar:`
+    <div class="aadh-card">
+      <div class="aadh-front">
+        <div class="aadh-top">
+          <div>
+            <div class="aadh-brand">आधार  AADHAAR</div>
+            <div class="aadh-brand-hindi">मेरा आधार, मेरी पहचान</div>
+          </div>
+          <div class="aadh-govt">Government of India<br>Unique Identification<br>Authority of India</div>
+        </div>
+        <div class="aadh-body">
+          <div class="aadh-photo">${init}</div>
+          <div class="aadh-info">
+            <div class="aadh-name">${name}</div>
+            <div class="aadh-row">DOB: ${dob}</div>
+            <div class="aadh-row">Gender: ${gender}</div>
+          </div>
+        </div>
+        <div class="aadh-num">${masked}</div>
+        <div class="aadh-bars"></div>
+      </div>
+    </div>`,
+
+  cheque:`
+    <div class="cheque">
+      <div class="cheque-top">
+        <div>
+          <div class="cheque-bank-name">${bank}</div>
+          <div class="cheque-branch">Main Branch &nbsp;|&nbsp; IFSC: ${ifsc}</div>
+        </div>
+        <div class="cheque-date-box">Date<br><strong>${today}</strong></div>
+      </div>
+      <div class="cheque-body cheque-rel">
+        <div class="cheque-row">
+          <span class="c-lbl">Pay to</span>
+          <span class="c-line">${name}</span>
+        </div>
+        <div class="cheque-row">
+          <span class="c-lbl">Rupees (in words)</span>
+          <span class="c-line">CANCELLED</span>
+          <span class="cheque-amount">₹ ——</span>
+        </div>
+        <div class="cheque-stamp">CANCELLED</div>
+        <div class="cheque-sig-row">
+          <div style="font-size:11px;color:#555">A/c No: <strong style="font-family:monospace">${account}</strong></div>
+          <div class="c-sig">Authorised Signatory</div>
+        </div>
+      </div>
+      <div class="cheque-micr">
+        <span>⑆ ${account.replace(/\D/g,'').padEnd(12,'0').slice(0,12)} ⑆</span>
+        <span>⑆ ${ifsc} ⑆</span>
+        <span>⑆ 001 ⑆</span>
+      </div>
+    </div>`,
+
+  agreement:`
+    <div class="agreement ag-rel">
+      <div class="ag-watermark">INSURE RIGHT</div>
+      <div class="ag-header">
+        <div class="ag-logo">INSURE RIGHT</div>
+        <div class="ag-tagline">Insurance Broking Services · IRDAI Registered</div>
+      </div>
+      <div class="ag-title">Broker Commission Agreement</div>
+      <div class="ag-period"><span class="ag-badge">Agreement Period: ${fmtDate(start)} – ${fmtDate(end)}</span></div>
+      <div class="ag-body">
+        <p class="ag-para">This Agreement is entered into between <strong>Insure Right Insurance Broking Pvt. Ltd.</strong> (hereinafter "the Company") and <strong>${name}</strong>, operating as <strong>${company}</strong> (hereinafter "the Broker"), effective from <strong>${fmtDate(start)}</strong>.</p>
+        <div class="ag-clause">1. Scope of Services</div>
+        <p class="ag-para">The Broker agrees to solicit and procure insurance business on behalf of the Company in strict accordance with the IRDAI regulations and guidelines in force from time to time.</p>
+        <div class="ag-clause">2. Commission Structure</div>
+        <p class="ag-para">The Company shall pay commission at rates mutually agreed and as per IRDAI approved tariffs. All commissions shall be settled within 30 days of premium receipt confirmation.</p>
+        <div class="ag-clause">3. Compliance & KYC</div>
+        <p class="ag-para">The Broker shall maintain a valid IRDAI license throughout the term of this agreement and ensure all KYC norms are complied with for each policyholder. Any lapse must be reported within 7 working days.</p>
+        <div class="ag-clause">4. Confidentiality</div>
+        <p class="ag-para">Both parties agree to maintain strict confidentiality of customer data and proprietary business information shared during the course of this agreement, surviving termination for 3 years.</p>
+        <div class="ag-clause">5. Termination</div>
+        <p class="ag-para">Either party may terminate this agreement with 30 days written notice. The Company reserves the right to terminate immediately upon any regulatory violation or material breach.</p>
+      </div>
+      <div class="ag-sigs">
+        <div class="ag-sig">
+          <div class="ag-sig-line"></div>
+          <div class="ag-sig-lbl"><strong>${name}</strong><br>${company}<br><span style="color:#888">Broker / Authorised Signatory</span></div>
+        </div>
+        <div class="ag-sig">
+          <div class="ag-sig-line"></div>
+          <div class="ag-sig-lbl"><strong>Authorised Signatory</strong><br>Insure Right Insurance Broking Pvt. Ltd.<br><span style="color:#888">CIN: U66010MH2020PTC345678</span></div>
+        </div>
+      </div>
+    </div>`,
+
+  photo:`
+    <div class="photo-box">
+      <div class="photo-img">${init}</div>
+      <div class="photo-name">${name}</div>
+      <div class="photo-sub">Passport Size Photograph</div>
+      <div class="photo-spec">35 mm × 45 mm &nbsp;|&nbsp; White Background<br>Recent • Colour • Front-facing</div>
+    </div>`
+};
+
+document.body.innerHTML = html[type] || html.pan;
+</script>
+</body>
+</html>

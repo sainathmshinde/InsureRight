@@ -1,18 +1,6 @@
 import { useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
-
-const MOCK_DATA = {
-  1: {
-    brokerName: 'Rahul Mehta', companyName: 'Mehta Insurance', brokerType: 'Individual',
-    licenseNumber: 'IRDAI-2023-001', licenseValidity: '2026-12-31', gstNumber: '27ABCDE1234F1Z5',
-    panNumber: 'ABCDE1234F', aadhaarNumber: '1234 5678 9012', kycStatus: 'Verified',
-    email: 'rahul@mehtains.com', mobile: '+91 98765 43210', alternateContact: '+91 87654 32109', website: 'https://mehtains.com',
-    registeredAddress: '201, Mehta House, Andheri West', communicationAddress: '201, Mehta House, Andheri West',
-    city: 'Mumbai', state: 'Maharashtra', pincode: '400058',
-    accountHolder: 'Rahul Mehta', bankName: 'HDFC Bank', accountNumber: '50100XXXXXXXXXX', ifscCode: 'HDFC0001234',
-    agreementStart: '2023-01-01', agreementEnd: '2025-12-31', complianceNotes: 'All documents verified.', status: 'Active',
-  },
-}
+import { BROKER_MAP } from './brokerData'
 
 const tabs = ['Basic Info', 'KYC', 'Contact & Address', 'Bank Details', 'Agreement']
 
@@ -29,7 +17,7 @@ export default function BrokerView() {
   const { id } = useParams()
   const navigate = useNavigate()
   const [tab, setTab] = useState(0)
-  const b = MOCK_DATA[id]
+  const b = BROKER_MAP[Number(id)]
 
   if (!b) return (
     <div className="empty-state">

@@ -4,21 +4,17 @@ import Pagination from '../../components/Pagination'
 import usePagination from '../../components/usePagination'
 import { Table, PageHeader, StatusBadge, KYCBadge, Button, EmptyState } from '../../components/UI'
 import { BrokerIcon } from '../../icons'
+import { BROKERS } from './brokerData'
 
-const MOCK = [
-  { id: 1,  name: 'Rahul Mehta',   company: 'Mehta Insurance',    type: 'Individual', license: 'IRDAI-2023-001', status: 'Active',   kyc: 'Verified' },
-  { id: 2,  name: 'Priya Brokers', company: 'Priya Brokers Pvt',  type: 'Corporate',  license: 'IRDAI-2023-045', status: 'Active',   kyc: 'Verified' },
-  { id: 3,  name: 'Anil Kumar',    company: 'AK Associates',       type: 'Individual', license: 'IRDAI-2022-112', status: 'Inactive', kyc: 'Pending'  },
-  { id: 4,  name: 'Sunita Shah',   company: 'Shah Financial',      type: 'Corporate',  license: 'IRDAI-2023-078', status: 'Active',   kyc: 'Verified' },
-  { id: 5,  name: 'Vikram Nair',   company: 'Nair & Co.',          type: 'Individual', license: 'IRDAI-2023-091', status: 'Active',   kyc: 'Verified' },
-  { id: 6,  name: 'Deepa Joshi',   company: 'Joshi Brokers',       type: 'Corporate',  license: 'IRDAI-2022-055', status: 'Active',   kyc: 'Verified' },
-  { id: 7,  name: 'Ramesh Gupta',  company: 'Gupta Insure',        type: 'Individual', license: 'IRDAI-2021-200', status: 'Inactive', kyc: 'Rejected' },
-  { id: 8,  name: 'Kavita Rao',    company: 'Rao & Partners',      type: 'Corporate',  license: 'IRDAI-2023-033', status: 'Active',   kyc: 'Verified' },
-  { id: 9,  name: 'Suresh Pillai', company: 'Pillai Associates',   type: 'Individual', license: 'IRDAI-2022-178', status: 'Active',   kyc: 'Pending'  },
-  { id: 10, name: 'Meena Agarwal', company: 'Agarwal Finance',     type: 'Corporate',  license: 'IRDAI-2023-060', status: 'Active',   kyc: 'Verified' },
-  { id: 11, name: 'Arjun Tiwari',  company: 'Tiwari Brokerage',    type: 'Individual', license: 'IRDAI-2023-112', status: 'Active',   kyc: 'Verified' },
-  { id: 12, name: 'Pooja Iyer',    company: 'Iyer Insurance',      type: 'Corporate',  license: 'IRDAI-2022-099', status: 'Inactive', kyc: 'Pending'  },
-]
+const MOCK = BROKERS.map(b => ({
+  id:      b.id,
+  name:    b.brokerName,
+  company: b.companyName,
+  type:    b.brokerType,
+  license: b.licenseNumber,
+  status:  b.status,
+  kyc:     b.kycStatus,
+}))
 
 export default function BrokerList() {
   const navigate = useNavigate()

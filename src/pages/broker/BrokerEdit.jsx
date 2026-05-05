@@ -1,16 +1,12 @@
 import { useNavigate, useParams } from 'react-router-dom'
 import { useBrokerForm, INITIAL } from './useBrokerForm'
 import BrokerForm from './BrokerForm'
-
-// Simulated fetch by ID — replace with real API call
-const MOCK_DATA = {
-  1: { ...INITIAL, brokerName: 'Rahul Mehta', companyName: 'Mehta Insurance', brokerType: 'Individual', licenseNumber: 'IRDAI-2023-001', email: 'rahul@mehtains.com', mobile: '+91 98765 43210', city: 'Mumbai', state: 'Maharashtra', pincode: '400001', kycStatus: 'Verified', status: 'Active' },
-}
+import { BROKER_MAP } from './brokerData'
 
 export default function BrokerEdit() {
   const { id } = useParams()
   const navigate = useNavigate()
-  const existing = MOCK_DATA[id] ?? INITIAL
+  const existing = BROKER_MAP[Number(id)] ?? INITIAL
   const { form, set, setFile } = useBrokerForm(existing)
 
   const handleSubmit = (e) => {

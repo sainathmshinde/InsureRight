@@ -1,16 +1,12 @@
 import { useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { Field, Input, Select, SectionBlock } from '../../components/Field'
-
-const MOCK_DATA = {
-  1: { icName: 'Star Health Insurance', code: 'SHI', contactPerson: 'Ravi Sharma', email: 'api@starhealth.in', phone: '+91 98765 43210', apiBaseUrl: 'https://api.starhealth.in/v1', apiKey: 'sk_live_abc123', apiSecret: 'secret_xyz789', status: 'Active' },
-  2: { icName: 'HDFC ERGO', code: 'HER', contactPerson: 'Neha Joshi', email: 'api@hdfcergo.com', phone: '+91 99887 65432', apiBaseUrl: 'https://api.hdfcergo.com/v2', apiKey: 'sk_live_def456', apiSecret: 'secret_uvw321', status: 'Active' },
-}
+import { IC_MAP } from './icData'
 
 export default function ICEdit() {
   const { id } = useParams()
   const navigate = useNavigate()
-  const [form, setForm] = useState(MOCK_DATA[id] ?? {})
+  const [form, setForm] = useState(IC_MAP[Number(id)] ?? {})
   const set = f => e => setForm(p => ({ ...p, [f]: e.target.value }))
 
   const handleSubmit = e => {
