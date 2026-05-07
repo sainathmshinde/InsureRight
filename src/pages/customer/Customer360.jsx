@@ -1,11 +1,22 @@
 import { useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
+import { TYPE_ICON } from './FamilyMembersSection'
+
+function calcAge(dob) {
+  if (!dob) return null
+  return Math.floor((Date.now() - new Date(dob)) / (365.25 * 24 * 3600 * 1000))
+}
 
 const MOCK = {
   1: {
     name: 'Anita Desai', mobile: '9876543210', email: 'anita@gmail.com',
     dob: '1985-04-12', gender: 'Female', city: 'Mumbai', state: 'Maharashtra',
     kyc: 'Verified',
+    familyMembers: [
+      { id: 1, type: 'Spouse',   name: 'Ravi Desai',  dob: '1982-06-15', gender: 'Male',   preExisting: '' },
+      { id: 2, type: 'Son',      name: 'Aarav Desai', dob: '2010-03-20', gender: 'Male',   preExisting: '' },
+      { id: 3, type: 'Daughter', name: 'Piya Desai',  dob: '2013-08-05', gender: 'Female', preExisting: 'Asthma' },
+    ],
     policies: [
       { id: 'POL-2024-001', type: 'Health',  ic: 'Star Health', premium: 12500, status: 'Active',  expiry: '2025-03-31' },
       { id: 'POL-2023-088', type: 'Motor',   ic: 'HDFC ERGO',   premium: 8200,  status: 'Expired', expiry: '2024-01-15' },
@@ -22,7 +33,7 @@ const MOCK = {
   },
 }
 
-const TABS = ['Policies', 'Payments', 'Interactions']
+const TABS = ['Policies', 'Payments', 'Interactions', 'Family']
 
 export default function Customer360() {
   const { id } = useParams()
@@ -146,6 +157,34 @@ export default function Customer360() {
                   </div>
                 </div>
               ))}
+            </div>
+          )}
+
+          {/* Family Members */}
+          {tab === 3 && (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+              {c.familyMembers?.length > 0 ? c.familyMembers.map(m => {
+                const age = calcAge(m.dob)
+                return (
+                  <div key={m.id} style={{ display: 'flex', alignItems: 'center', gap: 14, padding: '12px 16px', border: '1px solid var(--border)', borderRadius: 'var(--r-md)', background: '#fff' }}>
+                    <div style={{ width: 42, height: 42, display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#f5f3ff', borderRadius: 10, fontSize: 22, flexShrink: 0 }}>
+                      {TYPE_ICON[m.type] ?? '👤'}
+                    </div>
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <div style={{ fontWeight: 600, fontSize: 13.5, color: 'var(--text)' }}>{m.name}</div>
+                      <div style={{ fontSize: 12, color: 'var(--text-3)', marginTop: 2 }}>
+                        {m.type}{m.gender ? ` · ${m.gender}` : ''}{age !== null ? ` · Age: ${age} yrs` : ''}{m.dob ? ` (${m.dob})` : ''}
+                        {m.preExisting ? <span style={{ color: '#d97706', marginLeft: 6 }}>⚠ {m.preExisting}</span> : null}
+                      </div>
+                    </div>
+                    <span className="badge badge-purple" style={{ flexShrink: 0 }}>{m.type}</span>
+                  </div>
+                )
+              }) : (
+                <div style={{ padding: '32px 0', textAlign: 'center', color: 'var(--text-3)', fontSize: 13.5 }}>
+                  No family members recorded for this customer.
+                </div>
+              )}
             </div>
           )}
         </div>

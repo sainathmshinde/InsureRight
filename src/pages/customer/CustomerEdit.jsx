@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { Field, Input, Select, SectionBlock } from "../../components/Field";
+import { Field, Input, Select, SectionBlock, UploadBox } from "../../components/Field";
+import { useAuth } from "../../context/AuthContext";
+import FamilyMembersSection from "./FamilyMembersSection";
 
 const MOCK_DATA = {
   1: {
@@ -17,19 +19,41 @@ const MOCK_DATA = {
     nomineeName: "Ravi Desai",
     nomineeRelation: "Spouse",
     nomineeShare: "100",
+    familyMembers: [
+      { id: 1, type: "Spouse",   name: "Ravi Desai",   dob: "1982-06-15", gender: "Male",   preExisting: "" },
+      { id: 2, type: "Son",      name: "Aarav Desai",  dob: "2010-03-20", gender: "Male",   preExisting: "" },
+      { id: 3, type: "Daughter", name: "Piya Desai",   dob: "2013-08-05", gender: "Female", preExisting: "Asthma" },
+    ],
   },
 };
+
+function authUserToCustomer(u) {
+  if (!u) return {};
+  return { name: u.name, mobile: u.phone || '', email: u.email };
+}
 
 export default function CustomerEdit() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const [form, setForm] = useState(MOCK_DATA[id] ?? {});
-  const set = (f) => (e) => setForm((p) => ({ ...p, [f]: e.target.value }));
+  const { user } = useAuth();
+
+  const isProfile = !id;
+  const profileData = isProfile
+    ? (Object.values(MOCK_DATA).find(m => m.email === user?.email) ?? {})
+    : {};
+  const initial = isProfile
+    ? { ...profileData, ...authUserToCustomer(user) }
+    : (MOCK_DATA[id] ?? {});
+  const [form, setForm] = useState(initial);
+  const [members, setMembers] = useState(initial.familyMembers ?? []);
+  const [kycFiles, setKycFiles] = useState({ aadhaar: null, pan: null });
+  const set  = (f) => (e) => setForm((p) => ({ ...p, [f]: e.target.value }));
+  const setKF = (f) => (e) => setKycFiles((p) => ({ ...p, [f]: e.target.files[0] ?? null }));
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log("Update customer:", id, form);
-    navigate("/customer");
+    console.log(isProfile ? "Update customer profile:" : "Update customer:", form);
+    navigate(isProfile ? "/profile" : "/customer");
   };
 
   return (
@@ -38,22 +62,27 @@ export default function CustomerEdit() {
         <div className="page-title-row">
           <div className="page-icon">✏️</div>
           <div>
-            <div className="page-title">Edit Customer</div>
-            <div className="page-subtitle">Update customer profile</div>
+            <div className="page-title">{isProfile ? "Edit My Profile" : "Edit Customer"}</div>
+            <div className="page-subtitle">{isProfile ? "Update your contact details" : "Update customer profile"}</div>
           </div>
         </div>
         <div style={{ display: "flex", gap: 10 }}>
-          <button
-            className="btn btn-secondary"
-            onClick={() => navigate(`/customer/${id}/360`)}
-          >
-            360° View
-          </button>
+          {!isProfile && (
+            <button
+              className="btn btn-secondary"
+              onClick={() => navigate(`/customer/${id}/360`)}
+            >
+              360° View
+            </button>
+          )}
+          {isProfile && (
+            <button className="btn btn-ghost" onClick={() => navigate("/profile")}>← Profile</button>
+          )}
           <button
             className="btn btn-ghost"
-            onClick={() => navigate("/customer")}
+            onClick={() => navigate(isProfile ? "/dashboard" : "/customer")}
           >
-            ← Back
+            {isProfile ? "← Dashboard" : "← Back"}
           </button>
         </div>
       </div>
@@ -61,7 +90,7 @@ export default function CustomerEdit() {
       <div className="card">
         <div className="card-body">
           <form onSubmit={handleSubmit}>
-            <SectionBlock icon=<AgentIcon /> title="Basic Information">
+            <SectionBlock icon="👤" title="Basic Information">
               <div className="form-grid">
                 <Field label="Full Name" required>
                   <Input
@@ -100,16 +129,18 @@ export default function CustomerEdit() {
                     <option>Other</option>
                   </Select>
                 </Field>
-                <Field label="KYC Status">
-                  <Select
-                    value={form.kycStatus || "Pending"}
-                    onChange={set("kycStatus")}
-                  >
-                    <option>Pending</option>
-                    <option>Verified</option>
-                    <option>Rejected</option>
-                  </Select>
-                </Field>
+                {!isProfile && (
+                  <Field label="KYC Status">
+                    <Select
+                      value={form.kycStatus || "Pending"}
+                      onChange={set("kycStatus")}
+                    >
+                      <option>Pending</option>
+                      <option>Verified</option>
+                      <option>Rejected</option>
+                    </Select>
+                  </Field>
+                )}
               </div>
             </SectionBlock>
 
@@ -146,6 +177,46 @@ export default function CustomerEdit() {
                   />
                 </Field>
               </div>
+            </SectionBlock>
+
+            {isProfile && (
+              <SectionBlock icon="🪪" title="KYC Documents">
+                <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 18 }}>
+                  <span className={`badge badge-${form.kycStatus === 'Verified' ? 'green' : form.kycStatus === 'Rejected' ? 'red' : 'amber'}`}>
+                    KYC: {form.kycStatus || 'Pending'}
+                  </span>
+                  {form.kycStatus !== 'Verified' && (
+                    <span style={{ fontSize: 12.5, color: 'var(--text-3)' }}>
+                      Upload documents below to complete verification
+                    </span>
+                  )}
+                  {form.kycStatus === 'Verified' && (
+                    <span style={{ fontSize: 12.5, color: 'var(--text-3)' }}>
+                      Your KYC is verified. You may re-upload to update documents.
+                    </span>
+                  )}
+                </div>
+                <div className="form-grid">
+                  <Field label="Aadhaar Card">
+                    <UploadBox
+                      label="Upload Aadhaar card"
+                      hint="JPG, PNG or PDF"
+                      onChange={setKF('aadhaar')}
+                    />
+                  </Field>
+                  <Field label="PAN Card">
+                    <UploadBox
+                      label="Upload PAN card"
+                      hint="JPG, PNG or PDF"
+                      onChange={setKF('pan')}
+                    />
+                  </Field>
+                </div>
+              </SectionBlock>
+            )}
+
+            <SectionBlock icon="👨‍👩‍👧" title="Family Details">
+              <FamilyMembersSection members={members} onChange={setMembers} />
             </SectionBlock>
 
             <SectionBlock icon="📝" title="Nominee Details">
@@ -185,12 +256,12 @@ export default function CustomerEdit() {
               <button
                 type="button"
                 className="btn btn-ghost"
-                onClick={() => navigate("/customer")}
+                onClick={() => navigate(isProfile ? "/profile" : "/customer")}
               >
                 Cancel
               </button>
               <button type="submit" className="btn btn-primary">
-                Update Customer
+                {isProfile ? "Save Profile" : "Update Customer"}
               </button>
             </div>
           </form>

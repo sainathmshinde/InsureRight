@@ -1,0 +1,61 @@
+import { createContext, useContext, useState } from 'react'
+
+const AuthContext = createContext(null)
+
+const MOCK_USERS = {
+  'broker@kmdastur.com': {
+    id: 'b1', role: 'broker', password: 'broker@123',
+    name: 'K.M. Dastur', company: 'K.M. Dastur & Co. Insurance Brokers Pvt. Ltd.',
+    irdaiNo: 'CB-456/2008', phone: '9812345678', email: 'broker@kmdastur.com',
+    city: 'Mumbai', state: 'Maharashtra', avatar: 'KD',
+    address: '14, Horniman Circle, Fort, Mumbai - 400001',
+    gst: '27AABCK1234M1Z5', pan: 'AABCK1234M',
+    established: '1968', type: 'Partnership',
+  },
+  'rahul@kmdastur.com': {
+    id: 'a1', role: 'agent', password: 'agent@123',
+    name: 'Rahul Verma', company: 'K.M. Dastur & Co.', phone: '9876543210',
+    email: 'rahul@kmdastur.com', brokerId: 'b1', avatar: 'RV',
+  },
+  'anita@gmail.com': {
+    id: 'c1', role: 'customer', password: 'cust@123',
+    name: 'Anita Desai', phone: '9876543210',
+    email: 'anita@gmail.com', brokerId: 'b1', avatar: 'AD',
+  },
+}
+
+export function AuthProvider({ children }) {
+  const [user, setUser] = useState(null)
+
+  const login = (email, password) => {
+    const u = MOCK_USERS[email.toLowerCase().trim()]
+    if (!u || u.password !== password) return { ok: false, error: 'Invalid email or password' }
+    const { password: _, ...safe } = u
+    setUser(safe)
+    return { ok: true, user: safe }
+  }
+
+  const logout = () => setUser(null)
+
+  const register = (data) => {
+    const initials = data.name.split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2)
+    const newUser = {
+      id: `b_${Date.now()}`, role: 'broker',
+      name: data.name, email: data.email,
+      company: data.companyName, irdaiNo: data.irdaiNo,
+      phone: data.mobile, city: data.city, state: data.state,
+      avatar: initials, address: data.address1,
+      gst: data.gst, pan: data.pan, type: data.businessType,
+    }
+    setUser(newUser)
+    return { ok: true, user: newUser }
+  }
+
+  return (
+    <AuthContext.Provider value={{ user, login, logout, register }}>
+      {children}
+    </AuthContext.Provider>
+  )
+}
+
+export const useAuth = () => useContext(AuthContext)

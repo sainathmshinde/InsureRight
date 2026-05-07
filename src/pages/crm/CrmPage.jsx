@@ -2,26 +2,16 @@ import { useState } from 'react'
 import { Field, Select } from '../../components/Field'
 import { PageHeader } from '../../components/UI'
 import { CRMIcon } from '../../icons'
-
-const AGENTS = [
-  { id: 1,  name: 'Ravi Kulkarni', posLicense: 'POS-2023-001', broker: 'Mehta Insurance' },
-  { id: 2,  name: 'Pooja Desai',   posLicense: 'POS-2023-019', broker: 'Priya Brokers'   },
-  { id: 4,  name: 'Kavita Sharma', posLicense: 'POS-2023-045', broker: 'Shah Financial'  },
-  { id: 5,  name: 'Amit Verma',    posLicense: 'POS-2023-067', broker: 'Mehta Insurance' },
-  { id: 6,  name: 'Sneha Patil',   posLicense: 'POS-2022-133', broker: 'Nair & Co.'      },
-  { id: 8,  name: 'Priya Menon',   posLicense: 'POS-2023-088', broker: 'Shah Financial'  },
-  { id: 9,  name: 'Kiran Reddy',   posLicense: 'POS-2023-099', broker: 'Rao & Partners'  },
-  { id: 10, name: 'Neha Gupta',    posLicense: 'POS-2022-155', broker: 'Priya Brokers'   },
-  { id: 11, name: 'Ajay Tiwari',   posLicense: 'POS-2023-120', broker: 'Mehta Insurance' },
-]
+import { useAuth } from '../../context/AuthContext'
+import { AGENTS as KMD_AGENTS } from '../agent/agentData'
 
 const CAMPAIGNS = [
-  { id: 1, name: 'Summer Health Drive 2025',   type: 'Promotional', assignedAgents: [1, 2, 5] },
-  { id: 2, name: 'Renewal Reminder Q2',         type: 'Renewal',     assignedAgents: [1, 4, 8] },
-  { id: 3, name: 'New Member Onboarding',       type: 'Onboarding',  assignedAgents: [2, 6, 9] },
-  { id: 4, name: 'Motor Insurance Awareness',   type: 'Awareness',   assignedAgents: [1, 10]   },
-  { id: 5, name: 'High Value Customer Loyalty', type: 'Incentive',   assignedAgents: [4, 5, 11]},
-  { id: 6, name: 'Festival Season Offer',       type: 'Seasonal',    assignedAgents: [2, 8, 9] },
+  { id: 1, name: 'Summer Health Drive 2025',   type: 'Promotional', assignedAgents: [1, 2, 5]  },
+  { id: 2, name: 'Renewal Reminder Q2',         type: 'Renewal',     assignedAgents: [1, 4, 8]  },
+  { id: 3, name: 'New Member Onboarding',       type: 'Onboarding',  assignedAgents: [2, 6, 9]  },
+  { id: 4, name: 'Motor Insurance Awareness',   type: 'Awareness',   assignedAgents: [1, 10]    },
+  { id: 5, name: 'High Value Customer Loyalty', type: 'Incentive',   assignedAgents: [4, 5, 11] },
+  { id: 6, name: 'Festival Season Offer',       type: 'Seasonal',    assignedAgents: [2, 8, 9]  },
 ]
 
 const EMPTY_CALLS = Array.from({ length: 5 }, (_, i) => ({
@@ -46,8 +36,6 @@ const INITIAL_LEADS = [
   { id:15, campaignId:4, name:'Nikhil Bansal',  mobile:'9800223344', enrollmentStatus:'Pending',   enrollmentDate:'',           purchaseStatus:'Pending',        purchaseDate:'',           calls: EMPTY_CALLS.map(c => ({...c})) },
 ]
 
-const CURRENT_USER_ID = 1
-
 const ENROLLMENT_STATUSES  = ['Enrolled', 'Pending']
 const PURCHASE_STATUSES    = ['Purchased', 'Interested', 'Not Interested', 'Pending']
 const CALL_RESPONSES       = ['', 'Connected', 'No Answer', 'Busy', 'Call Back Later', 'Wrong Number', 'Not Reachable']
@@ -58,11 +46,18 @@ function purchBg(s)   { return s === 'Purchased' ? '#e6f4ea' : s === 'Interested
 function purchClr(s)  { return s === 'Purchased' ? '#2d7d46' : s === 'Interested' ? '#a05c00' : s === 'Not Interested' ? '#c0392b' : '#5f6368' }
 
 export default function CrmPage() {
-  const [selectedAgentId, setSelectedAgentId]     = useState(CURRENT_USER_ID)
+  const { user } = useAuth()
+  const isAgent = user?.role === 'agent'
+
+  const defaultAgentId = isAgent
+    ? (KMD_AGENTS.find(a => a.name.toLowerCase().includes(user.name.split(' ')[0].toLowerCase()))?.id ?? KMD_AGENTS[0].id)
+    : KMD_AGENTS[0].id
+
+  const [selectedAgentId, setSelectedAgentId]       = useState(defaultAgentId)
   const [selectedCampaignId, setSelectedCampaignId] = useState('')
-  const [leads, setLeads]                         = useState(INITIAL_LEADS)
-  const [activeLead, setActiveLead]               = useState(null)
-  const [draft, setDraft]                         = useState(null)
+  const [leads, setLeads]                           = useState(INITIAL_LEADS)
+  const [activeLead, setActiveLead]                 = useState(null)
+  const [draft, setDraft]                           = useState(null)
 
   const agentCampaigns = CAMPAIGNS.filter(c => c.assignedAgents.includes(selectedAgentId))
 
@@ -98,22 +93,32 @@ export default function CrmPage() {
 
   return (
     <div>
-      <PageHeader icon={<CRMIcon />} title="CRM" subtitle="Campaign lead tracking & agent performance" />
+      <PageHeader icon={<CRMIcon />} title="CRM" subtitle="K.M. Dastur & Co. — Campaign lead tracking & agent performance" />
 
       <div className="card">
         <div className="card-body">
 
           {/* ── Filters ── */}
           <div className="form-grid" style={{ marginBottom: 24 }}>
-            <Field label="Agent">
-              <Select value={selectedAgentId} onChange={handleAgentChange}>
-                {AGENTS.map(a => (
-                  <option key={a.id} value={a.id}>
-                    {a.name}{a.id === CURRENT_USER_ID ? ' (You)' : ''} — {a.broker}
-                  </option>
-                ))}
-              </Select>
-            </Field>
+            {!isAgent && (
+              <Field label="Agent">
+                <Select value={selectedAgentId} onChange={handleAgentChange}>
+                  {KMD_AGENTS.map(a => (
+                    <option key={a.id} value={a.id}>{a.name} ({a.posLicense})</option>
+                  ))}
+                </Select>
+              </Field>
+            )}
+            {isAgent && (
+              <Field label="Agent">
+                <input
+                  className="field-input"
+                  value={KMD_AGENTS.find(a => a.id === selectedAgentId)?.name ?? ''}
+                  readOnly
+                  style={{ background: 'var(--bg-2)', color: 'var(--text-2)' }}
+                />
+              </Field>
+            )}
             <Field label="Campaign">
               <Select
                 value={selectedCampaignId}

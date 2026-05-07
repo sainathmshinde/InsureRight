@@ -9,19 +9,29 @@ import {
 } from "../../components/Field";
 import { AgentIcon } from "../../icons";
 import { AGENT_MAP } from "./agentData";
+import { useAuth } from "../../context/AuthContext";
+
+function authUserToAgent(u) {
+  if (!u) return {};
+  return { name: u.name, mobile: u.phone || '', email: u.email, assignedBroker: u.company || '' };
+}
 
 export default function AgentEdit() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const [form, setForm] = useState(AGENT_MAP[Number(id)] ?? {});
+  const { user } = useAuth();
+
+  const isProfile = !id;
+  const initial = isProfile ? authUserToAgent(user) : (AGENT_MAP[Number(id)] ?? {});
+  const [form, setForm] = useState(initial);
   const set = (f) => (e) => setForm((p) => ({ ...p, [f]: e.target.value }));
   const setF = (f) => (e) =>
     setForm((p) => ({ ...p, [f]: e.target.files[0] ?? null }));
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log("Update agent:", id, form);
-    navigate("/agent");
+    console.log(isProfile ? "Update agent profile:" : "Update agent:", form);
+    navigate(isProfile ? "/profile" : "/agent");
   };
 
   return (
@@ -30,15 +40,20 @@ export default function AgentEdit() {
         <div className="page-title-row">
           <div className="page-icon">✏️</div>
           <div>
-            <div className="page-title">Edit Agent</div>
+            <div className="page-title">{isProfile ? "Edit My Profile" : "Edit Agent"}</div>
             <div className="page-subtitle">
-              Update agent profile and documents
+              {isProfile ? "Update your contact and professional details" : "Update agent profile and documents"}
             </div>
           </div>
         </div>
-        <button className="btn btn-ghost" onClick={() => navigate("/agent")}>
-          ← Back
-        </button>
+        <div style={{ display: "flex", gap: 10 }}>
+          {isProfile && (
+            <button className="btn btn-ghost" onClick={() => navigate("/profile")}>← Profile</button>
+          )}
+          <button className="btn btn-ghost" onClick={() => navigate(isProfile ? "/dashboard" : "/agent")}>
+            {isProfile ? "← Dashboard" : "← Back"}
+          </button>
+        </div>
       </div>
 
       <div className="card">
@@ -184,20 +199,7 @@ export default function AgentEdit() {
             <SectionBlock icon="🔗" title="Mapping">
               <div className="form-grid">
                 <Field label="Assigned Broker">
-                  <Select
-                    value={form.assignedBroker || ""}
-                    onChange={set("assignedBroker")}
-                  >
-                    <option value="">Select broker</option>
-                    <option>Mehta Insurance</option>
-                    <option>Priya Brokers</option>
-                    <option>AK Associates</option>
-                    <option>Shah Financial</option>
-                    <option>Nair & Co.</option>
-                    <option>Joshi Brokers</option>
-                    <option>Rao & Partners</option>
-                    <option>Pillai Associates</option>
-                  </Select>
+                  <Input value="K.M. Dastur & Co." readOnly style={{ background: 'var(--bg-2)', color: 'var(--text-2)' }} />
                 </Field>
                 <Field label="Reporting Manager">
                   <Input
@@ -221,12 +223,12 @@ export default function AgentEdit() {
               <button
                 type="button"
                 className="btn btn-ghost"
-                onClick={() => navigate("/agent")}
+                onClick={() => navigate(isProfile ? "/profile" : "/agent")}
               >
                 Cancel
               </button>
               <button type="submit" className="btn btn-primary">
-                Update Agent
+                {isProfile ? "Save Profile" : "Update Agent"}
               </button>
             </div>
           </form>

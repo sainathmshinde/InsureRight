@@ -95,3 +95,5 @@ export default function ProductList() {
     </div>
   )
 }
+
+export { MOCK as PRODUCT_MOCK }

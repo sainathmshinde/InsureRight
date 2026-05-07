@@ -1,5 +1,6 @@
 import { useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../../context/AuthContext";
 import { Field, Input, Select, Textarea } from "../../components/fields";
 import {
   Stepper,
@@ -29,6 +30,11 @@ const CUSTOMERS = [
     kyc: "Verified",
     policies: 2,
     address: "A-12, Linking Road, Bandra, Mumbai",
+    familyMembers: [
+      { type: "Spouse",  name: "Ravi Desai",  dob: "1982-06-15", gender: "Male"   },
+      { type: "Child 1", name: "Aarav Desai", dob: "2010-03-20", gender: "Male"   },
+      { type: "Child 2", name: "Piya Desai",  dob: "2013-08-05", gender: "Female" },
+    ],
   },
   {
     id: 2,
@@ -404,7 +410,7 @@ function Avatar({ name, size = 40, fontSize = 16 }) {
 }
 
 // ── Persistent "policy for" customer strip ─────────────────────────────────
-function CustomerStrip({ customer, onChangeCustomer }) {
+function CustomerStrip({ customer, onChangeCustomer, canChange = true }) {
   return (
     <div
       style={{
@@ -433,7 +439,6 @@ function CustomerStrip({ customer, onChangeCustomer }) {
         <span
           style={{
             fontSize: 12,
-            color: "var(--text-3)",
             background: "var(--brand-light)",
             borderRadius: 99,
             padding: "3px 10px",
@@ -444,9 +449,11 @@ function CustomerStrip({ customer, onChangeCustomer }) {
           {customer.policies} existing{" "}
           {customer.policies === 1 ? "policy" : "policies"}
         </span>
-        <button className="btn btn-ghost btn-sm" onClick={onChangeCustomer}>
-          Change
-        </button>
+        {canChange && (
+          <button className="btn btn-ghost btn-sm" onClick={onChangeCustomer}>
+            Change
+          </button>
+        )}
       </div>
     </div>
   );
@@ -494,19 +501,33 @@ function KYCWarning({ kyc }) {
 // ── Main component ─────────────────────────────────────────────────────────
 export default function BuyPolicy() {
   const navigate = useNavigate();
+  const { user } = useAuth();
+  const isCustomer = user?.role === "customer";
 
-  // Step state
-  const [step, setStep] = useState(0);
+  // For customer login: auto-find and lock in their own record
+  const selfCustomer = isCustomer
+    ? (CUSTOMERS.find((c) => c.email === user.email) ?? null)
+    : null;
 
-  // Step 0 — customer selection
+  // Step state — customers skip Step 0 (Select Customer)
+  const [step, setStep] = useState(isCustomer ? 1 : 0);
+
+  // Step 0 — customer selection (agent/broker only)
   const [custSearch, setCustSearch] = useState("");
-  const [selectedCustomer, setSelectedCustomer] = useState(null);
+  const [selectedCustomer, setSelectedCustomer] = useState(selfCustomer);
 
   // Step 1 — insurance type
   const [insuranceType, setInsuranceType] = useState(null);
 
-  // Step 2 — members / vehicle
-  const [members, setMembers] = useState([]);
+  // Step 2 — members / vehicle — pre-fill from customer's saved family
+  const [members, setMembers] = useState(
+    selfCustomer
+      ? [
+          { type: "Self", name: selfCustomer.name, dob: selfCustomer.dob, gender: selfCustomer.gender },
+          ...(selfCustomer.familyMembers ?? []),
+        ]
+      : [],
+  );
   const [vehicle, setVehicle] = useState({
     make: "",
     model: "",
@@ -521,12 +542,12 @@ export default function BuyPolicy() {
   const [showCompare, setShowCompare] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState(null);
 
-  // Step 4 — proposal
+  // Step 4 — proposal — pre-fill from customer record
   const [proposal, setProposal] = useState({
-    customerName: "",
-    mobile: "",
-    email: "",
-    address: "",
+    customerName: selfCustomer?.name ?? "",
+    mobile: selfCustomer?.mobile ?? "",
+    email: selfCustomer?.email ?? "",
+    address: selfCustomer?.address ?? "",
     medicalHistory: "No",
     preExisting: "",
     nomineeName: "",
@@ -548,7 +569,11 @@ export default function BuyPolicy() {
     setProposal((p) => ({ ...p, [f]: e.target.value }));
   const setV = (f) => (e) => setVehicle((v) => ({ ...v, [f]: e.target.value }));
   const next = () => setStep((s) => Math.min(s + 1, STEPS.length - 1));
-  const back = () => setStep((s) => Math.max(s - 1, 0));
+  // Customer can't go back to Step 0 (customer list); navigate to policy page instead
+  const back = () => {
+    if (isCustomer && step === 1) { navigate("/policy"); return; }
+    setStep((s) => Math.max(s - 1, 0));
+  };
 
   const products = PRODUCTS[insuranceType] ?? [];
   const compareProducts = products.filter((p) => compareIds.includes(p.id));
@@ -565,10 +590,13 @@ export default function BuyPolicy() {
     );
   }, [custSearch]);
 
-  // When customer is selected, pre-fill downstream state
+  // When customer is selected, pre-fill downstream state (including saved family members)
   const handleSelectCustomer = (c) => {
     setSelectedCustomer(c);
-    setMembers([{ type: "Self", name: c.name, dob: c.dob, gender: c.gender }]);
+    setMembers([
+      { type: "Self", name: c.name, dob: c.dob, gender: c.gender },
+      ...(c.familyMembers ?? []),
+    ]);
     setProposal((p) => ({
       ...p,
       customerName: c.name,
@@ -628,7 +656,7 @@ export default function BuyPolicy() {
           <div>
             <div className="page-title">Buy Insurance Policy</div>
             <div className="page-subtitle">
-              Select a customer, compare plans and issue a policy
+              {isCustomer ? "Compare plans and buy a policy for yourself" : "Select a customer, compare plans and issue a policy"}
             </div>
           </div>
         </div>
@@ -647,6 +675,7 @@ export default function BuyPolicy() {
         <CustomerStrip
           customer={selectedCustomer}
           onChangeCustomer={() => setStep(0)}
+          canChange={!isCustomer}
         />
       )}
 

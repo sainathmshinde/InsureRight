@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
+import { useAuth } from '../../context/AuthContext'
 import { BROKER_MAP } from './brokerData'
 
 const tabs = ['Basic Info', 'KYC', 'Contact & Address', 'Bank Details', 'Agreement']
@@ -13,11 +14,28 @@ function Row({ label, value }) {
   )
 }
 
+function userToBroker(u) {
+  if (!u) return null
+  return {
+    brokerName: u.name, companyName: u.company, brokerType: u.type || 'Partnership',
+    licenseNumber: u.irdaiNo, licenseValidity: '', gstNumber: u.gst || '',
+    panNumber: u.pan || '', aadhaarNumber: '', kycStatus: 'Verified',
+    email: u.email, mobile: u.phone, alternateContact: '', website: '',
+    registeredAddress: u.address || '', communicationAddress: u.address || '',
+    city: u.city || '', state: u.state || '', pincode: '',
+    accountHolder: u.name, bankName: '', accountNumber: '', ifscCode: '',
+    agreementStart: '', agreementEnd: '', complianceNotes: '', status: 'Active',
+  }
+}
+
 export default function BrokerView() {
   const { id } = useParams()
   const navigate = useNavigate()
+  const { user } = useAuth()
   const [tab, setTab] = useState(0)
-  const b = BROKER_MAP[Number(id)]
+
+  const isProfile = !id
+  const b = isProfile ? userToBroker(user) : BROKER_MAP[Number(id)]
 
   if (!b) return (
     <div className="empty-state">
@@ -34,13 +52,13 @@ export default function BrokerView() {
         <div className="page-title-row">
           <div className="page-icon">🏢</div>
           <div>
-            <div className="page-title">{b.brokerName}</div>
+            <div className="page-title">{isProfile ? 'My Profile' : b.brokerName}</div>
             <div className="page-subtitle">{b.companyName} · {b.licenseNumber}</div>
           </div>
         </div>
         <div style={{ display: 'flex', gap: 10 }}>
-          <button className="btn btn-secondary" onClick={() => navigate(`/broker/${id}/edit`)}>✏️ Edit</button>
-          <button className="btn btn-ghost" onClick={() => navigate('/broker')}>← Back</button>
+          <button className="btn btn-secondary" onClick={() => navigate(isProfile ? '/profile/edit' : `/broker/${id}/edit`)}>✏️ Edit</button>
+          <button className="btn btn-ghost" onClick={() => navigate(isProfile ? '/dashboard' : '/broker')}>← Back</button>
         </div>
       </div>
 

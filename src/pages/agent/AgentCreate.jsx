@@ -221,7 +221,7 @@ export default function AgentCreate() {
                     onChange={set("assignedBroker")}
                   >
                     <option value="">Select broker</option>
-                    <option>Mehta Insurance</option>
+                    <option>K.M. Dastur & Co.</option>
                     <option>Priya Brokers</option>
                     <option>AK Associates</option>
                     <option>Shah Financial</option>

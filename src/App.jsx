@@ -1,117 +1,163 @@
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { AuthProvider, useAuth } from "./context/AuthContext";
 import Layout from "./components/Layout";
+import ProtectedRoute from "./components/ProtectedRoute";
+import RoleGuard from "./components/RoleGuard";
+
+// Auth pages
+import SignIn  from "./pages/auth/SignIn";
+import SignUp  from "./pages/auth/SignUp";
+
+// Dashboard
+import Dashboard from "./pages/dashboard/Dashboard";
 
 // Broker pages
-import BrokerList from "./pages/broker/BrokerList";
+import BrokerList   from "./pages/broker/BrokerList";
 import BrokerCreate from "./pages/broker/BrokerCreate";
-import BrokerEdit from "./pages/broker/BrokerEdit";
-import BrokerView from "./pages/broker/BrokerView";
+import BrokerEdit   from "./pages/broker/BrokerEdit";
+import BrokerView   from "./pages/broker/BrokerView";
 
 // IC pages
-import ICList from "./pages/ic/ICList";
-import ICCreate from "./pages/ic/ICCreate";
-import ICEdit from "./pages/ic/ICEdit";
+import ICList        from "./pages/ic/ICList";
+import ICCreate      from "./pages/ic/ICCreate";
+import ICEdit        from "./pages/ic/ICEdit";
 import ICIntegration from "./pages/ic/ICIntegration";
 
 // Agent pages
-import AgentList from "./pages/agent/AgentList";
-import AgentCreate from "./pages/agent/AgentCreate";
-import AgentEdit from "./pages/agent/AgentEdit";
+import AgentList       from "./pages/agent/AgentList";
+import AgentCreate     from "./pages/agent/AgentCreate";
+import AgentEdit       from "./pages/agent/AgentEdit";
+import AgentProfile    from "./pages/agent/AgentProfile";
 import AgentCommission from "./pages/agent/AgentCommission";
 
 // Customer pages
-import CustomerList from "./pages/customer/CustomerList";
-import CustomerCreate from "./pages/customer/CustomerCreate";
-import CustomerEdit from "./pages/customer/CustomerEdit";
-import Customer360 from "./pages/customer/Customer360";
-
-// Campaign pages
-import CampaignList from "./pages/campaign/CampaignList";
-import CampaignCreate from "./pages/campaign/CampaignCreate";
-import CampaignEdit from "./pages/campaign/CampaignEdit";
+import CustomerList    from "./pages/customer/CustomerList";
+import CustomerCreate  from "./pages/customer/CustomerCreate";
+import CustomerEdit    from "./pages/customer/CustomerEdit";
+import CustomerProfile from "./pages/customer/CustomerProfile";
+import Customer360     from "./pages/customer/Customer360";
 
 // Product pages
-import ProductList from "./pages/product/ProductList";
+import ProductList   from "./pages/product/ProductList";
 import ProductCreate from "./pages/product/ProductCreate";
-import ProductEdit from "./pages/product/ProductEdit";
+import ProductEdit   from "./pages/product/ProductEdit";
+
+// Campaign pages
+import CampaignList   from "./pages/campaign/CampaignList";
+import CampaignCreate from "./pages/campaign/CampaignCreate";
+import CampaignEdit   from "./pages/campaign/CampaignEdit";
 
 // Policy pages
 import PolicyList from "./pages/policy/PolicyList";
-import BuyPolicy from "./pages/policy/BuyPolicy";
+import BuyPolicy  from "./pages/policy/BuyPolicy";
 
-// CRM pages
+// CRM
 import CrmPage from "./pages/crm/CrmPage";
+
+function ProfileView() {
+  const { user } = useAuth();
+  if (user?.role === 'agent')    return <AgentProfile />;
+  if (user?.role === 'customer') return <CustomerProfile />;
+  return <BrokerView />;
+}
+
+function ProfileEdit() {
+  const { user } = useAuth();
+  if (user?.role === 'agent')    return <AgentEdit />;
+  if (user?.role === 'customer') return <CustomerEdit />;
+  return <BrokerEdit />;
+}
 
 export default function App() {
   return (
     <BrowserRouter>
-      <Routes>
-        {/* All pages share the Layout (Sidebar + Topbar) */}
-        <Route path="/" element={<Layout />}>
-          {/* Default redirect */}
-          <Route index element={<Navigate to="/broker" replace />} />
+      <AuthProvider>
+        <Routes>
+          {/* ── Public auth routes (no sidebar/topbar) ── */}
+          <Route path="/login"    element={<SignIn />} />
+          <Route path="/register" element={<SignUp />} />
 
-          {/* ── BROKER ── */}
-          <Route path="broker">
-            <Route index element={<BrokerList />} />
-            <Route path="create" element={<BrokerCreate />} />
-            <Route path=":id" element={<BrokerView />} />
-            <Route path=":id/edit" element={<BrokerEdit />} />
+          {/* ── Protected routes (require login) ── */}
+          <Route element={<ProtectedRoute />}>
+            <Route path="/" element={<Layout />}>
+              <Route index element={<Navigate to="/dashboard" replace />} />
+
+              {/* ── DASHBOARD (all roles) ── */}
+              <Route path="dashboard" element={<Dashboard />} />
+
+              {/* ── PROFILE (role-aware) ── */}
+              <Route path="profile">
+                <Route index element={<ProfileView />} />
+                <Route path="edit" element={<ProfileEdit />} />
+              </Route>
+
+              {/* ── POLICY (all roles, scoped in component) ── */}
+              <Route path="policy">
+                <Route index element={<PolicyList />} />
+                <Route path="buy" element={<BuyPolicy />} />
+              </Route>
+
+              {/* ── CUSTOMER (broker + agent only) ── */}
+              <Route element={<RoleGuard roles={['broker', 'agent']} />}>
+                <Route path="customer">
+                  <Route index element={<CustomerList />} />
+                  <Route path="create" element={<CustomerCreate />} />
+                  <Route path=":id/edit" element={<CustomerEdit />} />
+                  <Route path=":id/360" element={<Customer360 />} />
+                </Route>
+                <Route path="crm">
+                  <Route index element={<CrmPage />} />
+                </Route>
+              </Route>
+
+              {/* ── AGENT commission (agent can see own commission) ── */}
+              <Route element={<RoleGuard roles={['broker', 'agent']} />}>
+                <Route path="agent/commission" element={<AgentCommission />} />
+              </Route>
+
+              {/* ── BROKER-ONLY routes ── */}
+              <Route element={<RoleGuard roles={['broker']} />}>
+                <Route path="agent">
+                  <Route index element={<AgentList />} />
+                  <Route path="create" element={<AgentCreate />} />
+                  <Route path=":id/edit" element={<AgentEdit />} />
+                </Route>
+
+                <Route path="product">
+                  <Route index element={<ProductList />} />
+                  <Route path="create" element={<ProductCreate />} />
+                  <Route path=":id/edit" element={<ProductEdit />} />
+                </Route>
+
+                <Route path="campaign">
+                  <Route index element={<CampaignList />} />
+                  <Route path="create" element={<CampaignCreate />} />
+                  <Route path=":id/edit" element={<CampaignEdit />} />
+                </Route>
+
+                <Route path="ic">
+                  <Route index element={<ICList />} />
+                  <Route path="create" element={<ICCreate />} />
+                  <Route path=":id/edit" element={<ICEdit />} />
+                  <Route path=":id/integration" element={<ICIntegration />} />
+                </Route>
+
+                <Route path="broker">
+                  <Route index element={<BrokerList />} />
+                  <Route path="create" element={<BrokerCreate />} />
+                  <Route path=":id" element={<BrokerView />} />
+                  <Route path=":id/edit" element={<BrokerEdit />} />
+                </Route>
+              </Route>
+
+              <Route path="*" element={<Navigate to="/dashboard" replace />} />
+            </Route>
           </Route>
 
-          {/* ── INSURANCE COMPANY ── */}
-          <Route path="ic">
-            <Route index element={<ICList />} />
-            <Route path="create" element={<ICCreate />} />
-            <Route path=":id/edit" element={<ICEdit />} />
-            <Route path=":id/integration" element={<ICIntegration />} />
-          </Route>
-
-          {/* ── AGENT ── */}
-          <Route path="agent">
-            <Route index element={<AgentList />} />
-            <Route path="create" element={<AgentCreate />} />
-            <Route path=":id/edit" element={<AgentEdit />} />
-            <Route path="commission" element={<AgentCommission />} />
-          </Route>
-
-          {/* ── CUSTOMER ── */}
-          <Route path="customer">
-            <Route index element={<CustomerList />} />
-            <Route path="create" element={<CustomerCreate />} />
-            <Route path=":id/edit" element={<CustomerEdit />} />
-            <Route path=":id/360" element={<Customer360 />} />
-          </Route>
-
-          {/* ── PRODUCT ── */}
-          <Route path="product">
-            <Route index element={<ProductList />} />
-            <Route path="create" element={<ProductCreate />} />
-            <Route path=":id/edit" element={<ProductEdit />} />
-          </Route>
-
-          {/* ── CAMPAIGN ── */}
-          <Route path="campaign">
-            <Route index element={<CampaignList />} />
-            <Route path="create" element={<CampaignCreate />} />
-            <Route path=":id/edit" element={<CampaignEdit />} />
-          </Route>
-
-          {/* ── CRM ── */}
-          <Route path="crm">
-            <Route index element={<CrmPage />} />
-          </Route>
-
-          {/* ── POLICY ── */}
-          <Route path="policy">
-            <Route index element={<PolicyList />} />
-            <Route path="buy" element={<BuyPolicy />} />
-          </Route>
-
-          {/* Catch-all */}
-          <Route path="*" element={<Navigate to="/broker" replace />} />
-        </Route>
-      </Routes>
+          {/* Catch-all → login */}
+          <Route path="*" element={<Navigate to="/login" replace />} />
+        </Routes>
+      </AuthProvider>
     </BrowserRouter>
   );
 }

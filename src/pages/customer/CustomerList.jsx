@@ -4,28 +4,32 @@ import Pagination from '../../components/Pagination'
 import usePagination from '../../components/usePagination'
 import { Table, PageHeader, KYCBadge, Button, EmptyState } from '../../components/UI'
 import { CustomerIcon } from '../../icons'
+import { useAuth } from '../../context/AuthContext'
 
 const MOCK = [
-  { id: 1,  name: 'Anita Desai',     mobile: '9876543210', email: 'anita@gmail.com',  dob: '1985-04-12', gender: 'Female', kyc: 'Verified',  policies: 2 },
-  { id: 2,  name: 'Rohit Sharma',    mobile: '9812000000', email: 'rohit@gmail.com',  dob: '1990-11-20', gender: 'Male',   kyc: 'Pending',   policies: 0 },
-  { id: 3,  name: 'Deepa Menon',     mobile: '9988776655', email: 'deepa@gmail.com',  dob: '1978-06-05', gender: 'Female', kyc: 'Verified',  policies: 3 },
-  { id: 4,  name: 'Vijay Patil',     mobile: '9011223344', email: 'vijay@gmail.com',  dob: '1995-09-30', gender: 'Male',   kyc: 'Rejected',  policies: 0 },
-  { id: 5,  name: 'Sneha Kulkarni',  mobile: '9900112233', email: 'sneha@gmail.com',  dob: '1988-02-14', gender: 'Female', kyc: 'Verified',  policies: 1 },
-  { id: 6,  name: 'Manoj Tiwari',    mobile: '9811223344', email: 'manoj@gmail.com',  dob: '1975-08-20', gender: 'Male',   kyc: 'Verified',  policies: 4 },
-  { id: 7,  name: 'Kavya Reddy',     mobile: '9877665544', email: 'kavya@gmail.com',  dob: '1993-12-01', gender: 'Female', kyc: 'Pending',   policies: 0 },
-  { id: 8,  name: 'Arjun Kapoor',    mobile: '9866554433', email: 'arjun@gmail.com',  dob: '1987-03-22', gender: 'Male',   kyc: 'Verified',  policies: 2 },
-  { id: 9,  name: 'Priya Nair',      mobile: '9855443322', email: 'priya@gmail.com',  dob: '1992-07-10', gender: 'Female', kyc: 'Verified',  policies: 1 },
-  { id: 10, name: 'Sunil Mehta',     mobile: '9844332211', email: 'sunil@gmail.com',  dob: '1980-01-05', gender: 'Male',   kyc: 'Verified',  policies: 5 },
-  { id: 11, name: 'Ritu Singh',      mobile: '9833221100', email: 'ritu@gmail.com',   dob: '1996-05-18', gender: 'Female', kyc: 'Pending',   policies: 0 },
-  { id: 12, name: 'Ajay Iyer',       mobile: '9822110099', email: 'ajay@gmail.com',   dob: '1983-10-30', gender: 'Male',   kyc: 'Rejected',  policies: 0 },
+  { id: 1,  name: 'Anita Desai',     mobile: '9876543210', email: 'anita@gmail.com',  dob: '1985-04-12', gender: 'Female', kyc: 'Verified',  policies: 2, agentId: 'a1' },
+  { id: 2,  name: 'Rohit Sharma',    mobile: '9812000000', email: 'rohit@gmail.com',  dob: '1990-11-20', gender: 'Male',   kyc: 'Pending',   policies: 0, agentId: 'a1' },
+  { id: 3,  name: 'Deepa Menon',     mobile: '9988776655', email: 'deepa@gmail.com',  dob: '1978-06-05', gender: 'Female', kyc: 'Verified',  policies: 3, agentId: 'a1' },
+  { id: 4,  name: 'Vijay Patil',     mobile: '9011223344', email: 'vijay@gmail.com',  dob: '1995-09-30', gender: 'Male',   kyc: 'Rejected',  policies: 0, agentId: 'a2' },
+  { id: 5,  name: 'Sneha Kulkarni',  mobile: '9900112233', email: 'sneha@gmail.com',  dob: '1988-02-14', gender: 'Female', kyc: 'Verified',  policies: 1, agentId: 'a1' },
+  { id: 6,  name: 'Manoj Tiwari',    mobile: '9811223344', email: 'manoj@gmail.com',  dob: '1975-08-20', gender: 'Male',   kyc: 'Verified',  policies: 4, agentId: 'a2' },
+  { id: 7,  name: 'Kavya Reddy',     mobile: '9877665544', email: 'kavya@gmail.com',  dob: '1993-12-01', gender: 'Female', kyc: 'Pending',   policies: 0, agentId: 'a1' },
+  { id: 8,  name: 'Arjun Kapoor',    mobile: '9866554433', email: 'arjun@gmail.com',  dob: '1987-03-22', gender: 'Male',   kyc: 'Verified',  policies: 2, agentId: 'a2' },
+  { id: 9,  name: 'Priya Nair',      mobile: '9855443322', email: 'priya@gmail.com',  dob: '1992-07-10', gender: 'Female', kyc: 'Verified',  policies: 1, agentId: 'a1' },
+  { id: 10, name: 'Sunil Mehta',     mobile: '9844332211', email: 'sunil@gmail.com',  dob: '1980-01-05', gender: 'Male',   kyc: 'Verified',  policies: 5, agentId: 'a2' },
+  { id: 11, name: 'Ritu Singh',      mobile: '9833221100', email: 'ritu@gmail.com',   dob: '1996-05-18', gender: 'Female', kyc: 'Pending',   policies: 0, agentId: 'a1' },
+  { id: 12, name: 'Ajay Iyer',       mobile: '9822110099', email: 'ajay@gmail.com',   dob: '1983-10-30', gender: 'Male',   kyc: 'Rejected',  policies: 0, agentId: 'a2' },
 ]
 
 export default function CustomerList() {
   const navigate = useNavigate()
+  const { user } = useAuth()
   const [search, setSearch]     = useState('')
   const [kycFilter, setKycFilter] = useState('')
 
-  const filtered = MOCK.filter(c =>
+  const scopedData = user?.role === 'agent' ? MOCK.filter(c => c.agentId === user.id) : MOCK
+
+  const filtered = scopedData.filter(c =>
     (c.name.toLowerCase().includes(search.toLowerCase()) || c.mobile.includes(search)) &&
     (kycFilter ? c.kyc === kycFilter : true)
   )
@@ -57,7 +61,7 @@ export default function CustomerList() {
 
   return (
     <div>
-      <PageHeader icon={<CustomerIcon />} title="Customers" subtitle={`${MOCK.length} customers onboarded`}>
+      <PageHeader icon={<CustomerIcon />} title={user?.role === 'agent' ? 'My Customers' : 'Customers'} subtitle={`${scopedData.length} customers`}>
         <Button onClick={() => navigate('/customer/create')}>+ Add Customer</Button>
       </PageHeader>
 
@@ -89,3 +93,5 @@ export default function CustomerList() {
     </div>
   )
 }
+
+export { MOCK as CUSTOMER_MOCK }
