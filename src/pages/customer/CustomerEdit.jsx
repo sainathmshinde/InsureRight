@@ -6,23 +6,23 @@ import FamilyMembersSection from "./FamilyMembersSection";
 
 const MOCK_DATA = {
   1: {
-    name: "Anita Desai",
+    name: "Aarav Sharma",
     mobile: "9876543210",
-    email: "anita@gmail.com",
-    dob: "1985-04-12",
-    gender: "Female",
+    email: "aarav@gmail.com",
+    dob: "1990-03-15",
+    gender: "Male",
     kycStatus: "Verified",
-    address: "12, Rose Apartments, Bandra",
+    address: "14, Green Valley Apartments, Andheri West",
     city: "Mumbai",
     state: "Maharashtra",
-    pincode: "400050",
-    nomineeName: "Ravi Desai",
+    pincode: "400053",
+    nomineeName: "Priya Sharma",
     nomineeRelation: "Spouse",
     nomineeShare: "100",
     familyMembers: [
-      { id: 1, type: "Spouse",   name: "Ravi Desai",   dob: "1982-06-15", gender: "Male",   preExisting: "" },
-      { id: 2, type: "Son",      name: "Aarav Desai",  dob: "2010-03-20", gender: "Male",   preExisting: "" },
-      { id: 3, type: "Daughter", name: "Piya Desai",   dob: "2013-08-05", gender: "Female", preExisting: "Asthma" },
+      { id: 1, type: "Spouse",   name: "Priya Sharma", dob: "1992-07-22", gender: "Female", preExisting: "" },
+      { id: 2, type: "Son",      name: "Aryan Sharma", dob: "2016-02-10", gender: "Male",   preExisting: "" },
+      { id: 3, type: "Daughter", name: "Aanya Sharma", dob: "2019-09-05", gender: "Female", preExisting: "" },
     ],
   },
 };

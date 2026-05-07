@@ -16,10 +16,10 @@ import { useAuth } from "../context/AuthContext";
 
 const BROKER_NAV = [
   {
-    key: "dashboard",
+    key: "broker-portal",
     label: "Dashboard",
     icon: DashboardIcon,
-    children: [{ label: "Overview", path: "/dashboard" }],
+    children: [{ label: "Overview", path: "/broker-portal" }],
   },
   {
     key: "profile",
@@ -95,10 +95,10 @@ const BROKER_NAV = [
 
 const AGENT_NAV = [
   {
-    key: "dashboard",
+    key: "agent-portal",
     label: "Dashboard",
     icon: DashboardIcon,
-    children: [{ label: "Overview", path: "/dashboard" }],
+    children: [{ label: "Overview", path: "/agent-portal" }],
   },
   {
     key: "profile",
@@ -137,10 +137,10 @@ const AGENT_NAV = [
 
 const CUSTOMER_NAV = [
   {
-    key: "dashboard",
+    key: "customer-portal",
     label: "Dashboard",
     icon: DashboardIcon,
-    children: [{ label: "Overview", path: "/dashboard" }],
+    children: [{ label: "Overview", path: "/customer-portal" }],
   },
   {
     key: "profile",
@@ -156,6 +156,12 @@ const CUSTOMER_NAV = [
     label: "My Policies",
     icon: PolicyIcon,
     children: [{ label: "View Policies", path: "/policy" }],
+  },
+  {
+    key: "policy-catalogue",
+    label: "Buy Insurance",
+    icon: ProductIcon,
+    children: [{ label: "Available Plans", path: "/policy-catalogue" }],
   },
 ];
 

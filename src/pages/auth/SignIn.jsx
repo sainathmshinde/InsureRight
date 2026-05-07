@@ -4,8 +4,8 @@ import { useAuth } from "../../context/AuthContext";
 
 const DEMO = [
   { role: "Broker", email: "broker@kmdastur.com", pass: "broker@123" },
-  { role: "Agent", email: "rahul@kmdastur.com", pass: "agent@123" },
-  { role: "Customer", email: "anita@gmail.com", pass: "cust@123" },
+  { role: "Agent", email: "pooja@kmdastur.com", pass: "agent@123" },
+  { role: "Customer", email: "aarav@gmail.com", pass: "cust@123" },
 ];
 
 export default function SignIn() {
@@ -25,7 +25,12 @@ export default function SignIn() {
     setTimeout(() => {
       const r = login(form.email, form.password);
       setLoading(false);
-      if (r.ok) navigate("/dashboard", { replace: true });
+      if (r.ok) {
+        const dest = r.user.role === 'broker' ? '/broker-portal'
+                   : r.user.role === 'agent'  ? '/agent-portal'
+                   : '/customer-portal'
+        navigate(dest, { replace: true })
+      }
       else setError(r.error);
     }, 500);
   };

@@ -54,6 +54,12 @@ import BuyPolicy  from "./pages/policy/BuyPolicy";
 // CRM
 import CrmPage from "./pages/crm/CrmPage";
 
+// Portals
+import BrokerPortal    from "./pages/portal/BrokerPortal";
+import AgentPortal     from "./pages/portal/AgentPortal";
+import CustomerPortal  from "./pages/portal/CustomerPortal";
+import PolicyCatalogue from "./pages/portal/PolicyCatalogue";
+
 function ProfileView() {
   const { user } = useAuth();
   if (user?.role === 'agent')    return <AgentProfile />;
@@ -81,6 +87,18 @@ export default function App() {
           <Route element={<ProtectedRoute />}>
             <Route path="/" element={<Layout />}>
               <Route index element={<Navigate to="/dashboard" replace />} />
+
+              {/* ── PORTALS (role-specific home) ── */}
+              <Route element={<RoleGuard roles={['broker']} />}>
+                <Route path="broker-portal" element={<BrokerPortal />} />
+              </Route>
+              <Route element={<RoleGuard roles={['agent']} />}>
+                <Route path="agent-portal" element={<AgentPortal />} />
+              </Route>
+              <Route element={<RoleGuard roles={['customer']} />}>
+                <Route path="customer-portal" element={<CustomerPortal />} />
+                <Route path="policy-catalogue" element={<PolicyCatalogue />} />
+              </Route>
 
               {/* ── DASHBOARD (all roles) ── */}
               <Route path="dashboard" element={<Dashboard />} />

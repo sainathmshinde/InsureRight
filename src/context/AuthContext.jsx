@@ -12,15 +12,17 @@ const MOCK_USERS = {
     gst: '27AABCK1234M1Z5', pan: 'AABCK1234M',
     established: '1968', type: 'Partnership',
   },
-  'rahul@kmdastur.com': {
-    id: 'a1', role: 'agent', password: 'agent@123',
-    name: 'Rahul Verma', company: 'K.M. Dastur & Co.', phone: '9876543210',
-    email: 'rahul@kmdastur.com', brokerId: 'b1', avatar: 'RV',
+  'pooja@kmdastur.com': {
+    id: 'a2', role: 'agent', password: 'agent@123',
+    name: 'Pooja Desai', company: 'K.M. Dastur & Co.', phone: '9812345678',
+    email: 'pooja@kmdastur.com', brokerId: 'b1', avatar: 'PD',
+    posLicense: 'POS-2023-019', qualification: 'Post Graduate', experience: '3',
   },
-  'anita@gmail.com': {
+  'aarav@gmail.com': {
     id: 'c1', role: 'customer', password: 'cust@123',
-    name: 'Anita Desai', phone: '9876543210',
-    email: 'anita@gmail.com', brokerId: 'b1', avatar: 'AD',
+    name: 'Aarav Sharma', phone: '9876543210',
+    email: 'aarav@gmail.com', brokerId: 'b1', avatar: 'AS',
+    dob: '15/03/1990', gender: 'Male', city: 'Mumbai', state: 'Maharashtra',
   },
 }
 
