@@ -4,6 +4,9 @@ import { Field, Input, Select, SectionBlock, UploadBox } from "../../components/
 import { useAuth } from "../../context/AuthContext";
 import FamilyMembersSection from "./FamilyMembersSection";
 
+const doc = (type, params) =>
+  `/documents/preview.html?type=${type}&${new URLSearchParams(params)}`;
+
 const MOCK_DATA = {
   1: {
     name: "Aarav Sharma",
@@ -19,6 +22,8 @@ const MOCK_DATA = {
     nomineeName: "Priya Sharma",
     nomineeRelation: "Spouse",
     nomineeShare: "100",
+    aadhaarFile: doc("aadhaar", { name: "Aarav Sharma", number: "1234 5678 9012", dob: "15/03/1990", gender: "Male" }),
+    panFile:     doc("pan",     { name: "Aarav Sharma", number: "AABCS1234D",     dob: "15/03/1990", gender: "Male" }),
     familyMembers: [
       { id: 1, type: "Spouse",   name: "Priya Sharma", dob: "1992-07-22", gender: "Female", preExisting: "" },
       { id: 2, type: "Son",      name: "Aryan Sharma", dob: "2016-02-10", gender: "Male",   preExisting: "" },
@@ -38,17 +43,17 @@ export default function CustomerEdit() {
   const { user } = useAuth();
 
   const isProfile = !id;
+  // Fall back to first mock record so doc previews always show in demo
   const profileData = isProfile
-    ? (Object.values(MOCK_DATA).find(m => m.email === user?.email) ?? {})
+    ? (Object.values(MOCK_DATA).find(m => m.email === user?.email) ?? Object.values(MOCK_DATA)[0] ?? {})
     : {};
   const initial = isProfile
     ? { ...profileData, ...authUserToCustomer(user) }
     : (MOCK_DATA[id] ?? {});
   const [form, setForm] = useState(initial);
   const [members, setMembers] = useState(initial.familyMembers ?? []);
-  const [kycFiles, setKycFiles] = useState({ aadhaar: null, pan: null });
   const set  = (f) => (e) => setForm((p) => ({ ...p, [f]: e.target.value }));
-  const setKF = (f) => (e) => setKycFiles((p) => ({ ...p, [f]: e.target.files[0] ?? null }));
+  const setF = (f) => (e) => setForm((p) => ({ ...p, [f]: e.target.files[0] ?? null }));
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -201,14 +206,16 @@ export default function CustomerEdit() {
                     <UploadBox
                       label="Upload Aadhaar card"
                       hint="JPG, PNG or PDF"
-                      onChange={setKF('aadhaar')}
+                      value={form.aadhaarFile}
+                      onChange={setF('aadhaarFile')}
                     />
                   </Field>
                   <Field label="PAN Card">
                     <UploadBox
                       label="Upload PAN card"
                       hint="JPG, PNG or PDF"
-                      onChange={setKF('pan')}
+                      value={form.panFile}
+                      onChange={setF('panFile')}
                     />
                   </Field>
                 </div>

@@ -22,7 +22,25 @@ export default function AgentEdit() {
   const { user } = useAuth();
 
   const isProfile = !id;
-  const initial = isProfile ? authUserToAgent(user) : (AGENT_MAP[Number(id)] ?? {});
+
+  // For profile: load full agent record (with doc URLs) then overlay auth user fields
+  const profileAgent = isProfile
+    ? (
+        Object.values(AGENT_MAP).find(a => a.email === user?.email)
+        ?? Object.values(AGENT_MAP).find(a => a.name === user?.name)
+        ?? AGENT_MAP[2]
+      )
+    : null
+
+  const initial = isProfile
+    ? {
+        ...profileAgent,
+        name:           user?.name    || profileAgent?.name    || '',
+        mobile:         user?.phone   || profileAgent?.mobile  || '',
+        email:          user?.email   || profileAgent?.email   || '',
+        assignedBroker: user?.company || profileAgent?.assignedBroker || '',
+      }
+    : (AGENT_MAP[Number(id)] ?? {});
   const [form, setForm] = useState(initial);
   const set = (f) => (e) => setForm((p) => ({ ...p, [f]: e.target.value }));
   const setF = (f) => (e) =>

@@ -32,7 +32,26 @@ export default function BrokerEdit() {
   const { user } = useAuth()
 
   const isProfile = !id
-  const existing  = isProfile ? userToInitial(user) : (BROKER_MAP[Number(id)] ?? INITIAL)
+
+  // For profile edit: pull the full broker record (documents, bank details, etc.)
+  // then override contact fields with the live auth user data
+  const profileBroker = isProfile
+    ? (
+        Object.values(BROKER_MAP).find(b => b.email === user?.email)
+        ?? Object.values(BROKER_MAP).find(b => b.companyName === user?.company)
+        ?? BROKER_MAP[1]
+      )
+    : null
+
+  // Strip null/empty entries so they don't overwrite real doc URLs in profileBroker
+  const userFields = isProfile
+    ? Object.fromEntries(Object.entries(userToInitial(user)).filter(([, v]) => v !== null && v !== ''))
+    : {}
+
+  const existing = isProfile
+    ? { ...profileBroker, ...userFields }
+    : (BROKER_MAP[Number(id)] ?? INITIAL)
+
   const { form, set, setFile } = useBrokerForm(existing)
 
   const handleSubmit = (e) => {
