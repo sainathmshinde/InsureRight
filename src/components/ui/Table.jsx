@@ -37,7 +37,7 @@ export function Table({ columns, rows, empty, rowKey = 'id' }) {
             <tr key={row[rowKey] ?? i}>
               {columns.map(col => (
                 <td key={col.key} style={col.style}>
-                  {col.render ? col.render(row) : row[col.key]}
+                  {col.render ? col.render(row, i) : row[col.key]}
                 </td>
               ))}
             </tr>

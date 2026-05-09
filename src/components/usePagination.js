@@ -26,6 +26,7 @@ export default function usePagination(data, defaultPerPage = 10) {
     page: safePage,
     perPage,
     total: data.length,
+    offset: from,    // 0-based index of the first row on this page
     onPage,
     onPerPage,
     reset: () => setPage(1),  // call this whenever filters change

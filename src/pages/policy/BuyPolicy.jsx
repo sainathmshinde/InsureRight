@@ -1,5 +1,5 @@
 import { useState, useMemo } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import { Field, Input, Select, Textarea } from "../../components/fields";
 import {
@@ -159,7 +159,7 @@ const CUSTOMERS = [
   },
 ];
 
-// ── Product catalogue ──────────────────────────────────────────────────────
+// ── Product catalogue (all 8 insurance types) ─────────────────────────────
 const PRODUCTS = {
   Health: [
     {
@@ -347,6 +347,37 @@ const PRODUCTS = {
       logo: "🏦",
     },
   ],
+  Car: [
+    { id: 5, name: "Bajaj Allianz Comprehensive Motor", code: "BAJ-MC-005", ic: "Bajaj Allianz", premium: 4800, sumInsured: "IDV based", waitingPeriod: 0, roomRent: "—", highlights: ["4,000+ network garages", "Cashless claims", "Zero depreciation add-on", "24/7 roadside assist"], addOns: ["Zero Depreciation", "Engine Protection"], logo: "🔵" },
+    { id: 6, name: "New India Motor OD + TP",           code: "NIA-MC-006", ic: "New India",    premium: 3600, sumInsured: "IDV based", waitingPeriod: 0, roomRent: "—", highlights: ["Government-backed insurer", "3,500+ cashless garages", "Personal accident ₹15L", "NCB retention"], addOns: ["Personal Accident", "Consumables"], logo: "🇮🇳" },
+    { id: 7, name: "HDFC ERGO Motor Comprehensive",     code: "HER-MC-020", ic: "HDFC ERGO",   premium: 5200, sumInsured: "IDV based", waitingPeriod: 0, roomRent: "—", highlights: ["Bumper-to-bumper cover", "Depreciation waiver", "Key replacement", "Cashless at 6,800+ garages"], addOns: ["Zero Depreciation", "RTI Cover"], logo: "🏦" },
+  ],
+  "Two-Wheeler": [
+    { id: 20, name: "ICICI Lombard Two Wheeler",          code: "ICL-TW-010", ic: "ICICI Lombard", premium: 1800, sumInsured: "IDV based", waitingPeriod: 0, roomRent: "—", highlights: ["Comprehensive plan", "Zero depreciation available", "Personal accident ₹15L", "Instant policy issuance"], addOns: ["Zero Depreciation", "PA Rider"], logo: "🛡️" },
+    { id: 21, name: "Bajaj Allianz Two-Wheeler Complete", code: "BAJ-TW-022", ic: "Bajaj Allianz", premium: 1500, sumInsured: "IDV based", waitingPeriod: 0, roomRent: "—", highlights: ["OD + third party cover", "Roadside assistance", "Pillion rider PA cover", "Cashless at 4,000+ garages"], addOns: ["Zero Depreciation", "Pillion PA"], logo: "🔵" },
+    { id: 22, name: "New India Two-Wheeler OD + TP",      code: "NIA-TW-023", ic: "New India",    premium: 1200, sumInsured: "IDV based", waitingPeriod: 0, roomRent: "—", highlights: ["Government-backed insurer", "Pan-India cashless", "NCB up to 50%", "Personal accident ₹15L"], addOns: ["Personal Accident", "Pillion PA"], logo: "🇮🇳" },
+  ],
+  "Term Life": [
+    { id: 8,  name: "LIC Tech Term Plan",              code: "LIC-TT-025", ic: "LIC",       premium: 6200,  sumInsured: "₹25L–₹5Cr", waitingPeriod: 0, roomRent: "—", highlights: ["Pure term protection", "Level or increasing cover", "98.6% claim settlement", "Tax benefit under 80C"], addOns: ["Accidental Death Rider", "Critical Illness Rider"], logo: "🏦" },
+    { id: 9,  name: "HDFC Life Click 2 Protect Plus", code: "HDFC-TP-024", ic: "HDFC Life", premium: 8400,  sumInsured: "₹50L–₹5Cr", waitingPeriod: 0, roomRent: "—", highlights: ["Return of premium option", "Critical illness rider", "99.5% claim settlement", "Long-term cover up to 85 yrs"], addOns: ["Critical Illness", "Waiver of Premium"], logo: "🔷" },
+    { id: 10, name: "SBI Life eShield Next",           code: "SBI-TT-030", ic: "SBI Life",  premium: 5800,  sumInsured: "₹25L–₹2Cr", waitingPeriod: 0, roomRent: "—", highlights: ["Online pure term plan", "Increasing life cover option", "Comprehensive terminal illness cover", "Tax benefits 80C & 10(10D)"], addOns: ["Accidental Death Rider", "Disability Rider"], logo: "🏛️" },
+  ],
+  Investment: [
+    { id: 11, name: "LIC Jeevan Anand",         code: "LIC-LA-008",   ic: "LIC",       premium: 14160, sumInsured: "₹10L–₹1Cr", waitingPeriod: 90, roomRent: "—", highlights: ["Whole life protection + endowment", "Guaranteed bonus every year", "Loan facility against policy", "Death + maturity benefit"], addOns: ["Accidental Death Rider", "Critical Illness Rider"], logo: "🏦" },
+    { id: 12, name: "HDFC Life Sanchay Plus",    code: "HDFC-LSP-009", ic: "HDFC Life", premium: 21240, sumInsured: "₹25L–₹2Cr", waitingPeriod: 90, roomRent: "—", highlights: ["Guaranteed returns", "Flexible payout options", "Income or lump-sum benefit", "Tax benefit 80C & 10(10D)"], addOns: ["Waiver of Premium"], logo: "🔷" },
+  ],
+  Travel: [
+    { id: 13, name: "HDFC ERGO Travel Shield",  code: "HER-TR-026", ic: "HDFC ERGO",   premium: 1800, sumInsured: "$2,50,000", waitingPeriod: 0, roomRent: "—", highlights: ["Medical emergency cover", "Trip cancellation", "Baggage loss & delay", "24×7 global assistance"], addOns: ["Adventure Sports", "Trip Interruption"], logo: "🏦" },
+    { id: 14, name: "Bajaj Allianz Travel Ace", code: "BAJ-TR-027", ic: "Bajaj Allianz", premium: 2200, sumInsured: "$5,00,000", waitingPeriod: 0, roomRent: "—", highlights: ["Individual & family plans", "Emergency evacuation", "Passport loss cover", "Student travel option"], addOns: ["Trip Cancellation", "Lost Baggage"], logo: "🔵" },
+  ],
+  Home: [
+    { id: 15, name: "Bajaj Allianz Home Shield", code: "BAJ-HM-028", ic: "Bajaj Allianz", premium: 3500, sumInsured: "₹20L–₹2Cr", waitingPeriod: 0, roomRent: "—", highlights: ["Structure + contents cover", "Natural disaster protection", "Burglary & theft", "Liability cover"], addOns: ["Valuables Cover", "Liability Extension"], logo: "🔵" },
+    { id: 16, name: "HDFC ERGO Home Complete",   code: "HER-HM-029", ic: "HDFC ERGO",   premium: 2800, sumInsured: "₹15L–₹1Cr", waitingPeriod: 0, roomRent: "—", highlights: ["All-risk home cover", "Electrical breakdown", "Personal accident cover", "Rent for alternate accommodation"], addOns: ["Tenant Liability", "Rental Cover"], logo: "🏦" },
+  ],
+  Business: [
+    { id: 17, name: "ICICI Lombard Business Guard", code: "ICL-BG-030", ic: "ICICI Lombard", premium: 15000, sumInsured: "₹50L–₹5Cr", waitingPeriod: 0, roomRent: "—", highlights: ["Fire & allied perils", "Burglary & theft", "Public liability", "Business interruption cover"], addOns: ["Machinery Breakdown", "Electronic Equipment"], logo: "🛡️" },
+    { id: 18, name: "Bajaj Allianz SME Shield",     code: "BAJ-BG-031", ic: "Bajaj Allianz", premium: 12000, sumInsured: "₹25L–₹2Cr", waitingPeriod: 0, roomRent: "—", highlights: ["Package policy for SMEs", "Employee liability", "Goods in transit", "Workers compensation"], addOns: ["Employee Benefits", "Professional Liability"], logo: "🔵" },
+  ],
 };
 
 const STEPS = [
@@ -501,23 +532,33 @@ function KYCWarning({ kyc }) {
 // ── Main component ─────────────────────────────────────────────────────────
 export default function BuyPolicy() {
   const navigate = useNavigate();
+  const location  = useLocation();
   const { user } = useAuth();
   const isCustomer = user?.role === "customer";
+
+  // Pre-selected type coming from Insurance menu / health page
+  const preType = location.state?.insuranceType ?? null;
 
   // For customer login: auto-find and lock in their own record
   const selfCustomer = isCustomer
     ? (CUSTOMERS.find((c) => c.email === user.email) ?? null)
     : null;
 
-  // Step state — customers skip Step 0 (Select Customer)
-  const [step, setStep] = useState(isCustomer ? 1 : 0);
+  // Step state:
+  //   • broker/agent always start at 0 (Select Customer)
+  //   • customer w/ pre-selected type → skip to step 2 (Members)
+  //   • customer w/o pre-selected type → skip to step 1 (Insurance Type)
+  const [step, setStep] = useState(() => {
+    if (isCustomer) return preType ? 2 : 1;
+    return 0;
+  });
 
   // Step 0 — customer selection (agent/broker only)
   const [custSearch, setCustSearch] = useState("");
   const [selectedCustomer, setSelectedCustomer] = useState(selfCustomer);
 
-  // Step 1 — insurance type
-  const [insuranceType, setInsuranceType] = useState(null);
+  // Step 1 — insurance type (pre-filled if coming from Insurance menu)
+  const [insuranceType, setInsuranceType] = useState(preType);
 
   // Step 2 — members / vehicle — pre-fill from customer's saved family
   const [members, setMembers] = useState(
@@ -568,11 +609,18 @@ export default function BuyPolicy() {
   const setP = (f) => (e) =>
     setProposal((p) => ({ ...p, [f]: e.target.value }));
   const setV = (f) => (e) => setVehicle((v) => ({ ...v, [f]: e.target.value }));
-  const next = () => setStep((s) => Math.min(s + 1, STEPS.length - 1));
-  // Customer can't go back to Step 0 (customer list); navigate to policy page instead
+  const next = () => setStep(s => {
+    const n = s + 1;
+    // Skip Insurance Type step if type is already known (pre-selected or just chosen)
+    if (n === 1 && insuranceType) return 2;
+    return Math.min(n, STEPS.length - 1);
+  });
   const back = () => {
+    // Customer: going back from Insurance Type step exits to policy list
     if (isCustomer && step === 1) { navigate("/policy"); return; }
-    setStep((s) => Math.max(s - 1, 0));
+    // Customer: going back from Members when type was pre-selected → return to Insurance page
+    if (isCustomer && step === 2 && preType) { navigate(-1); return; }
+    setStep(s => Math.max(s - 1, 0));
   };
 
   const products = PRODUCTS[insuranceType] ?? [];
@@ -656,7 +704,9 @@ export default function BuyPolicy() {
           <div>
             <div className="page-title">Buy Insurance Policy</div>
             <div className="page-subtitle">
-              {isCustomer ? "Compare plans and buy a policy for yourself" : "Select a customer, compare plans and issue a policy"}
+              {preType
+                ? `${preType} Insurance — ${isCustomer ? "compare plans and buy" : "select customer and issue policy"}`
+                : isCustomer ? "Compare plans and buy a policy for yourself" : "Select a customer, compare plans and issue a policy"}
             </div>
           </div>
         </div>
@@ -886,7 +936,7 @@ export default function BuyPolicy() {
       {step === 1 && (
         <div>
           {selectedCustomer && <KYCWarning kyc={selectedCustomer.kyc} />}
-          <div style={{ textAlign: "center", marginBottom: 32 }}>
+          <div style={{ textAlign: "center", marginBottom: 28 }}>
             <div style={{ fontSize: 16, fontWeight: 600, marginBottom: 6 }}>
               What type of insurance?
             </div>
@@ -894,100 +944,43 @@ export default function BuyPolicy() {
               Select the insurance type for {selectedCustomer?.name}
             </div>
           </div>
-          <div
-            style={{
-              display: "grid",
-              gridTemplateColumns: "repeat(1, 1fr)",
-              gap: 20,
-              maxWidth: 740,
-              margin: "0 auto",
-            }}
-          >
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 14, maxWidth: 860, margin: "0 auto" }}>
             {[
-              {
-                type: "Health",
-                icon: HealthIcon,
-                color: "#2563eb",
-                desc: "Medical expenses, hospitalisation, critical illness cover",
-                available: true,
-              },
-              // { type: 'Motor',  icon: MotorIcon,  color: '#d97706', desc: 'Car, bike & commercial vehicle — Own Damage + Third Party',  available: false },
-              // { type: 'Life',   icon: LifeIcon,   color: '#7c3aed', desc: 'Term, whole life & ULIP plans — secure your family\'s future', available: false },
-            ].map(({ type, icon: Icon, color, desc, available }) => (
-              <button
-                key={type}
-                type="button"
-                disabled={!available}
-                onClick={() => {
-                  if (available) {
-                    setInsuranceType(type);
-                    next();
-                  }
-                }}
-                style={{
-                  padding: "32px 24px",
-                  borderRadius: 14,
-                  position: "relative",
-                  cursor: available ? "pointer" : "not-allowed",
-                  fontFamily: "inherit",
-                  opacity: available ? 1 : 0.55,
-                  border: `2px solid ${insuranceType === type ? color : "var(--border)"}`,
-                  background:
-                    insuranceType === type ? color + "10" : "var(--surface)",
-                  boxShadow: "var(--shadow-sm)",
-                  textAlign: "center",
-                  transition: "all .15s",
-                }}
-              >
-                {!available && (
-                  <span
-                    style={{
-                      position: "absolute",
-                      top: 10,
-                      right: 10,
-                      fontSize: 10.5,
-                      fontWeight: 700,
-                      letterSpacing: ".4px",
-                      textTransform: "uppercase",
-                      background: "#f3f4f6",
-                      color: "var(--text-3)",
-                      padding: "2px 8px",
-                      borderRadius: 99,
-                    }}
-                  >
-                    Coming Soon
-                  </span>
-                )}
-                <div
+              { type: "Health",      icon: "🏥", color: "#2d7d46", desc: "Medical & hospitalisation" },
+              { type: "Car",         icon: "🚗", color: "#0a7ea4", desc: "Comprehensive car cover" },
+              { type: "Two-Wheeler", icon: "🏍️", color: "#f97316", desc: "Bike & scooter plans" },
+              { type: "Term Life",   icon: "🛡️", color: "#7c3aed", desc: "Pure term protection" },
+              { type: "Investment",  icon: "📈", color: "#1d4ed8", desc: "ULIP & savings plans" },
+              { type: "Travel",      icon: "✈️", color: "#059669", desc: "Domestic & international" },
+              { type: "Home",        icon: "🏠", color: "#a05c00", desc: "Home & contents cover" },
+              { type: "Business",    icon: "🏢", color: "#5c5573", desc: "SME & commercial" },
+            ].map(({ type, icon, color, desc }) => {
+              const isSelected = insuranceType === type;
+              return (
+                <button
+                  key={type}
+                  type="button"
+                  onClick={() => { setInsuranceType(type); next(); }}
                   style={{
-                    marginBottom: 14,
-                    display: "flex",
-                    justifyContent: "center",
+                    padding: "22px 14px 18px",
+                    borderRadius: 14,
+                    cursor: "pointer",
+                    fontFamily: "inherit",
+                    border: `2px solid ${isSelected ? color : "var(--border)"}`,
+                    background: isSelected ? color + "12" : "var(--surface)",
+                    boxShadow: isSelected ? `0 4px 16px ${color}22` : "var(--shadow-sm)",
+                    textAlign: "center",
+                    transition: "all .15s",
                   }}
                 >
-                  <Icon size={42} color={color} />
-                </div>
-                <div
-                  style={{
-                    fontWeight: 700,
-                    fontSize: 16,
-                    marginBottom: 8,
-                    color: "var(--text)",
-                  }}
-                >
-                  {type} Insurance
-                </div>
-                <div
-                  style={{
-                    fontSize: 12.5,
-                    color: "var(--text-3)",
-                    lineHeight: 1.6,
-                  }}
-                >
-                  {desc}
-                </div>
-              </button>
-            ))}
+                  <div style={{ fontSize: 36, marginBottom: 10 }}>{icon}</div>
+                  <div style={{ fontWeight: 700, fontSize: 13.5, color: isSelected ? color : "var(--text)", marginBottom: 5 }}>
+                    {type}
+                  </div>
+                  <div style={{ fontSize: 11.5, color: "var(--text-3)", lineHeight: 1.4 }}>{desc}</div>
+                </button>
+              );
+            })}
           </div>
         </div>
       )}
@@ -998,7 +991,7 @@ export default function BuyPolicy() {
       {step === 2 && (
         <div className="card">
           <div className="card-body">
-            {insuranceType === "Motor" ? (
+            {["Car", "Two-Wheeler"].includes(insuranceType) ? (
               <div>
                 <div
                   style={{ fontWeight: 600, fontSize: 15, marginBottom: 20 }}

@@ -1,5 +1,6 @@
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../../context/AuthContext'
+import { IC_LIST } from '../../data/icData'
 
 const STATS = [
   { label: 'Active Policies',  value: '2',    sub: 'Health & Motor',       color: '#7c3aed', bg: '#f5f3ff' },
@@ -174,6 +175,56 @@ export default function CustomerPortal() {
                 <div style={{ fontSize: 13, fontWeight: 600, color: '#1a1628', marginBottom: 4 }}>{c.label}</div>
                 <div style={{ fontSize: 12, color: '#9d94b8' }}>{c.detail}</div>
               </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* Our Insurers */}
+      <div className="card">
+        <div className="card-body">
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
+            <div>
+              <div style={{ fontWeight: 700, fontSize: 15 }}>Backed by Trusted Insurers</div>
+              <div style={{ fontSize: 12.5, color: '#9d94b8', marginTop: 3 }}>K.M. Dastur & Co. works with India's top IRDAI-regulated insurance companies</div>
+            </div>
+            <button
+              type="button"
+              className="btn btn-ghost"
+              style={{ fontSize: 12.5, padding: '6px 14px' }}
+              onClick={() => navigate('/insurance-partners')}
+            >
+              View All Partners →
+            </button>
+          </div>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(140px, 1fr))', gap: 12 }}>
+            {IC_LIST.map(ic => (
+              <button
+                key={ic.id}
+                type="button"
+                onClick={() => navigate('/insurance-partners')}
+                style={{
+                  display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8,
+                  padding: '14px 12px', borderRadius: 12,
+                  border: `1.5px solid ${ic.border}`,
+                  background: ic.bg,
+                  cursor: 'pointer', fontFamily: 'inherit',
+                  transition: 'box-shadow .15s',
+                }}
+                onMouseEnter={e => e.currentTarget.style.boxShadow = '0 4px 14px rgba(0,0,0,0.1)'}
+                onMouseLeave={e => e.currentTarget.style.boxShadow = 'none'}
+              >
+                <span style={{ fontSize: 28 }}>{ic.logo}</span>
+                <div style={{ textAlign: 'center' }}>
+                  <div style={{ fontSize: 12, fontWeight: 700, color: ic.color, lineHeight: 1.2 }}>{ic.shortName}</div>
+                  <div style={{ fontSize: 11, color: '#9d94b8', marginTop: 4 }}>{ic.claimRatio}% claims</div>
+                </div>
+                <div style={{ display: 'flex', gap: 4, flexWrap: 'wrap', justifyContent: 'center' }}>
+                  {ic.types.map(t => (
+                    <span key={t} style={{ fontSize: 10, padding: '2px 7px', borderRadius: 99, background: 'rgba(255,255,255,0.7)', color: ic.color, fontWeight: 600, border: `1px solid ${ic.border}` }}>{t}</span>
+                  ))}
+                </div>
+              </button>
             ))}
           </div>
         </div>

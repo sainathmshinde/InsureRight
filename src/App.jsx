@@ -55,10 +55,13 @@ import BuyPolicy  from "./pages/policy/BuyPolicy";
 import CrmPage from "./pages/crm/CrmPage";
 
 // Portals
-import BrokerPortal    from "./pages/portal/BrokerPortal";
-import AgentPortal     from "./pages/portal/AgentPortal";
-import CustomerPortal  from "./pages/portal/CustomerPortal";
-import PolicyCatalogue from "./pages/portal/PolicyCatalogue";
+import BrokerPortal       from "./pages/portal/BrokerPortal";
+import AgentPortal        from "./pages/portal/AgentPortal";
+import CustomerPortal     from "./pages/portal/CustomerPortal";
+import PolicyCatalogue        from "./pages/portal/PolicyCatalogue";
+import InsurancePartners      from "./pages/portal/InsurancePartners";
+import HealthInsurancePage    from "./pages/insurance/HealthInsurancePage";
+import InsuranceCategoryPage  from "./pages/insurance/InsuranceCategoryPage";
 
 function ProfileView() {
   const { user } = useAuth();
@@ -97,11 +100,22 @@ export default function App() {
               </Route>
               <Route element={<RoleGuard roles={['customer']} />}>
                 <Route path="customer-portal" element={<CustomerPortal />} />
+              </Route>
+              <Route element={<RoleGuard roles={['agent', 'customer']} />}>
                 <Route path="policy-catalogue" element={<PolicyCatalogue />} />
               </Route>
 
               {/* ── DASHBOARD (all roles) ── */}
               <Route path="dashboard" element={<Dashboard />} />
+
+              {/* ── INSURANCE PARTNERS (all roles) ── */}
+              <Route path="insurance-partners" element={<InsurancePartners />} />
+
+              {/* ── INSURANCE PAGES (all roles) ── */}
+              <Route path="insurance">
+                <Route path="health" element={<HealthInsurancePage />} />
+                <Route path=":type"  element={<InsuranceCategoryPage />} />
+              </Route>
 
               {/* ── PROFILE (role-aware) ── */}
               <Route path="profile">

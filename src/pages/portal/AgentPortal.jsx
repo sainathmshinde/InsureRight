@@ -1,5 +1,6 @@
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../../context/AuthContext'
+import { IC_LIST } from '../../data/icData'
 
 const STATS = [
   { label: 'My Customers',      value: '38',      sub: '+2 this month',       color: '#7c3aed', bg: '#f5f3ff' },
@@ -124,6 +125,27 @@ export default function AgentPortal() {
         </div>
 
       </div>
+
+      {/* IC Partner strip */}
+      <div className="card">
+        <div className="card-body">
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
+            <div style={{ fontWeight: 700, fontSize: 15 }}>Our Insurance Partners</div>
+            <button type="button" className="btn btn-ghost" style={{ fontSize: 12.5, padding: '5px 14px' }} onClick={() => navigate('/insurance-partners')}>View Details →</button>
+          </div>
+          <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
+            {IC_LIST.map(ic => (
+              <button key={ic.id} type="button" onClick={() => navigate('/insurance-partners')}
+                style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '8px 14px', borderRadius: 99, border: `1.5px solid ${ic.border}`, background: ic.bg, cursor: 'pointer', fontFamily: 'inherit' }}>
+                <span style={{ fontSize: 16 }}>{ic.logo}</span>
+                <span style={{ fontSize: 12.5, fontWeight: 600, color: ic.color }}>{ic.shortName}</span>
+                <span style={{ fontSize: 11.5, color: '#9d94b8' }}>{ic.claimRatio}%</span>
+              </button>
+            ))}
+          </div>
+        </div>
+      </div>
+
     </div>
   )
 }

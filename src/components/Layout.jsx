@@ -1,39 +1,15 @@
 import { Outlet } from "react-router-dom";
-import Sidebar from "./Sidebar";
-import Topbar from "./Topbar";
+import TopNav from "./TopNav";
 
 export default function Layout() {
   return (
-    <div style={S.shell}>
-      <Sidebar />
-      <div style={S.main}>
-        <Topbar />
-        <div style={S.content}>
+    <div style={{ display: "flex", flexDirection: "column", height: "100vh" }}>
+      <TopNav />
+      <main style={{ flex: 1, minHeight: 0, overflowY: "auto", background: "var(--bg, #f5f4f9)" }}>
+        <div style={{ maxWidth: 1400, margin: "0 auto", padding: "28px 32px" }}>
           <Outlet />
         </div>
-      </div>
+      </main>
     </div>
   );
 }
-
-const S = {
-  shell: {
-    display: "flex",
-    height: "100vh",
-    overflow: "hidden",
-  },
-  main: {
-    flex: 1,
-    display: "flex",
-    flexDirection: "column",
-    overflow: "hidden",
-    minWidth: 0,
-    transition: "margin-left 0.22s cubic-bezier(.4,0,.2,1)",
-  },
-  content: {
-    flex: 1,
-    overflowY: "auto",
-    padding: "28px",
-    background: "var(--bg, #f5f4f9)",
-  },
-};

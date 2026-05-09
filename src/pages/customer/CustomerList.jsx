@@ -37,7 +37,7 @@ export default function CustomerList() {
   const handle = setter => v => { setter(v); pg.reset() }
 
   const columns = [
-    { key: 'id',       label: '#',        style: { color: 'var(--text-3)' } },
+    { key: 'id',       label: '#',        style: { color: 'var(--text-3)' }, render: (_, i) => pg.offset + i + 1 },
     { key: 'name',     label: 'Name',     style: { fontWeight: 500 } },
     { key: 'mobile',   label: 'Mobile' },
     { key: 'email',    label: 'Email',    style: { color: 'var(--blue)' } },

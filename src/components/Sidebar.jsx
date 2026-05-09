@@ -91,6 +91,12 @@ const BROKER_NAV = [
       { label: "Add IC",    path: "/ic/create" },
     ],
   },
+  {
+    key: "insurance-partners",
+    label: "Our Partners",
+    icon: InsuranceCompanyIcon,
+    children: [{ label: "Insurance Partners", path: "/insurance-partners" }],
+  },
 ];
 
 const AGENT_NAV = [
@@ -133,6 +139,12 @@ const AGENT_NAV = [
     icon: AgentIcon,
     children: [{ label: "Commission", path: "/agent/commission" }],
   },
+  {
+    key: "insurance-partners",
+    label: "Our Partners",
+    icon: InsuranceCompanyIcon,
+    children: [{ label: "Insurance Partners", path: "/insurance-partners" }],
+  },
 ];
 
 const CUSTOMER_NAV = [
@@ -162,6 +174,12 @@ const CUSTOMER_NAV = [
     label: "Buy Insurance",
     icon: ProductIcon,
     children: [{ label: "Available Plans", path: "/policy-catalogue" }],
+  },
+  {
+    key: "insurance-partners",
+    label: "Our Partners",
+    icon: InsuranceCompanyIcon,
+    children: [{ label: "Insurance Partners", path: "/insurance-partners" }],
   },
 ];
 
