@@ -22,18 +22,18 @@ import {
 const CUSTOMERS = [
   {
     id: 1,
-    name: "Anita Desai",
+    name: "Aarav Sharma",
     mobile: "9876543210",
-    email: "anita@gmail.com",
-    dob: "1985-04-12",
-    gender: "Female",
+    email: "aarav@gmail.com",
+    dob: "1990-03-15",
+    gender: "Male",
     kyc: "Verified",
     policies: 2,
-    address: "A-12, Linking Road, Bandra, Mumbai",
+    address: "14, Green Valley Apartments, Andheri West, Mumbai",
     familyMembers: [
-      { type: "Spouse",  name: "Ravi Desai",  dob: "1982-06-15", gender: "Male"   },
-      { type: "Child 1", name: "Aarav Desai", dob: "2010-03-20", gender: "Male"   },
-      { type: "Child 2", name: "Piya Desai",  dob: "2013-08-05", gender: "Female" },
+      { type: "Spouse",  name: "Priya Sharma", dob: "1992-07-22", gender: "Female" },
+      { type: "Child 1", name: "Aryan Sharma", dob: "2016-02-10", gender: "Male"   },
+      { type: "Child 2", name: "Aanya Sharma", dob: "2019-09-05", gender: "Female" },
     ],
   },
   {
@@ -519,13 +519,10 @@ export default function BuyPolicy() {
   // Step 1 — insurance type
   const [insuranceType, setInsuranceType] = useState(null);
 
-  // Step 2 — members / vehicle — pre-fill from customer's saved family
+  // Step 2 — members / vehicle — start with Self only; family added on demand
   const [members, setMembers] = useState(
     selfCustomer
-      ? [
-          { type: "Self", name: selfCustomer.name, dob: selfCustomer.dob, gender: selfCustomer.gender },
-          ...(selfCustomer.familyMembers ?? []),
-        ]
+      ? [{ type: "Self", name: selfCustomer.name, dob: selfCustomer.dob, gender: selfCustomer.gender }]
       : [],
   );
   const [vehicle, setVehicle] = useState({
@@ -567,6 +564,30 @@ export default function BuyPolicy() {
   // Helpers
   const setP = (f) => (e) =>
     setProposal((p) => ({ ...p, [f]: e.target.value }));
+
+  const calcAge = (dob) => {
+    if (!dob) return "";
+    return String(Math.floor((Date.now() - new Date(dob)) / (365.25 * 24 * 3600 * 1000)));
+  };
+
+  const RELATION_TO_SLOT = {
+    Spouse: ["Spouse"],
+    Child:  ["Child 1", "Child 2"],
+    Parent: ["Father", "Mother"],
+  };
+
+  const handleNomineeRelation = (e) => {
+    const relation = e.target.value;
+    const slotTypes = RELATION_TO_SLOT[relation] ?? [];
+    const family = selectedCustomer?.familyMembers ?? [];
+    const match = slotTypes.reduce((found, t) => found ?? family.find(m => m.type === t), null);
+    setProposal((p) => ({
+      ...p,
+      nomineeRelation: relation,
+      nomineeName:     match ? match.name        : p.nomineeName,
+      nomineeAge:      match ? calcAge(match.dob) : p.nomineeAge,
+    }));
+  };
   const setV = (f) => (e) => setVehicle((v) => ({ ...v, [f]: e.target.value }));
   const next = () => setStep((s) => Math.min(s + 1, STEPS.length - 1));
   // Customer can't go back to Step 0 (customer list); navigate to policy page instead
@@ -595,7 +616,6 @@ export default function BuyPolicy() {
     setSelectedCustomer(c);
     setMembers([
       { type: "Self", name: c.name, dob: c.dob, gender: c.gender },
-      ...(c.familyMembers ?? []),
     ]);
     setProposal((p) => ({
       ...p,
@@ -608,9 +628,15 @@ export default function BuyPolicy() {
 
   const addMember = (type) => {
     const slot = FAMILY_SLOTS.find((s) => s.type === type);
+    const saved = selectedCustomer?.familyMembers?.find((m) => m.type === type);
     setMembers((prev) => [
       ...prev,
-      { type, name: "", dob: "", gender: slot?.genderDefault ?? "" },
+      {
+        type,
+        name:   saved?.name   ?? "",
+        dob:    saved?.dob    ?? "",
+        gender: saved?.gender ?? slot?.genderDefault ?? "",
+      },
     ]);
   };
   const removeMember = (type) =>
@@ -1736,7 +1762,7 @@ export default function BuyPolicy() {
                   <Field label="Relation" required>
                     <Select
                       value={proposal.nomineeRelation}
-                      onChange={setP("nomineeRelation")}
+                      onChange={handleNomineeRelation}
                       required
                     >
                       <option value="">Select relation</option>
@@ -1833,11 +1859,109 @@ export default function BuyPolicy() {
         <div
           style={{
             display: "grid",
-            gridTemplateColumns: "1fr 340px",
+            gridTemplateColumns: "1fr 1fr",
             gap: 24,
             alignItems: "start",
           }}
         >
+          {/* Order summary */}
+          <div className="card" style={{ position: "sticky", top: 80 }}>
+            <div className="card-header">
+              <span className="card-title">Order Summary</span>
+            </div>
+            <div className="card-body">
+              {/* Customer */}
+              {selectedCustomer && (
+                <div
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 10,
+                    padding: "10px 0",
+                    borderBottom: "1px solid var(--border)",
+                    marginBottom: 12,
+                  }}
+                >
+                  <Avatar
+                    name={selectedCustomer.name}
+                    size={32}
+                    fontSize={12}
+                  />
+                  <div>
+                    <div style={{ fontWeight: 600, fontSize: 13 }}>
+                      {selectedCustomer.name}
+                    </div>
+                    <div style={{ fontSize: 12, color: "var(--text-3)" }}>
+                      {selectedCustomer.mobile}
+                    </div>
+                  </div>
+                </div>
+              )}
+              {/* Product */}
+              <div
+                style={{
+                  textAlign: "center",
+                  padding: "12px 0",
+                  borderBottom: "1px solid var(--border)",
+                  marginBottom: 12,
+                }}
+              >
+                <div style={{ fontSize: 26, marginBottom: 4 }}>
+                  {selectedProduct.logo}
+                </div>
+                <div style={{ fontWeight: 600, fontSize: 14 }}>
+                  {selectedProduct.name}
+                </div>
+                <div
+                  style={{ fontSize: 12, color: "var(--text-3)", marginTop: 2 }}
+                >
+                  {selectedProduct.ic}
+                </div>
+              </div>
+              {[
+                ["Type", insuranceType],
+                ["Sum Insured", selectedProduct.sumInsured],
+                ["Policy Period", "1 Year"],
+                [
+                  "Base Premium",
+                  `₹${Math.round(selectedProduct.premium / 1.18).toLocaleString()}`,
+                ],
+                [
+                  "GST (18%)",
+                  `₹${Math.round(selectedProduct.premium - selectedProduct.premium / 1.18).toLocaleString()}`,
+                ],
+              ].map(([k, v]) => (
+                <div
+                  key={k}
+                  style={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    padding: "7px 0",
+                    borderBottom: "1px solid var(--border)",
+                    fontSize: 13,
+                  }}
+                >
+                  <span style={{ color: "var(--text-2)" }}>{k}</span>
+                  <span style={{ fontWeight: 500 }}>{v}</span>
+                </div>
+              ))}
+              <div
+                style={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  padding: "14px 0 0",
+                  fontSize: 17,
+                  fontWeight: 700,
+                }}
+              >
+                <span>Total</span>
+                <span style={{ color: "var(--brand)" }}>
+                  ₹{selectedProduct.premium.toLocaleString()}
+                </span>
+              </div>
+            </div>
+          </div>
+
           {/* Payment options */}
           <div className="card">
             <div className="card-header">
@@ -2012,103 +2136,6 @@ export default function BuyPolicy() {
             </div>
           </div>
 
-          {/* Order summary */}
-          <div className="card" style={{ position: "sticky", top: 80 }}>
-            <div className="card-header">
-              <span className="card-title">Order Summary</span>
-            </div>
-            <div className="card-body">
-              {/* Customer */}
-              {selectedCustomer && (
-                <div
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    gap: 10,
-                    padding: "10px 0",
-                    borderBottom: "1px solid var(--border)",
-                    marginBottom: 12,
-                  }}
-                >
-                  <Avatar
-                    name={selectedCustomer.name}
-                    size={32}
-                    fontSize={12}
-                  />
-                  <div>
-                    <div style={{ fontWeight: 600, fontSize: 13 }}>
-                      {selectedCustomer.name}
-                    </div>
-                    <div style={{ fontSize: 12, color: "var(--text-3)" }}>
-                      {selectedCustomer.mobile}
-                    </div>
-                  </div>
-                </div>
-              )}
-              {/* Product */}
-              <div
-                style={{
-                  textAlign: "center",
-                  padding: "12px 0",
-                  borderBottom: "1px solid var(--border)",
-                  marginBottom: 12,
-                }}
-              >
-                <div style={{ fontSize: 26, marginBottom: 4 }}>
-                  {selectedProduct.logo}
-                </div>
-                <div style={{ fontWeight: 600, fontSize: 14 }}>
-                  {selectedProduct.name}
-                </div>
-                <div
-                  style={{ fontSize: 12, color: "var(--text-3)", marginTop: 2 }}
-                >
-                  {selectedProduct.ic}
-                </div>
-              </div>
-              {[
-                ["Type", insuranceType],
-                ["Sum Insured", selectedProduct.sumInsured],
-                ["Policy Period", "1 Year"],
-                [
-                  "Base Premium",
-                  `₹${Math.round(selectedProduct.premium / 1.18).toLocaleString()}`,
-                ],
-                [
-                  "GST (18%)",
-                  `₹${Math.round(selectedProduct.premium - selectedProduct.premium / 1.18).toLocaleString()}`,
-                ],
-              ].map(([k, v]) => (
-                <div
-                  key={k}
-                  style={{
-                    display: "flex",
-                    justifyContent: "space-between",
-                    padding: "7px 0",
-                    borderBottom: "1px solid var(--border)",
-                    fontSize: 13,
-                  }}
-                >
-                  <span style={{ color: "var(--text-2)" }}>{k}</span>
-                  <span style={{ fontWeight: 500 }}>{v}</span>
-                </div>
-              ))}
-              <div
-                style={{
-                  display: "flex",
-                  justifyContent: "space-between",
-                  padding: "14px 0 0",
-                  fontSize: 17,
-                  fontWeight: 700,
-                }}
-              >
-                <span>Total</span>
-                <span style={{ color: "var(--brand)" }}>
-                  ₹{selectedProduct.premium.toLocaleString()}
-                </span>
-              </div>
-            </div>
-          </div>
         </div>
       )}
 

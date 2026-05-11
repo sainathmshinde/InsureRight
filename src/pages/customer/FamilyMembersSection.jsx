@@ -61,7 +61,6 @@ export default function FamilyMembersSection({ members = [], onChange }) {
                     {m.preExisting ? <span style={{ color: '#d97706', marginLeft: 6 }}>⚠ {m.preExisting}</span> : null}
                   </div>
                 </div>
-                <span className="badge badge-purple" style={{ flexShrink: 0 }}>{m.type}</span>
                 <button type="button" className="btn btn-ghost btn-sm" onClick={() => startEdit(m)} style={{ flexShrink: 0 }}>Edit</button>
                 <button type="button" className="btn btn-danger btn-sm" onClick={() => remove(m.id)} style={{ flexShrink: 0 }}>Remove</button>
               </div>
