@@ -23,7 +23,7 @@ const BROKER_NAV = [
   },
   {
     key: "profile",
-    label: "My Profile",
+    label: "Profile",
     icon: UserIcon,
     children: [
       { label: "View Profile", path: "/profile" },
@@ -59,21 +59,21 @@ const BROKER_NAV = [
     ],
   },
   {
-    key: "policy",
-    label: "Policy",
-    icon: PolicyIcon,
-    children: [
-      { label: "Policy Issuance", path: "/policy" },
-      { label: "Buy Policy",      path: "/policy/buy" },
-    ],
-  },
-  {
     key: "campaign",
     label: "Campaign",
     icon: CampaignIcon,
     children: [
       { label: "All Campaigns", path: "/campaign" },
       { label: "Add Campaign",  path: "/campaign/create" },
+    ],
+  },
+  {
+    key: "policy",
+    label: "Policy",
+    icon: PolicyIcon,
+    children: [
+      { label: "Policy Issuance", path: "/policy" },
+      { label: "Buy Policy",      path: "/policy/buy" },
     ],
   },
   {
@@ -132,6 +132,12 @@ const AGENT_NAV = [
     label: "My Commission",
     icon: AgentIcon,
     children: [{ label: "Commission", path: "/agent/commission" }],
+  },
+  {
+    key: "crm",
+    label: "CRM",
+    icon: CRMIcon,
+    children: [{ label: "CRM", path: "/crm" }],
   },
 ];
 

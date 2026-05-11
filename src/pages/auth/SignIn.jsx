@@ -11,7 +11,7 @@ const DEMO = [
 export default function SignIn() {
   const { login } = useAuth();
   const navigate = useNavigate();
-  const [form, setForm] = useState({ email: "", password: "" });
+  const [form, setForm] = useState({ identifier: "", password: "" });
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [showPass, setShowPass] = useState(false);
@@ -23,7 +23,7 @@ export default function SignIn() {
     setLoading(true);
     setError("");
     setTimeout(() => {
-      const r = login(form.email, form.password);
+      const r = login(form.identifier, form.password);
       setLoading(false);
       if (r.ok) {
         const dest = r.user.role === 'broker' ? '/broker-portal'
@@ -36,7 +36,7 @@ export default function SignIn() {
   };
 
   const fillDemo = (email, pass) => {
-    setForm({ email, password: pass });
+    setForm({ identifier: email, password: pass });
     setError("");
   };
 
@@ -61,15 +61,15 @@ export default function SignIn() {
 
         <form onSubmit={handleSubmit} style={S.form}>
           <div>
-            <label style={S.lbl}>Email address</label>
+            <label style={S.lbl}>Username / Email / Mobile</label>
             <input
-              type="email"
+              type="text"
               required
               autoFocus
               style={S.inp}
-              placeholder="you@example.com"
-              value={form.email}
-              onChange={set("email")}
+              placeholder="Email, mobile number or username"
+              value={form.identifier}
+              onChange={set("identifier")}
             />
           </div>
           <div style={{ position: "relative" }}>
@@ -119,7 +119,7 @@ export default function SignIn() {
         <p style={S.regLink}>
           New broker?{" "}
           <Link to="/register" style={S.link}>
-            Register your firm →
+            Register →
           </Link>
         </p>
       </div>
@@ -135,12 +135,12 @@ export default function SignIn() {
           </p>
           <ul style={S.feats}>
             {[
-              "✓  Onboard agents & POS agents",
+              "✓  Onboard agents",
               "✓  Manage customers & KYC",
-              "✓  Issue & track policies",
               "✓  Product catalogue & pricing",
+              "✓  Campaigns & CRM",
+              "✓  Issue & track policies",
               "✓  Commission management",
-              "✓  CRM & campaigns",
             ].map((f) => (
               <li key={f} style={S.feat}>
                 {f}

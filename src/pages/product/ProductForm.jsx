@@ -207,6 +207,10 @@ export default function ProductForm({
   const [activeToc, setActiveToc] = useState(null);
   const [activeTocDoc, setActiveTocDoc] = useState("policyWordings");
   const [viewingDoc, setViewingDoc] = useState(null);
+  const [policyToc, setPolicyToc] = useState(POLICY_TOC);
+  const [brochureToc, setBrochureToc] = useState(BROCHURE_TOC);
+  const [editingTocId, setEditingTocId] = useState(null);
+  const [tocDraft, setTocDraft] = useState({ title: '', content: '' });
   const [coveredMembers, setCoveredMembers] = useState(new Set());
   const [handicapFlags, setHandicapFlags] = useState({ "Child 1": false, "Child 2": false });
   const [premiumRows, setPremiumRows] = useState([
@@ -268,6 +272,17 @@ export default function ProductForm({
 
   const cancelReplace = (field) =>
     setDocState((prev) => ({ ...prev, [field]: { ...prev[field], status: "uploaded" } }));
+
+  const startEditToc = (item) => {
+    setEditingTocId(item.id);
+    setTocDraft({ title: item.title, content: item.content });
+  };
+  const saveEditToc = (docKey) => {
+    const setter = docKey === 'policyWordings' ? setPolicyToc : setBrochureToc;
+    setter(prev => prev.map(i => i.id === editingTocId ? { ...i, ...tocDraft } : i));
+    setEditingTocId(null);
+  };
+  const cancelEditToc = () => setEditingTocId(null);
 
   const handleFileUpload = (field) => (e) => {
     const file = e.target.files?.[0];
@@ -611,40 +626,80 @@ export default function ProductForm({
 
             {/* Accordion */}
             <div style={{ maxHeight: 400, overflowY: "auto" }}>
-              {(activeTocDoc === "policyWordings" ? POLICY_TOC : BROCHURE_TOC).map((item) => (
-                <div key={item.id}>
-                  <button
-                    type="button"
-                    onClick={() => setActiveToc((prev) => prev === item.id ? null : item.id)}
-                    style={{
-                      display: "flex", alignItems: "center", justifyContent: "space-between",
-                      width: "100%", padding: "10px 16px", textAlign: "left",
-                      background: activeToc === item.id ? "var(--brand-light)" : "transparent",
-                      border: "none", borderBottom: "1px solid var(--border)", cursor: "pointer",
-                      fontFamily: "inherit", transition: "background .12s",
-                      color: activeToc === item.id ? "var(--brand)" : "var(--text)",
-                    }}
-                  >
-                    <span style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 13 }}>
-                      <span>{item.icon}</span>
-                      <span style={{ fontWeight: activeToc === item.id ? 600 : 400 }}>{item.title}</span>
-                    </span>
-                    <span style={{ fontSize: 10, color: "var(--text-3)", flexShrink: 0 }}>
-                      {activeToc === item.id ? "▲" : "▼"}
-                    </span>
-                  </button>
-                  {activeToc === item.id && (
-                    <div style={{ padding: "12px 16px 14px", background: "var(--brand-light)", borderBottom: "1px solid var(--border)", fontSize: 12.5, color: "var(--text-2)", lineHeight: 1.75 }}>
-                      {item.content}
-                    </div>
-                  )}
-                </div>
-              ))}
+              {(activeTocDoc === "policyWordings" ? policyToc : brochureToc).map((item) => {
+                const isOpen    = activeToc === item.id;
+                const isEditing = editingTocId === item.id;
+                return (
+                  <div key={item.id}>
+                    <button
+                      type="button"
+                      onClick={() => { if (!isEditing) setActiveToc(prev => prev === item.id ? null : item.id); }}
+                      style={{
+                        display: "flex", alignItems: "center", justifyContent: "space-between",
+                        width: "100%", padding: "10px 16px", textAlign: "left",
+                        background: isOpen ? "var(--brand-light)" : "transparent",
+                        border: "none", borderBottom: "1px solid var(--border)", cursor: "pointer",
+                        fontFamily: "inherit", transition: "background .12s",
+                        color: isOpen ? "var(--brand)" : "var(--text)",
+                      }}
+                    >
+                      <span style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 13 }}>
+                        <span>{item.icon}</span>
+                        <span style={{ fontWeight: isOpen ? 600 : 400 }}>{item.title}</span>
+                      </span>
+                      <span style={{ fontSize: 10, color: "var(--text-3)", flexShrink: 0 }}>
+                        {isOpen ? "▲" : "▼"}
+                      </span>
+                    </button>
+                    {isOpen && (
+                      <div style={{ padding: "12px 16px 14px", background: "var(--brand-light)", borderBottom: "1px solid var(--border)" }}>
+                        {isEditing ? (
+                          <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+                            <div>
+                              <div style={{ fontSize: 11, fontWeight: 600, color: "var(--text-3)", marginBottom: 4 }}>Title</div>
+                              <input
+                                type="text"
+                                value={tocDraft.title}
+                                onChange={e => setTocDraft(p => ({ ...p, title: e.target.value }))}
+                                style={{ width: "100%", padding: "7px 10px", fontSize: 13, border: "1.5px solid var(--border)", borderRadius: 6, fontFamily: "inherit", outline: "none", boxSizing: "border-box" }}
+                              />
+                            </div>
+                            <div>
+                              <div style={{ fontSize: 11, fontWeight: 600, color: "var(--text-3)", marginBottom: 4 }}>Content</div>
+                              <textarea
+                                value={tocDraft.content}
+                                onChange={e => setTocDraft(p => ({ ...p, content: e.target.value }))}
+                                rows={5}
+                                style={{ width: "100%", padding: "7px 10px", fontSize: 12.5, border: "1.5px solid var(--border)", borderRadius: 6, fontFamily: "inherit", outline: "none", resize: "vertical", boxSizing: "border-box", lineHeight: 1.75 }}
+                              />
+                            </div>
+                            <div style={{ display: "flex", gap: 8 }}>
+                              <button type="button" className="btn btn-ghost btn-sm" onClick={cancelEditToc}>Cancel</button>
+                              <button type="button" className="btn btn-primary btn-sm" onClick={() => saveEditToc(activeTocDoc)}>Save</button>
+                            </div>
+                          </div>
+                        ) : (
+                          <div>
+                            <div style={{ fontSize: 12.5, color: "var(--text-2)", lineHeight: 1.75, marginBottom: 10 }}>
+                              {item.content}
+                            </div>
+                            <button
+                              type="button"
+                              className="btn btn-ghost btn-sm"
+                              onClick={e => { e.stopPropagation(); startEditToc(item); }}
+                              style={{ fontSize: 12, padding: "4px 12px" }}
+                            >
+                              ✏️ Edit
+                            </button>
+                          </div>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
             </div>
 
-            <div style={{ padding: "9px 16px", background: "var(--surface-2)", borderTop: "1px solid var(--border)", fontSize: 11.5, color: "var(--text-3)", display: "flex", alignItems: "center", gap: 6 }}>
-              <span>ℹ</span> TOC is auto-extracted from the uploaded document
-            </div>
           </div>
         </div>
 

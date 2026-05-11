@@ -29,9 +29,11 @@ const MOCK_USERS = {
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null)
 
-  const login = (email, password) => {
-    const u = MOCK_USERS[email.toLowerCase().trim()]
-    if (!u || u.password !== password) return { ok: false, error: 'Invalid email or password' }
+  const login = (identifier, password) => {
+    const key = identifier.toLowerCase().trim()
+    const u = MOCK_USERS[key]
+      ?? Object.values(MOCK_USERS).find(u => u.phone === key || u.name.toLowerCase() === key)
+    if (!u || u.password !== password) return { ok: false, error: 'Invalid credentials' }
     const { password: _, ...safe } = u
     setUser(safe)
     return { ok: true, user: safe }
