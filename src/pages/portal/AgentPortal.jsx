@@ -1,25 +1,45 @@
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../../context/AuthContext'
 
-const STATS = [
-  { label: 'My Customers',      value: '38',      sub: '+2 this month',       color: '#7c3aed', bg: '#f5f3ff' },
-  { label: 'Policies Issued',   value: '27',      sub: 'This financial year',  color: '#2d7d46', bg: '#e6f4ea' },
-  { label: 'Commission Earned', value: '₹14,200', sub: 'April 2025',          color: '#a05c00', bg: '#fff3e0' },
-  { label: 'CRM Leads',         value: '18',      sub: '7 interested',        color: '#0a7ea4', bg: '#e0f4fb' },
+// ── Sales agent (Ravi Kulkarni) data ─────────────────────────────────────────
+const SALES_STATS = [
+  { label: 'My Customers',      value: '8',       sub: '+3 this month',      color: '#7c3aed', bg: '#f5f3ff' },
+  { label: 'Policies Issued',   value: '5',       sub: 'This financial year', color: '#2d7d46', bg: '#e6f4ea' },
+  { label: 'Commission Earned', value: '₹24,600', sub: 'April 2025',         color: '#a05c00', bg: '#fff3e0' },
+  { label: 'CRM Leads',         value: '8',       sub: '3 interested',       color: '#0a7ea4', bg: '#e0f4fb' },
+]
+const SALES_CAMPAIGNS = [
+  { name: 'Summer Health Drive 2025',  type: 'Promotional', leads: 5, purchased: 2 },
+  { name: 'Renewal Reminder Q2',       type: 'Renewal',     leads: 4, purchased: 2 },
+  { name: 'Motor Insurance Awareness', type: 'Awareness',   leads: 3, purchased: 1 },
+]
+// Customers with purchased policies (CRM leads 1,6,9,11,14 assigned to Ravi)
+const SALES_RECENT_CUSTOMERS = [
+  { name: 'Aarav Sharma',  policy: 'Star Comprehensive Health', status: 'Active',  renewal: '10/04/2026' },
+  { name: 'Divya Nair',    policy: 'Bajaj Allianz Health Guard', status: 'Active',  renewal: '01/05/2026' },
+  { name: 'Vikram Rao',    policy: 'HDFC ERGO Optima Secure',   status: 'Active',  renewal: '03/05/2026' },
+  { name: 'Rahul Gupta',   policy: 'Star Comprehensive Health', status: 'Active',  renewal: '22/03/2026' },
+  { name: 'Kavita Pillai', policy: 'Bajaj Allianz Comprehensive', status: 'Renewal', renewal: '28/04/2025' },
 ]
 
-const MY_CAMPAIGNS = [
-  { name: 'Summer Health Drive 2025', type: 'Promotional', leads: 5,  purchased: 2 },
-  { name: 'New Member Onboarding',    type: 'Onboarding',  leads: 8,  purchased: 3 },
-  { name: 'Festival Season Offer',    type: 'Seasonal',    leads: 5,  purchased: 2 },
+// ── Calling agent (Pooja Desai) data ─────────────────────────────────────────
+const CALLING_STATS = [
+  { label: 'Leads Claimed',    value: '38',      sub: '+2 this month',      color: '#7c3aed', bg: '#f5f3ff' },
+  { label: 'Converted',        value: '27',      sub: 'This financial year', color: '#2d7d46', bg: '#e6f4ea' },
+  { label: 'Commission Earned',value: '₹14,200', sub: 'April 2025',         color: '#a05c00', bg: '#fff3e0' },
+  { label: 'Active Campaigns', value: '3',       sub: '7 interested leads', color: '#0a7ea4', bg: '#e0f4fb' },
 ]
-
-const RECENT_CUSTOMERS = [
-  { name: 'Aarav Sharma',   policy: 'Star Comprehensive Health', status: 'Active',  renewal: '10/04/2026' },
-  { name: 'Priya Mehta',    policy: 'HDFC ERGO Optima',          status: 'Active',  renewal: '11/06/2026' },
-  { name: 'Rahul Gupta',    policy: 'LIC Jeevan Anand',          status: 'Active',  renewal: '22/03/2026' },
-  { name: 'Meera Joshi',    policy: 'Bajaj Allianz Motor',        status: 'Renewal', renewal: '15/05/2025' },
-  { name: 'Karan Patel',    policy: 'New India Motor',            status: 'Active',  renewal: '13/09/2026' },
+const CALLING_CAMPAIGNS = [
+  { name: 'Summer Health Drive 2025', type: 'Promotional', leads: 5, purchased: 2 },
+  { name: 'New Member Onboarding',    type: 'Onboarding',  leads: 8, purchased: 3 },
+  { name: 'Festival Season Offer',    type: 'Seasonal',    leads: 5, purchased: 2 },
+]
+const CALLING_RECENT_CUSTOMERS = [
+  { name: 'Aarav Sharma',  policy: 'Star Comprehensive Health', status: 'Active',  renewal: '10/04/2026' },
+  { name: 'Priya Mehta',   policy: 'HDFC ERGO Optima Secure',   status: 'Active',  renewal: '11/06/2026' },
+  { name: 'Rahul Gupta',   policy: 'Star Comprehensive Health', status: 'Active',  renewal: '22/03/2026' },
+  { name: 'Sneha Iyer',    policy: '—',                         status: 'Prospect',renewal: '—'          },
+  { name: 'Rohan Verma',   policy: '—',                         status: 'Prospect',renewal: '—'          },
 ]
 
 const QUICK_ACTIONS = [
@@ -32,6 +52,12 @@ const QUICK_ACTIONS = [
 export default function AgentPortal() {
   const { user } = useAuth()
   const navigate  = useNavigate()
+
+  const isSales     = user?.agentType === 'sales'
+  const STATS            = isSales ? SALES_STATS            : CALLING_STATS
+  const MY_CAMPAIGNS     = isSales ? SALES_CAMPAIGNS        : CALLING_CAMPAIGNS
+  const RECENT_CUSTOMERS = isSales ? SALES_RECENT_CUSTOMERS : CALLING_RECENT_CUSTOMERS
+  const custLabel        = isSales ? 'My Customers' : 'My Leads'
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
@@ -76,7 +102,7 @@ export default function AgentPortal() {
         <div className="card">
           <div className="card-body">
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 14 }}>
-              <div style={{ fontWeight: 700, fontSize: 15 }}>My Customers</div>
+              <div style={{ fontWeight: 700, fontSize: 15 }}>{custLabel}</div>
               <button type="button" className="btn btn-ghost" style={{ fontSize: 12, padding: '4px 12px' }} onClick={() => navigate('/customer')}>View All</button>
             </div>
             <div className="table-wrap">
@@ -91,7 +117,7 @@ export default function AgentPortal() {
                       <td style={{ color: '#9d94b8', maxWidth: 120, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{c.policy}</td>
                       <td>{c.renewal}</td>
                       <td>
-                        <span style={{ padding: '2px 9px', borderRadius: 99, fontSize: 11.5, fontWeight: 600, background: c.status === 'Active' ? '#e6f4ea' : '#fff3e0', color: c.status === 'Active' ? '#2d7d46' : '#a05c00' }}>
+                        <span style={{ padding: '2px 9px', borderRadius: 99, fontSize: 11.5, fontWeight: 600, background: c.status === 'Active' ? '#e6f4ea' : c.status === 'Renewal' ? '#fff3e0' : '#f1f3f4', color: c.status === 'Active' ? '#2d7d46' : c.status === 'Renewal' ? '#a05c00' : '#5f6368' }}>
                           {c.status}
                         </span>
                       </td>

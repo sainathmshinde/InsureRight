@@ -421,9 +421,16 @@ const MOCK_PRODUCTS = [
   "HDFC Life Sanchay",
 ];
 
+const POLICY_TYPE_PRODUCTS = {
+  Health: ["Star Comprehensive Health", "HDFC ERGO Optima", "ICICI Lombard Health", "Bajaj Allianz Health Guard"],
+  Motor:  ["Bajaj Allianz Comprehensive Motor", "New India Motor OD + TP", "ICICI Lombard Motor"],
+  Life:   ["LIC Jeevan Anand", "HDFC Life Sanchay Plus", "SBI Life Smart Shield"],
+};
+
 const INITIAL = {
   name: "",
   type: "",
+  policyType: "",
   startDate: "",
   endDate: "",
   extendOption: false,
@@ -444,6 +451,34 @@ const INITIAL = {
   clickTracking: false,
   conversionTracking: false,
   status: "Active",
+  // Health config
+  hSumInsuredMin: "",
+  hSumInsuredMax: "",
+  hWaitingPeriod: "30",
+  hPreExistingWaiting: "24",
+  hRoomRent: "",
+  hDayCare: false,
+  hRestoration: false,
+  hAyush: false,
+  // Motor config
+  mVehicleType: "",
+  mIdvMin: "",
+  mIdvMax: "",
+  mZeroDepreciation: false,
+  mEngineProtection: false,
+  mNcbPct: "",
+  // Life config
+  lPolicyTerm: "",
+  lPaymentTerm: "",
+  lDeathBenefitType: "",
+  lLoan: false,
+  lReturnOfPremium: false,
+  // Financial
+  premiumMin: "",
+  premiumMax: "",
+  commissionPct: "",
+  targetPremiumVolume: "",
+  gstRate: "18",
 };
 
 const toInputDate = (v) => {
@@ -589,7 +624,7 @@ export default function CampaignCreate() {
                     ))}
                   </Select>
                 </Field>
-                <Field label="Start Date" required>
+<Field label="Start Date" required>
                   <Input
                     type="date"
                     value={toInputDate(form.startDate)}

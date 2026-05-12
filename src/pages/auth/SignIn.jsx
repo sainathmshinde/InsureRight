@@ -4,7 +4,8 @@ import { useAuth } from "../../context/AuthContext";
 
 const DEMO = [
   { role: "Broker", email: "broker@kmdastur.com", pass: "broker@123" },
-  { role: "Agent", email: "pooja@kmdastur.com", pass: "agent@123" },
+  { role: "Calling Agent", email: "pooja@kmdastur.com", pass: "agent@123" },
+  { role: "Sales Agent",   email: "ravi@kmdastur.com",  pass: "sales@123" },
   { role: "Customer", email: "aarav@gmail.com", pass: "cust@123" },
 ];
 

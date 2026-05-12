@@ -13,10 +13,16 @@ const MOCK_USERS = {
     established: '1968', type: 'Partnership',
   },
   'pooja@kmdastur.com': {
-    id: 'a2', role: 'agent', password: 'agent@123',
+    id: 'a2', role: 'agent', agentType: 'calling', password: 'agent@123',
     name: 'Pooja Desai', company: 'K.M. Dastur & Co.', phone: '9812345678',
     email: 'pooja@kmdastur.com', brokerId: 'b1', avatar: 'PD',
     posLicense: 'POS-2023-019', qualification: 'Post Graduate', experience: '3',
+  },
+  'ravi@kmdastur.com': {
+    id: 'a1', role: 'agent', agentType: 'sales', password: 'sales@123',
+    name: 'Ravi Kulkarni', company: 'K.M. Dastur & Co.', phone: '9876543210',
+    email: 'ravi@kmdastur.com', brokerId: 'b1', avatar: 'RK',
+    posLicense: 'POS-2023-001', qualification: 'Graduate', experience: '4',
   },
   'aarav@gmail.com': {
     id: 'c1', role: 'customer', password: 'cust@123',

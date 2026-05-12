@@ -24,7 +24,7 @@ const BROKER_QUICK = [
 ]
 const BROKER_ACTIVITY = [
   { time: '2 hrs ago',  icon: '👤', text: 'Agent Ravi Kulkarni onboarded' },
-  { time: '5 hrs ago',  icon: '🧑', text: 'Customer Sneha Kulkarni KYC verified' },
+  { time: '5 hrs ago',  icon: '🧑', text: 'Customer Suresh Kumar KYC verified' },
   { time: 'Yesterday',  icon: '📋', text: 'Policy SHI/2025/008901 issued' },
   { time: 'Yesterday',  icon: '💰', text: 'Commission credited ₹12,400' },
   { time: '2 days ago', icon: '📦', text: 'Star Senior Health product added' },

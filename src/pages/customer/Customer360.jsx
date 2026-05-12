@@ -9,26 +9,192 @@ function calcAge(dob) {
 
 const MOCK = {
   1: {
-    name: 'Anita Desai', mobile: '9876543210', email: 'anita@gmail.com',
-    dob: '1985-04-12', gender: 'Female', city: 'Mumbai', state: 'Maharashtra',
-    kyc: 'Verified',
+    name: 'Aarav Sharma', mobile: '9876543210', email: 'aarav@gmail.com',
+    dob: '1990-03-15', gender: 'Male', city: 'Mumbai', state: 'Maharashtra', kyc: 'Verified',
     familyMembers: [
-      { id: 1, type: 'Spouse',   name: 'Ravi Desai',  dob: '1982-06-15', gender: 'Male',   preExisting: '' },
-      { id: 2, type: 'Son',      name: 'Aarav Desai', dob: '2010-03-20', gender: 'Male',   preExisting: '' },
-      { id: 3, type: 'Daughter', name: 'Piya Desai',  dob: '2013-08-05', gender: 'Female', preExisting: 'Asthma' },
+      { id: 1, type: 'Spouse',   name: 'Priya Sharma', dob: '1992-07-22', gender: 'Female', preExisting: '' },
+      { id: 2, type: 'Son',      name: 'Aryan Sharma', dob: '2016-02-10', gender: 'Male',   preExisting: '' },
+      { id: 3, type: 'Daughter', name: 'Aanya Sharma', dob: '2019-09-05', gender: 'Female', preExisting: '' },
     ],
     policies: [
-      { id: 'POL-2024-001', type: 'Health',  ic: 'Star Health', premium: 12500, status: 'Active',  expiry: '2025-03-31' },
-      { id: 'POL-2023-088', type: 'Motor',   ic: 'HDFC ERGO',   premium: 8200,  status: 'Expired', expiry: '2024-01-15' },
+      { id: 'POL-2025-001', type: 'Health', ic: 'Star Health',   premium: 8500, status: 'Active',      expiry: '2026-04-10' },
+      { id: 'POL-2025-002', type: 'Motor',  ic: 'Bajaj Allianz', premium: 4800, status: 'Renewal Due', expiry: '2025-05-20' },
     ],
     payments: [
-      { date: '2024-03-15', amount: 12500, mode: 'UPI',  txnId: 'TXN9876543', status: 'Success' },
-      { date: '2023-01-10', amount: 8200,  mode: 'NEFT', txnId: 'TXN1234567', status: 'Success' },
+      { date: '2025-04-10', amount: 8500, mode: 'UPI',  txnId: 'TXN8765432', status: 'Success' },
+      { date: '2025-05-18', amount: 4800, mode: 'NEFT', txnId: 'TXN8765433', status: 'Success' },
     ],
     interactions: [
-      { date: '2024-04-01', type: 'Call',  note: 'Customer enquired about renewal. Explained benefits.' },
-      { date: '2024-02-14', type: 'Email', note: 'Sent policy renewal reminder.' },
-      { date: '2023-12-20', type: 'SMS',   note: 'Sent year-end summary.' },
+      { date: '2025-04-18', type: 'Call',  note: 'Policy issued after CRM lead conversion. Customer very satisfied.' },
+      { date: '2025-04-10', type: 'Email', note: 'Policy documents sent to registered email.' },
+      { date: '2025-03-20', type: 'Call',  note: 'Discussed plan options. Customer agreed on Star Comprehensive Health.' },
+    ],
+  },
+  2: {
+    name: 'Rohit Sharma', mobile: '9812000000', email: 'rohit@gmail.com',
+    dob: '1990-11-20', gender: 'Male', city: 'Pune', state: 'Maharashtra', kyc: 'Pending',
+    familyMembers: [],
+    policies: [],
+    payments: [],
+    interactions: [
+      { date: '2025-04-05', type: 'Call', note: 'Introduced health insurance plans. KYC documents requested.' },
+    ],
+  },
+  3: {
+    name: 'Divya Nair', mobile: '9911223344', email: 'divya@gmail.com',
+    dob: '1978-06-05', gender: 'Female', city: 'Bangalore', state: 'Karnataka', kyc: 'Verified',
+    familyMembers: [
+      { id: 1, type: 'Spouse',   name: 'Sandeep Nair', dob: '1975-04-10', gender: 'Male',   preExisting: '' },
+      { id: 2, type: 'Son',      name: 'Rohan Nair',   dob: '2005-08-15', gender: 'Male',   preExisting: '' },
+      { id: 3, type: 'Daughter', name: 'Ankita Nair',  dob: '2008-11-20', gender: 'Female', preExisting: '' },
+    ],
+    policies: [
+      { id: 'POL-2025-006', type: 'Health', ic: 'Bajaj Allianz', premium: 6490, status: 'Active', expiry: '2026-05-08' },
+    ],
+    payments: [
+      { date: '2025-05-08', amount: 6490, mode: 'UPI', txnId: 'TXN9112233', status: 'Success' },
+    ],
+    interactions: [
+      { date: '2025-05-01', type: 'Call',  note: 'Assigned to sales agent. Finalised family floater health plan.' },
+      { date: '2025-04-20', type: 'Email', note: 'Sent brochure for Bajaj Allianz Health Guard family plan.' },
+    ],
+  },
+  4: {
+    name: 'Vijay Patil', mobile: '9011223344', email: 'vijay@gmail.com',
+    dob: '1995-09-30', gender: 'Male', city: 'Nashik', state: 'Maharashtra', kyc: 'Rejected',
+    familyMembers: [],
+    policies: [],
+    payments: [],
+    interactions: [
+      { date: '2025-03-10', type: 'Call', note: 'KYC rejected due to address mismatch. Requested fresh documents.' },
+    ],
+  },
+  5: {
+    name: 'Suresh Kumar', mobile: '9988001122', email: 'suresh@gmail.com',
+    dob: '1985-03-20', gender: 'Male', city: 'Pune', state: 'Maharashtra', kyc: 'Verified',
+    familyMembers: [
+      { id: 1, type: 'Spouse', name: 'Meena Kumar', dob: '1987-06-12', gender: 'Female', preExisting: '' },
+      { id: 2, type: 'Son',    name: 'Aryan Kumar', dob: '2014-03-05', gender: 'Male',   preExisting: '' },
+    ],
+    policies: [
+      { id: 'POL-2025-013', type: 'Health', ic: 'Star Health', premium: 10030, status: 'Active', expiry: '2026-04-20' },
+    ],
+    payments: [
+      { date: '2025-04-20', amount: 10030, mode: 'Card', txnId: 'TXN9988001', status: 'Success' },
+    ],
+    interactions: [
+      { date: '2025-04-18', type: 'Call',  note: 'Customer interested in family health plan. Assigned to Ravi.' },
+      { date: '2025-04-14', type: 'Email', note: 'Sent premium comparison for family floater plans.' },
+    ],
+  },
+  6: {
+    name: 'Vikram Rao', mobile: '9944556677', email: 'vikram@gmail.com',
+    dob: '1975-08-20', gender: 'Male', city: 'Noida', state: 'Uttar Pradesh', kyc: 'Verified',
+    familyMembers: [
+      { id: 1, type: 'Spouse',   name: 'Sunita Rao',  dob: '1978-02-14', gender: 'Female', preExisting: '' },
+      { id: 2, type: 'Son',      name: 'Karthik Rao', dob: '2003-07-19', gender: 'Male',   preExisting: '' },
+      { id: 3, type: 'Daughter', name: 'Preethi Rao', dob: '2007-01-08', gender: 'Female', preExisting: '' },
+    ],
+    policies: [
+      { id: 'POL-2025-009', type: 'Health', ic: 'HDFC ERGO', premium: 7316, status: 'Active', expiry: '2026-05-10' },
+      { id: 'POL-2024-032', type: 'Motor',  ic: 'ICICI Lombard', premium: 5192, status: 'Active', expiry: '2025-08-12' },
+    ],
+    payments: [
+      { date: '2025-05-10', amount: 7316, mode: 'NEFT', txnId: 'TXN9944556', status: 'Success' },
+      { date: '2024-08-12', amount: 5192, mode: 'UPI',  txnId: 'TXN9944557', status: 'Success' },
+    ],
+    interactions: [
+      { date: '2025-05-03', type: 'Call',  note: 'Renewed health plan for family. Discussed motor insurance add-ons.' },
+      { date: '2025-04-25', type: 'Email', note: 'Sent renewal reminder for HDFC ERGO Optima.' },
+    ],
+  },
+  7: {
+    name: 'Kavita Pillai', mobile: '9899112233', email: 'kavita@gmail.com',
+    dob: '1993-12-01', gender: 'Female', city: 'Hyderabad', state: 'Telangana', kyc: 'Verified',
+    familyMembers: [
+      { id: 1, type: 'Spouse', name: 'Arun Pillai', dob: '1990-05-22', gender: 'Male', preExisting: '' },
+    ],
+    policies: [
+      { id: 'POL-2025-014', type: 'Motor', ic: 'Bajaj Allianz', premium: 5664, status: 'Renewal Due', expiry: '2025-04-28' },
+    ],
+    payments: [
+      { date: '2024-04-28', amount: 5664, mode: 'Card', txnId: 'TXN8991122', status: 'Success' },
+    ],
+    interactions: [
+      { date: '2025-04-21', type: 'Call',  note: 'Renewal reminder sent. Customer confirmed she will renew shortly.' },
+      { date: '2025-04-10', type: 'Email', note: 'Sent renewal notice for Bajaj Allianz Motor policy.' },
+    ],
+  },
+  8: {
+    name: 'Arjun Singh', mobile: '9922334455', email: 'arjun@gmail.com',
+    dob: '1987-03-22', gender: 'Male', city: 'Mumbai', state: 'Maharashtra', kyc: 'Verified',
+    familyMembers: [
+      { id: 1, type: 'Spouse', name: 'Neha Singh', dob: '1989-09-30', gender: 'Female', preExisting: '' },
+      { id: 2, type: 'Son',    name: 'Dev Singh',  dob: '2015-12-10', gender: 'Male',   preExisting: '' },
+    ],
+    policies: [],
+    payments: [],
+    interactions: [
+      { date: '2025-05-02', type: 'Call',  note: 'Interested in family health plan. Proposal under discussion.' },
+      { date: '2025-04-28', type: 'Email', note: 'Sent premium quotes for Star and HDFC health plans.' },
+    ],
+  },
+  9: {
+    name: 'Priya Mehta', mobile: '9812345678', email: 'priya@gmail.com',
+    dob: '1992-07-10', gender: 'Female', city: 'Kochi', state: 'Kerala', kyc: 'Verified',
+    familyMembers: [
+      { id: 1, type: 'Spouse',   name: 'Raj Mehta',  dob: '1989-03-25', gender: 'Male',   preExisting: '' },
+      { id: 2, type: 'Daughter', name: 'Sara Mehta', dob: '2019-06-18', gender: 'Female', preExisting: '' },
+    ],
+    policies: [
+      { id: 'POL-2025-002', type: 'Health', ic: 'HDFC ERGO', premium: 7316, status: 'Active', expiry: '2026-06-11' },
+    ],
+    payments: [
+      { date: '2025-06-11', amount: 7316, mode: 'UPI', txnId: 'TXN9812345', status: 'Success' },
+    ],
+    interactions: [
+      { date: '2025-04-18', type: 'Call',  note: 'Confirmed interest. Assigned to sales agent Ravi for proposal.' },
+      { date: '2025-04-14', type: 'Call',  note: 'Explained plan features. Requested brochure on WhatsApp.' },
+    ],
+  },
+  10: {
+    name: 'Rahul Gupta', mobile: '9966778899', email: 'rahul@gmail.com',
+    dob: '1980-01-05', gender: 'Male', city: 'Delhi', state: 'Delhi', kyc: 'Verified',
+    familyMembers: [
+      { id: 1, type: 'Spouse',   name: 'Pooja Gupta',     dob: '1983-11-28', gender: 'Female', preExisting: '' },
+      { id: 2, type: 'Son',      name: 'Siddharth Gupta', dob: '2008-04-15', gender: 'Male',   preExisting: '' },
+      { id: 3, type: 'Daughter', name: 'Ananya Gupta',    dob: '2012-09-03', gender: 'Female', preExisting: '' },
+    ],
+    policies: [
+      { id: 'POL-2025-011', type: 'Health', ic: 'Star Health', premium: 10030, status: 'Active', expiry: '2026-03-22' },
+    ],
+    payments: [
+      { date: '2025-03-22', amount: 10030, mode: 'Card', txnId: 'TXN9966778', status: 'Success' },
+    ],
+    interactions: [
+      { date: '2025-03-22', type: 'Call',  note: 'Policy issued. Customer very satisfied with quick process.' },
+      { date: '2025-03-20', type: 'Email', note: 'Proposal documents sent for review and signature.' },
+      { date: '2025-03-16', type: 'Call',  note: 'First contact from CRM campaign. Very receptive to health plan.' },
+    ],
+  },
+  11: {
+    name: 'Ritu Singh', mobile: '9833221100', email: 'ritu@gmail.com',
+    dob: '1996-05-18', gender: 'Female', city: 'Jaipur', state: 'Rajasthan', kyc: 'Pending',
+    familyMembers: [],
+    policies: [],
+    payments: [],
+    interactions: [
+      { date: '2025-04-12', type: 'Call', note: 'KYC verification pending. Customer to submit Aadhaar copy.' },
+    ],
+  },
+  12: {
+    name: 'Ajay Iyer', mobile: '9822110099', email: 'ajay@gmail.com',
+    dob: '1983-10-30', gender: 'Male', city: 'Chennai', state: 'Tamil Nadu', kyc: 'Rejected',
+    familyMembers: [],
+    policies: [],
+    payments: [],
+    interactions: [
+      { date: '2025-03-28', type: 'Call', note: 'KYC rejected. PAN card details did not match. Requested resubmission.' },
     ],
   },
 }

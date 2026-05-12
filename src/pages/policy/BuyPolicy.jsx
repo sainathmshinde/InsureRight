@@ -17,6 +17,8 @@ import {
   PaymentIcon,
   CustomerIcon,
 } from "../../icons";
+import { AGENTS as KMD_AGENTS } from "../agent/agentData";
+import { INITIAL_LEADS } from "../crm/crmData";
 
 // ── Shared customer data (same source of truth as CustomerList) ────────────
 const CUSTOMERS = [
@@ -49,14 +51,19 @@ const CUSTOMERS = [
   },
   {
     id: 3,
-    name: "Deepa Menon",
-    mobile: "9988776655",
-    email: "deepa@gmail.com",
+    name: "Divya Nair",
+    mobile: "9911223344",
+    email: "divya@gmail.com",
     dob: "1978-06-05",
     gender: "Female",
     kyc: "Verified",
     policies: 3,
     address: "7/B Koramangala, Bangalore",
+    familyMembers: [
+      { type: "Spouse",  name: "Sandeep Nair", dob: "1975-04-10", gender: "Male"   },
+      { type: "Child 1", name: "Rohan Nair",   dob: "2005-08-15", gender: "Male"   },
+      { type: "Child 2", name: "Ankita Nair",  dob: "2008-11-20", gender: "Female" },
+    ],
   },
   {
     id: 4,
@@ -71,69 +78,94 @@ const CUSTOMERS = [
   },
   {
     id: 5,
-    name: "Sneha Kulkarni",
-    mobile: "9900112233",
-    email: "sneha@gmail.com",
-    dob: "1988-02-14",
-    gender: "Female",
+    name: "Suresh Kumar",
+    mobile: "9988001122",
+    email: "suresh@gmail.com",
+    dob: "1985-03-20",
+    gender: "Male",
     kyc: "Verified",
     policies: 1,
     address: "101 Deccan, Pune",
+    familyMembers: [
+      { type: "Spouse",  name: "Meena Kumar", dob: "1987-06-12", gender: "Female" },
+      { type: "Child 1", name: "Aryan Kumar", dob: "2014-03-05", gender: "Male"   },
+    ],
   },
   {
     id: 6,
-    name: "Manoj Tiwari",
-    mobile: "9811223344",
-    email: "manoj@gmail.com",
+    name: "Vikram Rao",
+    mobile: "9944556677",
+    email: "vikram@gmail.com",
     dob: "1975-08-20",
     gender: "Male",
     kyc: "Verified",
-    policies: 4,
+    policies: 2,
     address: "B-5 Sector 18, Noida",
+    familyMembers: [
+      { type: "Spouse",  name: "Sunita Rao",  dob: "1978-02-14", gender: "Female" },
+      { type: "Child 1", name: "Karthik Rao", dob: "2003-07-19", gender: "Male"   },
+      { type: "Child 2", name: "Preethi Rao", dob: "2007-01-08", gender: "Female" },
+    ],
   },
   {
     id: 7,
-    name: "Kavya Reddy",
-    mobile: "9877665544",
-    email: "kavya@gmail.com",
+    name: "Kavita Pillai",
+    mobile: "9899112233",
+    email: "kavita@gmail.com",
     dob: "1993-12-01",
     gender: "Female",
-    kyc: "Pending",
-    policies: 0,
+    kyc: "Verified",
+    policies: 1,
     address: "56 Jubilee Hills, Hyderabad",
+    familyMembers: [
+      { type: "Spouse", name: "Arun Pillai", dob: "1990-05-22", gender: "Male" },
+    ],
   },
   {
     id: 8,
-    name: "Arjun Kapoor",
-    mobile: "9866554433",
+    name: "Arjun Singh",
+    mobile: "9922334455",
     email: "arjun@gmail.com",
     dob: "1987-03-22",
     gender: "Male",
     kyc: "Verified",
-    policies: 2,
+    policies: 0,
     address: "8 Andheri West, Mumbai",
+    familyMembers: [
+      { type: "Spouse",  name: "Neha Singh", dob: "1989-09-30", gender: "Female" },
+      { type: "Child 1", name: "Dev Singh",  dob: "2015-12-10", gender: "Male"   },
+    ],
   },
   {
     id: 9,
-    name: "Priya Nair",
-    mobile: "9855443322",
+    name: "Priya Mehta",
+    mobile: "9812345678",
     email: "priya@gmail.com",
     dob: "1992-07-10",
     gender: "Female",
     kyc: "Verified",
     policies: 1,
     address: "33 Fort Kochi, Kerala",
+    familyMembers: [
+      { type: "Spouse",  name: "Raj Mehta",  dob: "1989-03-25", gender: "Male"   },
+      { type: "Child 1", name: "Sara Mehta", dob: "2019-06-18", gender: "Female" },
+    ],
   },
   {
     id: 10,
-    name: "Sunil Mehta",
-    mobile: "9844332211",
-    email: "sunil@gmail.com",
+    name: "Rahul Gupta",
+    mobile: "9966778899",
+    email: "rahul@gmail.com",
     dob: "1980-01-05",
     gender: "Male",
     kyc: "Verified",
-    policies: 5,
+    policies: 1,
     address: "C-9 Civil Lines, Delhi",
+    familyMembers: [
+      { type: "Spouse",  name: "Pooja Gupta",     dob: "1983-11-28", gender: "Female" },
+      { type: "Child 1", name: "Siddharth Gupta", dob: "2008-04-15", gender: "Male"   },
+      { type: "Child 2", name: "Ananya Gupta",    dob: "2012-09-03", gender: "Female" },
+    ],
   },
   {
     id: 11,
@@ -504,6 +536,27 @@ export default function BuyPolicy() {
   const { user } = useAuth();
   const isCustomer = user?.role === "customer";
 
+  // Detect sales agent and find their assigned customers from CRM leads
+  const myAgentRecord = user?.role === "agent"
+    ? KMD_AGENTS.find(a => a.name.toLowerCase().includes(user.name.split(" ")[0].toLowerCase()))
+    : null;
+  const isSalesAgent = myAgentRecord?.agentType === "sales";
+  const myAgentId    = myAgentRecord?.id ?? null;
+
+  const salesAssignedCustomerIds = useMemo(() => {
+    if (!isSalesAgent || !myAgentId) return null;
+    return new Set(
+      INITIAL_LEADS
+        .filter(l => l.salesAssignedTo === myAgentId && l.customerId != null)
+        .map(l => l.customerId)
+    );
+  }, [isSalesAgent, myAgentId]);
+
+  // Base customer pool — sales agents see only their assigned customers
+  const baseCustomers = salesAssignedCustomerIds
+    ? CUSTOMERS.filter(c => salesAssignedCustomerIds.has(c.id))
+    : CUSTOMERS;
+
   // For customer login: auto-find and lock in their own record
   const selfCustomer = isCustomer
     ? (CUSTOMERS.find((c) => c.email === user.email) ?? null)
@@ -599,17 +652,17 @@ export default function BuyPolicy() {
   const products = PRODUCTS[insuranceType] ?? [];
   const compareProducts = products.filter((p) => compareIds.includes(p.id));
 
-  // Customer search filter
+  // Customer search filter — sales agents already scoped to their assigned customers
   const filteredCustomers = useMemo(() => {
     const q = custSearch.trim().toLowerCase();
-    if (!q) return CUSTOMERS;
-    return CUSTOMERS.filter(
+    if (!q) return baseCustomers;
+    return baseCustomers.filter(
       (c) =>
         c.name.toLowerCase().includes(q) ||
         c.mobile.includes(q) ||
         c.email.toLowerCase().includes(q),
     );
-  }, [custSearch]);
+  }, [custSearch, baseCustomers]);
 
   // When customer is selected, pre-fill downstream state (including saved family members)
   const handleSelectCustomer = (c) => {
@@ -715,7 +768,9 @@ export default function BuyPolicy() {
               Who is this policy for?
             </div>
             <div className="text-muted">
-              Search and select an existing customer, or add a new one
+              {isSalesAgent
+                ? "Customers assigned to you from CRM campaigns"
+                : "Search and select an existing customer, or add a new one"}
             </div>
           </div>
 
@@ -864,27 +919,29 @@ export default function BuyPolicy() {
             })}
           </div>
 
-          {/* Add new customer shortcut */}
-          <div
-            style={{
-              borderTop: "1px solid var(--border)",
-              marginTop: 16,
-              paddingTop: 16,
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "space-between",
-            }}
-          >
-            <span style={{ fontSize: 13.5, color: "var(--text-2)" }}>
-              Customer not in the list?
-            </span>
-            <button
-              className="btn btn-secondary btn-sm"
-              onClick={() => navigate("/customer/create")}
+          {/* Add new customer shortcut — hidden for sales agents */}
+          {!isSalesAgent && (
+            <div
+              style={{
+                borderTop: "1px solid var(--border)",
+                marginTop: 16,
+                paddingTop: 16,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+              }}
             >
-              <CustomerIcon size={14} /> + Add New Customer
-            </button>
-          </div>
+              <span style={{ fontSize: 13.5, color: "var(--text-2)" }}>
+                Customer not in the list?
+              </span>
+              <button
+                className="btn btn-secondary btn-sm"
+                onClick={() => navigate("/customer/create")}
+              >
+                <CustomerIcon size={14} /> + Add New Customer
+              </button>
+            </div>
+          )}
 
           {/* Continue CTA */}
           <div
