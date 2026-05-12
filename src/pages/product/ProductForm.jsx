@@ -246,6 +246,10 @@ export default function ProductForm({
     return [m];
   });
 
+  const cumulativeLabels = selectedMembers.map((_, i) =>
+    selectedMembers.slice(0, i + 1).join('+')
+  );
+
   const addPremiumRow = () =>
     setPremiumRows((prev) => [
       ...prev,
@@ -432,18 +436,18 @@ export default function ProductForm({
                   <tr>
                     <th style={{ minWidth: 130 }}>Sum Insured (₹)</th>
                     <th style={{ minWidth: 90 }}>GST %</th>
-                    {selectedMembers.map((m) => {
+                    {selectedMembers.map((m, i) => {
                       const isHandicap = m.includes("(Handicap)");
                       return (
                         <th
                           key={m}
                           style={{
-                            minWidth: 130,
+                            minWidth: 160,
                             background: isHandicap ? "#ede9fe" : undefined,
                             color: isHandicap ? "var(--brand)" : undefined,
                           }}
                         >
-                          {isHandicap ? "♿ " : ""}{m} (₹)
+                          {isHandicap ? "♿ " : ""}{cumulativeLabels[i]} (₹)
                         </th>
                       );
                     })}
