@@ -1728,7 +1728,7 @@ export default function BuyPolicy() {
             <div className="card-body">
               {/* Policyholder details */}
               <div className="section-block">
-                <div className="section-heading">👤 Policyholder Details</div>
+                <div className="section-heading">👤 Policy Holder Details</div>
                 <div
                   style={{
                     background: "var(--surface-2)",

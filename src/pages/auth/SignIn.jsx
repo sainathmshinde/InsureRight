@@ -100,8 +100,15 @@ export default function SignIn() {
           </button>
         </form>
 
+        <p style={S.regLink}>
+          New broker?{" "}
+          <Link to="/register" style={S.link}>
+            Register →
+          </Link>
+        </p>
+
         {/* Demo credentials */}
-        <div style={S.demoBox}>
+        <div style={{ ...S.demoBox, marginTop: "auto", paddingTop: 20 }}>
           <div style={S.demoHead}>Quick demo login</div>
           <div style={S.demoBtns}>
             {DEMO.map((d) => (
@@ -116,13 +123,6 @@ export default function SignIn() {
             ))}
           </div>
         </div>
-
-        <p style={S.regLink}>
-          New broker?{" "}
-          <Link to="/register" style={S.link}>
-            Register →
-          </Link>
-        </p>
       </div>
 
       {/* ── Right panel ── */}
@@ -239,7 +239,6 @@ const S = {
     letterSpacing: 0.2,
   },
   demoBox: {
-    marginTop: 24,
     padding: "13px 15px",
     background: "#f5f3ff",
     border: "1px solid #ede9fe",

@@ -117,6 +117,13 @@ export default function AgentEdit() {
                     <option>Other</option>
                   </Select>
                 </Field>
+                <Field label="Agent Type" required>
+                  <Select value={form.agentType || ""} onChange={set("agentType")} required>
+                    <option value="">Select agent type</option>
+                    <option value="calling">Calling Agent</option>
+                    <option value="sales">Sales Agent</option>
+                  </Select>
+                </Field>
               </div>
             </SectionBlock>
 

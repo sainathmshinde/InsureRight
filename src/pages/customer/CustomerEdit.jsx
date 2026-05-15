@@ -11,6 +11,7 @@ const MOCK_DATA = {
   1: {
     name: "Aarav Sharma", mobile: "9876543210", email: "aarav@gmail.com",
     dob: "1990-03-15", gender: "Male", kycStatus: "Verified",
+    aadhaar: "1234 5678 9012", pan: "AABCS1234D",
     address: "14, Green Valley Apartments, Andheri West", city: "Mumbai", state: "Maharashtra", pincode: "400053",
     nomineeName: "Priya Sharma", nomineeRelation: "Spouse", nomineeShare: "100",
     aadhaarFile: doc("aadhaar", { name: "Aarav Sharma", number: "1234 5678 9012", dob: "15/03/1990", gender: "Male" }),
@@ -24,6 +25,7 @@ const MOCK_DATA = {
   2: {
     name: "Rohit Sharma", mobile: "9812000000", email: "rohit@gmail.com",
     dob: "1990-11-20", gender: "Male", kycStatus: "Pending",
+    aadhaar: "2345 6789 0123", pan: "BBBRS2345E",
     address: "45, MG Road", city: "Pune", state: "Maharashtra", pincode: "411001",
     nomineeName: "", nomineeRelation: "", nomineeShare: "100",
     aadhaarFile: doc("aadhaar", { name: "Rohit Sharma", number: "2345 6789 0123", dob: "20/11/1990", gender: "Male" }),
@@ -33,6 +35,7 @@ const MOCK_DATA = {
   3: {
     name: "Divya Nair", mobile: "9911223344", email: "divya@gmail.com",
     dob: "1978-06-05", gender: "Female", kycStatus: "Verified",
+    aadhaar: "3456 7890 1234", pan: "CCCDN3456F",
     address: "7/B, Koramangala", city: "Bangalore", state: "Karnataka", pincode: "560034",
     nomineeName: "Sandeep Nair", nomineeRelation: "Spouse", nomineeShare: "100",
     aadhaarFile: doc("aadhaar", { name: "Divya Nair", number: "3456 7890 1234", dob: "05/06/1978", gender: "Female" }),
@@ -46,6 +49,7 @@ const MOCK_DATA = {
   4: {
     name: "Vijay Patil", mobile: "9011223344", email: "vijay@gmail.com",
     dob: "1995-09-30", gender: "Male", kycStatus: "Rejected",
+    aadhaar: "4567 8901 2345", pan: "DDDVP4567G",
     address: "23, Shivaji Nagar", city: "Nashik", state: "Maharashtra", pincode: "422001",
     nomineeName: "", nomineeRelation: "", nomineeShare: "100",
     aadhaarFile: doc("aadhaar", { name: "Vijay Patil", number: "4567 8901 2345", dob: "30/09/1995", gender: "Male" }),
@@ -55,6 +59,7 @@ const MOCK_DATA = {
   5: {
     name: "Suresh Kumar", mobile: "9988001122", email: "suresh@gmail.com",
     dob: "1985-03-20", gender: "Male", kycStatus: "Verified",
+    aadhaar: "5678 9012 3456", pan: "EEESK5678H",
     address: "101, Deccan Gymkhana", city: "Pune", state: "Maharashtra", pincode: "411004",
     nomineeName: "Meena Kumar", nomineeRelation: "Spouse", nomineeShare: "100",
     aadhaarFile: doc("aadhaar", { name: "Suresh Kumar", number: "5678 9012 3456", dob: "20/03/1985", gender: "Male" }),
@@ -67,6 +72,7 @@ const MOCK_DATA = {
   6: {
     name: "Vikram Rao", mobile: "9944556677", email: "vikram@gmail.com",
     dob: "1975-08-20", gender: "Male", kycStatus: "Verified",
+    aadhaar: "6789 0123 4567", pan: "FFFVR6789I",
     address: "B-5, Sector 18", city: "Noida", state: "Uttar Pradesh", pincode: "201301",
     nomineeName: "Sunita Rao", nomineeRelation: "Spouse", nomineeShare: "100",
     aadhaarFile: doc("aadhaar", { name: "Vikram Rao", number: "6789 0123 4567", dob: "20/08/1975", gender: "Male" }),
@@ -80,6 +86,7 @@ const MOCK_DATA = {
   7: {
     name: "Kavita Pillai", mobile: "9899112233", email: "kavita@gmail.com",
     dob: "1993-12-01", gender: "Female", kycStatus: "Verified",
+    aadhaar: "7890 1234 5678", pan: "GGGKP7890J",
     address: "56, Jubilee Hills", city: "Hyderabad", state: "Telangana", pincode: "500033",
     nomineeName: "Arun Pillai", nomineeRelation: "Spouse", nomineeShare: "100",
     aadhaarFile: doc("aadhaar", { name: "Kavita Pillai", number: "7890 1234 5678", dob: "01/12/1993", gender: "Female" }),
@@ -91,6 +98,7 @@ const MOCK_DATA = {
   8: {
     name: "Arjun Singh", mobile: "9922334455", email: "arjun@gmail.com",
     dob: "1987-03-22", gender: "Male", kycStatus: "Verified",
+    aadhaar: "8901 2345 6789", pan: "HHHAJ8901K",
     address: "8, Andheri West", city: "Mumbai", state: "Maharashtra", pincode: "400058",
     nomineeName: "Neha Singh", nomineeRelation: "Spouse", nomineeShare: "100",
     aadhaarFile: doc("aadhaar", { name: "Arjun Singh", number: "8901 2345 6789", dob: "22/03/1987", gender: "Male" }),
@@ -103,6 +111,7 @@ const MOCK_DATA = {
   9: {
     name: "Priya Mehta", mobile: "9812345678", email: "priya@gmail.com",
     dob: "1992-07-10", gender: "Female", kycStatus: "Verified",
+    aadhaar: "9012 3456 7890", pan: "IIIPM9012L",
     address: "33, Fort Kochi", city: "Kochi", state: "Kerala", pincode: "682001",
     nomineeName: "Raj Mehta", nomineeRelation: "Spouse", nomineeShare: "100",
     aadhaarFile: doc("aadhaar", { name: "Priya Mehta", number: "9012 3456 7890", dob: "10/07/1992", gender: "Female" }),
@@ -115,6 +124,7 @@ const MOCK_DATA = {
   10: {
     name: "Rahul Gupta", mobile: "9966778899", email: "rahul@gmail.com",
     dob: "1980-01-05", gender: "Male", kycStatus: "Verified",
+    aadhaar: "0123 4567 8901", pan: "JJJRG0123M",
     address: "C-9, Civil Lines", city: "Delhi", state: "Delhi", pincode: "110054",
     nomineeName: "Pooja Gupta", nomineeRelation: "Spouse", nomineeShare: "100",
     aadhaarFile: doc("aadhaar", { name: "Rahul Gupta", number: "0123 4567 8901", dob: "05/01/1980", gender: "Male" }),
@@ -128,6 +138,7 @@ const MOCK_DATA = {
   11: {
     name: "Ritu Singh", mobile: "9833221100", email: "ritu@gmail.com",
     dob: "1996-05-18", gender: "Female", kycStatus: "Pending",
+    aadhaar: "1234 9876 5432", pan: "KKKRS1234N",
     address: "12, Raja Park", city: "Jaipur", state: "Rajasthan", pincode: "302004",
     nomineeName: "", nomineeRelation: "", nomineeShare: "100",
     aadhaarFile: doc("aadhaar", { name: "Ritu Singh", number: "1234 9876 5432", dob: "18/05/1996", gender: "Female" }),
@@ -137,6 +148,7 @@ const MOCK_DATA = {
   12: {
     name: "Ajay Iyer", mobile: "9822110099", email: "ajay@gmail.com",
     dob: "1983-10-30", gender: "Male", kycStatus: "Rejected",
+    aadhaar: "2345 0987 6543", pan: "LLLAI2345O",
     address: "4, T Nagar", city: "Chennai", state: "Tamil Nadu", pincode: "600017",
     nomineeName: "", nomineeRelation: "", nomineeShare: "100",
     aadhaarFile: doc("aadhaar", { name: "Ajay Iyer", number: "2345 0987 6543", dob: "30/10/1983", gender: "Male" }),
@@ -297,43 +309,52 @@ export default function CustomerEdit() {
               </div>
             </SectionBlock>
 
-            {isProfile && (
-              <SectionBlock icon="🪪" title="KYC Documents">
-                <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 18 }}>
-                  <span className={`badge badge-${form.kycStatus === 'Verified' ? 'green' : form.kycStatus === 'Rejected' ? 'red' : 'amber'}`}>
-                    KYC: {form.kycStatus || 'Pending'}
-                  </span>
-                  {form.kycStatus !== 'Verified' && (
-                    <span style={{ fontSize: 12.5, color: 'var(--text-3)' }}>
-                      Upload documents below to complete verification
-                    </span>
-                  )}
-                  {form.kycStatus === 'Verified' && (
-                    <span style={{ fontSize: 12.5, color: 'var(--text-3)' }}>
-                      Your KYC is verified. You may re-upload to update documents.
-                    </span>
-                  )}
-                </div>
-                <div className="form-grid">
-                  <Field label="Aadhaar Card">
-                    <UploadBox
-                      label="Upload Aadhaar card"
-                      hint="JPG, PNG or PDF"
-                      value={form.aadhaarFile}
-                      onChange={setF('aadhaarFile')}
-                    />
-                  </Field>
-                  <Field label="PAN Card">
-                    <UploadBox
-                      label="Upload PAN card"
-                      hint="JPG, PNG or PDF"
-                      value={form.panFile}
-                      onChange={setF('panFile')}
-                    />
-                  </Field>
-                </div>
-              </SectionBlock>
-            )}
+            <SectionBlock icon="🪪" title="KYC Documents">
+              <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 18 }}>
+                <span className={`badge badge-${form.kycStatus === 'Verified' ? 'green' : form.kycStatus === 'Rejected' ? 'red' : 'amber'}`}>
+                  KYC: {form.kycStatus || 'Pending'}
+                </span>
+                <span style={{ fontSize: 12.5, color: 'var(--text-3)' }}>
+                  {form.kycStatus === 'Verified'
+                    ? 'KYC verified. Re-upload to update documents.'
+                    : 'Upload documents below to complete verification.'}
+                </span>
+              </div>
+              <div className="form-grid">
+                <Field label="Aadhaar Number">
+                  <Input
+                    placeholder="XXXX XXXX XXXX"
+                    maxLength={14}
+                    value={form.aadhaar || ""}
+                    onChange={set("aadhaar")}
+                  />
+                </Field>
+                <Field label="PAN Number">
+                  <Input
+                    placeholder="ABCDE1234F"
+                    maxLength={10}
+                    value={form.pan || ""}
+                    onChange={set("pan")}
+                  />
+                </Field>
+                <Field label="Aadhaar Card">
+                  <UploadBox
+                    label="Upload Aadhaar card"
+                    hint="JPG, PNG or PDF"
+                    value={form.aadhaarFile}
+                    onChange={setF('aadhaarFile')}
+                  />
+                </Field>
+                <Field label="PAN Card">
+                  <UploadBox
+                    label="Upload PAN card"
+                    hint="JPG, PNG or PDF"
+                    value={form.panFile}
+                    onChange={setF('panFile')}
+                  />
+                </Field>
+              </div>
+            </SectionBlock>
 
             <SectionBlock icon="👨‍👩‍👧" title="Family Details">
               <FamilyMembersSection members={members} onChange={setMembers} />
