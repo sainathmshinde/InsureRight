@@ -167,12 +167,11 @@ export default function AgentCreate() {
 
             <SectionBlock icon="💼" title="Professional Details">
               <div className="form-grid">
-                <Field label="POS License Number" required>
+                <Field label="POS License Number">
                   <Input
                     placeholder="POS-XXXX-XXX"
                     value={form.posLicense}
                     onChange={set("posLicense")}
-                    required
                   />
                 </Field>
                 <Field label="Qualification">
@@ -202,12 +201,11 @@ export default function AgentCreate() {
 
             <SectionBlock icon="🏦" title="Bank Details">
               <div className="form-grid">
-                <Field label="Account Number" required>
+                <Field label="Account Number">
                   <Input
                     placeholder="Enter account number"
                     value={form.accountNumber}
                     onChange={set("accountNumber")}
-                    required
                   />
                 </Field>
                 <Field label="IFSC Code" required>
@@ -221,37 +219,7 @@ export default function AgentCreate() {
               </div>
             </SectionBlock>
 
-            <SectionBlock icon="🔗" title="Mapping">
-              <div className="form-grid">
-                <Field label="Assigned Broker">
-                  <Select
-                    value={form.assignedBroker}
-                    onChange={set("assignedBroker")}
-                  >
-                    <option value="">Select broker</option>
-                    <option>K.M. Dastur & Co.</option>
-                    <option>Priya Brokers</option>
-                    <option>AK Associates</option>
-                    <option>Shah Financial</option>
-                  </Select>
-                </Field>
-                <Field label="Reporting Manager">
-                  <Input
-                    placeholder="Manager name"
-                    value={form.reportingManager}
-                    onChange={set("reportingManager")}
-                  />
-                </Field>
-                <Field label="Status">
-                  <Select value={form.status} onChange={set("status")}>
-                    <option>Active</option>
-                    <option>Inactive</option>
-                  </Select>
-                </Field>
-              </div>
-            </SectionBlock>
-
-            <div className="actions-row">
+<div className="actions-row">
               <button
                 type="button"
                 className="btn btn-ghost"

@@ -9,13 +9,18 @@ import {
 } from "../../components/Field";
 import { CustomerIcon } from "../../icons";
 import FamilyMembersSection from "./FamilyMembersSection";
+import { ORGANISATIONS, ASSOCIATIONS } from "./orgAssocData";
 
 const INITIAL = {
-  name: "",
+  firstName: "",
+  lastName: "",
+  empId: "",
   mobile: "",
   email: "",
   dob: "",
   gender: "",
+  organisationId: "",
+  associationId: "",
   aadhaarFile: null,
   panFile: null,
   kycStatus: "Pending",
@@ -69,15 +74,30 @@ export default function CustomerCreate() {
             {/* Basic Info */}
             <SectionBlock icon={<CustomerIcon />} title="Basic Information">
               <div className="form-grid">
-                <Field label="Full Name" required>
+                <Field label="First Name" required>
                   <Input
-                    placeholder="Enter full name"
-                    value={form.name}
-                    onChange={set("name")}
+                    placeholder="First name"
+                    value={form.firstName}
+                    onChange={set("firstName")}
                     required
                   />
                 </Field>
-                <Field label="Mobile" required>
+                <Field label="Last Name" required>
+                  <Input
+                    placeholder="Last name"
+                    value={form.lastName}
+                    onChange={set("lastName")}
+                    required
+                  />
+                </Field>
+                <Field label="EMP ID / PF No.">
+                  <Input
+                    placeholder="e.g. EMP-001 or PF123456"
+                    value={form.empId}
+                    onChange={set("empId")}
+                  />
+                </Field>
+                <Field label="Mobile" required style={{ gridColumnStart: 1 }}>
                   <Input
                     type="tel"
                     placeholder="+91 XXXXX XXXXX"
@@ -108,6 +128,27 @@ export default function CustomerCreate() {
                     <option>Male</option>
                     <option>Female</option>
                     <option>Other</option>
+                  </Select>
+                </Field>
+                <Field label="Organisation">
+                  <Select
+                    value={form.organisationId}
+                    onChange={e => setForm(p => ({ ...p, organisationId: e.target.value, associationId: "" }))}
+                  >
+                    <option value="">Select organisation</option>
+                    {ORGANISATIONS.map(o => <option key={o.id} value={o.id}>{o.name}</option>)}
+                  </Select>
+                </Field>
+                <Field label="Association">
+                  <Select
+                    value={form.associationId}
+                    onChange={set("associationId")}
+                    disabled={!form.organisationId}
+                  >
+                    <option value="">{form.organisationId ? "Select association" : "Select organisation first"}</option>
+                    {ASSOCIATIONS.filter(a => a.orgId === Number(form.organisationId)).map(a => (
+                      <option key={a.id} value={a.id}>{a.name}</option>
+                    ))}
                   </Select>
                 </Field>
               </div>

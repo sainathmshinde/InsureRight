@@ -53,6 +53,8 @@ import BuyPolicy  from "./pages/policy/BuyPolicy";
 
 // CRM
 import CrmPage from "./pages/crm/CrmPage";
+import Reports        from "./pages/reports/Reports";
+import Reconciliation from "./pages/reconciliation/Reconciliation";
 
 // Portals
 import BrokerPortal    from "./pages/portal/BrokerPortal";
@@ -166,6 +168,9 @@ export default function App() {
                   <Route path=":id" element={<BrokerView />} />
                   <Route path=":id/edit" element={<BrokerEdit />} />
                 </Route>
+
+                <Route path="reports"        element={<Reports />} />
+                <Route path="reconciliation" element={<Reconciliation />} />
               </Route>
 
               <Route path="*" element={<Navigate to="/dashboard" replace />} />

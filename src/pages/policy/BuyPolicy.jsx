@@ -444,47 +444,32 @@ function Avatar({ name, size = 40, fontSize = 16 }) {
 // ── Persistent "policy for" customer strip ─────────────────────────────────
 function CustomerStrip({ customer, onChangeCustomer, canChange = true }) {
   return (
-    <div
-      style={{
-        display: "flex",
-        alignItems: "center",
-        gap: 14,
-        background: "var(--surface)",
-        border: "1.5px solid var(--brand-light)",
-        borderRadius: "var(--r-md)",
-        padding: "11px 18px",
-        marginBottom: 24,
-        boxShadow: "0 2px 8px rgba(124,58,237,.07)",
-      }}
-    >
-      <Avatar name={customer.name} size={38} fontSize={14} />
+    <div className="bp-cust-strip" style={{
+      display: "flex", alignItems: "center", gap: 12, flexWrap: "wrap",
+      background: "var(--surface)", border: "1.5px solid var(--brand-light)",
+      borderRadius: "var(--r-md)", padding: "11px 16px", marginBottom: 20,
+      boxShadow: "0 2px 8px rgba(124,58,237,.07)",
+    }}>
+      <Avatar name={customer.name} size={36} fontSize={13} />
       <div style={{ flex: 1, minWidth: 0 }}>
-        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-          <span style={{ fontWeight: 600, fontSize: 14 }}>{customer.name}</span>
+        <div style={{ display: "flex", alignItems: "center", gap: 7, flexWrap: "wrap" }}>
+          <span style={{ fontWeight: 700, fontSize: 14 }}>{customer.name}</span>
           <StatusBadge status={customer.kyc} />
         </div>
-        <div style={{ fontSize: 12.5, color: "var(--text-3)", marginTop: 1 }}>
-          {customer.mobile} · {customer.email} · DOB: {customer.dob}
+        <div className="bp-cust-detail" style={{ fontSize: 12, color: "var(--text-3)", marginTop: 2 }}>
+          📱 {customer.mobile}
+          <span className="bp-cust-email"> · ✉ {customer.email}</span>
         </div>
       </div>
-      <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-        <span
-          style={{
-            fontSize: 12,
-            background: "var(--brand-light)",
-            borderRadius: 99,
-            padding: "3px 10px",
-            color: "var(--brand)",
-            fontWeight: 500,
-          }}
-        >
-          {customer.policies} existing{" "}
-          {customer.policies === 1 ? "policy" : "policies"}
+      <div className="bp-cust-actions" style={{ display: "flex", alignItems: "center", gap: 8, flexShrink: 0 }}>
+        <span style={{
+          fontSize: 11.5, background: "var(--brand-light)", borderRadius: 99,
+          padding: "3px 10px", color: "var(--brand)", fontWeight: 600, whiteSpace: "nowrap",
+        }}>
+          {customer.policies} {customer.policies === 1 ? "policy" : "policies"}
         </span>
         {canChange && (
-          <button className="btn btn-ghost btn-sm" onClick={onChangeCustomer}>
-            Change
-          </button>
+          <button className="btn btn-ghost btn-sm" onClick={onChangeCustomer}>Change</button>
         )}
       </div>
     </div>
@@ -590,7 +575,7 @@ export default function BuyPolicy() {
   // Step 3 — plan selection
   const [compareIds, setCompareIds] = useState([]);
   const [showCompare, setShowCompare] = useState(false);
-  const [selectedProduct, setSelectedProduct] = useState(null);
+  const [cart, setCart] = useState([]);
 
   // Step 4 — proposal — pre-fill from customer record
   const [proposal, setProposal] = useState({
@@ -612,7 +597,7 @@ export default function BuyPolicy() {
   const [upiId, setUpiId] = useState("");
 
   // Step 6 — result
-  const [policyResult, setPolicyResult] = useState(null);
+  const [policyResults, setPolicyResults] = useState([]);
 
   // Helpers
   const setP = (f) => (e) =>
@@ -648,6 +633,10 @@ export default function BuyPolicy() {
     if (isCustomer && step === 1) { navigate("/policy"); return; }
     setStep((s) => Math.max(s - 1, 0));
   };
+
+  const toggleCart = (p) =>
+    setCart(prev => prev.find(x => x.id === p.id) ? prev.filter(x => x.id !== p.id) : [...prev, p]);
+  const cartTotal = cart.reduce((s, p) => s + p.premium, 0);
 
   const products = PRODUCTS[insuranceType] ?? [];
   const compareProducts = products.filter((p) => compareIds.includes(p.id));
@@ -709,18 +698,17 @@ export default function BuyPolicy() {
           : prev,
     );
 
-  // Finalize payment
+  // Finalize payment — generate one policy per cart item
   const submitPayment = () => {
-    const ic = selectedProduct?.ic?.slice(0, 3).toUpperCase();
     const rand = () => Math.floor(Math.random() * 900000 + 100000);
-    setPolicyResult({
-      policyNo: `${ic}/2025/${rand()}`,
+    setPolicyResults(cart.map(p => ({
+      policyNo:   `${p.ic.slice(0, 3).toUpperCase()}/2025/${rand()}`,
       proposalId: `PRO-2025-${Math.floor(Math.random() * 9000 + 1000)}`,
-      product: selectedProduct?.name,
-      ic: selectedProduct?.ic,
-      premium: selectedProduct?.premium,
-      customer: selectedCustomer?.name,
-    });
+      product:    p.name,
+      ic:         p.ic,
+      premium:    p.premium,
+      customer:   selectedCustomer?.name,
+    })));
     next();
   };
 
@@ -1007,8 +995,9 @@ export default function BuyPolicy() {
                     next();
                   }
                 }}
+                className="bp-ins-type-btn"
                 style={{
-                  padding: "32px 24px",
+                  padding: "24px 20px",
                   borderRadius: 14,
                   position: "relative",
                   cursor: available ? "pointer" : "not-allowed",
@@ -1505,14 +1494,10 @@ export default function BuyPolicy() {
                         {compareProducts.map((p) => (
                           <td key={p.id}>
                             <button
-                              className="btn btn-primary btn-sm"
-                              onClick={() => {
-                                setSelectedProduct(p);
-                                setShowCompare(false);
-                                next();
-                              }}
+                              className={`btn btn-sm ${cart.find(x => x.id === p.id) ? "btn-secondary" : "btn-primary"}`}
+                              onClick={() => { toggleCart(p); setShowCompare(false); }}
                             >
-                              Select This Plan
+                              {cart.find(x => x.id === p.id) ? "✓ Added to Cart" : "+ Add to Cart"}
                             </button>
                           </td>
                         ))}
@@ -1520,6 +1505,40 @@ export default function BuyPolicy() {
                     </tbody>
                   </table>
                 </div>
+              </div>
+            </div>
+          )}
+
+          {/* Cart summary bar */}
+          {cart.length > 0 && (
+            <div style={{
+              background: "#1a1628", color: "#fff", borderRadius: 12,
+              padding: "14px 22px", marginBottom: 20,
+              display: "flex", alignItems: "center", gap: 16, flexWrap: "wrap",
+            }}>
+              <span style={{ fontWeight: 700, fontSize: 14 }}>🛒 Cart ({cart.length})</span>
+              <div style={{ display: "flex", gap: 8, flexWrap: "wrap", flex: 1 }}>
+                {cart.map(p => (
+                  <span key={p.id} style={{
+                    background: "#ffffff18", borderRadius: 99, padding: "3px 12px",
+                    fontSize: 12.5, display: "flex", alignItems: "center", gap: 6,
+                  }}>
+                    {p.logo} {p.name}
+                    <button type="button" onClick={() => toggleCart(p)}
+                      style={{ background: "none", border: "none", color: "#fff", cursor: "pointer", fontSize: 14, padding: 0, lineHeight: 1 }}>
+                      ×
+                    </button>
+                  </span>
+                ))}
+              </div>
+              <div style={{ display: "flex", alignItems: "center", gap: 16, flexShrink: 0 }}>
+                <div style={{ textAlign: "right" }}>
+                  <div style={{ fontSize: 11, color: "#bbb" }}>Total Premium</div>
+                  <div style={{ fontSize: 18, fontWeight: 800, color: "#a78bfa" }}>₹{cartTotal.toLocaleString()}/yr</div>
+                </div>
+                <button className="btn btn-primary" onClick={next} style={{ whiteSpace: "nowrap" }}>
+                  Proceed with {cart.length} Plan{cart.length > 1 ? "s" : ""} →
+                </button>
               </div>
             </div>
           )}
@@ -1533,17 +1552,17 @@ export default function BuyPolicy() {
             }}
           >
             {products.map((p) => {
-              const isSelected = selectedProduct?.id === p.id;
+              const inCart    = !!cart.find(x => x.id === p.id);
               const inCompare = compareIds.includes(p.id);
               return (
                 <div
                   key={p.id}
                   style={{
                     background: "var(--surface)",
-                    border: `2px solid ${isSelected ? "var(--brand)" : "var(--border)"}`,
+                    border: `2px solid ${inCart ? "var(--brand)" : "var(--border)"}`,
                     borderRadius: 14,
                     padding: 22,
-                    boxShadow: isSelected
+                    boxShadow: inCart
                       ? "0 4px 20px rgba(124,58,237,.15)"
                       : "var(--shadow-sm)",
                     transition: "all .15s",
@@ -1669,14 +1688,11 @@ export default function BuyPolicy() {
                     </button>
                     <button
                       type="button"
-                      className="btn btn-primary btn-sm"
+                      className={`btn btn-sm ${inCart ? "btn-secondary" : "btn-primary"}`}
                       style={{ flex: 1 }}
-                      onClick={() => {
-                        setSelectedProduct(p);
-                        next();
-                      }}
+                      onClick={() => toggleCart(p)}
                     >
-                      Select →
+                      {inCart ? "✓ Added" : "+ Add to Cart"}
                     </button>
                   </div>
                 </div>
@@ -1689,39 +1705,35 @@ export default function BuyPolicy() {
       {/* ══════════════════════════════════════════════════════════════════
           STEP 4 — Proposal Form
       ══════════════════════════════════════════════════════════════════ */}
-      {step === 4 && selectedProduct && (
+      {step === 4 && cart.length > 0 && (
         <div>
-          {/* Selected plan pill */}
-          <div
-            style={{
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "space-between",
-              background: "var(--brand-light)",
-              borderRadius: "var(--r-md)",
-              padding: "13px 20px",
-              marginBottom: 24,
-            }}
-          >
-            <div>
+          {/* Selected plans summary */}
+          <div style={{
+            background: "var(--brand-light)", borderRadius: "var(--r-md)",
+            padding: "14px 20px", marginBottom: 24,
+            border: "1.5px solid var(--brand)",
+          }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: cart.length > 1 ? 10 : 0 }}>
               <span style={{ fontSize: 13, color: "var(--text-3)" }}>
-                Selected plan:{" "}
+                {cart.length} plan{cart.length > 1 ? "s" : ""} selected
               </span>
-              <span
-                style={{ fontWeight: 700, color: "var(--brand)", fontSize: 14 }}
-              >
-                {selectedProduct.name}
-              </span>
-              <span style={{ color: "var(--text-3)", fontSize: 13 }}>
-                {" "}
-                · {selectedProduct.ic}
+              <span style={{ fontWeight: 800, fontSize: 18, color: "var(--brand)" }}>
+                Total ₹{cartTotal.toLocaleString()}/yr
               </span>
             </div>
-            <div
-              style={{ fontWeight: 700, fontSize: 18, color: "var(--brand)" }}
-            >
-              ₹{selectedProduct.premium.toLocaleString()}/yr
-            </div>
+            {cart.length > 1 && (
+              <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
+                {cart.map(p => (
+                  <span key={p.id} style={{
+                    background: "#fff", borderRadius: 99, padding: "3px 12px",
+                    fontSize: 12.5, fontWeight: 600, border: "1px solid var(--brand)",
+                    color: "var(--brand)",
+                  }}>
+                    {p.logo} {p.name} · ₹{p.premium.toLocaleString()}
+                  </span>
+                ))}
+              </div>
+            )}
           </div>
 
           <div className="card">
@@ -1912,17 +1924,10 @@ export default function BuyPolicy() {
       {/* ══════════════════════════════════════════════════════════════════
           STEP 5 — Payment
       ══════════════════════════════════════════════════════════════════ */}
-      {step === 5 && selectedProduct && (
-        <div
-          style={{
-            display: "grid",
-            gridTemplateColumns: "1fr 1fr",
-            gap: 24,
-            alignItems: "start",
-          }}
-        >
+      {step === 5 && cart.length > 0 && (
+        <div className="payment-layout">
           {/* Order summary */}
-          <div className="card" style={{ position: "sticky", top: 80 }}>
+          <div className="card payment-summary-card">
             <div className="card-header">
               <span className="card-title">Order Summary</span>
             </div>
@@ -1954,67 +1959,48 @@ export default function BuyPolicy() {
                   </div>
                 </div>
               )}
-              {/* Product */}
-              <div
-                style={{
-                  textAlign: "center",
-                  padding: "12px 0",
-                  borderBottom: "1px solid var(--border)",
-                  marginBottom: 12,
-                }}
-              >
-                <div style={{ fontSize: 26, marginBottom: 4 }}>
-                  {selectedProduct.logo}
-                </div>
-                <div style={{ fontWeight: 600, fontSize: 14 }}>
-                  {selectedProduct.name}
-                </div>
-                <div
-                  style={{ fontSize: 12, color: "var(--text-3)", marginTop: 2 }}
-                >
-                  {selectedProduct.ic}
-                </div>
+              {/* Products in cart */}
+              <div style={{ marginBottom: 12 }}>
+                {cart.map((p, i) => (
+                  <div key={p.id} style={{
+                    padding: "10px 0",
+                    borderBottom: "1px solid var(--border)",
+                    display: "flex", justifyContent: "space-between", alignItems: "center",
+                  }}>
+                    <div>
+                      <div style={{ fontSize: 18, marginBottom: 2 }}>{p.logo}</div>
+                      <div style={{ fontWeight: 600, fontSize: 13 }}>{p.name}</div>
+                      <div style={{ fontSize: 11.5, color: "var(--text-3)" }}>{p.ic} · {p.sumInsured}</div>
+                    </div>
+                    <div style={{ textAlign: "right" }}>
+                      <div style={{ fontWeight: 700, color: "var(--brand)", fontSize: 14 }}>
+                        ₹{p.premium.toLocaleString()}
+                      </div>
+                      <div style={{ fontSize: 11, color: "var(--text-3)" }}>per year</div>
+                    </div>
+                  </div>
+                ))}
               </div>
               {[
                 ["Type", insuranceType],
-                ["Sum Insured", selectedProduct.sumInsured],
                 ["Policy Period", "1 Year"],
-                [
-                  "Base Premium",
-                  `₹${Math.round(selectedProduct.premium / 1.18).toLocaleString()}`,
-                ],
-                [
-                  "GST (18%)",
-                  `₹${Math.round(selectedProduct.premium - selectedProduct.premium / 1.18).toLocaleString()}`,
-                ],
+                ["Subtotal", `₹${Math.round(cartTotal / 1.18).toLocaleString()}`],
+                ["GST (18%)", `₹${Math.round(cartTotal - cartTotal / 1.18).toLocaleString()}`],
               ].map(([k, v]) => (
-                <div
-                  key={k}
-                  style={{
-                    display: "flex",
-                    justifyContent: "space-between",
-                    padding: "7px 0",
-                    borderBottom: "1px solid var(--border)",
-                    fontSize: 13,
-                  }}
-                >
+                <div key={k} style={{
+                  display: "flex", justifyContent: "space-between",
+                  padding: "7px 0", borderBottom: "1px solid var(--border)", fontSize: 13,
+                }}>
                   <span style={{ color: "var(--text-2)" }}>{k}</span>
                   <span style={{ fontWeight: 500 }}>{v}</span>
                 </div>
               ))}
-              <div
-                style={{
-                  display: "flex",
-                  justifyContent: "space-between",
-                  padding: "14px 0 0",
-                  fontSize: 17,
-                  fontWeight: 700,
-                }}
-              >
-                <span>Total</span>
-                <span style={{ color: "var(--brand)" }}>
-                  ₹{selectedProduct.premium.toLocaleString()}
-                </span>
+              <div style={{
+                display: "flex", justifyContent: "space-between",
+                padding: "14px 0 0", fontSize: 17, fontWeight: 700,
+              }}>
+                <span>Total ({cart.length} plan{cart.length > 1 ? "s" : ""})</span>
+                <span style={{ color: "var(--brand)" }}>₹{cartTotal.toLocaleString()}</span>
               </div>
             </div>
           </div>
@@ -2186,8 +2172,7 @@ export default function BuyPolicy() {
                   onClick={submitPayment}
                   style={{ minWidth: 200 }}
                 >
-                  <PaymentIcon size={16} /> Pay ₹
-                  {selectedProduct.premium.toLocaleString()}
+                  <PaymentIcon size={16} /> Pay ₹{cartTotal.toLocaleString()}
                 </button>
               </div>
             </div>
@@ -2199,102 +2184,70 @@ export default function BuyPolicy() {
       {/* ══════════════════════════════════════════════════════════════════
           STEP 6 — Policy Issued
       ══════════════════════════════════════════════════════════════════ */}
-      {step === 6 && policyResult && (
-        <div style={{ maxWidth: 560, margin: "0 auto" }}>
+      {step === 6 && policyResults.length > 0 && (
+        <div style={{ maxWidth: 660, margin: "0 auto" }}>
           <div className="card">
-            <div
-              className="card-body"
-              style={{ textAlign: "center", padding: "48px 32px" }}
-            >
+            <div className="card-body" style={{ textAlign: "center", padding: "40px 32px" }}>
               <div style={{ fontSize: 68, marginBottom: 18 }}>🎉</div>
-              <div
-                style={{
-                  fontWeight: 700,
-                  fontSize: 22,
-                  color: "var(--green)",
-                  marginBottom: 8,
-                }}
-              >
-                Policy Issued Successfully!
+              <div style={{ fontWeight: 700, fontSize: 22, color: "var(--green)", marginBottom: 8 }}>
+                {policyResults.length > 1
+                  ? `${policyResults.length} Policies Issued Successfully!`
+                  : "Policy Issued Successfully!"}
               </div>
-              <div
-                style={{
-                  color: "var(--text-3)",
-                  marginBottom: 32,
-                  lineHeight: 1.6,
-                }}
-              >
-                The policy for <strong>{policyResult.customer}</strong> has been
-                activated. A confirmation has been sent to the customer's
-                registered email.
+              <div style={{ color: "var(--text-3)", marginBottom: 28, lineHeight: 1.6 }}>
+                Policies for <strong>{policyResults[0].customer}</strong> have been activated.
+                Confirmations have been sent to the customer's registered email.
               </div>
 
-              {/* Policy details card */}
-              <div
-                style={{
-                  background: "var(--surface-2)",
-                  borderRadius: "var(--r-md)",
-                  padding: 24,
-                  marginBottom: 28,
-                  textAlign: "left",
-                }}
-              >
-                {[
-                  ["Proposal ID", policyResult.proposalId],
-                  ["Policy Number", policyResult.policyNo],
-                  ["Customer", policyResult.customer],
-                  ["Product", policyResult.product],
-                  ["Insurer", policyResult.ic],
-                  [
-                    "Annual Premium",
-                    `₹${policyResult.premium?.toLocaleString()}`,
-                  ],
-                  ["Status", null],
-                ].map(([k, v]) => (
-                  <div
-                    key={k}
-                    style={{
-                      display: "flex",
-                      justifyContent: "space-between",
-                      alignItems: "center",
-                      padding: "9px 0",
-                      borderBottom: "1px solid var(--border)",
-                    }}
-                  >
-                    <span
-                      style={{
-                        fontSize: 13,
-                        color: "var(--text-2)",
-                        fontWeight: 500,
-                      }}
-                    >
-                      {k}
-                    </span>
-                    {k === "Status" ? (
-                      <StatusBadge status="Issued" />
-                    ) : (
-                      <span style={{ fontSize: 13.5, fontWeight: 600 }}>
-                        {v}
+              {/* One card per policy */}
+              <div style={{ display: "flex", flexDirection: "column", gap: 14, marginBottom: 28, textAlign: "left" }}>
+                {policyResults.map((r, i) => (
+                  <div key={r.policyNo} style={{
+                    background: "var(--surface-2)", borderRadius: "var(--r-md)",
+                    padding: "18px 22px", border: "1px solid var(--border)",
+                  }}>
+                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
+                      <span style={{ fontWeight: 700, fontSize: 14 }}>
+                        Policy {i + 1} — {r.product}
                       </span>
-                    )}
+                      <StatusBadge status="Issued" />
+                    </div>
+                    {[
+                      ["Proposal ID",    r.proposalId],
+                      ["Policy Number",  r.policyNo],
+                      ["Insurer",        r.ic],
+                      ["Annual Premium", `₹${r.premium?.toLocaleString()}`],
+                    ].map(([k, v]) => (
+                      <div key={k} style={{
+                        display: "flex", justifyContent: "space-between", alignItems: "center",
+                        padding: "6px 0", borderBottom: "1px solid var(--border)", fontSize: 13,
+                      }}>
+                        <span style={{ color: "var(--text-2)", fontWeight: 500 }}>{k}</span>
+                        <span style={{ fontWeight: 600 }}>{v}</span>
+                      </div>
+                    ))}
                   </div>
                 ))}
               </div>
 
-              <div
-                style={{ display: "flex", gap: 12, justifyContent: "center" }}
-              >
-                <button
-                  className="btn btn-secondary"
-                  onClick={() => navigate("/policy")}
-                >
+              {/* Total */}
+              <div style={{
+                background: "var(--brand-light)", borderRadius: "var(--r-md)",
+                padding: "12px 20px", marginBottom: 28,
+                display: "flex", justifyContent: "space-between", alignItems: "center",
+              }}>
+                <span style={{ fontWeight: 600, fontSize: 14 }}>Total Annual Premium</span>
+                <span style={{ fontWeight: 800, fontSize: 20, color: "var(--brand)" }}>
+                  ₹{policyResults.reduce((s, r) => s + r.premium, 0).toLocaleString()}
+                </span>
+              </div>
+
+              <div style={{ display: "flex", gap: 12, justifyContent: "center" }}>
+                <button className="btn btn-secondary" onClick={() => navigate("/policy")}>
                   View All Policies
                 </button>
-                <button
-                  className="btn btn-primary"
-                  onClick={() => navigate("/policy")}
-                >
-                  ⬇ Download Policy
+                <button className="btn btn-primary" onClick={() => navigate("/policy")}>
+                  ⬇ Download All Policies
                 </button>
               </div>
             </div>

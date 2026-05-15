@@ -2,7 +2,7 @@ import { useState, useRef, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 
-export default function Topbar() {
+export default function Topbar({ onMenuClick }) {
   const { user, logout } = useAuth()
   const navigate = useNavigate()
   const [open, setOpen] = useState(false)
@@ -25,8 +25,19 @@ export default function Topbar() {
 
   return (
     <header style={S.bar}>
+      {/* Hamburger — hidden on desktop via CSS */}
+      <button
+        className="topbar-hamburger"
+        style={S.hamburger}
+        onClick={onMenuClick}
+        title="Menu"
+        aria-label="Open menu"
+      >
+        <HamburgerIcon />
+      </button>
+
       <div style={S.left}>
-        <div style={S.searchBox}>
+        <div className="topbar-search" style={S.searchBox}>
           <SearchIcon />
           <input type="text" placeholder="Search customers, policies…" style={S.searchInput} />
         </div>
@@ -45,7 +56,7 @@ export default function Topbar() {
         <div style={{ position: 'relative' }} ref={ref}>
           <div style={S.userPill} onClick={() => setOpen(v => !v)}>
             <div style={S.avatar}>{initials}</div>
-            <div style={S.userInfo}>
+            <div className="topbar-user-text" style={S.userInfo}>
               <span style={S.userName}>{user?.name || 'User'}</span>
               <span style={S.userRole}>{roleName} · {user?.company?.split(' ').slice(0, 3).join(' ')}</span>
             </div>
@@ -81,6 +92,15 @@ export default function Topbar() {
   )
 }
 
+function HamburgerIcon() {
+  return (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#5c5573" strokeWidth="2" strokeLinecap="round">
+      <line x1="3" y1="6"  x2="21" y2="6"/>
+      <line x1="3" y1="12" x2="21" y2="12"/>
+      <line x1="3" y1="18" x2="21" y2="18"/>
+    </svg>
+  )
+}
 function SearchIcon() {
   return (
     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#9d94b8" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -106,7 +126,8 @@ function MailIcon() {
 }
 
 const S = {
-  bar:        { height: 'var(--topbar-h,58px)', background: '#fff', borderBottom: '1.5px solid #e8e4f0', display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 24px', gap: 16, flexShrink: 0, position: 'sticky', top: 0, zIndex: 10 },
+  bar:        { height: 'var(--topbar-h,58px)', background: '#fff', borderBottom: '1.5px solid #e8e4f0', display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 16px', gap: 10, flexShrink: 0, position: 'sticky', top: 0, zIndex: 10 },
+  hamburger:  { display: 'none', width: 36, height: 36, borderRadius: 6, border: '1.5px solid #e8e4f0', background: '#faf9fc', cursor: 'pointer', alignItems: 'center', justifyContent: 'center', flexShrink: 0 },
   left:       { display: 'flex', alignItems: 'center', flex: 1 },
   searchBox:  { display: 'flex', alignItems: 'center', gap: 8, background: '#faf9fc', border: '1.5px solid #e8e4f0', borderRadius: 6, padding: '0 12px', width: 280, height: 36 },
   searchInput:{ border: 'none', background: 'transparent', outline: 'none', fontSize: 13.5, color: '#1a1628', width: '100%', fontFamily: 'inherit' },

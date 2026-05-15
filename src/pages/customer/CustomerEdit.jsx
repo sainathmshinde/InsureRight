@@ -3,6 +3,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { Field, Input, Select, SectionBlock, UploadBox } from "../../components/Field";
 import { useAuth } from "../../context/AuthContext";
 import FamilyMembersSection from "./FamilyMembersSection";
+import { ORGANISATIONS, ASSOCIATIONS } from "./orgAssocData";
 
 const doc = (type, params) =>
   `/documents/preview.html?type=${type}&${new URLSearchParams(params)}`;
@@ -172,9 +173,18 @@ export default function CustomerEdit() {
   const profileData = isProfile
     ? (Object.values(MOCK_DATA).find(m => m.email === user?.email) ?? Object.values(MOCK_DATA)[0] ?? {})
     : {};
-  const initial = isProfile
+  const rawInitial = isProfile
     ? { ...profileData, ...authUserToCustomer(user) }
     : (MOCK_DATA[id] ?? {});
+  const splitName = (raw) => {
+    const parts = (raw.name || "").trim().split(" ");
+    return { firstName: parts[0] || "", lastName: parts.slice(1).join(" ") || "" };
+  };
+  const initial = {
+    ...rawInitial,
+    ...(!rawInitial.firstName ? splitName(rawInitial) : {}),
+    empId: rawInitial.empId || "",
+  };
   const [form, setForm] = useState(initial);
   const [members, setMembers] = useState(initial.familyMembers ?? []);
   const set  = (f) => (e) => setForm((p) => ({ ...p, [f]: e.target.value }));
@@ -222,14 +232,30 @@ export default function CustomerEdit() {
           <form onSubmit={handleSubmit}>
             <SectionBlock icon="👤" title="Basic Information">
               <div className="form-grid">
-                <Field label="Full Name" required>
+                <Field label="First Name" required>
                   <Input
-                    value={form.name || ""}
-                    onChange={set("name")}
+                    placeholder="First name"
+                    value={form.firstName || ""}
+                    onChange={set("firstName")}
                     required
                   />
                 </Field>
-                <Field label="Mobile" required>
+                <Field label="Last Name" required>
+                  <Input
+                    placeholder="Last name"
+                    value={form.lastName || ""}
+                    onChange={set("lastName")}
+                    required
+                  />
+                </Field>
+                <Field label="EMP ID / PF No.">
+                  <Input
+                    placeholder="e.g. EMP-001 or PF123456"
+                    value={form.empId || ""}
+                    onChange={set("empId")}
+                  />
+                </Field>
+                <Field label="Mobile" required style={{ gridColumnStart: 1 }}>
                   <Input
                     type="tel"
                     value={form.mobile || ""}
@@ -257,6 +283,27 @@ export default function CustomerEdit() {
                     <option>Male</option>
                     <option>Female</option>
                     <option>Other</option>
+                  </Select>
+                </Field>
+                <Field label="Organisation">
+                  <Select
+                    value={form.organisationId || ""}
+                    onChange={e => setForm(p => ({ ...p, organisationId: e.target.value, associationId: "" }))}
+                  >
+                    <option value="">Select organisation</option>
+                    {ORGANISATIONS.map(o => <option key={o.id} value={o.id}>{o.name}</option>)}
+                  </Select>
+                </Field>
+                <Field label="Association">
+                  <Select
+                    value={form.associationId || ""}
+                    onChange={set("associationId")}
+                    disabled={!form.organisationId}
+                  >
+                    <option value="">{form.organisationId ? "Select association" : "Select organisation first"}</option>
+                    {ASSOCIATIONS.filter(a => a.orgId === Number(form.organisationId)).map(a => (
+                      <option key={a.id} value={a.id}>{a.name}</option>
+                    ))}
                   </Select>
                 </Field>
                 {!isProfile && (

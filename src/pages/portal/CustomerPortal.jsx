@@ -248,14 +248,14 @@ export default function CustomerPortal() {
       {/* ══════════════════════════════════════════════════
           HERO
       ══════════════════════════════════════════════════ */}
-      <div style={{ background: 'linear-gradient(135deg,#1b5e20 0%,#2e7d32 50%,#1565c0 100%)', borderRadius: 16, padding: '40px 40px 44px', position: 'relative', overflow: 'hidden', marginBottom: 24 }}>
+      <div className="cp-hero" style={{ background: 'linear-gradient(135deg,#1b5e20 0%,#2e7d32 50%,#1565c0 100%)', borderRadius: 16, padding: '40px 40px 44px', position: 'relative', overflow: 'hidden', marginBottom: 24 }}>
         {/* decorative blobs */}
         <div style={{ position:'absolute', top:-60, right:160, width:280, height:280, borderRadius:'50%', background:'rgba(255,255,255,0.05)', pointerEvents:'none' }} />
         <div style={{ position:'absolute', bottom:-80, right:-30, width:320, height:320, borderRadius:'50%', background:'rgba(255,255,255,0.05)', pointerEvents:'none' }} />
 
-        <div style={{ display:'flex', justifyContent:'space-between', alignItems:'flex-start', gap:32, position:'relative' }}>
+        <div className="cp-hero-inner" style={{ display:'flex', justifyContent:'space-between', alignItems:'flex-start', gap:32, position:'relative' }}>
           {/* left copy */}
-          <div style={{ flex:1, maxWidth:560 }}>
+          <div className="cp-hero-left" style={{ flex:1, maxWidth:560 }}>
             <div style={{ display:'inline-flex', alignItems:'center', gap:7, background:'rgba(255,255,255,0.12)', border:'1px solid rgba(255,255,255,0.2)', borderRadius:99, padding:'5px 14px', marginBottom:16 }}>
               <span style={{ width:7, height:7, borderRadius:'50%', background:'#4ade80', display:'inline-block', boxShadow:'0 0 0 3px rgba(74,222,128,0.3)' }} />
               <span style={{ fontSize:12, color:'#fff', fontWeight:600 }}>K.M. Dastur & Co. · IRDAI Licensed Broker CB-456/2008</span>
@@ -271,7 +271,7 @@ export default function CustomerPortal() {
             </p>
 
             {/* CTA row */}
-            <div style={{ display:'flex', gap:10, flexWrap:'wrap', marginBottom:28 }}>
+            <div className="cp-cta-row" style={{ display:'flex', gap:10, flexWrap:'wrap', marginBottom:28 }}>
               <button onClick={() => navigate('/insurance/health')}
                 style={{ padding:'11px 24px', borderRadius:9, border:'none', background:'#fff', color:'#2d7d46', fontWeight:800, fontSize:14, cursor:'pointer', fontFamily:'inherit', boxShadow:'0 4px 14px rgba(0,0,0,0.15)' }}>
                 🏥 Explore Health Plans
@@ -298,7 +298,7 @@ export default function CustomerPortal() {
           </div>
 
           {/* right: my policy card */}
-          <div style={{ width:260, flexShrink:0 }}>
+          <div className="cp-hero-right" style={{ width:260, flexShrink:0 }}>
             <div style={{ background:'rgba(255,255,255,0.1)', backdropFilter:'blur(12px)', border:'1px solid rgba(255,255,255,0.2)', borderRadius:14, padding:'18px 20px' }}>
               <div style={{ fontSize:11, color:'#a5d6a7', fontWeight:700, textTransform:'uppercase', letterSpacing:1, marginBottom:12 }}>My Portfolio</div>
               {[
@@ -355,7 +355,7 @@ export default function CustomerPortal() {
             All Plans →
           </button>
         </div>
-        <div style={{ display:'grid', gridTemplateColumns:'repeat(8,1fr)', gap:10 }}>
+        <div className="cp-cats" style={{ display:'grid', gridTemplateColumns:'repeat(8,1fr)', gap:10 }}>
           {INSURANCE_TYPES.map(t => (
             <div key={t.id}
               onClick={() => navigate(t.path)}
@@ -379,7 +379,7 @@ export default function CustomerPortal() {
       {/* ══════════════════════════════════════════════════
           MY POLICIES  +  SIDEBAR
       ══════════════════════════════════════════════════ */}
-      <div style={{ display:'grid', gridTemplateColumns:'1fr 290px', gap:16, alignItems:'flex-start', marginBottom:28 }}>
+      <div className="cp-main-grid" style={{ display:'grid', gridTemplateColumns:'1fr 290px', gap:16, alignItems:'flex-start', marginBottom:28 }}>
 
         {/* My Policies */}
         <div className="card">
@@ -413,7 +413,7 @@ export default function CustomerPortal() {
                       {p.status}
                     </span>
                   </div>
-                  <div style={{ display:'grid', gridTemplateColumns:'repeat(4,1fr)', gap:10 }}>
+                  <div className="cp-pol-details" style={{ display:'grid', gridTemplateColumns:'repeat(4,1fr)', gap:10 }}>
                     {[['Type',p.type],['Sum Insured',p.sumInsured],['Premium',`₹${p.premium?.toLocaleString()}/yr`],['Valid Until',fmtDate(p.endDate)]].map(([k,v]) => (
                       <div key={k}>
                         <div style={{ fontSize:10.5, color:'#9d94b8', marginBottom:2 }}>{k}</div>
@@ -483,7 +483,7 @@ export default function CustomerPortal() {
       <div style={{ marginBottom:24 }}>
         <div style={{ fontSize:18, fontWeight:800, color:'#1a1628', marginBottom:4 }}>What Our Customers Say</div>
         <div style={{ fontSize:13, color:'#9d94b8', marginBottom:14 }}>Trusted by 50,000+ policyholders across India</div>
-        <div style={{ display:'grid', gridTemplateColumns:'repeat(3,1fr)', gap:14 }}>
+        <div className="cp-testimonials" style={{ display:'grid', gridTemplateColumns:'repeat(3,1fr)', gap:14 }}>
           {TESTIMONIALS.map((t, i) => (
             <div key={i} style={{ background:'#fff', border:'1px solid #e8e4f0', borderRadius:12, padding:'18px 20px' }}>
               <div style={{ display:'flex', justifyContent:'space-between', alignItems:'flex-start', marginBottom:10 }}>
@@ -519,8 +519,8 @@ export default function CustomerPortal() {
               Start Claim →
             </button>
           </div>
-          <div style={{ display:'grid', gridTemplateColumns:'repeat(4,1fr)', gap:0, position:'relative' }}>
-            <div style={{ position:'absolute', top:19, left:'12.5%', right:'12.5%', height:1, background:'#e8e4f0', zIndex:0 }} />
+          <div className="cp-claim-steps" style={{ display:'grid', gridTemplateColumns:'repeat(4,1fr)', gap:0, position:'relative' }}>
+            <div className="cp-claim-line" style={{ position:'absolute', top:19, left:'12.5%', right:'12.5%', height:1, background:'#e8e4f0', zIndex:0 }} />
             {[
               { icon:'📞', label:'Intimate Insurer',  desc:'Call within 24 hrs of incident' },
               { icon:'📎', label:'Submit Documents',  desc:'Upload bills & scan reports' },

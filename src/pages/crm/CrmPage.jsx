@@ -101,50 +101,89 @@ export default function CrmPage() {
 
   const campaignName = id => CAMPAIGNS.find(c => c.id === id)?.name ?? '—'
 
-  // ── Shared table renderer ──────────────────────────────────────────────────
+  // ── Shared lead renderer — cards on mobile, table on desktop ─────────────
   const LeadTable = ({ rows, showCampaign = false, showClaim = false, showAssignedTo = false }) => (
-    <div className="table-wrap">
-      <table style={{ fontSize: 13 }}>
-        <thead>
-          <tr>
-            <th>#</th>
-            <th>Name</th>
-            <th>Mobile</th>
-            {showCampaign   && <th>Campaign</th>}
-            <th>Enrollment</th>
-            <th>Enrollment Date</th>
-            <th>Purchase Status</th>
-            {showAssignedTo && <th>Sales Agent</th>}
-            <th>Action</th>
-          </tr>
-        </thead>
-        <tbody>
-          {rows.map((lead, i) => (
-            <tr key={lead.id}>
-              <td>{i + 1}</td>
-              <td style={{ fontWeight: 500 }}>{lead.name}</td>
-              <td>{lead.mobile}</td>
-              {showCampaign   && <td style={{ color: 'var(--text-3)', fontSize: 12 }}>{campaignName(lead.campaignId)}</td>}
-              <td><Badge bg={enrollBg(lead.enrollmentStatus)} color={enrollClr(lead.enrollmentStatus)}>{lead.enrollmentStatus}</Badge></td>
-              <td>{lead.enrollmentDate || '—'}</td>
-              <td><Badge bg={purchBg(lead.purchaseStatus)} color={purchClr(lead.purchaseStatus)}>{lead.purchaseStatus}</Badge></td>
-              {showAssignedTo && <td style={{ fontSize: 12, color: 'var(--text-3)' }}>{KMD_AGENTS.find(a => a.id === lead.salesAssignedTo)?.name ?? '—'}</td>}
-              <td>
-                {showClaim ? (
-                  <button type="button" className="btn btn-primary btn-sm" style={{ fontSize: 12 }} onClick={() => claimLead(lead.id)}>
-                    Claim
-                  </button>
-                ) : (
-                  <button type="button" className="btn btn-ghost btn-sm" style={{ fontSize: 12 }} onClick={() => openAction(lead)}>
-                    Action
-                  </button>
+    <>
+      {/* ── Mobile cards ── */}
+      <div className="crm-lead-cards">
+        {rows.map(lead => (
+          <div key={lead.id} style={{ border: '1.5px solid var(--border)', borderRadius: 'var(--r-lg)', background: 'var(--surface)', overflow: 'hidden' }}>
+            {/* Card header */}
+            <div style={{ padding: '12px 14px', borderBottom: '1px solid var(--border)', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 8 }}>
+              <div>
+                <div style={{ fontWeight: 700, fontSize: 14, color: 'var(--text)' }}>{lead.name}</div>
+                <div style={{ fontSize: 12.5, color: 'var(--text-3)', marginTop: 2 }}>📱 {lead.mobile}</div>
+                {showCampaign && <div style={{ fontSize: 11.5, color: 'var(--text-3)', marginTop: 2 }}>📢 {campaignName(lead.campaignId)}</div>}
+              </div>
+              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 5, flexShrink: 0 }}>
+                <Badge bg={enrollBg(lead.enrollmentStatus)} color={enrollClr(lead.enrollmentStatus)}>{lead.enrollmentStatus}</Badge>
+                <Badge bg={purchBg(lead.purchaseStatus)}  color={purchClr(lead.purchaseStatus)}>{lead.purchaseStatus}</Badge>
+              </div>
+            </div>
+            {/* Card body */}
+            <div style={{ padding: '10px 14px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
+              <div style={{ display: 'flex', gap: 20, flexWrap: 'wrap' }}>
+                <div>
+                  <div style={{ fontSize: 10.5, color: 'var(--text-3)' }}>Enrollment Date</div>
+                  <div style={{ fontSize: 12.5, fontWeight: 600 }}>{lead.enrollmentDate || '—'}</div>
+                </div>
+                {showAssignedTo && (
+                  <div>
+                    <div style={{ fontSize: 10.5, color: 'var(--text-3)' }}>Sales Agent</div>
+                    <div style={{ fontSize: 12.5, fontWeight: 600 }}>{KMD_AGENTS.find(a => a.id === lead.salesAssignedTo)?.name ?? '—'}</div>
+                  </div>
                 )}
-              </td>
+              </div>
+              {showClaim ? (
+                <button type="button" className="btn btn-primary btn-sm" onClick={() => claimLead(lead.id)}>Claim</button>
+              ) : (
+                <button type="button" className="btn btn-ghost btn-sm" onClick={() => openAction(lead)}>Action →</button>
+              )}
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* ── Desktop table ── */}
+      <div className="crm-table-wrap">
+        <table style={{ fontSize: 13 }}>
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Name</th>
+              <th>Mobile</th>
+              {showCampaign   && <th>Campaign</th>}
+              <th>Enrollment</th>
+              <th>Enrollment Date</th>
+              <th>Purchase Status</th>
+              {showAssignedTo && <th>Sales Agent</th>}
+              <th>Action</th>
             </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
+          </thead>
+          <tbody>
+            {rows.map((lead, i) => (
+              <tr key={lead.id}>
+                <td>{i + 1}</td>
+                <td style={{ fontWeight: 500 }}>{lead.name}</td>
+                <td>{lead.mobile}</td>
+                {showCampaign   && <td style={{ color: 'var(--text-3)', fontSize: 12 }}>{campaignName(lead.campaignId)}</td>}
+                <td><Badge bg={enrollBg(lead.enrollmentStatus)} color={enrollClr(lead.enrollmentStatus)}>{lead.enrollmentStatus}</Badge></td>
+                <td>{lead.enrollmentDate || '—'}</td>
+                <td><Badge bg={purchBg(lead.purchaseStatus)} color={purchClr(lead.purchaseStatus)}>{lead.purchaseStatus}</Badge></td>
+                {showAssignedTo && <td style={{ fontSize: 12, color: 'var(--text-3)' }}>{KMD_AGENTS.find(a => a.id === lead.salesAssignedTo)?.name ?? '—'}</td>}
+                <td>
+                  {showClaim ? (
+                    <button type="button" className="btn btn-primary btn-sm" style={{ fontSize: 12 }} onClick={() => claimLead(lead.id)}>Claim</button>
+                  ) : (
+                    <button type="button" className="btn btn-ghost btn-sm" style={{ fontSize: 12 }} onClick={() => openAction(lead)}>Action</button>
+                  )}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </>
   )
 
   const SummaryChips = ({ rows }) => (
@@ -298,17 +337,13 @@ export default function CrmPage() {
       {draft && (
         <>
           <div onClick={closeModal} style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.35)', zIndex: 100 }} />
-          <div style={{
-            position: 'fixed', top: 0, right: 0, bottom: 0, width: 520,
-            background: 'var(--surface)', boxShadow: '-4px 0 24px rgba(0,0,0,.15)',
-            zIndex: 101, display: 'flex', flexDirection: 'column',
-          }}>
+          <div className="crm-drawer">
             {/* Header */}
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '18px 24px', borderBottom: '1px solid var(--border)', flexShrink: 0 }}>
               <div>
                 <div style={{ fontWeight: 700, fontSize: 15 }}>{draft.name}</div>
                 <div style={{ fontSize: 12, color: 'var(--text-3)', marginTop: 2 }}>
-                  {draft.mobile} · {campaignName(draft.campaignId)}
+                  📱 {draft.mobile} · 📢 {campaignName(draft.campaignId)}
                 </div>
               </div>
               <button type="button" onClick={closeModal} style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 22, color: 'var(--text-3)', lineHeight: 1 }}>×</button>
@@ -320,7 +355,7 @@ export default function CrmPage() {
               {/* Status Update */}
               <section>
                 <div style={{ fontWeight: 600, fontSize: 13.5, marginBottom: 12, color: 'var(--text-2)' }}>Status Update</div>
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
+                <div className="crm-drawer-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
                   <Field label="Enrollment Status">
                     <Select value={draft.enrollmentStatus} onChange={e => setDraftField('enrollmentStatus', e.target.value)}>
                       {ENROLLMENT_STATUSES.map(s => <option key={s}>{s}</option>)}
@@ -334,11 +369,11 @@ export default function CrmPage() {
                 </div>
               </section>
 
-              {/* Assign to Sales Agent — shown when calling agent marks Interested */}
+              {/* Assign to Sales Agent */}
               {isCallingAgent && draft.purchaseStatus === 'Interested' && (
                 <section style={{ background: '#e6f4ea', border: '1px solid #a8d5b5', borderRadius: 10, padding: '16px 18px' }}>
                   <div style={{ fontWeight: 600, fontSize: 13.5, marginBottom: 12, color: '#2d7d46' }}>🎯 Assign to Sales Agent</div>
-                  <div style={{ display: 'flex', gap: 10, alignItems: 'flex-end' }}>
+                  <div className="crm-assign-row" style={{ display: 'flex', gap: 10, alignItems: 'flex-end' }}>
                     <div style={{ flex: 1 }}>
                       <Field label="Select Sales Agent">
                         <Select value={salesAssignId} onChange={e => setSalesAssignId(e.target.value)}>
@@ -347,13 +382,8 @@ export default function CrmPage() {
                         </Select>
                       </Field>
                     </div>
-                    <button
-                      type="button"
-                      className="btn btn-primary btn-sm"
-                      disabled={!salesAssignId}
-                      onClick={assignToSales}
-                      style={{ marginBottom: 2, whiteSpace: 'nowrap' }}
-                    >
+                    <button type="button" className="btn btn-primary btn-sm" disabled={!salesAssignId}
+                      onClick={assignToSales} style={{ marginBottom: 2, whiteSpace: 'nowrap' }}>
                       Assign →
                     </button>
                   </div>
@@ -372,11 +402,9 @@ export default function CrmPage() {
                   {draft.calls.map(call => (
                     <div key={call.callNo} style={{ border: '1px solid var(--border)', borderRadius: 'var(--r-md)', padding: '14px 16px', background: 'var(--surface-2)' }}>
                       <div style={{ fontWeight: 600, fontSize: 13, marginBottom: 10, color: 'var(--brand)' }}>Call {call.callNo}</div>
-                      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginBottom: 10 }}>
+                      <div className="crm-drawer-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginBottom: 10 }}>
                         <Field label="Date & Time">
-                          <input
-                            type="datetime-local"
-                            value={call.time}
+                          <input type="datetime-local" value={call.time}
                             onChange={e => setCallField(call.callNo, 'time', e.target.value)}
                             style={{ width: '100%', padding: '7px 10px', fontSize: 13, border: '1px solid var(--border)', borderRadius: 'var(--r-sm)', background: 'var(--surface)', color: 'var(--text)', boxSizing: 'border-box' }}
                           />
@@ -388,11 +416,8 @@ export default function CrmPage() {
                         </Field>
                       </div>
                       <Field label="Comment">
-                        <textarea
-                          value={call.comment}
-                          onChange={e => setCallField(call.callNo, 'comment', e.target.value)}
-                          placeholder="Add a comment…"
-                          rows={2}
+                        <textarea value={call.comment} onChange={e => setCallField(call.callNo, 'comment', e.target.value)}
+                          placeholder="Add a comment…" rows={2}
                           style={{ width: '100%', padding: '7px 10px', fontSize: 13, resize: 'vertical', border: '1px solid var(--border)', borderRadius: 'var(--r-sm)', background: 'var(--surface)', color: 'var(--text)', fontFamily: 'inherit', boxSizing: 'border-box' }}
                         />
                       </Field>

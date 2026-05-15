@@ -183,6 +183,16 @@ const BROCHURE_TOC = [
   },
 ];
 
+const BASE_POLICIES = [
+  { id: 1,  name: "Star Comprehensive Health",     code: "SHI-HC-001" },
+  { id: 2,  name: "HDFC ERGO Optima Secure",       code: "HER-HS-002" },
+  { id: 3,  name: "ICICI Lombard Complete Health", code: "ICL-HC-003" },
+  { id: 6,  name: "LIC Jeevan Anand",              code: "LIC-LA-006" },
+  { id: 7,  name: "HDFC Life Sanchay Plus",        code: "HDFC-LSP-007" },
+  { id: 9,  name: "Star Senior Health",            code: "SHI-SH-009" },
+  { id: 11, name: "Bajaj Allianz Health Guard",    code: "BAJ-HG-011" },
+];
+
 const COVERED_MEMBERS = [
   "Self",
   "Spouse",
@@ -366,6 +376,24 @@ export default function ProductForm({
               <option>Inactive</option>
             </Select>
           </Field>
+          <Field label="Policy Type" required>
+            <Select value={form.policyType} onChange={set("policyType")} required>
+              <option>Base</option>
+              <option>Top-up</option>
+              <option>Super Top-up</option>
+              <option>Comprehensive</option>
+            </Select>
+          </Field>
+          {(form.policyType === "Top-up" || form.policyType === "Super Top-up") && (
+            <Field label="Link to Base Policy">
+              <Select value={form.basePolicyId} onChange={set("basePolicyId")}>
+                <option value="">Select base policy</option>
+                {BASE_POLICIES.map(p => (
+                  <option key={p.id} value={p.id}>{p.name} ({p.code})</option>
+                ))}
+              </Select>
+            </Field>
+          )}
         </div>
       </SectionBlock>
 
@@ -543,7 +571,7 @@ export default function ProductForm({
 
       {/* ── 3. Documents ─────────────────────────── */}
       <SectionBlock icon="📄" title="Documents">
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 24, alignItems: "start" }}>
+        <div className="pf-doc-grid" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 24, alignItems: "start" }}>
 
           {/* Left — file cards */}
           <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
@@ -736,16 +764,6 @@ export default function ProductForm({
                 onChange={setArr("addOns")}
               />
             </div>
-          </Field>
-        </div>
-        <div className="form-grid">
-          <Field label="Policy Type">
-            <Select value={form.policyType} onChange={set("policyType")}>
-              <option>Base</option>
-              <option>Top-up</option>
-              <option>Super Top-up</option>
-              <option>Comprehensive</option>
-            </Select>
           </Field>
         </div>
       </SectionBlock>

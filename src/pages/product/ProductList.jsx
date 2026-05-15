@@ -83,11 +83,43 @@ export default function ProductList() {
             )}
           </div>
 
-          <Table
-            columns={columns}
-            rows={pg.slice}
-            empty={<EmptyState icon="📦" title="No products found" subtitle="Add a new product to the catalogue" />}
-          />
+          {/* Mobile cards */}
+          <div className="prod-cards">
+            {pg.slice.length === 0 ? (
+              <EmptyState icon="📦" title="No products found" subtitle="Add a new product to the catalogue" />
+            ) : pg.slice.map(p => (
+              <div key={p.id} style={{ border: '1px solid var(--border)', borderRadius: 10, padding: '13px 14px', background: '#fff' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 8, marginBottom: 6 }}>
+                  <span style={{ fontWeight: 600, fontSize: 14, lineHeight: 1.3 }}>{p.productName}</span>
+                  <StatusBadge status={p.status} />
+                </div>
+                <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginBottom: 6 }}>
+                  <span className={`badge badge-${TYPE_COLOR[p.insuranceType] ?? 'blue'}`}>{p.insuranceType}</span>
+                  <StatusBadge status={p.category} />
+                </div>
+                <div style={{ fontSize: 12, color: 'var(--text-3)', marginBottom: 8 }}>{p.icName}</div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 6 }}>
+                  <span className="badge badge-purple" style={{ fontFamily: 'monospace', fontSize: 11 }}>{p.productCode}</span>
+                  <span style={{ fontSize: 13, fontWeight: 700 }}>
+                    ₹{p.basePremium.toLocaleString()}
+                    <span style={{ fontWeight: 400, color: 'var(--text-3)', fontSize: 12 }}> · {p.sumInsured}</span>
+                  </span>
+                </div>
+                <div style={{ marginTop: 10, display: 'flex', justifyContent: 'flex-end' }}>
+                  <Button variant="secondary" size="sm" onClick={() => navigate(`/product/${p.id}/edit`)}>Edit</Button>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Desktop table */}
+          <div className="prod-table-wrap">
+            <Table
+              columns={columns}
+              rows={pg.slice}
+              empty={<EmptyState icon="📦" title="No products found" subtitle="Add a new product to the catalogue" />}
+            />
+          </div>
 
           <Pagination total={pg.total} page={pg.page} perPage={pg.perPage} onPage={pg.onPage} onPerPage={pg.onPerPage} />
         </div>

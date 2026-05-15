@@ -172,11 +172,10 @@ export default function AgentEdit() {
 
             <SectionBlock icon="💼" title="Professional Details">
               <div className="form-grid">
-                <Field label="POS License Number" required>
+                <Field label="POS License Number">
                   <Input
                     value={form.posLicense || ""}
                     onChange={set("posLicense")}
-                    required
                   />
                 </Field>
                 <Field label="Qualification">
@@ -204,11 +203,10 @@ export default function AgentEdit() {
 
             <SectionBlock icon="🏦" title="Bank Details">
               <div className="form-grid">
-                <Field label="Account Number" required>
+                <Field label="Account Number">
                   <Input
                     value={form.accountNumber || ""}
                     onChange={set("accountNumber")}
-                    required
                   />
                 </Field>
                 <Field label="IFSC Code" required>
@@ -221,30 +219,7 @@ export default function AgentEdit() {
               </div>
             </SectionBlock>
 
-            <SectionBlock icon="🔗" title="Mapping">
-              <div className="form-grid">
-                <Field label="Assigned Broker">
-                  <Input value="K.M. Dastur & Co." readOnly style={{ background: 'var(--bg-2)', color: 'var(--text-2)' }} />
-                </Field>
-                <Field label="Reporting Manager">
-                  <Input
-                    value={form.reportingManager || ""}
-                    onChange={set("reportingManager")}
-                  />
-                </Field>
-                <Field label="Status">
-                  <Select
-                    value={form.status || "Active"}
-                    onChange={set("status")}
-                  >
-                    <option>Active</option>
-                    <option>Inactive</option>
-                  </Select>
-                </Field>
-              </div>
-            </SectionBlock>
-
-            <div className="actions-row">
+<div className="actions-row">
               <button
                 type="button"
                 className="btn btn-ghost"

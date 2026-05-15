@@ -1,14 +1,24 @@
+import { useState } from "react";
 import { Outlet } from "react-router-dom";
 import Sidebar from "./Sidebar";
 import Topbar from "./Topbar";
 
 export default function Layout() {
+  const [mobileOpen, setMobileOpen] = useState(false);
+
   return (
     <div style={S.shell}>
-      <Sidebar />
+      {/* Mobile backdrop */}
+      <div
+        className={`sb-mobile-backdrop${mobileOpen ? " show" : ""}`}
+        onClick={() => setMobileOpen(false)}
+      />
+
+      <Sidebar mobileOpen={mobileOpen} onMobileClose={() => setMobileOpen(false)} />
+
       <div style={S.main}>
-        <Topbar />
-        <div style={S.content}>
+        <Topbar onMenuClick={() => setMobileOpen(v => !v)} />
+        <div style={S.content} className="app-content">
           <Outlet />
         </div>
       </div>
@@ -28,7 +38,6 @@ const S = {
     flexDirection: "column",
     overflow: "hidden",
     minWidth: 0,
-    transition: "margin-left 0.22s cubic-bezier(.4,0,.2,1)",
   },
   content: {
     flex: 1,

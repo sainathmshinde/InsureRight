@@ -37,14 +37,14 @@ export default function BrokerPortal() {
     <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
 
       {/* Welcome banner */}
-      <div style={{ background: 'linear-gradient(135deg,#7c3aed 0%,#4f1d96 100%)', borderRadius: 14, padding: '28px 32px', color: '#fff' }}>
+      <div className="bd-banner" style={{ background: 'linear-gradient(135deg,#7c3aed 0%,#4f1d96 100%)', borderRadius: 14, padding: '28px 32px', color: '#fff' }}>
         <div style={{ fontSize: 13, color: '#c4b5fd', marginBottom: 6, fontWeight: 500 }}>Broker Portal</div>
-        <div style={{ fontSize: 24, fontWeight: 800, marginBottom: 4 }}>Welcome back, {user?.name} 👋</div>
+        <div className="bd-banner-title" style={{ fontSize: 24, fontWeight: 800, marginBottom: 4 }}>Welcome back, {user?.name} 👋</div>
         <div style={{ fontSize: 13.5, color: '#ddd6fe' }}>{user?.company} &nbsp;·&nbsp; IRDAI {user?.irdaiNo}</div>
       </div>
 
       {/* Stats */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 16 }}>
+      <div className="bd-stats" style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 16 }}>
         {STATS.map(s => (
           <div key={s.label} style={{ background: '#fff', border: '1px solid #e8e4f0', borderRadius: 12, padding: '20px 22px' }}>
             <div style={{ fontSize: 28, fontWeight: 800, color: s.color }}>{s.value}</div>
@@ -58,11 +58,11 @@ export default function BrokerPortal() {
       <div className="card">
         <div className="card-body">
           <div style={{ fontWeight: 700, fontSize: 15, marginBottom: 14 }}>Quick Actions</div>
-          <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
+          <div className="bd-quick-actions" style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 10 }}>
             {QUICK_ACTIONS.map(a => (
               <button key={a.label} type="button"
                 onClick={() => navigate(a.path)}
-                style={{ padding: '10px 22px', borderRadius: 8, border: `1.5px solid ${a.color}33`, background: a.bg, color: a.color, fontWeight: 600, fontSize: 13.5, cursor: 'pointer', fontFamily: 'inherit' }}>
+                style={{ padding: '10px 16px', borderRadius: 8, border: `1.5px solid ${a.color}33`, background: a.bg, color: a.color, fontWeight: 600, fontSize: 13.5, cursor: 'pointer', fontFamily: 'inherit' }}>
                 + {a.label}
               </button>
             ))}
@@ -70,7 +70,7 @@ export default function BrokerPortal() {
         </div>
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20 }}>
+      <div className="bd-two-col" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20 }}>
 
         {/* Recent Agents */}
         <div className="card">
@@ -79,7 +79,26 @@ export default function BrokerPortal() {
               <div style={{ fontWeight: 700, fontSize: 15 }}>Agents</div>
               <button type="button" className="btn btn-ghost" style={{ fontSize: 12, padding: '4px 12px' }} onClick={() => navigate('/agent')}>View All</button>
             </div>
-            <div className="table-wrap">
+
+            {/* Mobile cards */}
+            <div className="bd-agent-cards">
+              {RECENT_AGENTS.map(a => (
+                <div key={a.name} style={{ padding: '11px 13px', border: '1px solid #e8e4f0', borderRadius: 10, background: '#faf9fc' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 }}>
+                    <span style={{ fontWeight: 600, fontSize: 13.5 }}>{a.name}</span>
+                    <span style={{ padding: '2px 9px', borderRadius: 99, fontSize: 11.5, fontWeight: 600, background: a.status === 'Active' ? '#e6f4ea' : '#f1f3f4', color: a.status === 'Active' ? '#2d7d46' : '#5f6368' }}>
+                      {a.status}
+                    </span>
+                  </div>
+                  <div style={{ fontSize: 12, color: '#9d94b8' }}>
+                    {a.license} &nbsp;·&nbsp; {a.customers} customers
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* Desktop table */}
+            <div className="bd-agent-table table-wrap">
               <table style={{ fontSize: 13 }}>
                 <thead>
                   <tr><th>Name</th><th>License</th><th>Customers</th><th>Status</th></tr>
@@ -114,7 +133,7 @@ export default function BrokerPortal() {
               {ACTIVE_CAMPAIGNS.map(c => (
                 <div key={c.name} style={{ padding: '12px 14px', border: '1px solid #e8e4f0', borderRadius: 10, background: '#faf9fc' }}>
                   <div style={{ fontWeight: 600, fontSize: 13.5, marginBottom: 4 }}>{c.name}</div>
-                  <div style={{ display: 'flex', gap: 16, fontSize: 12, color: '#9d94b8' }}>
+                  <div style={{ display: 'flex', gap: 16, fontSize: 12, color: '#9d94b8', flexWrap: 'wrap' }}>
                     <span>Type: {c.type}</span>
                     <span>Agents: {c.agents}</span>
                     <span>Leads: {c.leads}</span>

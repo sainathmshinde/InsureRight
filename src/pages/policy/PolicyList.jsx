@@ -96,7 +96,7 @@ export default function PolicyList() {
       </PageHeader>
 
       {/* Summary tiles */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 16, marginBottom: 24 }}>
+      <div className="pl-tiles" style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 16, marginBottom: 24 }}>
         {[
           { label: isCustomer ? 'My Policies'    : 'Total Proposals', value: scopedData.length,                                                         icon: '📋', color: 'var(--brand)' },
           { label: 'Active Policies',              value: scopedData.filter(p => p.status === 'Active').length,                                          icon: '✅', color: 'var(--green)' },
@@ -137,11 +137,93 @@ export default function PolicyList() {
             )}
           </div>
 
-          <Table
-            columns={columns}
-            rows={pg.slice}
-            empty={<EmptyState icon="📋" title="No policies found" subtitle="Buy a new policy to get started" />}
-          />
+          {/* ── Mobile cards (hidden on desktop) ── */}
+          <div className="pl-cards">
+            {pg.slice.length === 0
+              ? <EmptyState icon="📋" title="No policies found" subtitle="Buy a new policy to get started" />
+              : pg.slice.map(row => {
+                const typeColor = { Health: '#2563eb', Motor: '#d97706', Life: '#7c3aed' }[row.type] ?? '#7c3aed'
+                const typeBg   = { Health: '#dbeafe', Motor: '#fef3c7', Life: '#ede9fe' }[row.type]  ?? '#ede9fe'
+                return (
+                  <div key={row.id} style={{ border: '1.5px solid var(--border)', borderRadius: 'var(--r-lg)', background: 'var(--surface)', overflow: 'hidden' }}>
+                    {/* Card header */}
+                    <div style={{ padding: '14px 16px', borderBottom: '1px solid var(--border)', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 10 }}>
+                      <div style={{ flex: 1, minWidth: 0 }}>
+                        <div style={{ fontWeight: 700, fontSize: 14, color: 'var(--text)', marginBottom: 3, lineHeight: 1.3 }}>{row.product}</div>
+                        <div style={{ fontSize: 12, color: 'var(--text-3)' }}>{row.icName}</div>
+                      </div>
+                      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 5, flexShrink: 0 }}>
+                        <StatusBadge status={row.status} />
+                        <span style={{ fontSize: 11, fontWeight: 600, padding: '2px 8px', borderRadius: 99, background: typeBg, color: typeColor }}>{row.type}</span>
+                      </div>
+                    </div>
+
+                    {/* Card body */}
+                    <div style={{ padding: '12px 16px', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px 16px' }}>
+                      <div>
+                        <div style={{ fontSize: 10.5, color: 'var(--text-3)', marginBottom: 2 }}>Annual Premium</div>
+                        <div style={{ fontWeight: 700, fontSize: 15, color: 'var(--brand)' }}>₹{row.premium.toLocaleString()}</div>
+                      </div>
+                      <div>
+                        <div style={{ fontSize: 10.5, color: 'var(--text-3)', marginBottom: 2 }}>Sum Insured</div>
+                        <div style={{ fontWeight: 600, fontSize: 13 }}>{row.sumInsured}</div>
+                      </div>
+                      <div>
+                        <div style={{ fontSize: 10.5, color: 'var(--text-3)', marginBottom: 2 }}>Payment</div>
+                        <StatusBadge status={row.paymentStatus} />
+                      </div>
+                      <div>
+                        <div style={{ fontSize: 10.5, color: 'var(--text-3)', marginBottom: 2 }}>Valid Until</div>
+                        <div style={{ fontWeight: 500, fontSize: 12.5 }}>{row.endDate || '—'}</div>
+                      </div>
+                      {!isCustomer && (
+                        <div style={{ gridColumn: 'span 2' }}>
+                          <div style={{ fontSize: 10.5, color: 'var(--text-3)', marginBottom: 2 }}>Customer</div>
+                          <div style={{ fontWeight: 600, fontSize: 13 }}>{row.customerName} · {row.mobile}</div>
+                        </div>
+                      )}
+                      {row.policyNo && (
+                        <div style={{ gridColumn: 'span 2' }}>
+                          <div style={{ fontSize: 10.5, color: 'var(--text-3)', marginBottom: 2 }}>Policy No.</div>
+                          <div style={{ fontFamily: 'monospace', fontSize: 12.5, fontWeight: 600, color: 'var(--brand)' }}>{row.policyNo}</div>
+                        </div>
+                      )}
+                      <div style={{ gridColumn: 'span 2' }}>
+                        <div style={{ fontSize: 10.5, color: 'var(--text-3)', marginBottom: 2 }}>Proposal ID</div>
+                        <div style={{ fontFamily: 'monospace', fontSize: 12, color: 'var(--text-2)' }}>{row.proposalId}</div>
+                      </div>
+                    </div>
+
+                    {/* Card actions */}
+                    {(row.status === 'Active' && row.policyNo || row.paymentStatus === 'Pending') && (
+                      <div style={{ padding: '10px 16px', borderTop: '1px solid var(--border)', background: 'var(--surface-2)', display: 'flex', gap: 8 }}>
+                        {row.status === 'Active' && row.policyNo && (
+                          <Button variant="secondary" size="sm" style={{ flex: 1, justifyContent: 'center' }}>
+                            ⬇ Download Policy
+                          </Button>
+                        )}
+                        {row.paymentStatus === 'Pending' && (
+                          <Button variant="primary" size="sm" style={{ flex: 1, justifyContent: 'center' }}
+                            onClick={() => navigate('/policy/buy')}>
+                            💳 Pay Now
+                          </Button>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                )
+              })
+            }
+          </div>
+
+          {/* ── Desktop table (hidden on mobile) ── */}
+          <div className="pl-table-wrap">
+            <Table
+              columns={columns}
+              rows={pg.slice}
+              empty={<EmptyState icon="📋" title="No policies found" subtitle="Buy a new policy to get started" />}
+            />
+          </div>
 
           <Pagination total={pg.total} page={pg.page} perPage={pg.perPage} onPage={pg.onPage} onPerPage={pg.onPerPage} />
         </div>

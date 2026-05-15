@@ -11,6 +11,8 @@ import {
   CRMIcon,
   InsuranceCompanyIcon,
   LogoutIcon,
+  ReportIcon,
+  DocumentIcon,
 } from "../icons";
 import { useAuth } from "../context/AuthContext";
 
@@ -22,22 +24,12 @@ const BROKER_NAV = [
     children: [{ label: "Overview", path: "/broker-portal" }],
   },
   {
-    key: "profile",
-    label: "Profile",
-    icon: UserIcon,
-    children: [
-      { label: "View Profile", path: "/profile" },
-      { label: "Edit Profile", path: "/profile/edit" },
-    ],
-  },
-  {
     key: "agent",
     label: "Agents",
     icon: AgentIcon,
     children: [
       { label: "All Agents",  path: "/agent" },
       { label: "Add Agent",   path: "/agent/create" },
-      { label: "Commission",  path: "/agent/commission" },
     ],
   },
   {
@@ -91,6 +83,22 @@ const BROKER_NAV = [
       { label: "Add IC",    path: "/ic/create" },
     ],
   },
+  {
+    key: "reports",
+    label: "Reports",
+    icon: ReportIcon,
+    children: [
+      { label: "All Reports", path: "/reports" },
+    ],
+  },
+  {
+    key: "reconciliation",
+    label: "Reconciliation",
+    icon: DocumentIcon,
+    children: [
+      { label: "Reconcile Data", path: "/reconciliation" },
+    ],
+  },
 ];
 
 const AGENT_NAV = [
@@ -126,12 +134,6 @@ const AGENT_NAV = [
       { label: "Policy Issuance", path: "/policy" },
       { label: "Buy Policy",      path: "/policy/buy" },
     ],
-  },
-  {
-    key: "agent",
-    label: "My Commission",
-    icon: AgentIcon,
-    children: [{ label: "Commission", path: "/agent/commission" }],
   },
   {
     key: "crm",
@@ -174,24 +176,39 @@ const CUSTOMER_NAV = [
 const EXPANDED_W  = 230;
 const COLLAPSED_W = 62;
 
-export default function Sidebar() {
+export default function Sidebar({ mobileOpen = false, onMobileClose }) {
   const location = useLocation();
   const navigate = useNavigate();
   const { user, logout } = useAuth();
 
   const activeNav = user?.role === 'agent' ? AGENT_NAV : user?.role === 'customer' ? CUSTOMER_NAV : BROKER_NAV;
 
+  // Precise match: avoids "policy" matching "/policy-catalogue" etc.
+  const matchesKey = (pathname, key) =>
+    pathname === "/" + key || pathname.startsWith("/" + key + "/");
+
   const [collapsed, setCollapsed] = useState(false);
   const [openKey, setOpenKey] = useState(
-    () => activeNav.find((n) => location.pathname.startsWith("/" + n.key))?.key ?? "dashboard"
+    () => activeNav.find((n) => matchesKey(location.pathname, n.key))?.key ?? activeNav[0]?.key
   );
   const [hoveredKey, setHoveredKey] = useState(null);
   const leaveTimer = useRef(null);
+  const isMounted = useRef(false);
 
-  useEffect(() => { setHoveredKey(null); }, [location.pathname]);
+  useEffect(() => {
+    if (!isMounted.current) { isMounted.current = true; return; }
+    // Auto-expand the matching section and close mobile drawer on route change
+    const match = activeNav.find(n => matchesKey(location.pathname, n.key));
+    if (match) setOpenKey(match.key);
+    setHoveredKey(null);
+    if (onMobileClose) onMobileClose();
+  }, [location.pathname]);
 
   const toggle = () => { setCollapsed(c => !c); setHoveredKey(null); };
-  const handleParentClick = key => { if (!collapsed) setOpenKey(p => p === key ? null : key); };
+  const handleParentClick = key => {
+    if (collapsed) return;
+    setOpenKey(p => p === key ? null : key);
+  };
   const onEnter  = key => { if (!collapsed) return; clearTimeout(leaveTimer.current); setHoveredKey(key); };
   const onLeave  = ()  => { if (!collapsed) return; leaveTimer.current = setTimeout(() => setHoveredKey(null), 150); };
   const keepOpen = ()  => { if (!collapsed) return; clearTimeout(leaveTimer.current); };
@@ -211,7 +228,10 @@ export default function Sidebar() {
         .sb-logout:hover { background:#fef2f2 !important; color:#dc2626 !important; }
       `}</style>
 
-      <aside style={{ ...S.aside, width: collapsed ? COLLAPSED_W : EXPANDED_W }}>
+      <aside
+        className={`sidebar-root${mobileOpen ? " mobile-open" : ""}`}
+        style={{ ...S.aside, width: collapsed ? COLLAPSED_W : EXPANDED_W }}
+      >
 
         {/* ── Logo ── */}
         <div style={{ ...S.logoRow, justifyContent: collapsed ? "center" : "space-between", padding: collapsed ? 0 : "0 16px 0 18px" }}>
@@ -220,9 +240,16 @@ export default function Sidebar() {
               Insure<span style={{ color: "#7c3aed" }}>Right</span>
             </span>
           )}
-          <button className="sb-toggle" style={S.toggleBtn} onClick={toggle} title={collapsed ? "Expand" : "Collapse"}>
-            {collapsed ? <IconExpand /> : <IconCollapse />}
-          </button>
+          {/* Desktop collapse toggle; on mobile show a close × instead */}
+          {mobileOpen ? (
+            <button className="sb-toggle" style={S.toggleBtn} onClick={onMobileClose} title="Close">
+              <span style={{ fontSize: 18, lineHeight: 1 }}>×</span>
+            </button>
+          ) : (
+            <button className="sb-toggle" style={S.toggleBtn} onClick={toggle} title={collapsed ? "Expand" : "Collapse"}>
+              {collapsed ? <IconExpand /> : <IconCollapse />}
+            </button>
+          )}
         </div>
 
         {/* ── User pill (expanded only) ── */}
@@ -240,7 +267,7 @@ export default function Sidebar() {
         <nav style={{ ...S.nav, alignItems: collapsed ? "center" : "stretch" }}>
           {activeNav.map(item => {
             const Icon = item.icon;
-            const moduleActive = location.pathname.startsWith("/" + item.key);
+            const moduleActive = matchesKey(location.pathname, item.key);
             const isOpen  = !collapsed && openKey === item.key;
             const flyOpen = collapsed && hoveredKey === item.key;
 

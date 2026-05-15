@@ -3,10 +3,9 @@ import { useAuth } from '../../context/AuthContext'
 
 // ── Sales agent (Ravi Kulkarni) data ─────────────────────────────────────────
 const SALES_STATS = [
-  { label: 'My Customers',      value: '8',       sub: '+3 this month',      color: '#7c3aed', bg: '#f5f3ff' },
-  { label: 'Policies Issued',   value: '5',       sub: 'This financial year', color: '#2d7d46', bg: '#e6f4ea' },
-  { label: 'Commission Earned', value: '₹24,600', sub: 'April 2025',         color: '#a05c00', bg: '#fff3e0' },
-  { label: 'CRM Leads',         value: '8',       sub: '3 interested',       color: '#0a7ea4', bg: '#e0f4fb' },
+  { label: 'My Customers',    value: '8', sub: '+3 this month',       color: '#7c3aed', bg: '#f5f3ff' },
+  { label: 'Policies Issued', value: '5', sub: 'This financial year', color: '#2d7d46', bg: '#e6f4ea' },
+  { label: 'CRM Leads',       value: '8', sub: '3 interested',        color: '#0a7ea4', bg: '#e0f4fb' },
 ]
 const SALES_CAMPAIGNS = [
   { name: 'Summer Health Drive 2025',  type: 'Promotional', leads: 5, purchased: 2 },
@@ -24,10 +23,9 @@ const SALES_RECENT_CUSTOMERS = [
 
 // ── Calling agent (Pooja Desai) data ─────────────────────────────────────────
 const CALLING_STATS = [
-  { label: 'Leads Claimed',    value: '38',      sub: '+2 this month',      color: '#7c3aed', bg: '#f5f3ff' },
-  { label: 'Converted',        value: '27',      sub: 'This financial year', color: '#2d7d46', bg: '#e6f4ea' },
-  { label: 'Commission Earned',value: '₹14,200', sub: 'April 2025',         color: '#a05c00', bg: '#fff3e0' },
-  { label: 'Active Campaigns', value: '3',       sub: '7 interested leads', color: '#0a7ea4', bg: '#e0f4fb' },
+  { label: 'Leads Claimed',    value: '38', sub: '+2 this month',       color: '#7c3aed', bg: '#f5f3ff' },
+  { label: 'Converted',        value: '27', sub: 'This financial year', color: '#2d7d46', bg: '#e6f4ea' },
+  { label: 'Active Campaigns', value: '3',  sub: '7 interested leads',  color: '#0a7ea4', bg: '#e0f4fb' },
 ]
 const CALLING_CAMPAIGNS = [
   { name: 'Summer Health Drive 2025', type: 'Promotional', leads: 5, purchased: 2 },
@@ -46,7 +44,6 @@ const QUICK_ACTIONS = [
   { label: 'Add Customer', path: '/customer/create', color: '#7c3aed', bg: '#f5f3ff' },
   { label: 'Buy Policy',   path: '/policy/buy',      color: '#2d7d46', bg: '#e6f4ea' },
   { label: 'CRM',          path: '/crm',             color: '#0a7ea4', bg: '#e0f4fb' },
-  { label: 'Commission',   path: '/agent/commission',color: '#a05c00', bg: '#fff3e0' },
 ]
 
 export default function AgentPortal() {
@@ -63,14 +60,14 @@ export default function AgentPortal() {
     <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
 
       {/* Welcome banner */}
-      <div style={{ background: 'linear-gradient(135deg,#0a7ea4 0%,#065f82 100%)', borderRadius: 14, padding: '28px 32px', color: '#fff' }}>
+      <div className="ap-banner" style={{ background: 'linear-gradient(135deg,#0a7ea4 0%,#065f82 100%)', borderRadius: 14, padding: '28px 32px', color: '#fff' }}>
         <div style={{ fontSize: 13, color: '#bae6fd', marginBottom: 6, fontWeight: 500 }}>Agent Portal</div>
-        <div style={{ fontSize: 24, fontWeight: 800, marginBottom: 4 }}>Welcome back, {user?.name} 👋</div>
+        <div className="ap-banner-title" style={{ fontSize: 24, fontWeight: 800, marginBottom: 4 }}>Welcome back, {user?.name} 👋</div>
         <div style={{ fontSize: 13.5, color: '#e0f2fe' }}>{user?.company}</div>
       </div>
 
       {/* Stats */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 16 }}>
+      <div className="ap-stats" style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 16 }}>
         {STATS.map(s => (
           <div key={s.label} style={{ background: '#fff', border: '1px solid #e8e4f0', borderRadius: 12, padding: '20px 22px' }}>
             <div style={{ fontSize: 28, fontWeight: 800, color: s.color }}>{s.value}</div>
@@ -84,11 +81,11 @@ export default function AgentPortal() {
       <div className="card">
         <div className="card-body">
           <div style={{ fontWeight: 700, fontSize: 15, marginBottom: 14 }}>Quick Actions</div>
-          <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
+          <div className="ap-quick-actions" style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 10 }}>
             {QUICK_ACTIONS.map(a => (
               <button key={a.label} type="button"
                 onClick={() => navigate(a.path)}
-                style={{ padding: '10px 22px', borderRadius: 8, border: `1.5px solid ${a.color}33`, background: a.bg, color: a.color, fontWeight: 600, fontSize: 13.5, cursor: 'pointer', fontFamily: 'inherit' }}>
+                style={{ padding: '10px 16px', borderRadius: 8, border: `1.5px solid ${a.color}33`, background: a.bg, color: a.color, fontWeight: 600, fontSize: 13.5, cursor: 'pointer', fontFamily: 'inherit' }}>
                 {a.label}
               </button>
             ))}
@@ -96,16 +93,36 @@ export default function AgentPortal() {
         </div>
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20 }}>
+      <div className="ap-two-col" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20 }}>
 
-        {/* My Customers */}
+        {/* My Customers / Leads */}
         <div className="card">
           <div className="card-body">
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 14 }}>
               <div style={{ fontWeight: 700, fontSize: 15 }}>{custLabel}</div>
               <button type="button" className="btn btn-ghost" style={{ fontSize: 12, padding: '4px 12px' }} onClick={() => navigate('/customer')}>View All</button>
             </div>
-            <div className="table-wrap">
+
+            {/* Mobile cards */}
+            <div className="ap-cust-cards">
+              {RECENT_CUSTOMERS.map(c => (
+                <div key={c.name} style={{ padding: '11px 13px', border: '1px solid #e8e4f0', borderRadius: 10, background: '#faf9fc' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 }}>
+                    <span style={{ fontWeight: 600, fontSize: 13.5 }}>{c.name}</span>
+                    <span style={{ padding: '2px 9px', borderRadius: 99, fontSize: 11.5, fontWeight: 600, background: c.status === 'Active' ? '#e6f4ea' : c.status === 'Renewal' ? '#fff3e0' : '#f1f3f4', color: c.status === 'Active' ? '#2d7d46' : c.status === 'Renewal' ? '#a05c00' : '#5f6368' }}>
+                      {c.status}
+                    </span>
+                  </div>
+                  <div style={{ fontSize: 12, color: '#9d94b8' }}>{c.policy}</div>
+                  {c.renewal !== '—' && (
+                    <div style={{ fontSize: 11.5, color: '#9d94b8', marginTop: 2 }}>Renewal: {c.renewal}</div>
+                  )}
+                </div>
+              ))}
+            </div>
+
+            {/* Desktop table */}
+            <div className="ap-cust-table table-wrap">
               <table style={{ fontSize: 13 }}>
                 <thead>
                   <tr><th>Name</th><th>Policy</th><th>Renewal</th><th>Status</th></tr>
@@ -137,7 +154,7 @@ export default function AgentPortal() {
               {MY_CAMPAIGNS.map(c => (
                 <div key={c.name} style={{ padding: '12px 14px', border: '1px solid #e8e4f0', borderRadius: 10, background: '#faf9fc' }}>
                   <div style={{ fontWeight: 600, fontSize: 13.5, marginBottom: 6 }}>{c.name}</div>
-                  <div style={{ display: 'flex', gap: 16, fontSize: 12 }}>
+                  <div style={{ display: 'flex', gap: 16, fontSize: 12, flexWrap: 'wrap' }}>
                     <span style={{ color: '#9d94b8' }}>{c.type}</span>
                     <span style={{ color: '#0a7ea4', fontWeight: 500 }}>{c.leads} Leads</span>
                     <span style={{ color: '#2d7d46', fontWeight: 500 }}>{c.purchased} Purchased</span>
