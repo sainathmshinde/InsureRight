@@ -39,8 +39,10 @@ export const BrokerIcon = (p) => (
 
 export const InsuranceCompanyIcon = (p) => (
   <I {...p}>
-    <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
-    <polyline points="9 22 9 12 15 12 15 22" />
+    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+    <rect x="9" y="13" width="6" height="6" />
+    <rect x="10" y="10" width="4" height="3" />
+    <line x1="12" y1="13" x2="12" y2="10" />
   </I>
 );
 
@@ -80,7 +82,9 @@ export const PolicyIcon = (p) => (
 
 export const CampaignIcon = (p) => (
   <I {...p}>
-    <path d="M22 12h-4l-3 9L9 3l-3 9H2" />
+    <path d="M11 5L6 9H2v6h4l5 4V5z" />
+    <path d="M19.07 4.93a10 10 0 0 1 0 14.14" />
+    <path d="M15.54 8.46a5 5 0 0 1 0 7.07" />
   </I>
 );
 
@@ -95,7 +99,10 @@ export const DashboardIcon = (p) => (
 
 export const CRMIcon = (p) => (
   <I {...p}>
-    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+    <circle cx="10" cy="7" r="3" />
+    <path d="M5 20v-1a5 5 0 0 1 7.9-4.1" />
+    <path d="M19 11l2 2-2 2" />
+    <path d="M21 13a5 5 0 0 0-5-5" />
   </I>
 );
 
