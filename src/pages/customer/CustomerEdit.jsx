@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { Field, Input, Select, SectionBlock, UploadBox } from "../../components/Field";
 import { useAuth } from "../../context/AuthContext";
@@ -196,6 +196,18 @@ export default function CustomerEdit() {
   const [kycFetching, setKycFetching] = useState(null);
   const [kycFetched, setKycFetched] = useState(null);
   const [resubmitted, setResubmitted] = useState(false);
+  const [photoPreview, setPhotoPreview] = useState(
+    typeof initial.photoFile === 'string' ? initial.photoFile : null
+  )
+  useEffect(() => {
+    if (form.photoFile instanceof File) {
+      const url = URL.createObjectURL(form.photoFile)
+      setPhotoPreview(url)
+      return () => URL.revokeObjectURL(url)
+    }
+    if (typeof form.photoFile === 'string') setPhotoPreview(form.photoFile)
+    if (form.photoFile == null) setPhotoPreview(null)
+  }, [form.photoFile])
 
   const liveKyc = contextCustomer?.kyc ?? form.kycStatus ?? 'Pending';
 
@@ -395,6 +407,35 @@ export default function CustomerEdit() {
 
             {/* Basic Information */}
             <SectionBlock icon="👤" title="Basic Information">
+              {/* Photo upload / replace */}
+              <div style={{ display: 'flex', alignItems: 'center', gap: 20, paddingBottom: 18, borderBottom: '1px solid var(--border)', marginBottom: 18 }}>
+                <div style={{
+                  width: 90, height: 90, borderRadius: '50%', flexShrink: 0,
+                  background: 'var(--brand-light)', border: '2.5px dashed var(--brand)',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden',
+                }}>
+                  {photoPreview
+                    ? <img src={photoPreview} alt="Customer" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                    : <span style={{ fontSize: 38, lineHeight: 1 }}>👤</span>
+                  }
+                </div>
+                <div>
+                  <label style={{ cursor: 'pointer', display: 'inline-block' }}>
+                    <input type="file" accept="image/*" style={{ display: 'none' }}
+                      onChange={e => setForm(p => ({ ...p, photoFile: e.target.files[0] ?? null }))} />
+                    <span className="btn btn-secondary" style={{ pointerEvents: 'none' }}>
+                      {photoPreview ? '🔄 Replace Photo' : '📷 Upload Photo'}
+                    </span>
+                  </label>
+                  {form.photoFile != null && (
+                    <button type="button" className="btn btn-ghost" style={{ marginLeft: 8 }}
+                      onClick={() => setForm(p => ({ ...p, photoFile: null }))}>
+                      Remove
+                    </button>
+                  )}
+                  <div style={{ fontSize: 12, color: 'var(--text-3)', marginTop: 6 }}>JPG or PNG · Max 2 MB</div>
+                </div>
+              </div>
               <div className="form-grid">
                 <Field label="First Name" required>
                   <Input

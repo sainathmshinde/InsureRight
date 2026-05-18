@@ -1,17 +1,12 @@
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import Pagination from "../../components/Pagination";
-import usePagination from "../../components/usePagination";
-import {
-  Table,
-  PageHeader,
-  KYCBadge,
-  Button,
-  EmptyState,
-} from "../../components/UI";
-import { CustomerIcon } from "../../icons";
-import { useAuth } from "../../context/AuthContext";
-import { useCustomers, INITIAL_CUSTOMERS } from "../../context/CustomerContext";
+import { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
+import Pagination from '../../components/Pagination'
+import usePagination from '../../components/usePagination'
+import { Table, PageHeader, KYCBadge, Button, EmptyState } from '../../components/UI'
+import { CustomerIcon } from '../../icons'
+import { useAuth } from '../../context/AuthContext'
+import { useCustomers, INITIAL_CUSTOMERS } from '../../context/CustomerContext'
+import { ASSOCIATIONS } from './orgAssocData'
 
 export default function CustomerList() {
   const navigate = useNavigate();
@@ -38,33 +33,27 @@ export default function CustomerList() {
   };
 
   const columns = [
-    { key: "id", label: "#", style: { color: "var(--text-3)" } },
-    { key: "name", label: "Name", style: { fontWeight: 500 } },
-    { key: "mobile", label: "Mobile" },
-    { key: "email", label: "Email", style: { color: "var(--blue)" } },
-    { key: "gender", label: "Gender" },
-    { key: "dob", label: "DOB" },
-    {
-      key: "kyc",
-      label: "KYC",
-      render: (row) =>
-        row.kyc === "Pending" ? (
-          <button
-            style={S.pendingBtn}
-            onClick={() => navigate(`/customer/${row.id}/kyc`)}
-          >
-            ⏳ Pending
-          </button>
-        ) : (
-          <KYCBadge status={row.kyc} />
-        ),
+    { key: 'id',       label: '#',        style: { color: 'var(--text-3)' } },
+    { key: 'name',     label: 'Name',     style: { fontWeight: 500 } },
+    { key: 'mobile',   label: 'Mobile' },
+    { key: 'email',    label: 'Email',    style: { color: 'var(--blue)' } },
+    { key: 'gender',   label: 'Gender' },
+    { key: 'dob',      label: 'DOB' },
+    { key: 'association', label: 'Association',
+      render: row => {
+        const assoc = ASSOCIATIONS.find(a => a.id === row.associationId)
+        return assoc
+          ? <span style={{ fontSize: 11.5, color: 'var(--text-2)' }}>{assoc.name}</span>
+          : <span style={{ color: 'var(--text-3)' }}>—</span>
+      }
     },
-    {
-      key: "policies",
-      label: "Policies",
-      render: (row) => (
-        <span>
-          {row.policies} {row.policies === 1 ? "policy" : "policies"}
+    { key: 'kyc',      label: 'KYC',      render: row => row.kyc === 'Pending'
+        ? <button style={S.pendingBtn} onClick={() => navigate(`/customer/${row.id}/kyc`)}>⏳ Pending</button>
+        : <KYCBadge status={row.kyc} /> },
+    { key: 'policies', label: 'Policies',
+      render: row => (
+        <span >
+          {row.policies} {row.policies === 1 ? 'policy' : 'policies'}
         </span>
       ),
     },

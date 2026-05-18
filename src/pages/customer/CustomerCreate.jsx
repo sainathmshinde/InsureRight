@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   Field,
@@ -21,6 +21,7 @@ const INITIAL = {
   gender: "",
   organisationId: "",
   associationId: "",
+  photoFile: null,
   aadhaarFile: null,
   panFile: null,
   address: "",
@@ -51,6 +52,16 @@ export default function CustomerCreate() {
   const [members, setMembers] = useState([]);
   const [kycFetching, setKycFetching] = useState(null);
   const [kycFetched, setKycFetched] = useState(null);
+
+  const [photoPreview, setPhotoPreview] = useState(null)
+  useEffect(() => {
+    if (form.photoFile instanceof File) {
+      const url = URL.createObjectURL(form.photoFile)
+      setPhotoPreview(url)
+      return () => URL.revokeObjectURL(url)
+    }
+    setPhotoPreview(null)
+  }, [form.photoFile])
 
   const set = (f) => (e) => setForm((p) => ({ ...p, [f]: e.target.value }));
   const setF = (f) => (e) => {
@@ -148,6 +159,35 @@ export default function CustomerCreate() {
 
             {/* Basic Info */}
             <SectionBlock icon={<CustomerIcon />} title="Basic Information">
+              {/* Photo upload */}
+              <div style={{ display: 'flex', alignItems: 'center', gap: 20, paddingBottom: 18, borderBottom: '1px solid var(--border)', marginBottom: 18 }}>
+                <div style={{
+                  width: 90, height: 90, borderRadius: '50%', flexShrink: 0,
+                  background: 'var(--brand-light)', border: '2.5px dashed var(--brand)',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden',
+                }}>
+                  {photoPreview
+                    ? <img src={photoPreview} alt="Customer" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                    : <span style={{ fontSize: 38, lineHeight: 1 }}>👤</span>
+                  }
+                </div>
+                <div>
+                  <label style={{ cursor: 'pointer', display: 'inline-block' }}>
+                    <input type="file" accept="image/*" style={{ display: 'none' }}
+                      onChange={e => setForm(p => ({ ...p, photoFile: e.target.files[0] ?? null }))} />
+                    <span className="btn btn-secondary" style={{ pointerEvents: 'none' }}>
+                      {photoPreview ? '🔄 Change Photo' : '📷 Upload Photo'}
+                    </span>
+                  </label>
+                  {form.photoFile && (
+                    <button type="button" className="btn btn-ghost" style={{ marginLeft: 8 }}
+                      onClick={() => setForm(p => ({ ...p, photoFile: null }))}>
+                      Remove
+                    </button>
+                  )}
+                  <div style={{ fontSize: 12, color: 'var(--text-3)', marginTop: 6 }}>JPG or PNG · Max 2 MB</div>
+                </div>
+              </div>
               <div className="form-grid">
                 <Field label="First Name" required>
                   <Input

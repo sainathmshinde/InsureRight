@@ -538,7 +538,7 @@ export default function SignIn() {
               <p style={S.panelText}>To render professional services of the highest order and be recognized as a professional company that consistently exceeds the expectations of our clients and our people through commitment to learning, integrity and hard work.</p>
             </div>
           </div>
-          <div style={S.badge}>IRDAI Registered Reinsurance Broker · CB-456/2008</div>
+          {/* <div style={S.badge}>IRDAI Registered Reinsurance Broker · CB-456/2008</div> */}
         </div>
       </div>
     </div>
