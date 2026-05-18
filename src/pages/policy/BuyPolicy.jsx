@@ -271,14 +271,8 @@ function CustomerStrip({ customer, onChangeCustomer, canChange = true }) {
         </div>
       </div>
       <div className="bp-cust-actions" style={{ display: "flex", alignItems: "center", gap: 8, flexShrink: 0 }}>
-        <span style={{
-          fontSize: 11.5, background: "var(--brand-light)", borderRadius: 99,
-          padding: "3px 10px", color: "var(--brand)", fontWeight: 600, whiteSpace: "nowrap",
-        }}>
-          {customer.policies} {customer.policies === 1 ? "policy" : "policies"}
-        </span>
         {canChange && (
-          <button className="btn btn-ghost btn-sm" onClick={onChangeCustomer}>Change</button>
+          <button className="btn btn-ghost btn-sm" onClick={onChangeCustomer}>Change Customer</button>
         )}
       </div>
     </div>
@@ -610,203 +604,130 @@ export default function BuyPolicy() {
           STEP 0 — Select Customer
       ══════════════════════════════════════════════════════════════════ */}
       {step === 0 && (
-        <div style={{ maxWidth: 680, margin: "0 auto" }}>
-          <div style={{ textAlign: "center", marginBottom: 28 }}>
-            <div style={{ fontSize: 17, fontWeight: 700, marginBottom: 6 }}>
-              {/* Who is this policy for? */}
-              <div >
-              {isSalesAgent
-                ? "Customers assigned to you from CRM campaigns"
-                : "Search and select an existing customer, or add a new one"}
+        <div>
+          {/* Header + search bar */}
+          <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 18, flexWrap: "wrap" }}>
+            <div style={{ position: "relative", flex: 1, minWidth: 260 }}>
+              <span style={{ position: "absolute", left: 12, top: "50%", transform: "translateY(-50%)", color: "var(--text-3)", fontSize: 15, pointerEvents: "none" }}>🔍</span>
+              <input
+                className="field-input"
+                style={{ paddingLeft: 38, width: "100%" }}
+                placeholder={isSalesAgent ? "Search your assigned customers…" : "Search by name, mobile or email…"}
+                value={custSearch}
+                onChange={(e) => setCustSearch(e.target.value)}
+                autoFocus
+              />
             </div>
+            <div style={{ fontSize: 13, color: "var(--text-3)", whiteSpace: "nowrap" }}>
+              {filteredCustomers.length} customer{filteredCustomers.length !== 1 ? "s" : ""}
             </div>
-            
           </div>
 
-          {/* Search */}
-          <div style={{ position: "relative", marginBottom: 16 }}>
-            <span
-              style={{
-                position: "absolute",
-                left: 12,
-                top: "50%",
-                transform: "translateY(-50%)",
-                color: "var(--text-3)",
-                fontSize: 16,
-              }}
-            >
-              🔍
-            </span>
-            <input
-              className="field-input"
-              style={{ paddingLeft: 38 }}
-              placeholder="Search by name, mobile or email…"
-              value={custSearch}
-              onChange={(e) => setCustSearch(e.target.value)}
-              autoFocus
-            />
-          </div>
-
-          {/* Customer cards */}
-          <div
-            style={{
-              display: "flex",
-              flexDirection: "column",
-              gap: 10,
-              maxHeight: 420,
+          {/* Customer grid */}
+          {filteredCustomers.length === 0 ? (
+            <div style={{ textAlign: "center", padding: "56px 0", color: "var(--text-3)" }}>
+              <div style={{ fontSize: 36, marginBottom: 10 }}>🔍</div>
+              <div style={{ fontWeight: 600, marginBottom: 4 }}>No customers found</div>
+              <div style={{ fontSize: 13 }}>Try a different name, mobile or email</div>
+            </div>
+          ) : (
+            <div style={{
+              display: "grid",
+              gridTemplateColumns: "repeat(auto-fill, minmax(320px, 1fr))",
+              gap: 12,
+              maxHeight: 520,
               overflowY: "auto",
-              paddingRight: 2,
-            }}
-          >
-            {filteredCustomers.length === 0 && (
-              <div
-                style={{
-                  textAlign: "center",
-                  padding: "40px 0",
-                  color: "var(--text-3)",
-                }}
-              >
-                No customers match your search
-              </div>
-            )}
-            {filteredCustomers.map((c) => {
-              const isSelected = selectedCustomer?.id === c.id;
-              const isRejected = c.kyc === "Rejected";
-              return (
-                <button
-                  key={c.id}
-                  type="button"
-                  onClick={() => handleSelectCustomer(c)}
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    gap: 14,
-                    padding: "14px 18px",
-                    textAlign: "left",
-                    borderRadius: "var(--r-md)",
-                    cursor: "pointer",
-                    fontFamily: "inherit",
-                    border: `2px solid ${isSelected ? "var(--brand)" : "var(--border)"}`,
-                    background: isSelected
-                      ? "var(--brand-light)"
-                      : isRejected
-                        ? "#fff8f8"
-                        : "var(--surface)",
-                    boxShadow: isSelected
-                      ? "0 2px 10px rgba(124,58,237,.15)"
-                      : "var(--shadow-sm)",
-                    transition: "all .13s",
-                  }}
-                >
-                  {/* Avatar */}
-                  <Avatar name={c.name} size={44} fontSize={16} />
-
-                  {/* Info */}
-                  <div style={{ flex: 1, minWidth: 0 }}>
-                    <div
-                      style={{
-                        fontWeight: 600,
-                        fontSize: 14,
-                        marginBottom: 3,
-                        color: "var(--text)",
-                      }}
-                    >
-                      {c.name}
-                    </div>
-                    <div style={{ fontSize: 12.5, color: "var(--text-3)" }}>
-                      📱 {c.mobile} · ✉ {c.email}
-                    </div>
-                    <div
-                      style={{
-                        fontSize: 12.5,
-                        color: "var(--text-3)",
-                        marginTop: 2,
-                      }}
-                    >
-                      DOB: {c.dob} · {c.gender}
-                    </div>
-                  </div>
-
-                  {/* Right side */}
-                  <div
+              paddingRight: 4,
+              paddingBottom: 2,
+            }}>
+              {filteredCustomers.map((c) => {
+                const isSelected = selectedCustomer?.id === c.id;
+                const isRejected = c.kyc === "Rejected";
+                const age = c.dob ? Math.floor((Date.now() - new Date(c.dob)) / (365.25 * 24 * 3600 * 1000)) : null;
+                return (
+                  <button
+                    key={c.id}
+                    type="button"
+                    onClick={() => handleSelectCustomer(c)}
                     style={{
-                      display: "flex",
-                      flexDirection: "column",
-                      alignItems: "flex-end",
-                      gap: 6,
+                      textAlign: "left", cursor: "pointer", fontFamily: "inherit",
+                      borderRadius: 14, overflow: "hidden",
+                      border: `2px solid ${isSelected ? "var(--brand)" : isRejected ? "#fecdd3" : "var(--border)"}`,
+                      background: isSelected ? "var(--brand-light)" : isRejected ? "#fff8f8" : "#fff",
+                      boxShadow: isSelected ? "0 4px 16px rgba(124,58,237,.14)" : "0 1px 4px rgba(0,0,0,.06)",
+                      transition: "all .14s",
+                      padding: 0,
                     }}
                   >
-                    <StatusBadge status={c.kyc} />
-                    <span style={{ fontSize: 12, color: "var(--text-3)" }}>
-                      {c.policies} {c.policies === 1 ? "policy" : "policies"}
-                    </span>
-                  </div>
-
-                  {/* Selection tick */}
-                  {isSelected && (
-                    <div
-                      style={{
-                        width: 24,
-                        height: 24,
-                        borderRadius: "50%",
-                        background: "var(--brand)",
-                        color: "#fff",
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                        fontSize: 13,
-                        fontWeight: 700,
-                        flexShrink: 0,
-                        marginLeft: 4,
-                      }}
-                    >
-                      ✓
+                    {/* Card header */}
+                    <div style={{
+                      display: "flex", alignItems: "center", gap: 12,
+                      padding: "13px 16px 11px",
+                      borderBottom: `1px solid ${isSelected ? "rgba(124,58,237,.15)" : "var(--border)"}`,
+                      background: isSelected ? "rgba(124,58,237,.06)" : "var(--surface-2)",
+                    }}>
+                      <Avatar name={c.name} size={42} fontSize={15} />
+                      <div style={{ flex: 1, minWidth: 0 }}>
+                        <div style={{ fontWeight: 700, fontSize: 14.5, color: "var(--text)", marginBottom: 3, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                          {c.name}
+                        </div>
+                        <div style={{ display: "flex", alignItems: "center", gap: 6, flexWrap: "wrap" }}>
+                          <StatusBadge status={c.kyc} />
+                          {c.policies > 0 && (
+                            <span style={{ fontSize: 11, color: "var(--text-3)", background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 99, padding: "1px 8px" }}>
+                              {c.policies} {c.policies === 1 ? "policy" : "policies"}
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                      {isSelected && (
+                        <div style={{ width: 26, height: 26, borderRadius: "50%", background: "var(--brand)", color: "#fff", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, fontWeight: 700, flexShrink: 0 }}>✓</div>
+                      )}
                     </div>
-                  )}
-                </button>
-              );
-            })}
-          </div>
 
-          {/* Add new customer shortcut — hidden for sales agents */}
-          {!isSalesAgent && (
-            <div
-              style={{
-                borderTop: "1px solid var(--border)",
-                marginTop: 16,
-                paddingTop: 16,
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "space-between",
-              }}
-            >
-              <span style={{ fontSize: 13.5, color: "var(--text-2)" }}>
-                Customer not in the list?
-              </span>
-              <button
-                className="btn btn-secondary btn-sm"
-                onClick={() => navigate("/customer/create")}
-              >
-                <CustomerIcon size={14} /> + Add New Customer
-              </button>
+                    {/* Card body — customer details */}
+                    <div style={{ padding: "11px 16px", display: "grid", gridTemplateColumns: "1fr 1fr", gap: "7px 12px" }}>
+                      <div>
+                        <div style={{ fontSize: 10.5, color: "var(--text-3)", fontWeight: 600, textTransform: "uppercase", letterSpacing: ".4px", marginBottom: 2 }}>Mobile</div>
+                        <div style={{ fontSize: 13, fontWeight: 500, color: "var(--text)" }}>📱 {c.mobile}</div>
+                      </div>
+                      <div>
+                        <div style={{ fontSize: 10.5, color: "var(--text-3)", fontWeight: 600, textTransform: "uppercase", letterSpacing: ".4px", marginBottom: 2 }}>Gender</div>
+                        <div style={{ fontSize: 13, fontWeight: 500, color: "var(--text)" }}>{c.gender ?? "—"}</div>
+                      </div>
+                      <div>
+                        <div style={{ fontSize: 10.5, color: "var(--text-3)", fontWeight: 600, textTransform: "uppercase", letterSpacing: ".4px", marginBottom: 2 }}>Email</div>
+                        <div style={{ fontSize: 12.5, color: "var(--blue)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>✉ {c.email}</div>
+                      </div>
+                      <div>
+                        <div style={{ fontSize: 10.5, color: "var(--text-3)", fontWeight: 600, textTransform: "uppercase", letterSpacing: ".4px", marginBottom: 2 }}>Age / DOB</div>
+                        <div style={{ fontSize: 13, fontWeight: 500, color: "var(--text)" }}>
+                          {age !== null ? `${age} yrs` : "—"}
+                          <span style={{ fontSize: 11, color: "var(--text-3)", marginLeft: 5 }}>({c.dob})</span>
+                        </div>
+                      </div>
+                      {c.address && (
+                        <div style={{ gridColumn: "1 / -1" }}>
+                          <div style={{ fontSize: 10.5, color: "var(--text-3)", fontWeight: 600, textTransform: "uppercase", letterSpacing: ".4px", marginBottom: 2 }}>Address</div>
+                          <div style={{ fontSize: 12.5, color: "var(--text-2)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>📍 {c.address}</div>
+                        </div>
+                      )}
+                    </div>
+                  </button>
+                );
+              })}
             </div>
           )}
 
-          {/* Continue CTA */}
-          <div
-            style={{
-              marginTop: 24,
-              display: "flex",
-              justifyContent: "flex-end",
-            }}
-          >
-            <Button
-              disabled={!selectedCustomer}
-              onClick={next}
-              style={{ minWidth: 220 }}
-            >
-              Continue with{" "}
-              {selectedCustomer ? selectedCustomer.name : "selected customer"} →
+          {/* Footer row */}
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginTop: 18, flexWrap: "wrap", gap: 12 }}>
+            {!isSalesAgent ? (
+              <button className="btn btn-secondary btn-sm" onClick={() => navigate("/customer/create")}>
+                <CustomerIcon size={14} /> + Add New Customer
+              </button>
+            ) : <div />}
+            <Button disabled={!selectedCustomer} onClick={next} style={{ minWidth: 240 }}>
+              Continue with {selectedCustomer ? selectedCustomer.name : "selected customer"} →
             </Button>
           </div>
         </div>
@@ -818,7 +739,7 @@ export default function BuyPolicy() {
       {step === 1 && (
         <div>
           {selectedCustomer && <KYCWarning kyc={selectedCustomer.kyc} />}
-          <div style={{ textAlign: "center", marginBottom: 32 }}>
+          <div style={{ textAlign: "center", marginBottom: 28 }}>
             <div style={{ fontSize: 16, fontWeight: 600, marginBottom: 6 }}>
               What type of insurance?
             </div>
@@ -826,26 +747,51 @@ export default function BuyPolicy() {
               Select the insurance type for {selectedCustomer?.name}
             </div>
           </div>
-          <div style={{ maxWidth: 360, margin: "0 auto" }}>
-            <button
-              type="button"
-              onClick={() => { setInsuranceType("Health"); next(); }}
-              style={{
-                width: "100%", padding: "32px 24px", borderRadius: 16,
-                cursor: "pointer", fontFamily: "inherit",
-                border: "2px solid var(--brand)", background: "var(--brand-light)",
-                boxShadow: "0 4px 16px rgba(124,58,237,.12)", textAlign: "center",
-                transition: "all .15s",
-              }}
-            >
-              <div style={{ fontSize: 48, marginBottom: 14 }}>🏥</div>
-              <div style={{ fontWeight: 700, fontSize: 18, marginBottom: 8, color: "var(--text)" }}>
-                Health Insurance
-              </div>
-              <div style={{ fontSize: 13, color: "var(--text-3)", lineHeight: 1.6 }}>
-                Base policy, top-up, OPD, payment protection &amp; more
-              </div>
-            </button>
+          <div style={{
+            display: "grid",
+            gridTemplateColumns: "repeat(auto-fill, minmax(200px, 1fr))",
+            gap: 14,
+          }}>
+            {[
+              { type: "Health",  icon: "🏥", label: "Health Insurance",   desc: "Base policy, top-up, OPD & more" },
+              { type: "Motor",   icon: "🚗", label: "Motor Insurance",    desc: "Car & two-wheeler comprehensive cover" },
+              { type: "Life",    icon: "❤️", label: "Life Insurance",     desc: "Term, whole life & endowment plans" },
+              { type: "Travel",  icon: "✈️", label: "Travel Insurance",   desc: "Domestic & international trip cover" },
+              { type: "Home",    icon: "🏠", label: "Home Insurance",     desc: "Structure & contents protection" },
+              { type: "Business",icon: "🏢", label: "Business Insurance", desc: "Fire, liability & commercial cover" },
+            ].map(({ type, icon, label, desc }) => (
+              <button
+                key={type}
+                type="button"
+                onClick={() => { setInsuranceType(type); next(); }}
+                style={{
+                  padding: "24px 20px", borderRadius: 14,
+                  cursor: "pointer", fontFamily: "inherit",
+                  border: "2px solid var(--border)",
+                  background: "var(--surface)",
+                  boxShadow: "0 1px 4px rgba(0,0,0,.06)",
+                  textAlign: "center", transition: "all .15s",
+                }}
+                onMouseEnter={e => {
+                  e.currentTarget.style.border = "2px solid var(--brand)";
+                  e.currentTarget.style.background = "var(--brand-light)";
+                  e.currentTarget.style.boxShadow = "0 4px 16px rgba(124,58,237,.12)";
+                }}
+                onMouseLeave={e => {
+                  e.currentTarget.style.border = "2px solid var(--border)";
+                  e.currentTarget.style.background = "var(--surface)";
+                  e.currentTarget.style.boxShadow = "0 1px 4px rgba(0,0,0,.06)";
+                }}
+              >
+                <div style={{ fontSize: 38, marginBottom: 10 }}>{icon}</div>
+                <div style={{ fontWeight: 700, fontSize: 14, marginBottom: 6, color: "var(--text)" }}>
+                  {label}
+                </div>
+                <div style={{ fontSize: 12, color: "var(--text-3)", lineHeight: 1.5 }}>
+                  {desc}
+                </div>
+              </button>
+            ))}
           </div>
         </div>
       )}
@@ -1331,11 +1277,13 @@ export default function BuyPolicy() {
 
           {/* ── Sticky footer bar ── */}
           <div style={{
+            position: "sticky", bottom: 0, zIndex: 20,
             marginTop: 20, display: "flex", alignItems: "center", justifyContent: "space-between",
-            gap: 16, padding: "12px 18px",
-            background: cart.length > 0 ? "var(--brand-light)" : "var(--surface)",
-            border: `1.5px solid ${cart.length > 0 ? "rgba(124,58,237,.2)" : "var(--border)"}`,
+            gap: 16, padding: "14px 20px",
+            background: cart.length > 0 ? "#ede9fb" : "#fff",
+            border: `1.5px solid ${cart.length > 0 ? "rgba(124,58,237,.25)" : "var(--border)"}`,
             borderRadius: 12, transition: "all .2s",
+            boxShadow: "0 -4px 20px rgba(0,0,0,.08)",
           }}>
             <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
               <div>

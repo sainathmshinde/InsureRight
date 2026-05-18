@@ -19,13 +19,13 @@ import { PRODUCTS, POLICY_TYPE_ICON } from "../product/productData";
 import { ASSOCIATIONS } from "../customer/orgAssocData";
 
 const PTYPE_META = {
-  'Base Policy':        { color: '#2563eb', bg: '#dbeafe', border: '#bfdbfe' },
-  'Top Up Policy':      { color: '#0891b2', bg: '#e0f2fe', border: '#7dd3fc' },
-  'Super Top Up':       { color: '#dc2626', bg: '#fee2e2', border: '#fca5a5' },
-  'OPD':                { color: '#16a34a', bg: '#dcfce7', border: '#86efac' },
-  'Age Band Premium':   { color: '#7c3aed', bg: '#f5f3ff', border: '#c4b5fd' },
-  'Payment Protection': { color: '#d97706', bg: '#fef3c7', border: '#fcd34d' },
-  'Other':              { color: '#6b7280', bg: '#f3f4f6', border: '#d1d5db' },
+  "Base Policy": { color: "#2563eb", bg: "#dbeafe", border: "#bfdbfe" },
+  "Top Up Policy": { color: "#0891b2", bg: "#e0f2fe", border: "#7dd3fc" },
+  "Super Top Up": { color: "#dc2626", bg: "#fee2e2", border: "#fca5a5" },
+  OPD: { color: "#16a34a", bg: "#dcfce7", border: "#86efac" },
+  "Age Band Premium": { color: "#7c3aed", bg: "#f5f3ff", border: "#c4b5fd" },
+  "Payment Protection": { color: "#d97706", bg: "#fef3c7", border: "#fcd34d" },
+  Other: { color: "#6b7280", bg: "#f3f4f6", border: "#d1d5db" },
 };
 
 const INDIA_STATES = [
@@ -367,20 +367,73 @@ const MOCK_USERS = [
 const PAGE_SIZE = 10;
 
 const AGENTS = [
-  { id: 1,  name: "Ravi Kulkarni", posLicense: "POS-2023-001", broker: "K.M. Dastur & Co.", agentType: "sales"    },
-  { id: 2,  name: "Pooja Desai",   posLicense: "POS-2023-019", broker: "K.M. Dastur & Co.", agentType: "calling"  },
-  { id: 4,  name: "Kavita Sharma", posLicense: "POS-2023-045", broker: "Shah Financial",    agentType: "calling"  },
-  { id: 5,  name: "Amit Verma",    posLicense: "POS-2023-067", broker: "K.M. Dastur & Co.", agentType: "sales"    },
-  { id: 6,  name: "Sneha Patil",   posLicense: "POS-2022-133", broker: "Nair & Co.",         agentType: "calling"  },
-  { id: 8,  name: "Priya Menon",   posLicense: "POS-2023-088", broker: "Shah Financial",    agentType: "sales"    },
-  { id: 9,  name: "Kiran Reddy",   posLicense: "POS-2023-099", broker: "Rao & Partners",    agentType: "calling"  },
-  { id: 10, name: "Neha Gupta",    posLicense: "POS-2022-155", broker: "Priya Brokers",     agentType: "sales"    },
-  { id: 11, name: "Ajay Tiwari",   posLicense: "POS-2023-120", broker: "K.M. Dastur & Co.", agentType: "calling"  },
+  {
+    id: 1,
+    name: "Ravi Kulkarni",
+    posLicense: "POS-2023-001",
+    broker: "K.M. Dastur & Co.",
+    agentType: "sales",
+  },
+  {
+    id: 2,
+    name: "Pooja Desai",
+    posLicense: "POS-2023-019",
+    broker: "K.M. Dastur & Co.",
+    agentType: "calling",
+  },
+  {
+    id: 4,
+    name: "Kavita Sharma",
+    posLicense: "POS-2023-045",
+    broker: "Shah Financial",
+    agentType: "calling",
+  },
+  {
+    id: 5,
+    name: "Amit Verma",
+    posLicense: "POS-2023-067",
+    broker: "K.M. Dastur & Co.",
+    agentType: "sales",
+  },
+  {
+    id: 6,
+    name: "Sneha Patil",
+    posLicense: "POS-2022-133",
+    broker: "Nair & Co.",
+    agentType: "calling",
+  },
+  {
+    id: 8,
+    name: "Priya Menon",
+    posLicense: "POS-2023-088",
+    broker: "Shah Financial",
+    agentType: "sales",
+  },
+  {
+    id: 9,
+    name: "Kiran Reddy",
+    posLicense: "POS-2023-099",
+    broker: "Rao & Partners",
+    agentType: "calling",
+  },
+  {
+    id: 10,
+    name: "Neha Gupta",
+    posLicense: "POS-2022-155",
+    broker: "Priya Brokers",
+    agentType: "sales",
+  },
+  {
+    id: 11,
+    name: "Ajay Tiwari",
+    posLicense: "POS-2023-120",
+    broker: "K.M. Dastur & Co.",
+    agentType: "calling",
+  },
 ];
 
-const CALLING_AGENTS = AGENTS.filter(a => a.agentType === "calling");
-const SALES_AGENTS   = AGENTS.filter(a => a.agentType === "sales");
-
+const CALLING_AGENTS = AGENTS.filter((a) => a.agentType === "calling");
+const SALES_AGENTS = AGENTS.filter((a) => a.agentType === "sales");
 
 const INITIAL = {
   name: "",
@@ -457,46 +510,56 @@ export default function CampaignCreate() {
     setForm((p) => ({ ...p, [f]: fromInputDate(e.target.value) }));
   const setBool = (f) => (val) => setForm((p) => ({ ...p, [f]: val }));
 
-  const [assocSearch, setAssocSearch] = useState('');
-  const [assocOpen, setAssocOpen]     = useState(false);
+  const [assocSearch, setAssocSearch] = useState("");
+  const [assocOpen, setAssocOpen] = useState(false);
 
-  const filteredAssoc = ASSOCIATIONS.filter(a =>
-    a.name.toLowerCase().includes(assocSearch.toLowerCase())
+  const filteredAssoc = ASSOCIATIONS.filter((a) =>
+    a.name.toLowerCase().includes(assocSearch.toLowerCase()),
   );
 
   const toggleAssoc = (id) =>
-    setForm(prev => ({
+    setForm((prev) => ({
       ...prev,
       selectedAssociations: prev.selectedAssociations.includes(id)
-        ? prev.selectedAssociations.filter(x => x !== id)
+        ? prev.selectedAssociations.filter((x) => x !== id)
         : [...prev.selectedAssociations, id],
     }));
 
   const [assignedCalling, setAssignedCalling] = useState(new Set());
-  const [callingSearch, setCallingSearch]     = useState("");
-  const [callingOpen, setCallingOpen]         = useState(false);
+  const [callingSearch, setCallingSearch] = useState("");
+  const [callingOpen, setCallingOpen] = useState(false);
 
   const [assignedSales, setAssignedSales] = useState(new Set());
-  const [salesSearch, setSalesSearch]     = useState("");
-  const [salesOpen, setSalesOpen]         = useState(false);
+  const [salesSearch, setSalesSearch] = useState("");
+  const [salesOpen, setSalesOpen] = useState(false);
 
-  const filteredCalling = CALLING_AGENTS.filter(a =>
-    a.name.toLowerCase().includes(callingSearch.toLowerCase()) ||
-    a.broker.toLowerCase().includes(callingSearch.toLowerCase()) ||
-    a.posLicense.toLowerCase().includes(callingSearch.toLowerCase()),
+  const filteredCalling = CALLING_AGENTS.filter(
+    (a) =>
+      a.name.toLowerCase().includes(callingSearch.toLowerCase()) ||
+      a.broker.toLowerCase().includes(callingSearch.toLowerCase()) ||
+      a.posLicense.toLowerCase().includes(callingSearch.toLowerCase()),
   );
 
-  const filteredSales = SALES_AGENTS.filter(a =>
-    a.name.toLowerCase().includes(salesSearch.toLowerCase()) ||
-    a.broker.toLowerCase().includes(salesSearch.toLowerCase()) ||
-    a.posLicense.toLowerCase().includes(salesSearch.toLowerCase()),
+  const filteredSales = SALES_AGENTS.filter(
+    (a) =>
+      a.name.toLowerCase().includes(salesSearch.toLowerCase()) ||
+      a.broker.toLowerCase().includes(salesSearch.toLowerCase()) ||
+      a.posLicense.toLowerCase().includes(salesSearch.toLowerCase()),
   );
 
   const toggleCalling = (id) =>
-    setAssignedCalling(prev => { const n = new Set(prev); n.has(id) ? n.delete(id) : n.add(id); return n; });
+    setAssignedCalling((prev) => {
+      const n = new Set(prev);
+      n.has(id) ? n.delete(id) : n.add(id);
+      return n;
+    });
 
   const toggleSales = (id) =>
-    setAssignedSales(prev => { const n = new Set(prev); n.has(id) ? n.delete(id) : n.add(id); return n; });
+    setAssignedSales((prev) => {
+      const n = new Set(prev);
+      n.has(id) ? n.delete(id) : n.add(id);
+      return n;
+    });
 
   const [filteredUsers, setFilteredUsers] = useState([]);
   const [userPage, setUserPage] = useState(1);
@@ -607,7 +670,7 @@ export default function CampaignCreate() {
                     ))}
                   </Select>
                 </Field>
-<Field label="Start Date" required>
+                <Field label="Start Date" required>
                   <Input
                     type="date"
                     value={toInputDate(form.startDate)}
@@ -644,59 +707,136 @@ export default function CampaignCreate() {
             {/* ── 2. Product Mapping ────────────────────── */}
             <SectionBlock icon="📦" title="Product Mapping">
               <div style={{ marginBottom: 4 }}>
-                <div style={{ fontSize: 13, color: 'var(--text-3)', marginBottom: 12 }}>
+                <div
+                  style={{
+                    fontSize: 13,
+                    color: "var(--text-3)",
+                    marginBottom: 12,
+                  }}
+                >
                   Select products to promote in this campaign
                   {form.selectedProducts.length > 0 && (
-                    <span style={{ marginLeft: 8, fontWeight: 600, color: 'var(--brand)' }}>
+                    <span
+                      style={{
+                        marginLeft: 8,
+                        fontWeight: 600,
+                        color: "var(--brand)",
+                      }}
+                    >
                       · {form.selectedProducts.length} selected
                     </span>
                   )}
                 </div>
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(256px, 1fr))', gap: 10 }}>
-                  {PRODUCTS.map(p => {
+                <div
+                  style={{
+                    display: "grid",
+                    gridTemplateColumns:
+                      "repeat(auto-fill, minmax(256px, 1fr))",
+                    gap: 10,
+                  }}
+                >
+                  {PRODUCTS.map((p) => {
                     const sel = form.selectedProducts.includes(p.id);
                     const m = PTYPE_META[p.policyType] ?? PTYPE_META.Other;
-                    const icon = POLICY_TYPE_ICON[p.policyType] ?? '📋';
+                    const icon = POLICY_TYPE_ICON[p.policyType] ?? "📋";
                     return (
                       <div
                         key={p.id}
                         onClick={() => toggleProduct(p.id)}
                         style={{
-                          border: `1.5px solid ${sel ? m.color : 'var(--border)'}`,
+                          border: `1.5px solid ${sel ? m.color : "var(--border)"}`,
                           borderRadius: 10,
-                          padding: '11px 13px',
-                          cursor: 'pointer',
-                          background: sel ? m.bg : '#fff',
-                          transition: 'all .13s',
-                          display: 'flex',
-                          flexDirection: 'column',
+                          padding: "11px 13px",
+                          cursor: "pointer",
+                          background: sel ? m.bg : "#fff",
+                          transition: "all .13s",
+                          display: "flex",
+                          flexDirection: "column",
                           gap: 5,
-                          userSelect: 'none',
+                          userSelect: "none",
                         }}
                       >
-                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                          <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                        <div
+                          style={{
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "space-between",
+                          }}
+                        >
+                          <div
+                            style={{
+                              display: "flex",
+                              alignItems: "center",
+                              gap: 6,
+                            }}
+                          >
                             <span style={{ fontSize: 17 }}>{icon}</span>
-                            <span style={{ fontSize: 10.5, fontWeight: 700, color: m.color, textTransform: 'uppercase', letterSpacing: '.4px' }}>
+                            <span
+                              style={{
+                                fontSize: 10.5,
+                                fontWeight: 700,
+                                color: m.color,
+                                textTransform: "uppercase",
+                                letterSpacing: ".4px",
+                              }}
+                            >
                               {p.policyType}
                             </span>
                           </div>
-                          <div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
-                            <span style={{ fontFamily: 'monospace', fontSize: 10, color: m.color, background: '#fff', border: `1px solid ${m.border}`, borderRadius: 4, padding: '1px 5px' }}>
+                          <div
+                            style={{
+                              display: "flex",
+                              alignItems: "center",
+                              gap: 5,
+                            }}
+                          >
+                            <span
+                              style={{
+                                fontFamily: "monospace",
+                                fontSize: 10,
+                                color: m.color,
+                                background: "#fff",
+                                border: `1px solid ${m.border}`,
+                                borderRadius: 4,
+                                padding: "1px 5px",
+                              }}
+                            >
                               {p.code}
                             </span>
-                            {sel && <span style={{ color: m.color, fontSize: 14, fontWeight: 800, lineHeight: 1 }}>✓</span>}
+                            {sel && (
+                              <span
+                                style={{
+                                  color: m.color,
+                                  fontSize: 14,
+                                  fontWeight: 800,
+                                  lineHeight: 1,
+                                }}
+                              >
+                                ✓
+                              </span>
+                            )}
                           </div>
                         </div>
-                        <div style={{ fontWeight: 700, fontSize: 12.5, color: 'var(--text)', lineHeight: 1.3 }}>{p.name}</div>
-                        <div style={{ fontSize: 11, color: 'var(--text-3)' }}>{p.provider}</div>
+                        <div
+                          style={{
+                            fontWeight: 700,
+                            fontSize: 12.5,
+                            color: "var(--text)",
+                            lineHeight: 1.3,
+                          }}
+                        >
+                          {p.name}
+                        </div>
+                        <div style={{ fontSize: 11, color: "var(--text-3)" }}>
+                          {p.provider}
+                        </div>
                       </div>
                     );
                   })}
                 </div>
               </div>
               <div className="form-grid" style={{ marginTop: 18 }}>
-                <Field label="Offer Type">
+                <Field label="Discount">
                   <Select value={form.offerType} onChange={set("offerType")}>
                     <option value="Flat">Flat (₹)</option>
                     <option value="Percent">Percentage (%)</option>
@@ -815,47 +955,169 @@ export default function CampaignCreate() {
                   <Field label="Association" className="col-span-2">
                     <div>
                       {form.selectedAssociations.length > 0 && (
-                        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, marginBottom: 8 }}>
-                          {form.selectedAssociations.map(id => {
-                            const assoc = ASSOCIATIONS.find(a => a.id === id);
+                        <div
+                          style={{
+                            display: "flex",
+                            flexWrap: "wrap",
+                            gap: 6,
+                            marginBottom: 8,
+                          }}
+                        >
+                          {form.selectedAssociations.map((id) => {
+                            const assoc = ASSOCIATIONS.find((a) => a.id === id);
                             return (
-                              <span key={id} style={{ display: 'inline-flex', alignItems: 'center', gap: 5, background: 'var(--brand-light)', color: 'var(--brand)', border: '1px solid var(--brand-mid)', borderRadius: 20, padding: '3px 10px 3px 12px', fontSize: 12.5, fontWeight: 500 }}>
+                              <span
+                                key={id}
+                                style={{
+                                  display: "inline-flex",
+                                  alignItems: "center",
+                                  gap: 5,
+                                  background: "var(--brand-light)",
+                                  color: "var(--brand)",
+                                  border: "1px solid var(--brand-mid)",
+                                  borderRadius: 20,
+                                  padding: "3px 10px 3px 12px",
+                                  fontSize: 12.5,
+                                  fontWeight: 500,
+                                }}
+                              >
                                 {assoc?.name ?? id}
-                                <button type="button" onClick={() => toggleAssoc(id)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--brand)', fontSize: 14, lineHeight: 1, padding: 0 }}>×</button>
+                                <button
+                                  type="button"
+                                  onClick={() => toggleAssoc(id)}
+                                  style={{
+                                    background: "none",
+                                    border: "none",
+                                    cursor: "pointer",
+                                    color: "var(--brand)",
+                                    fontSize: 14,
+                                    lineHeight: 1,
+                                    padding: 0,
+                                  }}
+                                >
+                                  ×
+                                </button>
                               </span>
                             );
                           })}
                         </div>
                       )}
-                      <div style={{ position: 'relative' }}>
+                      <div style={{ position: "relative" }}>
                         <div
-                          style={{ display: 'flex', alignItems: 'center', gap: 8, border: '1px solid var(--border)', borderRadius: 'var(--r-md)', padding: '8px 12px', background: 'var(--surface)', cursor: 'text' }}
+                          style={{
+                            display: "flex",
+                            alignItems: "center",
+                            gap: 8,
+                            border: "1px solid var(--border)",
+                            borderRadius: "var(--r-md)",
+                            padding: "8px 12px",
+                            background: "var(--surface)",
+                            cursor: "text",
+                          }}
                           onClick={() => setAssocOpen(true)}
                         >
                           <input
                             type="text"
-                            placeholder={form.selectedAssociations.length === 0 ? 'All Associations' : 'Add more…'}
+                            placeholder={
+                              form.selectedAssociations.length === 0
+                                ? "All Associations"
+                                : "Add more…"
+                            }
                             value={assocSearch}
-                            onChange={e => { setAssocSearch(e.target.value); setAssocOpen(true); }}
+                            onChange={(e) => {
+                              setAssocSearch(e.target.value);
+                              setAssocOpen(true);
+                            }}
                             onFocus={() => setAssocOpen(true)}
-                            style={{ flex: 1, border: 'none', outline: 'none', background: 'transparent', fontSize: 13, fontFamily: 'inherit' }}
+                            style={{
+                              flex: 1,
+                              border: "none",
+                              outline: "none",
+                              background: "transparent",
+                              fontSize: 13,
+                              fontFamily: "inherit",
+                            }}
                           />
-                          <span style={{ fontSize: 11, color: 'var(--text-3)' }}>{form.selectedAssociations.length > 0 ? `${form.selectedAssociations.length} selected` : ''}</span>
-                          <span style={{ color: 'var(--text-3)', fontSize: 12 }}>{assocOpen ? '▲' : '▼'}</span>
+                          <span
+                            style={{ fontSize: 11, color: "var(--text-3)" }}
+                          >
+                            {form.selectedAssociations.length > 0
+                              ? `${form.selectedAssociations.length} selected`
+                              : ""}
+                          </span>
+                          <span
+                            style={{ color: "var(--text-3)", fontSize: 12 }}
+                          >
+                            {assocOpen ? "▲" : "▼"}
+                          </span>
                         </div>
                         {assocOpen && (
                           <>
-                            <div style={{ position: 'fixed', inset: 0, zIndex: 10 }} onClick={() => { setAssocOpen(false); setAssocSearch(''); }} />
-                            <div style={{ position: 'absolute', top: 'calc(100% + 4px)', left: 0, right: 0, zIndex: 11, background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 'var(--r-md)', boxShadow: '0 4px 16px rgba(0,0,0,.1)', maxHeight: 200, overflowY: 'auto' }}>
-                              {filteredAssoc.length === 0
-                                ? <div style={{ padding: '12px 16px', fontSize: 13, color: 'var(--text-3)' }}>No associations found.</div>
-                                : filteredAssoc.map(a => (
-                                  <label key={a.id} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '9px 16px', cursor: 'pointer', fontSize: 13, background: form.selectedAssociations.includes(a.id) ? 'var(--brand-light)' : 'transparent', borderBottom: '1px solid var(--border)' }}>
-                                    <input type="checkbox" checked={form.selectedAssociations.includes(a.id)} onChange={() => toggleAssoc(a.id)} />
+                            <div
+                              style={{
+                                position: "fixed",
+                                inset: 0,
+                                zIndex: 10,
+                              }}
+                              onClick={() => {
+                                setAssocOpen(false);
+                                setAssocSearch("");
+                              }}
+                            />
+                            <div
+                              style={{
+                                position: "absolute",
+                                top: "calc(100% + 4px)",
+                                left: 0,
+                                right: 0,
+                                zIndex: 11,
+                                background: "var(--surface)",
+                                border: "1px solid var(--border)",
+                                borderRadius: "var(--r-md)",
+                                boxShadow: "0 4px 16px rgba(0,0,0,.1)",
+                                maxHeight: 200,
+                                overflowY: "auto",
+                              }}
+                            >
+                              {filteredAssoc.length === 0 ? (
+                                <div
+                                  style={{
+                                    padding: "12px 16px",
+                                    fontSize: 13,
+                                    color: "var(--text-3)",
+                                  }}
+                                >
+                                  No associations found.
+                                </div>
+                              ) : (
+                                filteredAssoc.map((a) => (
+                                  <label
+                                    key={a.id}
+                                    style={{
+                                      display: "flex",
+                                      alignItems: "center",
+                                      gap: 10,
+                                      padding: "9px 16px",
+                                      cursor: "pointer",
+                                      fontSize: 13,
+                                      background:
+                                        form.selectedAssociations.includes(a.id)
+                                          ? "var(--brand-light)"
+                                          : "transparent",
+                                      borderBottom: "1px solid var(--border)",
+                                    }}
+                                  >
+                                    <input
+                                      type="checkbox"
+                                      checked={form.selectedAssociations.includes(
+                                        a.id,
+                                      )}
+                                      onChange={() => toggleAssoc(a.id)}
+                                    />
                                     {a.name}
                                   </label>
                                 ))
-                              }
+                              )}
                             </div>
                           </>
                         )}
@@ -1092,54 +1354,195 @@ export default function CampaignCreate() {
 
             {/* ── 6. Assign Agents ─────────────────────── */}
             <SectionBlock icon="👤" title="Assign Agents">
-              <div style={{ display: "flex", flexDirection: "column", gap: 24 }}>
-
+              <div
+                style={{ display: "flex", flexDirection: "column", gap: 24 }}
+              >
                 {/* ── Calling Agents ── */}
                 <div>
-                  <div style={{ fontSize: 13, fontWeight: 600, color: "var(--text-2)", marginBottom: 10, display: "flex", alignItems: "center", gap: 7 }}>
-                    <span style={{ background: "#e0f2fe", color: "#0369a1", borderRadius: 6, padding: "2px 9px", fontSize: 12 }}>📞 Calling Agents</span>
+                  <div
+                    style={{
+                      fontSize: 13,
+                      fontWeight: 600,
+                      color: "var(--text-2)",
+                      marginBottom: 10,
+                      display: "flex",
+                      alignItems: "center",
+                      gap: 7,
+                    }}
+                  >
+                    <span
+                      style={{
+                        background: "#e0f2fe",
+                        color: "#0369a1",
+                        borderRadius: 6,
+                        padding: "2px 9px",
+                        fontSize: 12,
+                      }}
+                    >
+                      📞 Calling Agents
+                    </span>
                   </div>
 
                   {assignedCalling.size > 0 && (
-                    <div style={{ display: "flex", flexWrap: "wrap", gap: 8, marginBottom: 10 }}>
-                      {CALLING_AGENTS.filter(a => assignedCalling.has(a.id)).map(a => (
-                        <span key={a.id} style={{ display: "inline-flex", alignItems: "center", gap: 6, background: "#e0f2fe", color: "#0369a1", border: "1px solid #bae6fd", borderRadius: 20, padding: "4px 10px 4px 12px", fontSize: 13, fontWeight: 500 }}>
+                    <div
+                      style={{
+                        display: "flex",
+                        flexWrap: "wrap",
+                        gap: 8,
+                        marginBottom: 10,
+                      }}
+                    >
+                      {CALLING_AGENTS.filter((a) =>
+                        assignedCalling.has(a.id),
+                      ).map((a) => (
+                        <span
+                          key={a.id}
+                          style={{
+                            display: "inline-flex",
+                            alignItems: "center",
+                            gap: 6,
+                            background: "#e0f2fe",
+                            color: "#0369a1",
+                            border: "1px solid #bae6fd",
+                            borderRadius: 20,
+                            padding: "4px 10px 4px 12px",
+                            fontSize: 13,
+                            fontWeight: 500,
+                          }}
+                        >
                           {a.name}
-                          <button type="button" onClick={() => toggleCalling(a.id)} style={{ background: "none", border: "none", cursor: "pointer", color: "#0369a1", fontSize: 15, lineHeight: 1, padding: 0 }}>×</button>
+                          <button
+                            type="button"
+                            onClick={() => toggleCalling(a.id)}
+                            style={{
+                              background: "none",
+                              border: "none",
+                              cursor: "pointer",
+                              color: "#0369a1",
+                              fontSize: 15,
+                              lineHeight: 1,
+                              padding: 0,
+                            }}
+                          >
+                            ×
+                          </button>
                         </span>
                       ))}
                     </div>
                   )}
 
                   <div style={{ position: "relative" }}>
-                    <div style={{ display: "flex", alignItems: "center", gap: 8, border: "1px solid var(--border)", borderRadius: "var(--r-md)", padding: "8px 12px", background: "var(--surface)", cursor: "text" }} onClick={() => setCallingOpen(true)}>
+                    <div
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        gap: 8,
+                        border: "1px solid var(--border)",
+                        borderRadius: "var(--r-md)",
+                        padding: "8px 12px",
+                        background: "var(--surface)",
+                        cursor: "text",
+                      }}
+                      onClick={() => setCallingOpen(true)}
+                    >
                       <input
                         type="text"
                         placeholder="Search calling agents…"
                         value={callingSearch}
-                        onChange={e => { setCallingSearch(e.target.value); setCallingOpen(true); }}
+                        onChange={(e) => {
+                          setCallingSearch(e.target.value);
+                          setCallingOpen(true);
+                        }}
                         onFocus={() => setCallingOpen(true)}
-                        style={{ flex: 1, border: "none", outline: "none", background: "transparent", fontSize: 13 }}
+                        style={{
+                          flex: 1,
+                          border: "none",
+                          outline: "none",
+                          background: "transparent",
+                          fontSize: 13,
+                        }}
                       />
-                      <span style={{ fontSize: 11, color: "var(--text-3)" }}>{assignedCalling.size > 0 ? `${assignedCalling.size} selected` : ""}</span>
-                      <span style={{ color: "var(--text-3)", fontSize: 12 }}>{callingOpen ? "▲" : "▼"}</span>
+                      <span style={{ fontSize: 11, color: "var(--text-3)" }}>
+                        {assignedCalling.size > 0
+                          ? `${assignedCalling.size} selected`
+                          : ""}
+                      </span>
+                      <span style={{ color: "var(--text-3)", fontSize: 12 }}>
+                        {callingOpen ? "▲" : "▼"}
+                      </span>
                     </div>
                     {callingOpen && (
                       <>
-                        <div style={{ position: "fixed", inset: 0, zIndex: 10 }} onClick={() => { setCallingOpen(false); setCallingSearch(""); }} />
-                        <div style={{ position: "absolute", top: "calc(100% + 4px)", left: 0, right: 0, zIndex: 11, background: "var(--surface)", border: "1px solid var(--border)", borderRadius: "var(--r-md)", boxShadow: "0 4px 16px rgba(0,0,0,.1)", maxHeight: 220, overflowY: "auto" }}>
-                          {filteredCalling.length === 0
-                            ? <div style={{ padding: "14px 16px", fontSize: 13, color: "var(--text-3)" }}>No agents found.</div>
-                            : filteredCalling.map(a => (
-                              <label key={a.id} style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 16px", cursor: "pointer", fontSize: 13, background: assignedCalling.has(a.id) ? "#e0f2fe" : "transparent", borderBottom: "1px solid var(--border)" }}>
-                                <input type="checkbox" checked={assignedCalling.has(a.id)} onChange={() => toggleCalling(a.id)} />
+                        <div
+                          style={{ position: "fixed", inset: 0, zIndex: 10 }}
+                          onClick={() => {
+                            setCallingOpen(false);
+                            setCallingSearch("");
+                          }}
+                        />
+                        <div
+                          style={{
+                            position: "absolute",
+                            top: "calc(100% + 4px)",
+                            left: 0,
+                            right: 0,
+                            zIndex: 11,
+                            background: "var(--surface)",
+                            border: "1px solid var(--border)",
+                            borderRadius: "var(--r-md)",
+                            boxShadow: "0 4px 16px rgba(0,0,0,.1)",
+                            maxHeight: 220,
+                            overflowY: "auto",
+                          }}
+                        >
+                          {filteredCalling.length === 0 ? (
+                            <div
+                              style={{
+                                padding: "14px 16px",
+                                fontSize: 13,
+                                color: "var(--text-3)",
+                              }}
+                            >
+                              No agents found.
+                            </div>
+                          ) : (
+                            filteredCalling.map((a) => (
+                              <label
+                                key={a.id}
+                                style={{
+                                  display: "flex",
+                                  alignItems: "center",
+                                  gap: 10,
+                                  padding: "10px 16px",
+                                  cursor: "pointer",
+                                  fontSize: 13,
+                                  background: assignedCalling.has(a.id)
+                                    ? "#e0f2fe"
+                                    : "transparent",
+                                  borderBottom: "1px solid var(--border)",
+                                }}
+                              >
+                                <input
+                                  type="checkbox"
+                                  checked={assignedCalling.has(a.id)}
+                                  onChange={() => toggleCalling(a.id)}
+                                />
                                 <div>
-                                  <div style={{ fontWeight: 500 }}>{a.name}</div>
-                                  <div style={{ fontSize: 11.5, color: "var(--text-3)" }}>{a.broker} · {a.posLicense}</div>
+                                  <div style={{ fontWeight: 500 }}>
+                                    {a.name}
+                                  </div>
+                                  <div
+                                    style={{
+                                      fontSize: 11.5,
+                                      color: "var(--text-3)",
+                                    }}
+                                  >
+                                    {a.broker} · {a.posLicense}
+                                  </div>
                                 </div>
                               </label>
                             ))
-                          }
+                          )}
                         </div>
                       </>
                     )}
@@ -1148,56 +1551,195 @@ export default function CampaignCreate() {
 
                 {/* ── Sales Agents ── */}
                 <div>
-                  <div style={{ fontSize: 13, fontWeight: 600, color: "var(--text-2)", marginBottom: 10, display: "flex", alignItems: "center", gap: 7 }}>
-                    <span style={{ background: "var(--brand-light)", color: "var(--brand)", borderRadius: 6, padding: "2px 9px", fontSize: 12 }}>💼 Sales Agents</span>
+                  <div
+                    style={{
+                      fontSize: 13,
+                      fontWeight: 600,
+                      color: "var(--text-2)",
+                      marginBottom: 10,
+                      display: "flex",
+                      alignItems: "center",
+                      gap: 7,
+                    }}
+                  >
+                    <span
+                      style={{
+                        background: "var(--brand-light)",
+                        color: "var(--brand)",
+                        borderRadius: 6,
+                        padding: "2px 9px",
+                        fontSize: 12,
+                      }}
+                    >
+                      💼 Sales Agents
+                    </span>
                   </div>
 
                   {assignedSales.size > 0 && (
-                    <div style={{ display: "flex", flexWrap: "wrap", gap: 8, marginBottom: 10 }}>
-                      {SALES_AGENTS.filter(a => assignedSales.has(a.id)).map(a => (
-                        <span key={a.id} style={{ display: "inline-flex", alignItems: "center", gap: 6, background: "var(--brand-light)", color: "var(--brand)", border: "1px solid var(--brand-mid)", borderRadius: 20, padding: "4px 10px 4px 12px", fontSize: 13, fontWeight: 500 }}>
-                          {a.name}
-                          <button type="button" onClick={() => toggleSales(a.id)} style={{ background: "none", border: "none", cursor: "pointer", color: "var(--brand)", fontSize: 15, lineHeight: 1, padding: 0 }}>×</button>
-                        </span>
-                      ))}
+                    <div
+                      style={{
+                        display: "flex",
+                        flexWrap: "wrap",
+                        gap: 8,
+                        marginBottom: 10,
+                      }}
+                    >
+                      {SALES_AGENTS.filter((a) => assignedSales.has(a.id)).map(
+                        (a) => (
+                          <span
+                            key={a.id}
+                            style={{
+                              display: "inline-flex",
+                              alignItems: "center",
+                              gap: 6,
+                              background: "var(--brand-light)",
+                              color: "var(--brand)",
+                              border: "1px solid var(--brand-mid)",
+                              borderRadius: 20,
+                              padding: "4px 10px 4px 12px",
+                              fontSize: 13,
+                              fontWeight: 500,
+                            }}
+                          >
+                            {a.name}
+                            <button
+                              type="button"
+                              onClick={() => toggleSales(a.id)}
+                              style={{
+                                background: "none",
+                                border: "none",
+                                cursor: "pointer",
+                                color: "var(--brand)",
+                                fontSize: 15,
+                                lineHeight: 1,
+                                padding: 0,
+                              }}
+                            >
+                              ×
+                            </button>
+                          </span>
+                        ),
+                      )}
                     </div>
                   )}
 
                   <div style={{ position: "relative" }}>
-                    <div style={{ display: "flex", alignItems: "center", gap: 8, border: "1px solid var(--border)", borderRadius: "var(--r-md)", padding: "8px 12px", background: "var(--surface)", cursor: "text" }} onClick={() => setSalesOpen(true)}>
+                    <div
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        gap: 8,
+                        border: "1px solid var(--border)",
+                        borderRadius: "var(--r-md)",
+                        padding: "8px 12px",
+                        background: "var(--surface)",
+                        cursor: "text",
+                      }}
+                      onClick={() => setSalesOpen(true)}
+                    >
                       <input
                         type="text"
                         placeholder="Search sales agents…"
                         value={salesSearch}
-                        onChange={e => { setSalesSearch(e.target.value); setSalesOpen(true); }}
+                        onChange={(e) => {
+                          setSalesSearch(e.target.value);
+                          setSalesOpen(true);
+                        }}
                         onFocus={() => setSalesOpen(true)}
-                        style={{ flex: 1, border: "none", outline: "none", background: "transparent", fontSize: 13 }}
+                        style={{
+                          flex: 1,
+                          border: "none",
+                          outline: "none",
+                          background: "transparent",
+                          fontSize: 13,
+                        }}
                       />
-                      <span style={{ fontSize: 11, color: "var(--text-3)" }}>{assignedSales.size > 0 ? `${assignedSales.size} selected` : ""}</span>
-                      <span style={{ color: "var(--text-3)", fontSize: 12 }}>{salesOpen ? "▲" : "▼"}</span>
+                      <span style={{ fontSize: 11, color: "var(--text-3)" }}>
+                        {assignedSales.size > 0
+                          ? `${assignedSales.size} selected`
+                          : ""}
+                      </span>
+                      <span style={{ color: "var(--text-3)", fontSize: 12 }}>
+                        {salesOpen ? "▲" : "▼"}
+                      </span>
                     </div>
                     {salesOpen && (
                       <>
-                        <div style={{ position: "fixed", inset: 0, zIndex: 10 }} onClick={() => { setSalesOpen(false); setSalesSearch(""); }} />
-                        <div style={{ position: "absolute", top: "calc(100% + 4px)", left: 0, right: 0, zIndex: 11, background: "var(--surface)", border: "1px solid var(--border)", borderRadius: "var(--r-md)", boxShadow: "0 4px 16px rgba(0,0,0,.1)", maxHeight: 220, overflowY: "auto" }}>
-                          {filteredSales.length === 0
-                            ? <div style={{ padding: "14px 16px", fontSize: 13, color: "var(--text-3)" }}>No agents found.</div>
-                            : filteredSales.map(a => (
-                              <label key={a.id} style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 16px", cursor: "pointer", fontSize: 13, background: assignedSales.has(a.id) ? "var(--brand-light)" : "transparent", borderBottom: "1px solid var(--border)" }}>
-                                <input type="checkbox" checked={assignedSales.has(a.id)} onChange={() => toggleSales(a.id)} />
+                        <div
+                          style={{ position: "fixed", inset: 0, zIndex: 10 }}
+                          onClick={() => {
+                            setSalesOpen(false);
+                            setSalesSearch("");
+                          }}
+                        />
+                        <div
+                          style={{
+                            position: "absolute",
+                            top: "calc(100% + 4px)",
+                            left: 0,
+                            right: 0,
+                            zIndex: 11,
+                            background: "var(--surface)",
+                            border: "1px solid var(--border)",
+                            borderRadius: "var(--r-md)",
+                            boxShadow: "0 4px 16px rgba(0,0,0,.1)",
+                            maxHeight: 220,
+                            overflowY: "auto",
+                          }}
+                        >
+                          {filteredSales.length === 0 ? (
+                            <div
+                              style={{
+                                padding: "14px 16px",
+                                fontSize: 13,
+                                color: "var(--text-3)",
+                              }}
+                            >
+                              No agents found.
+                            </div>
+                          ) : (
+                            filteredSales.map((a) => (
+                              <label
+                                key={a.id}
+                                style={{
+                                  display: "flex",
+                                  alignItems: "center",
+                                  gap: 10,
+                                  padding: "10px 16px",
+                                  cursor: "pointer",
+                                  fontSize: 13,
+                                  background: assignedSales.has(a.id)
+                                    ? "var(--brand-light)"
+                                    : "transparent",
+                                  borderBottom: "1px solid var(--border)",
+                                }}
+                              >
+                                <input
+                                  type="checkbox"
+                                  checked={assignedSales.has(a.id)}
+                                  onChange={() => toggleSales(a.id)}
+                                />
                                 <div>
-                                  <div style={{ fontWeight: 500 }}>{a.name}</div>
-                                  <div style={{ fontSize: 11.5, color: "var(--text-3)" }}>{a.broker} · {a.posLicense}</div>
+                                  <div style={{ fontWeight: 500 }}>
+                                    {a.name}
+                                  </div>
+                                  <div
+                                    style={{
+                                      fontSize: 11.5,
+                                      color: "var(--text-3)",
+                                    }}
+                                  >
+                                    {a.broker} · {a.posLicense}
+                                  </div>
                                 </div>
                               </label>
                             ))
-                          }
+                          )}
                         </div>
                       </>
                     )}
                   </div>
                 </div>
-
               </div>
             </SectionBlock>
 

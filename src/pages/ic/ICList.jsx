@@ -11,7 +11,7 @@ const MOCK = ICS.map(ic => ({
   name:    ic.icName,
   code:    ic.code,
   contact: ic.contactPerson,
-  email:   ic.email,
+  email:   ic.contactEmail,
   status:  ic.status,
 }))
 
