@@ -1,5 +1,6 @@
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider, useAuth } from "./context/AuthContext";
+import { CustomerProvider } from "./context/CustomerContext";
 import Layout from "./components/Layout";
 import ProtectedRoute from "./components/ProtectedRoute";
 import RoleGuard from "./components/RoleGuard";
@@ -36,6 +37,7 @@ import CustomerCreate  from "./pages/customer/CustomerCreate";
 import CustomerEdit    from "./pages/customer/CustomerEdit";
 import CustomerProfile from "./pages/customer/CustomerProfile";
 import Customer360     from "./pages/customer/Customer360";
+import KYCReview      from "./pages/customer/KYCReview";
 
 // Product pages
 import ProductList   from "./pages/product/ProductList";
@@ -80,6 +82,7 @@ export default function App() {
   return (
     <BrowserRouter>
       <AuthProvider>
+      <CustomerProvider>
         <Routes>
           {/* ── Public auth routes (no sidebar/topbar) ── */}
           <Route path="/login"    element={<SignIn />} />
@@ -124,6 +127,7 @@ export default function App() {
                   <Route path="create" element={<CustomerCreate />} />
                   <Route path=":id/edit" element={<CustomerEdit />} />
                   <Route path=":id/360" element={<Customer360 />} />
+                  <Route path=":id/kyc" element={<KYCReview />} />
                 </Route>
                 <Route path="crm">
                   <Route index element={<CrmPage />} />
@@ -180,6 +184,7 @@ export default function App() {
           {/* Catch-all → login */}
           <Route path="*" element={<Navigate to="/login" replace />} />
         </Routes>
+      </CustomerProvider>
       </AuthProvider>
     </BrowserRouter>
   );

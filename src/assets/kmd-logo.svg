@@ -1,7 +1,11 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
+  <!-- Background circle -->
   <circle cx="100" cy="100" r="100" fill="#7B1818"/>
+  <!-- Outer white ring -->
   <circle cx="100" cy="100" r="92" fill="none" stroke="white" stroke-width="3.5"/>
+  <!-- Inner white ring -->
   <circle cx="100" cy="100" r="84" fill="none" stroke="white" stroke-width="1.5"/>
+  <!-- KMD text -->
   <text
     x="100" y="124"
     text-anchor="middle"

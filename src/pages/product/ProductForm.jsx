@@ -9,6 +9,7 @@ import {
 } from "../../components/Field";
 import { CheckboxGroup, FormActions } from "../../components/UI";
 import { DocumentViewerModal } from "../../components/fields/DocumentViewerModal";
+import { PREMIUM_CHART } from "./productData";
 import policyWordingsPdf from "../../assets/StarHealthAssureInsurancePolicy-Policy-wording.pdf";
 import brochurePdf from "../../assets/Brochure_Star_Comprehensive_Insurance_Policy_V_15_Web_633bcfcaaf.pdf";
 
@@ -204,12 +205,30 @@ const COVERED_MEMBERS = [
   "Father in Law",
 ];
 
+function chartToRows(productId) {
+  const rows = PREMIUM_CHART[productId] ?? [];
+  if (rows.length === 0) return [{ id: Date.now(), sumInsured: '', gst: '0', ageBandId: '', members: {} }];
+  return rows.map((r, i) => ({
+    id: i + 1,
+    sumInsured: String(r.sumInsured),
+    gst: '0',
+    ageBandId: r.ageBandId != null ? String(r.ageBandId) : '',
+    members: {
+      ...(r.selfOnly            != null ? { Self:      String(r.selfOnly)            } : {}),
+      ...(r.selfSpouse          != null ? { Spouse:    String(r.selfSpouse)          } : {}),
+      ...(r.selfSpouse2Children != null ? { 'Child 2': String(r.selfSpouse2Children) } : {}),
+    },
+  }));
+}
+
 export default function ProductForm({
   form,
   set,
   setFile,
   setArr,
   setPremium,
+  productId,
+  initialMembers,
   onSubmit,
   onCancel,
   submitLabel = "Save Product",
@@ -221,11 +240,9 @@ export default function ProductForm({
   const [brochureToc, setBrochureToc] = useState(BROCHURE_TOC);
   const [editingTocId, setEditingTocId] = useState(null);
   const [tocDraft, setTocDraft] = useState({ title: '', content: '' });
-  const [coveredMembers, setCoveredMembers] = useState(new Set());
+  const [coveredMembers, setCoveredMembers] = useState(() => new Set(initialMembers ?? []));
   const [handicapFlags, setHandicapFlags] = useState({ "Child 1": false, "Child 2": false });
-  const [premiumRows, setPremiumRows] = useState([
-    { id: Date.now(), sumInsured: "", gst: "18", members: {} },
-  ]);
+  const [premiumRows, setPremiumRows] = useState(() => chartToRows(productId));
   const [docState, setDocState] = useState({
     policyWordingsFile: {
       status: "uploaded",
@@ -260,10 +277,12 @@ export default function ProductForm({
     selectedMembers.slice(0, i + 1).join('+')
   );
 
+  const hasAgeBand = premiumRows.some(r => r.ageBandId !== '');
+
   const addPremiumRow = () =>
     setPremiumRows((prev) => [
       ...prev,
-      { id: Date.now(), sumInsured: "", gst: "18", members: {} },
+      { id: Date.now(), sumInsured: '', gst: '0', ageBandId: '', members: {} },
     ]);
 
   const removePremiumRow = (id) =>
@@ -463,6 +482,7 @@ export default function ProductForm({
                 <thead>
                   <tr>
                     <th style={{ minWidth: 130 }}>Sum Insured (₹)</th>
+                    {hasAgeBand && <th style={{ minWidth: 100 }}>Age Band</th>}
                     <th style={{ minWidth: 90 }}>GST %</th>
                     {selectedMembers.map((m, i) => {
                       const isHandicap = m.includes("(Handicap)");
@@ -492,14 +512,23 @@ export default function ProductForm({
                           placeholder="e.g. 500000"
                           value={row.sumInsured}
                           onChange={(e) =>
-                            updatePremiumRow(
-                              row.id,
-                              "sumInsured",
-                              e.target.value,
-                            )
+                            updatePremiumRow(row.id, "sumInsured", e.target.value)
                           }
                         />
                       </td>
+                      {hasAgeBand && (
+                        <td>
+                          <Input
+                            type="number"
+                            min="1"
+                            placeholder="Band ID"
+                            value={row.ageBandId}
+                            onChange={(e) =>
+                              updatePremiumRow(row.id, "ageBandId", e.target.value)
+                            }
+                          />
+                        </td>
+                      )}
                       <td>
                         <Select
                           value={row.gst}

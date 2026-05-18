@@ -3,11 +3,11 @@ import { createContext, useContext, useState } from 'react'
 const AuthContext = createContext(null)
 
 const MOCK_USERS = {
-  'broker@kmdastur.com': {
+  'sainath@kmdastur.com': {
     id: 'b1', role: 'broker', password: 'broker@123',
-    name: 'K.M. Dastur', company: 'K.M. Dastur & Co. Insurance Brokers Pvt. Ltd.',
-    irdaiNo: 'CB-456/2008', phone: '9812345678', email: 'broker@kmdastur.com',
-    city: 'Mumbai', state: 'Maharashtra', avatar: 'KD',
+    name: 'Sainath Shinde', company: 'K.M. Dastur & Co. Insurance Brokers Pvt. Ltd.',
+    irdaiNo: 'CB-456/2008', phone: '9812345678', email: 'sainath@kmdastur.com',
+    city: 'Mumbai', state: 'Maharashtra', avatar: 'SS',
     address: '14, Horniman Circle, Fort, Mumbai - 400001',
     gst: '27AABCK1234M1Z5', pan: 'AABCK1234M',
     established: '1968', type: 'Partnership',

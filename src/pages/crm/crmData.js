@@ -1,10 +1,10 @@
 export const CAMPAIGNS = [
-  { id: 1, name: 'Summer Health Drive 2025',   type: 'Promotional', assignedAgents: [1, 2, 5]  },
-  { id: 2, name: 'Renewal Reminder Q2',         type: 'Renewal',     assignedAgents: [1, 4, 8]  },
-  { id: 3, name: 'New Member Onboarding',       type: 'Onboarding',  assignedAgents: [2, 6, 9]  },
-  { id: 4, name: 'Motor Insurance Awareness',   type: 'Awareness',   assignedAgents: [1, 10]    },
-  { id: 5, name: 'High Value Customer Loyalty', type: 'Incentive',   assignedAgents: [4, 5, 11] },
-  { id: 6, name: 'Festival Season Offer',       type: 'Seasonal',    assignedAgents: [2, 8, 9]  },
+  { id: 1, name: 'Summer Health Drive 2025',   type: 'Promotional', assignedAgents: [1, 2, 5],  productIds: [3, 6, 7, 42, 43]       },
+  { id: 2, name: 'Renewal Reminder Q2',         type: 'Renewal',     assignedAgents: [1, 4, 8],  productIds: [42, 44, 45, 38, 39, 40] },
+  { id: 3, name: 'New Member Onboarding',       type: 'Onboarding',  assignedAgents: [2, 6, 9],  productIds: [9, 10, 11, 12, 44, 45]  },
+  { id: 4, name: 'Motor Insurance Awareness',   type: 'Awareness',   assignedAgents: [1, 10],    productIds: [8, 3, 42]               },
+  { id: 5, name: 'High Value Customer Loyalty', type: 'Incentive',   assignedAgents: [4, 5, 11], productIds: [38, 39, 40, 44, 45]     },
+  { id: 6, name: 'Festival Season Offer',       type: 'Seasonal',    assignedAgents: [2, 8, 9],  productIds: [3, 7, 38, 42, 43]      },
 ]
 
 const EMPTY_CALLS = Array.from({ length: 5 }, (_, i) => ({

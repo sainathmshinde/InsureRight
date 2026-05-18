@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import { NavLink, useLocation, useNavigate } from "react-router-dom";
+import kmdLogo from "../assets/kmd-logo.svg";
 import {
   DashboardIcon,
   UserIcon,
@@ -236,9 +237,7 @@ export default function Sidebar({ mobileOpen = false, onMobileClose }) {
         {/* ── Logo ── */}
         <div style={{ ...S.logoRow, justifyContent: collapsed ? "center" : "space-between", padding: collapsed ? 0 : "0 16px 0 18px" }}>
           {!collapsed && (
-            <span style={S.logoText}>
-              Insure<span style={{ color: "#7c3aed" }}>Right</span>
-            </span>
+            <img src={kmdLogo} alt="KMD" style={{ width: 36, height: 36, borderRadius: "50%", flexShrink: 0 }} />
           )}
           {/* Desktop collapse toggle; on mobile show a close × instead */}
           {mobileOpen ? (

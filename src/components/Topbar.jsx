@@ -36,12 +36,7 @@ export default function Topbar({ onMenuClick }) {
         <HamburgerIcon />
       </button>
 
-      <div style={S.left}>
-        <div className="topbar-search" style={S.searchBox}>
-          <SearchIcon />
-          <input type="text" placeholder="Search customers, policies…" style={S.searchInput} />
-        </div>
-      </div>
+      <div style={S.left} />
 
       <div style={S.right}>
         <button style={S.iconBtn} title="Notifications">

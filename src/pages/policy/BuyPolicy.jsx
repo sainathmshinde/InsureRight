@@ -1,5 +1,5 @@
 import { useState, useMemo } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import { Field, Input, Select, Textarea } from "../../components/fields";
 import {
@@ -10,15 +10,13 @@ import {
   Toggle,
 } from "../../components/ui";
 import {
-  HealthIcon,
-  MotorIcon,
-  LifeIcon,
   ShieldCheckIcon,
   PaymentIcon,
   CustomerIcon,
 } from "../../icons";
+import { PRODUCTS, PRODUCTS_BY_TYPE, POLICY_TYPE_ICON, PREMIUM_CHART } from "../product/productData";
 import { AGENTS as KMD_AGENTS } from "../agent/agentData";
-import { INITIAL_LEADS } from "../crm/crmData";
+import { INITIAL_LEADS, CAMPAIGNS } from "../crm/crmData";
 
 // ── Shared customer data (same source of truth as CustomerList) ────────────
 const CUSTOMERS = [
@@ -191,201 +189,12 @@ const CUSTOMERS = [
   },
 ];
 
-// ── Product catalogue ──────────────────────────────────────────────────────
-const PRODUCTS = {
-  Health: [
-    {
-      id: 1,
-      name: "Star Comprehensive Health",
-      code: "SHI-HC-001",
-      ic: "Star Health",
-      premium: 10030,
-      sumInsured: "5L–50L",
-      waitingPeriod: 30,
-      roomRent: "No Limit",
-      highlights: [
-        "541 day-care procedures",
-        "No sub-limits on room rent",
-        "AYUSH cover",
-        "Global emergency",
-      ],
-      addOns: ["Critical Illness Rider", "OPD Cover"],
-      logo: "⭐",
-    },
-    {
-      id: 2,
-      name: "HDFC ERGO Optima Secure",
-      code: "HER-HS-002",
-      ic: "HDFC ERGO",
-      premium: 7316,
-      sumInsured: "3L–25L",
-      waitingPeriod: 30,
-      roomRent: "Single AC Room",
-      highlights: [
-        "Direct claim settlement",
-        "Organ donor cover",
-        "Mental illness cover",
-        "Int'l emergency",
-      ],
-      addOns: ["Personal Accident", "Maternity Cover"],
-      logo: "🔷",
-    },
-    {
-      id: 3,
-      name: "ICICI Lombard Complete Health",
-      code: "ICL-HC-003",
-      ic: "ICICI Lombard",
-      premium: 10738,
-      sumInsured: "5L–1Cr",
-      waitingPeriod: 30,
-      roomRent: "2% Sum Insured",
-      highlights: [
-        "1 Cr super coverage",
-        "Unlimited restore benefit",
-        "Telemedicine included",
-        "14,000+ hospitals",
-      ],
-      addOns: ["Critical Illness Rider", "Vision Cover"],
-      logo: "💎",
-    },
-    {
-      id: 4,
-      name: "Bajaj Allianz Health Guard",
-      code: "BAJ-HG-004",
-      ic: "Bajaj Allianz",
-      premium: 6490,
-      sumInsured: "3L–10L",
-      waitingPeriod: 30,
-      roomRent: "1% Sum Insured",
-      highlights: [
-        "Family floater",
-        "Daily hospital cash",
-        "Cataract cover",
-        "Ambulance cover",
-      ],
-      addOns: ["OPD Cover", "Dental Cover"],
-      logo: "🔶",
-    },
-  ],
-  Motor: [
-    {
-      id: 5,
-      name: "Bajaj Allianz Comprehensive",
-      code: "BAJ-MC-005",
-      ic: "Bajaj Allianz",
-      premium: 5664,
-      sumInsured: "IDV based",
-      waitingPeriod: 0,
-      roomRent: "—",
-      highlights: [
-        "4,000+ network garages",
-        "Cashless claims",
-        "Zero depreciation",
-        "24/7 roadside assist",
-      ],
-      addOns: ["Zero Depreciation", "Engine Protection"],
-      logo: "🔶",
-    },
-    {
-      id: 6,
-      name: "New India Motor OD + TP",
-      code: "NIA-MC-006",
-      ic: "New India Assurance",
-      premium: 4248,
-      sumInsured: "IDV based",
-      waitingPeriod: 0,
-      roomRent: "—",
-      highlights: [
-        "Government insurer",
-        "Wide acceptance",
-        "3,500+ garages",
-        "Quick survey",
-      ],
-      addOns: ["Personal Accident", "Consumables"],
-      logo: "🇮🇳",
-    },
-    {
-      id: 7,
-      name: "ICICI Lombard Motor",
-      code: "ICL-MC-007",
-      ic: "ICICI Lombard",
-      premium: 5192,
-      sumInsured: "IDV based",
-      waitingPeriod: 0,
-      roomRent: "—",
-      highlights: [
-        "Digital claim filing",
-        "Own damage cover",
-        "Third-party liability",
-        "Fast settlement",
-      ],
-      addOns: ["Zero Depreciation", "RTI Cover"],
-      logo: "💎",
-    },
-  ],
-  Life: [
-    {
-      id: 8,
-      name: "LIC Jeevan Anand",
-      code: "LIC-LA-008",
-      ic: "LIC",
-      premium: 14160,
-      sumInsured: "10L–1Cr",
-      waitingPeriod: 90,
-      roomRent: "—",
-      highlights: [
-        "Whole life protection",
-        "Bonus additions",
-        "Loan facility",
-        "Guaranteed returns",
-      ],
-      addOns: ["Accidental Death Rider", "Critical Illness Rider"],
-      logo: "🇮🇳",
-    },
-    {
-      id: 9,
-      name: "HDFC Life Sanchay Plus",
-      code: "HDFC-LSP-009",
-      ic: "HDFC Life",
-      premium: 21240,
-      sumInsured: "25L–2Cr",
-      waitingPeriod: 90,
-      roomRent: "—",
-      highlights: [
-        "Guaranteed income",
-        "Flexible payout",
-        "Tax benefits 80C",
-        "Death benefit",
-      ],
-      addOns: ["Waiver of Premium"],
-      logo: "🔷",
-    },
-    {
-      id: 10,
-      name: "SBI Life Smart Shield",
-      code: "SBI-LSS-010",
-      ic: "SBI Life",
-      premium: 11210,
-      sumInsured: "10L–1Cr",
-      waitingPeriod: 90,
-      roomRent: "—",
-      highlights: [
-        "Pure term cover",
-        "Low premium",
-        "Online discount",
-        "Return of premium",
-      ],
-      addOns: ["Critical Illness Rider", "Accidental Death Rider"],
-      logo: "🏦",
-    },
-  ],
-};
 
 const STEPS = [
   "Select Customer",
   "Insurance Type",
+  "Select Product",
   "Members",
-  "Choose Plan",
   "Proposal",
   "Payment",
   "Policy Issued",
@@ -537,6 +346,13 @@ export default function BuyPolicy() {
     );
   }, [isSalesAgent, myAgentId]);
 
+  // Products available from agent's campaign assignments
+  const agentCampaignProductIds = useMemo(() => {
+    if (!myAgentId || isCustomer) return null; // null = show all
+    const myCampaigns = CAMPAIGNS.filter(c => c.assignedAgents.includes(myAgentId));
+    return new Set(myCampaigns.flatMap(c => c.productIds ?? []));
+  }, [myAgentId, isCustomer]);
+
   // Base customer pool — sales agents see only their assigned customers
   const baseCustomers = salesAssignedCustomerIds
     ? CUSTOMERS.filter(c => salesAssignedCustomerIds.has(c.id))
@@ -547,20 +363,30 @@ export default function BuyPolicy() {
     ? (CUSTOMERS.find((c) => c.email === user.email) ?? null)
     : null;
 
-  // Step state — customers skip Step 0 (Select Customer)
-  const [step, setStep] = useState(isCustomer ? 1 : 0);
+  // Pre-select customer when navigated from customer list via ?customerId=X
+  const [searchParams] = useSearchParams();
+  const preselectedId = searchParams.get("customerId");
+  const preselectedCustomer = (!isCustomer && preselectedId)
+    ? (CUSTOMERS.find((c) => c.id === Number(preselectedId)) ?? null)
+    : null;
+
+  // Unified initial customer — self (customer role) OR broker-preselected OR none
+  const initialCustomer = selfCustomer ?? preselectedCustomer;
+
+  // Step state — skip Step 0 when customer already known
+  const [step, setStep] = useState(initialCustomer ? 1 : 0);
 
   // Step 0 — customer selection (agent/broker only)
   const [custSearch, setCustSearch] = useState("");
-  const [selectedCustomer, setSelectedCustomer] = useState(selfCustomer);
+  const [selectedCustomer, setSelectedCustomer] = useState(initialCustomer);
 
   // Step 1 — insurance type
   const [insuranceType, setInsuranceType] = useState(null);
 
   // Step 2 — members / vehicle — start with Self only; family added on demand
   const [members, setMembers] = useState(
-    selfCustomer
-      ? [{ type: "Self", name: selfCustomer.name, dob: selfCustomer.dob, gender: selfCustomer.gender }]
+    initialCustomer
+      ? [{ type: "Self", name: initialCustomer.name, dob: initialCustomer.dob, gender: initialCustomer.gender }]
       : [],
   );
   const [vehicle, setVehicle] = useState({
@@ -572,17 +398,16 @@ export default function BuyPolicy() {
     fuelType: "",
   });
 
-  // Step 3 — plan selection
-  const [compareIds, setCompareIds] = useState([]);
-  const [showCompare, setShowCompare] = useState(false);
+  // Step 2 — product selection
   const [cart, setCart] = useState([]);
+  const [productSels, setProductSels] = useState({});  // per-product {sumInsured,ageBandId,coverage,premium}
 
   // Step 4 — proposal — pre-fill from customer record
   const [proposal, setProposal] = useState({
-    customerName: selfCustomer?.name ?? "",
-    mobile: selfCustomer?.mobile ?? "",
-    email: selfCustomer?.email ?? "",
-    address: selfCustomer?.address ?? "",
+    customerName: initialCustomer?.name ?? "",
+    mobile: initialCustomer?.mobile ?? "",
+    email: initialCustomer?.email ?? "",
+    address: initialCustomer?.address ?? "",
     medicalHistory: "No",
     preExisting: "",
     nomineeName: "",
@@ -628,18 +453,64 @@ export default function BuyPolicy() {
   };
   const setV = (f) => (e) => setVehicle((v) => ({ ...v, [f]: e.target.value }));
   const next = () => setStep((s) => Math.min(s + 1, STEPS.length - 1));
-  // Customer can't go back to Step 0 (customer list); navigate to policy page instead
   const back = () => {
-    if (isCustomer && step === 1) { navigate("/policy"); return; }
+    if (isCustomer && step === 1)        { navigate("/policy");   return; }
+    if (preselectedCustomer && step === 1) { navigate("/customer"); return; }
     setStep((s) => Math.max(s - 1, 0));
   };
 
-  const toggleCart = (p) =>
-    setCart(prev => prev.find(x => x.id === p.id) ? prev.filter(x => x.id !== p.id) : [...prev, p]);
-  const cartTotal = cart.reduce((s, p) => s + p.premium, 0);
+  // ── Premium-selection helpers ────────────────────────────────────────────
+  const defaultSel = (pid) => {
+    const rows = PREMIUM_CHART[pid] ?? [];
+    if (!rows.length) return { sumInsured: '', ageBandId: '', coverage: '', premium: null };
+    const r = rows[0];
+    return {
+      sumInsured: String(r.sumInsured),
+      ageBandId:  r.ageBandId != null ? String(r.ageBandId) : '',
+      coverage:   r.selfOnly != null ? 'selfOnly' : '',
+      premium:    r.selfOnly ?? null,
+    };
+  };
+  const psel    = (pid) => productSels[pid] ?? defaultSel(pid);
+  const setPsel = (pid, patch) => {
+    const updated = { ...psel(pid), ...patch };
+    setProductSels(prev => ({ ...prev, [pid]: updated }));
+    setCart(prev => prev.map(x => x.id === pid ? { ...x, ...updated } : x));
+  };
+  const matchRow = (pid, si, band) => {
+    const rows = PREMIUM_CHART[pid] ?? [];
+    const siN  = Number(si);
+    return rows.find(r => r.sumInsured === siN && (band ? String(r.ageBandId) === band : r.ageBandId == null))
+        ?? rows.find(r => r.sumInsured === siN)
+        ?? null;
+  };
+  const COV_LABEL = {
+    selfOnly:            'Self',
+    selfSpouse:          'Self + Spouse',
+    selfSpouse2Children: 'Self + Spouse + 2 Children',
+  };
 
-  const products = PRODUCTS[insuranceType] ?? [];
-  const compareProducts = products.filter((p) => compareIds.includes(p.id));
+  const coverageOpts = (row) => [
+    row?.selfOnly            != null && { key: 'selfOnly',            label: 'Self',                       value: row.selfOnly },
+    row?.selfSpouse          != null && { key: 'selfSpouse',          label: 'Self + Spouse',               value: row.selfSpouse },
+    row?.selfSpouse2Children != null && { key: 'selfSpouse2Children', label: 'Self + Spouse + 2 Children',  value: row.selfSpouse2Children },
+  ].filter(Boolean);
+
+  const toggleCart = (p) =>
+    setCart(prev => prev.find(x => x.id === p.id)
+      ? prev.filter(x => x.id !== p.id)
+      : [...prev, { ...p, ...psel(p.id) }]);
+
+  const availableProducts = useMemo(() => {
+    if (!insuranceType) return [];
+    const allCampaignProducts = agentCampaignProductIds
+      ? PRODUCTS.filter(p => agentCampaignProductIds.has(p.id))
+      : PRODUCTS;
+    if (insuranceType === "Health") return allCampaignProducts;
+    const byType = PRODUCTS_BY_TYPE[insuranceType] ?? [];
+    if (!agentCampaignProductIds) return byType;
+    return byType.filter(p => agentCampaignProductIds.has(p.id));
+  }, [insuranceType, agentCampaignProductIds]);
 
   // Customer search filter — sales agents already scoped to their assigned customers
   const filteredCustomers = useMemo(() => {
@@ -688,25 +559,14 @@ export default function BuyPolicy() {
       prev.map((m) => (m.type === type ? { ...m, [field]: val } : m)),
     );
 
-  // Toggle compare list (max 3)
-  const toggleCompare = (id) =>
-    setCompareIds((prev) =>
-      prev.includes(id)
-        ? prev.filter((x) => x !== id)
-        : prev.length < 3
-          ? [...prev, id]
-          : prev,
-    );
-
   // Finalize payment — generate one policy per cart item
   const submitPayment = () => {
     const rand = () => Math.floor(Math.random() * 900000 + 100000);
     setPolicyResults(cart.map(p => ({
-      policyNo:   `${p.ic.slice(0, 3).toUpperCase()}/2025/${rand()}`,
+      policyNo:   `KMD/2025/${rand()}`,
       proposalId: `PRO-2025-${Math.floor(Math.random() * 9000 + 1000)}`,
       product:    p.name,
-      ic:         p.ic,
-      premium:    p.premium,
+      provider:   p.provider,
       customer:   selectedCustomer?.name,
     })));
     next();
@@ -753,13 +613,14 @@ export default function BuyPolicy() {
         <div style={{ maxWidth: 680, margin: "0 auto" }}>
           <div style={{ textAlign: "center", marginBottom: 28 }}>
             <div style={{ fontSize: 17, fontWeight: 700, marginBottom: 6 }}>
-              Who is this policy for?
-            </div>
-            <div className="text-muted">
+              {/* Who is this policy for? */}
+              <div >
               {isSalesAgent
                 ? "Customers assigned to you from CRM campaigns"
                 : "Search and select an existing customer, or add a new one"}
             </div>
+            </div>
+            
           </div>
 
           {/* Search */}
@@ -965,112 +826,37 @@ export default function BuyPolicy() {
               Select the insurance type for {selectedCustomer?.name}
             </div>
           </div>
-          <div
-            style={{
-              display: "grid",
-              gridTemplateColumns: "repeat(1, 1fr)",
-              gap: 20,
-              maxWidth: 740,
-              margin: "0 auto",
-            }}
-          >
-            {[
-              {
-                type: "Health",
-                icon: HealthIcon,
-                color: "#2563eb",
-                desc: "Medical expenses, hospitalisation, critical illness cover",
-                available: true,
-              },
-              // { type: 'Motor',  icon: MotorIcon,  color: '#d97706', desc: 'Car, bike & commercial vehicle — Own Damage + Third Party',  available: false },
-              // { type: 'Life',   icon: LifeIcon,   color: '#7c3aed', desc: 'Term, whole life & ULIP plans — secure your family\'s future', available: false },
-            ].map(({ type, icon: Icon, color, desc, available }) => (
-              <button
-                key={type}
-                type="button"
-                disabled={!available}
-                onClick={() => {
-                  if (available) {
-                    setInsuranceType(type);
-                    next();
-                  }
-                }}
-                className="bp-ins-type-btn"
-                style={{
-                  padding: "24px 20px",
-                  borderRadius: 14,
-                  position: "relative",
-                  cursor: available ? "pointer" : "not-allowed",
-                  fontFamily: "inherit",
-                  opacity: available ? 1 : 0.55,
-                  border: `2px solid ${insuranceType === type ? color : "var(--border)"}`,
-                  background:
-                    insuranceType === type ? color + "10" : "var(--surface)",
-                  boxShadow: "var(--shadow-sm)",
-                  textAlign: "center",
-                  transition: "all .15s",
-                }}
-              >
-                {!available && (
-                  <span
-                    style={{
-                      position: "absolute",
-                      top: 10,
-                      right: 10,
-                      fontSize: 10.5,
-                      fontWeight: 700,
-                      letterSpacing: ".4px",
-                      textTransform: "uppercase",
-                      background: "#f3f4f6",
-                      color: "var(--text-3)",
-                      padding: "2px 8px",
-                      borderRadius: 99,
-                    }}
-                  >
-                    Coming Soon
-                  </span>
-                )}
-                <div
-                  style={{
-                    marginBottom: 14,
-                    display: "flex",
-                    justifyContent: "center",
-                  }}
-                >
-                  <Icon size={42} color={color} />
-                </div>
-                <div
-                  style={{
-                    fontWeight: 700,
-                    fontSize: 16,
-                    marginBottom: 8,
-                    color: "var(--text)",
-                  }}
-                >
-                  {type} Insurance
-                </div>
-                <div
-                  style={{
-                    fontSize: 12.5,
-                    color: "var(--text-3)",
-                    lineHeight: 1.6,
-                  }}
-                >
-                  {desc}
-                </div>
-              </button>
-            ))}
+          <div style={{ maxWidth: 360, margin: "0 auto" }}>
+            <button
+              type="button"
+              onClick={() => { setInsuranceType("Health"); next(); }}
+              style={{
+                width: "100%", padding: "32px 24px", borderRadius: 16,
+                cursor: "pointer", fontFamily: "inherit",
+                border: "2px solid var(--brand)", background: "var(--brand-light)",
+                boxShadow: "0 4px 16px rgba(124,58,237,.12)", textAlign: "center",
+                transition: "all .15s",
+              }}
+            >
+              <div style={{ fontSize: 48, marginBottom: 14 }}>🏥</div>
+              <div style={{ fontWeight: 700, fontSize: 18, marginBottom: 8, color: "var(--text)" }}>
+                Health Insurance
+              </div>
+              <div style={{ fontSize: 13, color: "var(--text-3)", lineHeight: 1.6 }}>
+                Base policy, top-up, OPD, payment protection &amp; more
+              </div>
+            </button>
           </div>
         </div>
       )}
 
       {/* ══════════════════════════════════════════════════════════════════
-          STEP 2 — Members / Vehicle
+          STEP 3 — Members
       ══════════════════════════════════════════════════════════════════ */}
-      {step === 2 && (
+      {step === 3 && (
         <div className="card">
           <div className="card-body">
-            {insuranceType === "Motor" ? (
+            {false ? (
               <div>
                 <div
                   style={{ fontWeight: 600, fontSize: 15, marginBottom: 20 }}
@@ -1348,7 +1134,7 @@ export default function BuyPolicy() {
 
             <div className="actions-row">
               <button className="btn btn-primary" onClick={next}>
-                View Available Plans →
+                Continue to Proposal →
               </button>
             </div>
           </div>
@@ -1356,348 +1142,223 @@ export default function BuyPolicy() {
       )}
 
       {/* ══════════════════════════════════════════════════════════════════
-          STEP 3 — Choose Plan
+          STEP 2 — Select Product (from campaign assignments)
       ══════════════════════════════════════════════════════════════════ */}
-      {step === 3 && (
+      {step === 2 && (
         <div>
-          {/* Compare bar */}
-          {compareIds.length > 0 && (
-            <div
-              style={{
-                background: "var(--brand-light)",
-                border: "1.5px solid var(--brand)",
-                borderRadius: "var(--r-md)",
-                padding: "12px 18px",
-                marginBottom: 20,
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "space-between",
-              }}
-            >
-              <span
-                style={{
-                  color: "var(--brand)",
-                  fontWeight: 500,
-                  fontSize: 13.5,
-                }}
-              >
-                {compareIds.length} plan{compareIds.length > 1 ? "s" : ""}{" "}
-                selected for comparison
-              </span>
-              <div style={{ display: "flex", gap: 10 }}>
-                {compareIds.length >= 2 && (
-                  <button
-                    className="btn btn-primary btn-sm"
-                    onClick={() => setShowCompare(true)}
-                  >
-                    Compare {compareIds.length} Plans
-                  </button>
-                )}
-                <button
-                  className="btn btn-ghost btn-sm"
-                  onClick={() => setCompareIds([])}
-                >
-                  Clear
-                </button>
-              </div>
+          <div style={{ textAlign: "center", marginBottom: 28 }}>
+            <div style={{ fontSize: 16, fontWeight: 600, marginBottom: 6 }}>Select Products</div>
+            <div className="text-muted">
+              Choose products and select a coverage option for each
             </div>
-          )}
+          </div>
 
-          {/* Comparison modal */}
-          {showCompare && (
-            <div
-              style={{
-                position: "fixed",
-                inset: 0,
-                background: "rgba(0,0,0,.45)",
-                zIndex: 999,
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                padding: 24,
-              }}
-            >
-              <div
-                style={{
-                  background: "var(--surface)",
-                  borderRadius: 16,
-                  maxWidth: 920,
-                  width: "100%",
-                  maxHeight: "85vh",
-                  overflow: "auto",
-                  padding: 28,
-                }}
-              >
-                <div
-                  style={{
-                    display: "flex",
-                    justifyContent: "space-between",
-                    alignItems: "center",
-                    marginBottom: 22,
-                  }}
-                >
-                  <span style={{ fontWeight: 700, fontSize: 17 }}>
-                    Plan Comparison
-                  </span>
-                  <button
-                    className="btn btn-ghost btn-sm"
-                    onClick={() => setShowCompare(false)}
-                  >
-                    Close ×
-                  </button>
-                </div>
-                <div style={{ overflowX: "auto" }}>
-                  <table>
-                    <thead>
-                      <tr>
-                        <th style={{ width: 160 }}>Feature</th>
-                        {compareProducts.map((p) => (
-                          <th key={p.id} style={{ minWidth: 200 }}>
-                            {p.name}
-                          </th>
-                        ))}
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {[
-                        ["Insurer", (p) => p.ic],
-                        [
-                          "Annual Premium",
-                          (p) => (
-                            <strong style={{ color: "var(--brand)" }}>
-                              ₹{p.premium.toLocaleString()}
-                            </strong>
-                          ),
-                        ],
-                        ["Sum Insured", (p) => p.sumInsured],
-                        ["Waiting Period", (p) => `${p.waitingPeriod} days`],
-                        ["Room Rent", (p) => p.roomRent],
-                        ["Available Add-ons", (p) => p.addOns.join(", ")],
-                      ].map(([label, getter]) => (
-                        <tr key={label}>
-                          <td
-                            style={{
-                              fontWeight: 500,
-                              color: "var(--text-2)",
-                              fontSize: 13,
-                            }}
-                          >
-                            {label}
-                          </td>
-                          {compareProducts.map((p) => (
-                            <td key={p.id}>{getter(p)}</td>
-                          ))}
-                        </tr>
-                      ))}
-                      <tr>
-                        <td></td>
-                        {compareProducts.map((p) => (
-                          <td key={p.id}>
-                            <button
-                              className={`btn btn-sm ${cart.find(x => x.id === p.id) ? "btn-secondary" : "btn-primary"}`}
-                              onClick={() => { toggleCart(p); setShowCompare(false); }}
-                            >
-                              {cart.find(x => x.id === p.id) ? "✓ Added to Cart" : "+ Add to Cart"}
-                            </button>
-                          </td>
-                        ))}
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>
-              </div>
+          {availableProducts.length === 0 ? (
+            <div style={{ textAlign: "center", padding: "48px 0", color: "var(--text-3)" }}>
+              <div style={{ fontSize: 36, marginBottom: 12 }}>📦</div>
+              <div style={{ fontWeight: 600, marginBottom: 4 }}>No products available</div>
+              <div style={{ fontSize: 13 }}>No products are assigned to your campaigns</div>
             </div>
-          )}
+          ) : (
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(300px, 1fr))", gap: 14, alignItems: "start" }}>
+              {availableProducts.map(p => {
+                const inCart    = !!cart.find(x => x.id === p.id);
+                const sel       = psel(p.id);
+                const chartRows = PREMIUM_CHART[p.id] ?? [];
+                const uniqueSIs = [...new Set(chartRows.map(r => r.sumInsured))];
+                const hasAB     = chartRows.some(r => r.ageBandId != null);
+                const rowBands  = hasAB
+                  ? [...new Set(chartRows.filter(r => r.sumInsured === Number(sel.sumInsured)).map(r => String(r.ageBandId)))]
+                  : [];
+                const activeRow = matchRow(p.id, sel.sumInsured, sel.ageBandId);
+                const covOpts   = coverageOpts(activeRow);
+                const icon      = POLICY_TYPE_ICON[p.policyType] ?? "📋";
 
-          {/* Cart summary bar */}
-          {cart.length > 0 && (
-            <div style={{
-              background: "#1a1628", color: "#fff", borderRadius: 12,
-              padding: "14px 22px", marginBottom: 20,
-              display: "flex", alignItems: "center", gap: 16, flexWrap: "wrap",
-            }}>
-              <span style={{ fontWeight: 700, fontSize: 14 }}>🛒 Cart ({cart.length})</span>
-              <div style={{ display: "flex", gap: 8, flexWrap: "wrap", flex: 1 }}>
-                {cart.map(p => (
-                  <span key={p.id} style={{
-                    background: "#ffffff18", borderRadius: 99, padding: "3px 12px",
-                    fontSize: 12.5, display: "flex", alignItems: "center", gap: 6,
-                  }}>
-                    {p.logo} {p.name}
-                    <button type="button" onClick={() => toggleCart(p)}
-                      style={{ background: "none", border: "none", color: "#fff", cursor: "pointer", fontSize: 14, padding: 0, lineHeight: 1 }}>
-                      ×
-                    </button>
-                  </span>
-                ))}
-              </div>
-              <div style={{ display: "flex", alignItems: "center", gap: 16, flexShrink: 0 }}>
-                <div style={{ textAlign: "right" }}>
-                  <div style={{ fontSize: 11, color: "#bbb" }}>Total Premium</div>
-                  <div style={{ fontSize: 18, fontWeight: 800, color: "#a78bfa" }}>₹{cartTotal.toLocaleString()}/yr</div>
-                </div>
-                <button className="btn btn-primary" onClick={next} style={{ whiteSpace: "nowrap" }}>
-                  Proceed with {cart.length} Plan{cart.length > 1 ? "s" : ""} →
-                </button>
-              </div>
-            </div>
-          )}
-
-          {/* Product cards */}
-          <div
-            style={{
-              display: "grid",
-              gridTemplateColumns: "repeat(auto-fill, minmax(300px, 1fr))",
-              gap: 20,
-            }}
-          >
-            {products.map((p) => {
-              const inCart    = !!cart.find(x => x.id === p.id);
-              const inCompare = compareIds.includes(p.id);
-              return (
-                <div
-                  key={p.id}
-                  style={{
-                    background: "var(--surface)",
-                    border: `2px solid ${inCart ? "var(--brand)" : "var(--border)"}`,
+                return (
+                  <div key={p.id} style={{
                     borderRadius: 14,
-                    padding: 22,
-                    boxShadow: inCart
-                      ? "0 4px 20px rgba(124,58,237,.15)"
-                      : "var(--shadow-sm)",
-                    transition: "all .15s",
-                  }}
-                >
-                  {/* Header */}
-                  <div
-                    style={{
-                      display: "flex",
-                      justifyContent: "space-between",
-                      alignItems: "flex-start",
-                      marginBottom: 14,
-                    }}
-                  >
-                    <div>
-                      <div style={{ fontSize: 26, marginBottom: 6 }}>
-                        {p.logo}
-                      </div>
-                      <div
-                        style={{
-                          fontWeight: 700,
-                          fontSize: 14.5,
-                          marginBottom: 2,
-                        }}
-                      >
-                        {p.name}
-                      </div>
-                      <div style={{ fontSize: 12.5, color: "var(--text-3)" }}>
-                        {p.ic}
-                      </div>
-                    </div>
-                    <div style={{ textAlign: "right" }}>
-                      <div
-                        style={{
-                          fontSize: 22,
-                          fontWeight: 700,
-                          color: "var(--brand)",
-                        }}
-                      >
-                        ₹{p.premium.toLocaleString()}
-                      </div>
-                      <div style={{ fontSize: 11.5, color: "var(--text-3)" }}>
-                        per year
-                      </div>
-                    </div>
-                  </div>
+                    border: `2px solid ${inCart ? "var(--brand)" : "var(--border)"}`,
+                    background: "#fff",
+                    boxShadow: inCart ? "0 4px 18px rgba(124,58,237,.13)" : "0 1px 4px rgba(0,0,0,.06)",
+                    overflow: "hidden",
+                    transition: "border-color .15s, box-shadow .18s",
+                  }}>
 
-                  {/* Key stats */}
-                  <div
-                    style={{
-                      display: "grid",
-                      gridTemplateColumns: "1fr 1fr",
-                      gap: 8,
-                      padding: "12px 0",
-                      margin: "0 0 14px",
-                      borderTop: "1px solid var(--border)",
-                      borderBottom: "1px solid var(--border)",
-                    }}
-                  >
-                    {[
-                      ["Sum Insured", p.sumInsured],
-                      ["Waiting", `${p.waitingPeriod}d`],
-                      ["Room Rent", p.roomRent],
-                    ].map(([k, v]) => (
-                      <div key={k}>
-                        <div
-                          style={{
-                            fontSize: 10.5,
-                            color: "var(--text-3)",
-                            marginBottom: 2,
-                            textTransform: "uppercase",
-                            letterSpacing: ".4px",
-                          }}
-                        >
-                          {k}
+                    {/* ── Header ──────────────────────────────── */}
+                    <div style={{
+                      display: "flex", alignItems: "center", gap: 10,
+                      padding: "11px 13px",
+                      background: inCart ? "rgba(124,58,237,.04)" : "var(--surface-2)",
+                      borderBottom: `1px solid ${inCart ? "rgba(124,58,237,.15)" : "var(--border)"}`,
+                    }}>
+                      <input
+                        type="checkbox"
+                        checked={inCart}
+                        onChange={() => toggleCart(p)}
+                        style={{ width: 16, height: 16, cursor: "pointer", accentColor: "var(--brand)", flexShrink: 0 }}
+                      />
+                      <div style={{
+                        width: 34, height: 34, borderRadius: 9, flexShrink: 0,
+                        background: inCart ? "var(--brand)" : "var(--surface)",
+                        border: `1px solid ${inCart ? "var(--brand)" : "var(--border)"}`,
+                        display: "flex", alignItems: "center", justifyContent: "center",
+                        fontSize: 16, transition: "all .15s",
+                      }}>{icon}</div>
+                      <div style={{ flex: 1, minWidth: 0 }}>
+                        <div style={{ fontWeight: 700, fontSize: 12.5, lineHeight: 1.3, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", color: "var(--text)" }}>
+                          {p.name}
                         </div>
-                        <div style={{ fontSize: 13, fontWeight: 600 }}>{v}</div>
+                        <div style={{ fontSize: 11, color: "var(--text-3)", marginTop: 1, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                          {p.provider}
+                        </div>
                       </div>
-                    ))}
-                  </div>
+                    </div>
 
-                  {/* Highlights */}
-                  <div style={{ marginBottom: 18 }}>
-                    {p.highlights.map((h) => (
-                      <div
-                        key={h}
-                        style={{
-                          display: "flex",
-                          alignItems: "flex-start",
-                          gap: 7,
-                          marginBottom: 5,
-                        }}
-                      >
-                        <span
-                          style={{
-                            color: "var(--green)",
-                            fontSize: 12,
-                            fontWeight: 700,
-                            flexShrink: 0,
-                            marginTop: 1,
-                          }}
-                        >
-                          ✓
-                        </span>
-                        <span
-                          style={{ fontSize: 12.5, color: "var(--text-2)" }}
-                        >
-                          {h}
+                    {/* ── Detail strip ────────────────────────── */}
+                    <div style={{ padding: "7px 13px", background: "var(--brand-light)", borderBottom: "1px solid rgba(124,58,237,.15)", fontSize: 11.5 }}>
+                      <div style={{ display: "flex", flexWrap: "wrap", gap: "3px 14px", color: "var(--text-2)" }}>
+                        <span><span style={{ color: "var(--text-3)" }}>Code </span>
+                          <span style={{ fontFamily: "monospace", fontWeight: 700, color: "var(--brand)" }}>{p.code}</span></span>
+                        <span><span style={{ color: "var(--text-3)" }}>Type </span><strong>{p.policyType}</strong></span>
+                        <span style={{ color: "var(--green)", fontWeight: 600 }}>● Active</span>
+                      </div>
+                    </div>
+
+                    {/* ── Body ────────────────────────────────── */}
+                    <div style={{ padding: "11px 13px" }}>
+                      {chartRows.length === 0 ? (
+                        <div style={{ fontSize: 12, color: "var(--text-3)", padding: "6px 0", fontStyle: "italic" }}>
+                          Contact for premium details
+                        </div>
+                      ) : (
+                        <>
+                          {/* Controls row: Sum Insured + Age Band */}
+                          <div style={{ display: "flex", gap: 8, marginBottom: 10 }}>
+                            <div style={{ flex: 1, minWidth: 0 }}>
+                              <div style={{ fontSize: 10.5, color: "var(--text-3)", fontWeight: 600, marginBottom: 3, textTransform: "uppercase", letterSpacing: ".4px" }}>Sum Insured</div>
+                              <select
+                                className="field-select"
+                                value={sel.sumInsured}
+                                onChange={e => {
+                                  const si    = e.target.value;
+                                  const bands = hasAB ? [...new Set(chartRows.filter(r => r.sumInsured === Number(si)).map(r => String(r.ageBandId)))] : [];
+                                  const band  = bands[0] ?? '';
+                                  const row   = matchRow(p.id, si, band);
+                                  const cov   = row?.selfOnly != null ? 'selfOnly' : '';
+                                  setPsel(p.id, { sumInsured: si, ageBandId: band, coverage: cov, premium: row?.[cov] ?? null });
+                                }}
+                                style={{ width: "100%", fontSize: 12, padding: "5px 8px" }}
+                              >
+                                {uniqueSIs.map(si => (
+                                  <option key={si} value={String(si)}>₹{si.toLocaleString("en-IN")}</option>
+                                ))}
+                              </select>
+                            </div>
+                            {hasAB && rowBands.length > 0 && (
+                              <div style={{ flex: 1, minWidth: 0 }}>
+                                <div style={{ fontSize: 10.5, color: "var(--text-3)", fontWeight: 600, marginBottom: 3, textTransform: "uppercase", letterSpacing: ".4px" }}>Age Band</div>
+                                <select
+                                  className="field-select"
+                                  value={sel.ageBandId}
+                                  onChange={e => {
+                                    const band = e.target.value;
+                                    const row  = matchRow(p.id, sel.sumInsured, band);
+                                    const cov  = sel.coverage && row?.[sel.coverage] != null ? sel.coverage : (row?.selfOnly != null ? 'selfOnly' : '');
+                                    setPsel(p.id, { ageBandId: band, coverage: cov, premium: row?.[cov] ?? null });
+                                  }}
+                                  style={{ width: "100%", fontSize: 12, padding: "5px 8px" }}
+                                >
+                                  {rowBands.map(b => <option key={b} value={b}>Band {b}</option>)}
+                                </select>
+                              </div>
+                            )}
+                          </div>
+
+                          {/* Coverage options — compact radio rows */}
+                          {covOpts.length > 0 && (
+                            <div style={{ borderTop: "1px solid var(--border)", paddingTop: 8, display: "flex", flexDirection: "column", gap: 2 }}>
+                              {covOpts.map(opt => {
+                                const active = sel.coverage === opt.key;
+                                return (
+                                  <label key={opt.key} style={{
+                                    display: "flex", alignItems: "center", gap: 9,
+                                    padding: "6px 8px", borderRadius: 8, cursor: "pointer",
+                                    background: active ? "rgba(124,58,237,.07)" : "transparent",
+                                    border: `1px solid ${active ? "rgba(124,58,237,.2)" : "transparent"}`,
+                                    transition: "all .12s",
+                                  }}>
+                                    <input
+                                      type="radio"
+                                      name={`cov-${p.id}`}
+                                      checked={active}
+                                      onChange={() => setPsel(p.id, { coverage: opt.key, premium: opt.value })}
+                                      style={{ accentColor: "var(--brand)", flexShrink: 0, width: 14, height: 14 }}
+                                    />
+                                    <span style={{ flex: 1, fontSize: 12, color: active ? "var(--brand)" : "var(--text-2)", fontWeight: active ? 600 : 400 }}>
+                                      {opt.label}
+                                    </span>
+                                    <span style={{ fontWeight: 700, fontSize: 13, color: active ? "var(--brand)" : "var(--text)", letterSpacing: "-0.2px", flexShrink: 0 }}>
+                                      ₹{opt.value.toLocaleString("en-IN")}
+                                    </span>
+                                  </label>
+                                );
+                              })}
+                            </div>
+                          )}
+                        </>
+                      )}
+                    </div>
+
+                    {/* ── Selected premium footer ──────────────── */}
+                    {inCart && sel.premium != null && (
+                      <div style={{
+                        display: "flex", justifyContent: "space-between", alignItems: "center",
+                        padding: "7px 13px",
+                        background: "rgba(124,58,237,.06)",
+                        borderTop: "1px solid rgba(124,58,237,.15)",
+                      }}>
+                        <span style={{ fontSize: 11, color: "var(--brand)", fontWeight: 500 }}>Selected premium</span>
+                        <span style={{ fontSize: 14, fontWeight: 800, color: "var(--brand)" }}>
+                          ₹{sel.premium.toLocaleString("en-IN")}
                         </span>
                       </div>
-                    ))}
+                    )}
                   </div>
+                );
+              })}
+            </div>
+          )}
 
-                  {/* Actions */}
-                  <div style={{ display: "flex", gap: 8 }}>
-                    <button
-                      type="button"
-                      className={`btn btn-sm ${inCompare ? "btn-secondary" : "btn-ghost"}`}
-                      style={{ flex: 1 }}
-                      onClick={() => toggleCompare(p.id)}
-                    >
-                      {inCompare ? "✓ Compare" : "⊕ Compare"}
-                    </button>
-                    <button
-                      type="button"
-                      className={`btn btn-sm ${inCart ? "btn-secondary" : "btn-primary"}`}
-                      style={{ flex: 1 }}
-                      onClick={() => toggleCart(p)}
-                    >
-                      {inCart ? "✓ Added" : "+ Add to Cart"}
-                    </button>
-                  </div>
+          {/* ── Sticky footer bar ── */}
+          <div style={{
+            marginTop: 20, display: "flex", alignItems: "center", justifyContent: "space-between",
+            gap: 16, padding: "12px 18px",
+            background: cart.length > 0 ? "var(--brand-light)" : "var(--surface)",
+            border: `1.5px solid ${cart.length > 0 ? "rgba(124,58,237,.2)" : "var(--border)"}`,
+            borderRadius: 12, transition: "all .2s",
+          }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
+              <div>
+                <div style={{ fontSize: 11, color: "var(--text-3)", fontWeight: 500 }}>Selected</div>
+                <div style={{ fontWeight: 700, fontSize: 16, color: "var(--text)" }}>
+                  {cart.length} {cart.length === 1 ? "product" : "products"}
                 </div>
-              );
-            })}
+              </div>
+              {cart.length > 0 && (
+                <>
+                  <div style={{ width: 1, height: 32, background: "var(--border)" }} />
+                  <div>
+                    <div style={{ fontSize: 11, color: "var(--text-3)", fontWeight: 500 }}>Total Premium</div>
+                    <div style={{ fontWeight: 800, fontSize: 16, color: "var(--brand)" }}>
+                      ₹{cart.reduce((s, x) => s + (x.premium ?? 0), 0).toLocaleString("en-IN")}
+                    </div>
+                  </div>
+                </>
+              )}
+            </div>
+            <button className="btn btn-primary" disabled={cart.length === 0} onClick={next} style={{ flexShrink: 0 }}>
+              Continue →
+            </button>
           </div>
         </div>
       )}
@@ -1710,30 +1371,40 @@ export default function BuyPolicy() {
           {/* Selected plans summary */}
           <div style={{
             background: "var(--brand-light)", borderRadius: "var(--r-md)",
-            padding: "14px 20px", marginBottom: 24,
-            border: "1.5px solid var(--brand)",
+            padding: "14px 18px", marginBottom: 24,
+            border: "1.5px solid rgba(124,58,237,.25)",
           }}>
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: cart.length > 1 ? 10 : 0 }}>
-              <span style={{ fontSize: 13, color: "var(--text-3)" }}>
-                {cart.length} plan{cart.length > 1 ? "s" : ""} selected
-              </span>
-              <span style={{ fontWeight: 800, fontSize: 18, color: "var(--brand)" }}>
-                Total ₹{cartTotal.toLocaleString()}/yr
+            <div style={{ fontSize: 11, fontWeight: 600, color: "var(--brand)", textTransform: "uppercase", letterSpacing: ".5px", marginBottom: 10 }}>
+              Selected Plans
+            </div>
+            {cart.map((p, i) => (
+              <div key={p.id} style={{
+                display: "flex", justifyContent: "space-between", alignItems: "center",
+                padding: "7px 0",
+                borderBottom: i < cart.length - 1 ? "1px solid rgba(124,58,237,.12)" : "none",
+                fontSize: 13,
+              }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 8, minWidth: 0 }}>
+                  <span style={{ fontSize: 16, flexShrink: 0 }}>{POLICY_TYPE_ICON[p.policyType] ?? "📋"}</span>
+                  <div style={{ minWidth: 0 }}>
+                    <div style={{ fontWeight: 600, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{p.name}</div>
+                    <div style={{ fontSize: 11, color: "var(--text-3)" }}>
+                      {p.sumInsured ? `₹${Number(p.sumInsured).toLocaleString("en-IN")} SI` : ""}
+                      {p.coverage ? ` · ${COV_LABEL[p.coverage] ?? p.coverage}` : ""}
+                    </div>
+                  </div>
+                </div>
+                <span style={{ fontWeight: 700, color: "var(--brand)", flexShrink: 0, marginLeft: 12 }}>
+                  {p.premium != null ? `₹${p.premium.toLocaleString("en-IN")}` : "—"}
+                </span>
+              </div>
+            ))}
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", paddingTop: 10, marginTop: 2, borderTop: "1.5px solid rgba(124,58,237,.2)" }}>
+              <span style={{ fontSize: 12, fontWeight: 600, color: "var(--text-2)" }}>Total Premium</span>
+              <span style={{ fontSize: 16, fontWeight: 800, color: "var(--brand)" }}>
+                ₹{cart.reduce((s, x) => s + (x.premium ?? 0), 0).toLocaleString("en-IN")}
               </span>
             </div>
-            {cart.length > 1 && (
-              <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
-                {cart.map(p => (
-                  <span key={p.id} style={{
-                    background: "#fff", borderRadius: 99, padding: "3px 12px",
-                    fontSize: 12.5, fontWeight: 600, border: "1px solid var(--brand)",
-                    color: "var(--brand)",
-                  }}>
-                    {p.logo} {p.name} · ₹{p.premium.toLocaleString()}
-                  </span>
-                ))}
-              </div>
-            )}
           </div>
 
           <div className="card">
@@ -1786,8 +1457,8 @@ export default function BuyPolicy() {
                 </div>
               </div>
 
-              {/* Medical info — Health only */}
-              {insuranceType === "Health" && (
+              {/* Medical info — shown for health-related policy types */}
+              {["Base Policy", "Top Up Policy", "OPD", "Age Band Premium", "Super Top Up"].includes(insuranceType) && (
                 <div className="section-block">
                   <div className="section-heading">🏥 Medical Information</div>
                   <div className="form-grid">
@@ -1960,32 +1631,50 @@ export default function BuyPolicy() {
                 </div>
               )}
               {/* Products in cart */}
-              <div style={{ marginBottom: 12 }}>
+              <div style={{ marginBottom: 4 }}>
                 {cart.map((p, i) => (
                   <div key={p.id} style={{
                     padding: "10px 0",
                     borderBottom: "1px solid var(--border)",
-                    display: "flex", justifyContent: "space-between", alignItems: "center",
                   }}>
-                    <div>
-                      <div style={{ fontSize: 18, marginBottom: 2 }}>{p.logo}</div>
-                      <div style={{ fontWeight: 600, fontSize: 13 }}>{p.name}</div>
-                      <div style={{ fontSize: 11.5, color: "var(--text-3)" }}>{p.ic} · {p.sumInsured}</div>
-                    </div>
-                    <div style={{ textAlign: "right" }}>
-                      <div style={{ fontWeight: 700, color: "var(--brand)", fontSize: 14 }}>
-                        ₹{p.premium.toLocaleString()}
+                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 8 }}>
+                      <div style={{ display: "flex", gap: 8, alignItems: "flex-start", minWidth: 0 }}>
+                        <span style={{ fontSize: 18, flexShrink: 0, marginTop: 1 }}>{POLICY_TYPE_ICON[p.policyType] ?? "📋"}</span>
+                        <div style={{ minWidth: 0 }}>
+                          <div style={{ fontWeight: 600, fontSize: 13, lineHeight: 1.3 }}>{p.name}</div>
+                          <div style={{ fontSize: 11.5, color: "var(--text-3)", marginTop: 2 }}>{p.provider} · <span style={{ fontFamily: "monospace" }}>{p.code}</span></div>
+                        </div>
                       </div>
-                      <div style={{ fontSize: 11, color: "var(--text-3)" }}>per year</div>
+                      <span style={{ fontWeight: 700, fontSize: 14, color: "var(--text)", flexShrink: 0 }}>
+                        {p.premium != null ? `₹${p.premium.toLocaleString("en-IN")}` : "—"}
+                      </span>
+                    </div>
+                    <div style={{ display: "flex", gap: 8, marginTop: 6, flexWrap: "wrap" }}>
+                      {p.sumInsured && (
+                        <span style={{ fontSize: 11, background: "var(--surface-2)", border: "1px solid var(--border)", borderRadius: 5, padding: "2px 7px", color: "var(--text-2)", fontWeight: 500 }}>
+                          SI: ₹{Number(p.sumInsured).toLocaleString("en-IN")}
+                        </span>
+                      )}
+                      {p.coverage && (
+                        <span style={{ fontSize: 11, background: "var(--brand-light)", border: "1px solid rgba(124,58,237,.2)", borderRadius: 5, padding: "2px 7px", color: "var(--brand)", fontWeight: 500 }}>
+                          {COV_LABEL[p.coverage] ?? p.coverage}
+                        </span>
+                      )}
+                      {p.ageBandId && (
+                        <span style={{ fontSize: 11, background: "var(--surface-2)", border: "1px solid var(--border)", borderRadius: 5, padding: "2px 7px", color: "var(--text-2)", fontWeight: 500 }}>
+                          Band {p.ageBandId}
+                        </span>
+                      )}
                     </div>
                   </div>
                 ))}
               </div>
+
+              {/* Summary rows */}
               {[
-                ["Type", insuranceType],
-                ["Policy Period", "1 Year"],
-                ["Subtotal", `₹${Math.round(cartTotal / 1.18).toLocaleString()}`],
-                ["GST (18%)", `₹${Math.round(cartTotal - cartTotal / 1.18).toLocaleString()}`],
+                ["Insurance Type", insuranceType],
+                ["Policy Period",  "1 Year"],
+                ["Plans",          `${cart.length} plan${cart.length > 1 ? "s" : ""}`],
               ].map(([k, v]) => (
                 <div key={k} style={{
                   display: "flex", justifyContent: "space-between",
@@ -1995,12 +1684,27 @@ export default function BuyPolicy() {
                   <span style={{ fontWeight: 500 }}>{v}</span>
                 </div>
               ))}
+
+              {/* Premium breakdown */}
+              {cart.length > 1 && cart.map(p => (
+                <div key={p.id} style={{
+                  display: "flex", justifyContent: "space-between",
+                  padding: "5px 0", fontSize: 12.5, color: "var(--text-2)",
+                }}>
+                  <span style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", maxWidth: "60%" }}>{p.name}</span>
+                  <span>{p.premium != null ? `₹${p.premium.toLocaleString("en-IN")}` : "—"}</span>
+                </div>
+              ))}
+
+              {/* Total */}
               <div style={{
-                display: "flex", justifyContent: "space-between",
-                padding: "14px 0 0", fontSize: 17, fontWeight: 700,
+                display: "flex", justifyContent: "space-between", alignItems: "center",
+                padding: "12px 0 0", marginTop: 4, borderTop: "2px solid var(--border)",
               }}>
-                <span>Total ({cart.length} plan{cart.length > 1 ? "s" : ""})</span>
-                <span style={{ color: "var(--brand)" }}>₹{cartTotal.toLocaleString()}</span>
+                <span style={{ fontSize: 14, fontWeight: 700 }}>Total Premium</span>
+                <span style={{ fontSize: 20, fontWeight: 800, color: "var(--brand)" }}>
+                  ₹{cart.reduce((s, x) => s + (x.premium ?? 0), 0).toLocaleString("en-IN")}
+                </span>
               </div>
             </div>
           </div>
@@ -2172,7 +1876,7 @@ export default function BuyPolicy() {
                   onClick={submitPayment}
                   style={{ minWidth: 200 }}
                 >
-                  <PaymentIcon size={16} /> Pay ₹{cartTotal.toLocaleString()}
+                  <PaymentIcon size={16} /> Confirm & Issue Policy
                 </button>
               </div>
             </div>
@@ -2213,10 +1917,9 @@ export default function BuyPolicy() {
                       <StatusBadge status="Issued" />
                     </div>
                     {[
-                      ["Proposal ID",    r.proposalId],
-                      ["Policy Number",  r.policyNo],
-                      ["Insurer",        r.ic],
-                      ["Annual Premium", `₹${r.premium?.toLocaleString()}`],
+                      ["Proposal ID",   r.proposalId],
+                      ["Policy Number", r.policyNo],
+                      ["Provider",      r.provider],
                     ].map(([k, v]) => (
                       <div key={k} style={{
                         display: "flex", justifyContent: "space-between", alignItems: "center",
@@ -2230,15 +1933,17 @@ export default function BuyPolicy() {
                 ))}
               </div>
 
-              {/* Total */}
+              {/* Summary */}
               <div style={{
                 background: "var(--brand-light)", borderRadius: "var(--r-md)",
                 padding: "12px 20px", marginBottom: 28,
                 display: "flex", justifyContent: "space-between", alignItems: "center",
               }}>
-                <span style={{ fontWeight: 600, fontSize: 14 }}>Total Annual Premium</span>
-                <span style={{ fontWeight: 800, fontSize: 20, color: "var(--brand)" }}>
-                  ₹{policyResults.reduce((s, r) => s + r.premium, 0).toLocaleString()}
+                <span style={{ fontWeight: 600, fontSize: 14 }}>
+                  {policyResults.length} {policyResults.length === 1 ? "Policy" : "Policies"} Issued
+                </span>
+                <span style={{ fontWeight: 600, fontSize: 13, color: "var(--amber)" }}>
+                  Premium — Contact for details
                 </span>
               </div>
 

@@ -23,7 +23,6 @@ const INITIAL = {
   associationId: "",
   aadhaarFile: null,
   panFile: null,
-  kycStatus: "Pending",
   address: "",
   city: "",
   state: "",
@@ -34,14 +33,39 @@ const INITIAL = {
   nomineeShare: "100",
 };
 
+const MOCK_OCR = {
+  aadhaar: {
+    firstName: "Rajesh", lastName: "Kumar",
+    dob: "1988-04-12", gender: "Male",
+    address: "24, Shivaji Park, Dadar", city: "Mumbai", state: "Maharashtra", pincode: "400028",
+  },
+  pan: {
+    firstName: "Rajesh", lastName: "Kumar",
+    dob: "1988-04-12", gender: "Male",
+  },
+};
+
 export default function CustomerCreate() {
   const navigate = useNavigate();
   const [form, setForm] = useState(INITIAL);
   const [members, setMembers] = useState([]);
+  const [kycFetching, setKycFetching] = useState(null);
+  const [kycFetched, setKycFetched] = useState(null);
 
   const set = (f) => (e) => setForm((p) => ({ ...p, [f]: e.target.value }));
-  const setF = (f) => (e) =>
+  const setF = (f) => (e) => {
     setForm((p) => ({ ...p, [f]: e.target.files[0] ?? null }));
+    setKycFetched(null);
+  };
+
+  const fetchFromDoc = (docType) => {
+    setKycFetching(docType);
+    setTimeout(() => {
+      setForm((p) => ({ ...p, ...MOCK_OCR[docType] }));
+      setKycFetching(null);
+      setKycFetched(docType);
+    }, 1200);
+  };
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -71,6 +95,57 @@ export default function CustomerCreate() {
       <div className="card">
         <div className="card-body">
           <form onSubmit={handleSubmit}>
+            {/* KYC — FIRST */}
+            <SectionBlock icon="🪪" title="KYC (OCR + API)">
+              {kycFetched && (
+                <div style={{
+                  background: '#f0fdf4', border: '1.5px solid #86efac', borderRadius: 8,
+                  padding: '10px 14px', marginBottom: 16, display: 'flex', alignItems: 'center', gap: 8,
+                  fontSize: 13.5, color: '#166534',
+                }}>
+                  ✅ Details auto-filled from {kycFetched === 'aadhaar' ? 'Aadhaar' : 'PAN'} — please review and confirm below.
+                </div>
+              )}
+              <div className="form-grid">
+                <Field label="Upload Aadhaar (Auto fetch details)">
+                  <UploadBox
+                    label="Upload Aadhaar card"
+                    hint="JPG, PNG or PDF — details auto-filled"
+                    onChange={setF("aadhaarFile")}
+                  />
+                  {form.aadhaarFile && (
+                    <button
+                      type="button"
+                      className="btn btn-secondary"
+                      style={{ marginTop: 8, width: '100%' }}
+                      onClick={() => fetchFromDoc('aadhaar')}
+                      disabled={kycFetching !== null}
+                    >
+                      {kycFetching === 'aadhaar' ? '⏳ Fetching details…' : '🔍 Get Details from Aadhaar'}
+                    </button>
+                  )}
+                </Field>
+                <Field label="Upload PAN">
+                  <UploadBox
+                    label="Upload PAN card"
+                    hint="JPG, PNG or PDF"
+                    onChange={setF("panFile")}
+                  />
+                  {/* {form.panFile && (
+                    // <button
+                    //   type="button"
+                    //   className="btn btn-secondary"
+                    //   style={{ marginTop: 8, width: '100%' }}
+                    //   onClick={() => fetchFromDoc('pan')}
+                    //   disabled={kycFetching !== null}
+                    // >
+                    //   {kycFetching === 'pan' ? '⏳ Fetching details…' : '🔍 Get Details from PAN'}
+                    // </button>
+                  )} */}
+                </Field>
+              </div>
+            </SectionBlock>
+
             {/* Basic Info */}
             <SectionBlock icon={<CustomerIcon />} title="Basic Information">
               <div className="form-grid">
@@ -149,33 +224,6 @@ export default function CustomerCreate() {
                     {ASSOCIATIONS.filter(a => a.orgId === Number(form.organisationId)).map(a => (
                       <option key={a.id} value={a.id}>{a.name}</option>
                     ))}
-                  </Select>
-                </Field>
-              </div>
-            </SectionBlock>
-
-            {/* KYC */}
-            <SectionBlock icon="🪪" title="KYC (OCR + API)">
-              <div className="form-grid">
-                <Field label="Upload Aadhaar (Auto fetch details)">
-                  <UploadBox
-                    label="Upload Aadhaar card"
-                    hint="JPG, PNG or PDF — details auto-filled"
-                    onChange={setF("aadhaarFile")}
-                  />
-                </Field>
-                <Field label="Upload PAN">
-                  <UploadBox
-                    label="Upload PAN card"
-                    hint="JPG, PNG or PDF"
-                    onChange={setF("panFile")}
-                  />
-                </Field>
-                <Field label="KYC Status">
-                  <Select value={form.kycStatus} onChange={set("kycStatus")}>
-                    <option>Pending</option>
-                    <option>Verified</option>
-                    <option>Rejected</option>
                   </Select>
                 </Field>
               </div>

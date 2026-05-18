@@ -5,23 +5,24 @@ import usePagination from '../../components/usePagination'
 import { Table, PageHeader, StatusBadge, Button, EmptyState } from '../../components/UI'
 import { PolicyIcon, DownloadPolicyIcon } from '../../icons'
 import { useAuth } from '../../context/AuthContext'
+import { POLICY_TYPE_COLOR } from '../product/productData'
 
 const MOCK = [
-  { id: 1,  agentId: 'a1', customerId: 'c1', proposalId: 'PRO-2025-1001', customerName: 'Aarav Sharma',    mobile: '98765 43210', product: 'Star Comprehensive Health',        icName: 'Star Health',         type: 'Health', premium: 10030, sumInsured: '10L', policyNo: 'SHI/2025/001234', paymentStatus: 'Paid',    status: 'Active',    startDate: '2025-01-15', endDate: '2026-01-14' },
-  { id: 2,  agentId: 'a2', customerId: 'c2', proposalId: 'PRO-2025-1002', customerName: 'Priya Sharma',   mobile: '87654 32109', product: 'HDFC ERGO Optima Secure',          icName: 'HDFC ERGO',           type: 'Health', premium: 7316,  sumInsured: '5L',  policyNo: 'HER/2025/002456', paymentStatus: 'Paid',    status: 'Active',    startDate: '2025-02-01', endDate: '2026-01-31' },
-  { id: 3,  agentId: 'a1', customerId: 'c3', proposalId: 'PRO-2025-1003', customerName: 'Amit Kumar',     mobile: '76543 21098', product: 'Bajaj Allianz Comprehensive Motor', icName: 'Bajaj Allianz',       type: 'Motor',  premium: 5664,  sumInsured: 'IDV', policyNo: 'BAJ/2025/003789', paymentStatus: 'Paid',    status: 'Active',    startDate: '2025-02-10', endDate: '2026-02-09' },
-  { id: 4,  agentId: 'a2', customerId: 'c4', proposalId: 'PRO-2025-1004', customerName: 'Sunita Rao',     mobile: '65432 10987', product: 'LIC Jeevan Anand',                 icName: 'LIC',                 type: 'Life',   premium: 14160, sumInsured: '25L', policyNo: 'LIC/2025/004012', paymentStatus: 'Paid',    status: 'Active',    startDate: '2025-03-01', endDate: '2055-03-01' },
-  { id: 5,  agentId: 'a1', customerId: 'c1', proposalId: 'PRO-2025-1005', customerName: 'Aarav Sharma',    mobile: '98765 43210', product: 'ICICI Lombard Complete Health',     icName: 'ICICI Lombard',       type: 'Health', premium: 10738, sumInsured: '10L', policyNo: '',                paymentStatus: 'Pending', status: 'Pending',   startDate: '',           endDate: ''           },
-  { id: 6,  agentId: 'a2', customerId: 'c5', proposalId: 'PRO-2025-1006', customerName: 'Deepa Joshi',    mobile: '43210 98765', product: 'New India Motor OD + TP',          icName: 'New India Assurance', type: 'Motor',  premium: 4248,  sumInsured: 'IDV', policyNo: 'NIA/2025/006345', paymentStatus: 'Paid',    status: 'Active',    startDate: '2025-03-20', endDate: '2026-03-19' },
-  { id: 7,  agentId: 'a2', customerId: 'c6', proposalId: 'PRO-2025-1007', customerName: 'Ramesh Gupta',   mobile: '32109 87654', product: 'HDFC Life Sanchay Plus',           icName: 'HDFC Life',           type: 'Life',   premium: 21240, sumInsured: '50L', policyNo: '',                paymentStatus: 'Failed',  status: 'Cancelled', startDate: '',           endDate: ''           },
-  { id: 8,  agentId: 'a2', customerId: 'c2', proposalId: 'PRO-2025-1008', customerName: 'Priya Sharma',   mobile: '87654 32109', product: 'Star Comprehensive Health',        icName: 'Star Health',         type: 'Health', premium: 10030, sumInsured: '5L',  policyNo: 'SHI/2025/008901', paymentStatus: 'Paid',    status: 'Active',    startDate: '2025-04-01', endDate: '2026-03-31' },
-  { id: 9,  agentId: 'a1', customerId: 'c3', proposalId: 'PRO-2025-1009', customerName: 'Amit Kumar',     mobile: '76543 21098', product: 'Bajaj Allianz Health Guard',       icName: 'Bajaj Allianz',       type: 'Health', premium: 6490,  sumInsured: '3L',  policyNo: '',                paymentStatus: 'Pending', status: 'Pending',   startDate: '',           endDate: ''           },
-  { id: 10, agentId: 'a2', customerId: 'c4', proposalId: 'PRO-2025-1010', customerName: 'Sunita Rao',     mobile: '65432 10987', product: 'ICICI Lombard Motor',              icName: 'ICICI Lombard',       type: 'Motor',  premium: 5192,  sumInsured: 'IDV', policyNo: 'ICL/2025/010234', paymentStatus: 'Paid',    status: 'Active',    startDate: '2025-04-15', endDate: '2026-04-14' },
+  { id: 1,  agentId: 'a1', customerId: 'c1', proposalId: 'PRO-2025-1001', customerName: 'Aarav Sharma',  mobile: '98765 43210', product: 'Group Health Insurance Policy for BPP_2026-2027', icName: 'SBI General Insurance',          type: 'Age Band Premium',   premium: 27777, sumInsured: '₹3L', policyNo: 'SBI/2025/001234', paymentStatus: 'Paid',    status: 'Active',    startDate: '2025-01-15', endDate: '2026-01-14' },
+  { id: 2,  agentId: 'a2', customerId: 'c2', proposalId: 'PRO-2025-1002', customerName: 'Priya Mehta',   mobile: '87654 32109', product: 'Group Health Insurance Policy for BPP',          icName: 'MAGMA General Insurance',        type: 'Age Band Premium',   premium: 47221, sumInsured: '₹3L', policyNo: 'MAG/2025/002456', paymentStatus: 'Paid',    status: 'Active',    startDate: '2025-02-01', endDate: '2026-01-31' },
+  { id: 3,  agentId: 'a1', customerId: 'c3', proposalId: 'PRO-2025-1003', customerName: 'Amit Kumar',    mobile: '76543 21098', product: 'SBI Base Policy',                                icName: 'SBI General Insurance',          type: 'Base Policy',        premium: 31053, sumInsured: '₹5L', policyNo: 'SBI/2025/003789', paymentStatus: 'Paid',    status: 'Active',    startDate: '2025-02-10', endDate: '2026-02-09' },
+  { id: 4,  agentId: 'a2', customerId: 'c4', proposalId: 'PRO-2025-1004', customerName: 'Sunita Rao',    mobile: '65432 10987', product: 'OPD Policy-2025-26',                             icName: 'SBI General Insurance',          type: 'OPD',                premium: 9676,  sumInsured: '₹20K',policyNo: 'SBI/2025/004012', paymentStatus: 'Paid',    status: 'Active',    startDate: '2025-03-01', endDate: '2026-03-01' },
+  { id: 5,  agentId: 'a1', customerId: 'c1', proposalId: 'PRO-2025-1005', customerName: 'Aarav Sharma',  mobile: '98765 43210', product: 'Standalone Super Top Up Policy_BPP_2026-2027',   icName: 'SBI General Insurance',          type: 'Age Band Premium',   premium: 50574, sumInsured: '₹3L', policyNo: '',                paymentStatus: 'Pending', status: 'Pending',   startDate: '',           endDate: ''           },
+  { id: 6,  agentId: 'a2', customerId: 'c5', proposalId: 'PRO-2025-1006', customerName: 'Deepa Joshi',   mobile: '43210 98765', product: 'For Threshold of 3 Lakhs — Super Top Up Policy', icName: 'SBI General Insurance',          type: 'Super Top Up',       premium: 2000,  sumInsured: '₹1L', policyNo: 'SBI/2025/006345', paymentStatus: 'Paid',    status: 'Active',    startDate: '2025-03-20', endDate: '2026-03-19' },
+  { id: 7,  agentId: 'a2', customerId: 'c6', proposalId: 'PRO-2025-1007', customerName: 'Ramesh Gupta',  mobile: '32109 87654', product: 'Super Top Up Policy',                            icName: 'Go Digit General Insurance',     type: 'Base Policy',        premium: 5509,  sumInsured: '₹3L', policyNo: '',                paymentStatus: 'Failed',  status: 'Cancelled', startDate: '',           endDate: ''           },
+  { id: 8,  agentId: 'a2', customerId: 'c2', proposalId: 'PRO-2025-1008', customerName: 'Priya Mehta',   mobile: '87654 32109', product: 'Group Health Insurance Policy for BPP_2026-2027', icName: 'SBI General Insurance',          type: 'Age Band Premium',   premium: 19194, sumInsured: '₹3L', policyNo: 'SBI/2025/008901', paymentStatus: 'Paid',    status: 'Active',    startDate: '2025-04-01', endDate: '2026-03-31' },
+  { id: 9,  agentId: 'a1', customerId: 'c3', proposalId: 'PRO-2025-1009', customerName: 'Amit Kumar',    mobile: '76543 21098', product: 'Standalone Super Top Up Policy (BPP)',            icName: 'MAGMA General Insurance',        type: 'Age Band Premium',   premium: 13178, sumInsured: '₹3L', policyNo: '',                paymentStatus: 'Pending', status: 'Pending',   startDate: '',           endDate: ''           },
+  { id: 10, agentId: 'a2', customerId: 'c4', proposalId: 'PRO-2025-1010', customerName: 'Sunita Rao',    mobile: '65432 10987', product: 'OUT-PATIENT CARE INSURANCE POLICY',              icName: 'Go Digit General Insurance',     type: 'OPD',                premium: 10385, sumInsured: '₹15K',policyNo: 'DIG/2025/010234', paymentStatus: 'Paid',    status: 'Active',    startDate: '2025-04-15', endDate: '2026-04-14' },
 ]
 
 export { MOCK as POLICY_MOCK }
 
-const TYPE_COLOR = { Health: 'blue', Motor: 'amber', Life: 'purple' }
+const UNIQUE_TYPES = [...new Set(MOCK.map(p => p.type))]
 
 export default function PolicyList() {
   const navigate = useNavigate()
@@ -60,7 +61,7 @@ export default function PolicyList() {
     { key: 'product',       label: 'Product',     style: { maxWidth: 180, fontSize: 13 } },
     { key: 'icName',        label: 'IC',          style: { color: 'var(--text-2)', fontSize: 13 } },
     { key: 'type',          label: 'Type',
-      render: row => <span className={`badge badge-${TYPE_COLOR[row.type] ?? 'blue'}`}>{row.type}</span> },
+      render: row => <span className={`badge badge-${POLICY_TYPE_COLOR[row.type] ?? 'blue'}`}>{row.type}</span> },
     { key: 'premium',       label: 'Premium',     style: { fontWeight: 600 },
       render: row => `₹${row.premium.toLocaleString()}` },
     { key: 'paymentStatus', label: 'Payment',     render: row => <StatusBadge status={row.paymentStatus} /> },
@@ -120,11 +121,9 @@ export default function PolicyList() {
           <div className="filter-bar">
             <input className="field-input filter-search" placeholder={isCustomer ? "Search by proposal ID or policy no…" : "Search by customer, proposal ID or policy no…"}
               value={search} onChange={e => handle(setSearch)(e.target.value)} />
-            <select className="field-select" style={{ width: 150 }} value={typeFilter} onChange={e => handle(setType)(e.target.value)}>
+            <select className="field-select" style={{ width: 175 }} value={typeFilter} onChange={e => handle(setType)(e.target.value)}>
               <option value="">All Types</option>
-              <option>Health</option>
-              <option>Motor</option>
-              <option>Life</option>
+              {UNIQUE_TYPES.map(t => <option key={t}>{t}</option>)}
             </select>
             <select className="field-select" style={{ width: 160 }} value={statusFilter} onChange={e => handle(setStatus)(e.target.value)}>
               <option value="">All Status</option>
@@ -142,8 +141,11 @@ export default function PolicyList() {
             {pg.slice.length === 0
               ? <EmptyState icon="📋" title="No policies found" subtitle="Buy a new policy to get started" />
               : pg.slice.map(row => {
-                const typeColor = { Health: '#2563eb', Motor: '#d97706', Life: '#7c3aed' }[row.type] ?? '#7c3aed'
-                const typeBg   = { Health: '#dbeafe', Motor: '#fef3c7', Life: '#ede9fe' }[row.type]  ?? '#ede9fe'
+                const BADGE_HEX = { blue: '#2563eb', green: '#16a34a', amber: '#d97706', purple: '#7c3aed', red: '#dc2626', gray: '#6b7280' }
+                const BADGE_BG  = { blue: '#dbeafe', green: '#dcfce7', amber: '#fef3c7', purple: '#ede9fe', red: '#fee2e2', gray: '#f3f4f6' }
+                const colorKey  = POLICY_TYPE_COLOR[row.type] ?? 'blue'
+                const typeColor = BADGE_HEX[colorKey]
+                const typeBg    = BADGE_BG[colorKey]
                 return (
                   <div key={row.id} style={{ border: '1.5px solid var(--border)', borderRadius: 'var(--r-lg)', background: 'var(--surface)', overflow: 'hidden' }}>
                     {/* Card header */}

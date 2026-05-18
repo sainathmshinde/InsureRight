@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { Field, Input, Select, SectionBlock, UploadBox } from "../../components/Field";
 import { useAuth } from "../../context/AuthContext";
+import { useCustomers } from "../../context/CustomerContext";
 import FamilyMembersSection from "./FamilyMembersSection";
 import { ORGANISATIONS, ASSOCIATIONS } from "./orgAssocData";
 
@@ -169,7 +170,6 @@ export default function CustomerEdit() {
   const { user } = useAuth();
 
   const isProfile = !id;
-  // Fall back to first mock record so doc previews always show in demo
   const profileData = isProfile
     ? (Object.values(MOCK_DATA).find(m => m.email === user?.email) ?? Object.values(MOCK_DATA)[0] ?? {})
     : {};
@@ -185,10 +185,53 @@ export default function CustomerEdit() {
     ...(!rawInitial.firstName ? splitName(rawInitial) : {}),
     empId: rawInitial.empId || "",
   };
+  const { customers, updateKycStatus } = useCustomers();
+  // Resolve the context customer for both id-based edit and profile (email) mode
+  const contextCustomer = isProfile
+    ? customers.find(c => c.email === user?.email)
+    : customers.find(c => c.id === Number(id));
+
   const [form, setForm] = useState(initial);
   const [members, setMembers] = useState(initial.familyMembers ?? []);
+  const [kycFetching, setKycFetching] = useState(null);
+  const [kycFetched, setKycFetched] = useState(null);
+  const [resubmitted, setResubmitted] = useState(false);
+
+  const liveKyc = contextCustomer?.kyc ?? form.kycStatus ?? 'Pending';
+
+  const handleResubmit = () => {
+    if (contextCustomer?.id) updateKycStatus(contextCustomer.id, 'Pending');
+    setResubmitted(true);
+  };
+
   const set  = (f) => (e) => setForm((p) => ({ ...p, [f]: e.target.value }));
-  const setF = (f) => (e) => setForm((p) => ({ ...p, [f]: e.target.files[0] ?? null }));
+  const setF = (f) => (e) => {
+    setForm((p) => ({ ...p, [f]: e.target.files[0] ?? null }));
+    setKycFetched(null);
+  };
+
+  const fetchFromDoc = (docType) => {
+    setKycFetching(docType);
+    setTimeout(() => {
+      const fill = {
+        firstName: form.firstName || 'Rajesh',
+        lastName: form.lastName || 'Kumar',
+        dob: form.dob || '1988-04-12',
+        gender: form.gender || 'Male',
+      };
+      if (docType === 'aadhaar') {
+        Object.assign(fill, {
+          address: form.address || '24, Shivaji Park, Dadar',
+          city: form.city || 'Mumbai',
+          state: form.state || 'Maharashtra',
+          pincode: form.pincode || '400028',
+        });
+      }
+      setForm(p => ({ ...p, ...fill }));
+      setKycFetching(null);
+      setKycFetched(docType);
+    }, 1200);
+  };
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -230,6 +273,127 @@ export default function CustomerEdit() {
       <div className="card">
         <div className="card-body">
           <form onSubmit={handleSubmit}>
+            {/* KYC Documents — FIRST */}
+            <SectionBlock icon="🪪" title="KYC Documents">
+              {kycFetched && (
+                <div style={{
+                  background: '#f0fdf4', border: '1.5px solid #86efac', borderRadius: 8,
+                  padding: '10px 14px', marginBottom: 16, display: 'flex', alignItems: 'center', gap: 8,
+                  fontSize: 13.5, color: '#166534',
+                }}>
+                  ✅ Details auto-filled from {kycFetched === 'aadhaar' ? 'Aadhaar' : 'PAN'} — please review and confirm below.
+                </div>
+              )}
+              {/* KYC Status Banner */}
+              {resubmitted ? (
+                <div style={kycBanner('green')}>
+                  <span style={{ fontSize: 18 }}>✅</span>
+                  <div>
+                    <div style={{ fontWeight: 600, fontSize: 13.5, color: '#166534' }}>Documents Resubmitted</div>
+                    <div style={{ fontSize: 12.5, color: '#15803d', marginTop: 2 }}>KYC is pending re-verification by the broker.</div>
+                  </div>
+                </div>
+              ) : liveKyc === 'Verified' ? (
+                <div style={kycBanner('green')}>
+                  <span style={{ fontSize: 18 }}>✅</span>
+                  <div>
+                    <div style={{ fontWeight: 600, fontSize: 13.5, color: '#166534' }}>KYC Verified</div>
+                    <div style={{ fontSize: 12.5, color: '#15803d', marginTop: 2 }}>Documents approved. Re-upload to update.</div>
+                  </div>
+                </div>
+              ) : liveKyc === 'Rejected' ? (
+                <div style={kycBanner('red')}>
+                  <span style={{ fontSize: 18 }}>❌</span>
+                  <div>
+                    <div style={{ fontWeight: 600, fontSize: 13.5, color: '#991b1b' }}>KYC Rejected</div>
+                    <div style={{ fontSize: 12.5, color: '#b91c1c', marginTop: 2 }}>
+                      Your documents were rejected. Please re-upload valid Aadhaar and PAN documents below and submit for re-verification.
+                    </div>
+                  </div>
+                </div>
+              ) : (
+                <div style={kycBanner('amber')}>
+                  <span style={{ fontSize: 18 }}>⏳</span>
+                  <div>
+                    <div style={{ fontWeight: 600, fontSize: 13.5, color: '#92400e' }}>KYC Pending Review</div>
+                    <div style={{ fontSize: 12.5, color: '#b45309', marginTop: 2 }}>Documents submitted and awaiting verification.</div>
+                  </div>
+                </div>
+              )}
+              <div className="form-grid">
+                <Field label="Aadhaar Number">
+                  <Input
+                    placeholder="XXXX XXXX XXXX"
+                    maxLength={14}
+                    value={form.aadhaar || ""}
+                    onChange={set("aadhaar")}
+                  />
+                </Field>
+                <Field label="PAN Number">
+                  <Input
+                    placeholder="ABCDE1234F"
+                    maxLength={10}
+                    value={form.pan || ""}
+                    onChange={set("pan")}
+                  />
+                </Field>
+                <Field label="Aadhaar Card">
+                  <UploadBox
+                    label="Upload Aadhaar card"
+                    hint="JPG, PNG or PDF"
+                    value={form.aadhaarFile}
+                    onChange={setF('aadhaarFile')}
+                  />
+                  {form.aadhaarFile instanceof File && (
+                    <button
+                      type="button"
+                      className="btn btn-secondary"
+                      style={{ marginTop: 8, width: '100%' }}
+                      onClick={() => fetchFromDoc('aadhaar')}
+                      disabled={kycFetching !== null}
+                    >
+                      {kycFetching === 'aadhaar' ? '⏳ Fetching details…' : '🔍 Get Details from Aadhaar'}
+                    </button>
+                  )}
+                </Field>
+                <Field label="PAN Card">
+                  <UploadBox
+                    label="Upload PAN card"
+                    hint="JPG, PNG or PDF"
+                    value={form.panFile}
+                    onChange={setF('panFile')}
+                  />
+                  {form.panFile instanceof File && (
+                    <button
+                      type="button"
+                      className="btn btn-secondary"
+                      style={{ marginTop: 8, width: '100%' }}
+                      onClick={() => fetchFromDoc('pan')}
+                      disabled={kycFetching !== null}
+                    >
+                      {kycFetching === 'pan' ? '⏳ Fetching details…' : '🔍 Get Details from PAN'}
+                    </button>
+                  )}
+                </Field>
+              </div>
+
+              {/* Re-verification submit — only when rejected and a new file is uploaded */}
+              {liveKyc === 'Rejected' && !resubmitted &&
+                (form.aadhaarFile instanceof File || form.panFile instanceof File) && (
+                <div style={{ marginTop: 14 }}>
+                  <button
+                    type="button"
+                    className="btn btn-primary"
+                    style={{ width: '100%' }}
+                    onClick={handleResubmit}
+                  >
+                    🔄 Submit for Re-verification
+                  </button>
+                </div>
+              )}
+            </SectionBlock>
+
+            {/* Basic Information */}
             <SectionBlock icon="👤" title="Basic Information">
               <div className="form-grid">
                 <Field label="First Name" required>
@@ -306,21 +470,10 @@ export default function CustomerEdit() {
                     ))}
                   </Select>
                 </Field>
-                {!isProfile && (
-                  <Field label="KYC Status">
-                    <Select
-                      value={form.kycStatus || "Pending"}
-                      onChange={set("kycStatus")}
-                    >
-                      <option>Pending</option>
-                      <option>Verified</option>
-                      <option>Rejected</option>
-                    </Select>
-                  </Field>
-                )}
               </div>
             </SectionBlock>
 
+            {/* Address */}
             <SectionBlock icon="📍" title="Address">
               <div className="form-grid">
                 <Field label="Address">
@@ -356,57 +509,12 @@ export default function CustomerEdit() {
               </div>
             </SectionBlock>
 
-            <SectionBlock icon="🪪" title="KYC Documents">
-              <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 18 }}>
-                <span className={`badge badge-${form.kycStatus === 'Verified' ? 'green' : form.kycStatus === 'Rejected' ? 'red' : 'amber'}`}>
-                  KYC: {form.kycStatus || 'Pending'}
-                </span>
-                <span style={{ fontSize: 12.5, color: 'var(--text-3)' }}>
-                  {form.kycStatus === 'Verified'
-                    ? 'KYC verified. Re-upload to update documents.'
-                    : 'Upload documents below to complete verification.'}
-                </span>
-              </div>
-              <div className="form-grid">
-                <Field label="Aadhaar Number">
-                  <Input
-                    placeholder="XXXX XXXX XXXX"
-                    maxLength={14}
-                    value={form.aadhaar || ""}
-                    onChange={set("aadhaar")}
-                  />
-                </Field>
-                <Field label="PAN Number">
-                  <Input
-                    placeholder="ABCDE1234F"
-                    maxLength={10}
-                    value={form.pan || ""}
-                    onChange={set("pan")}
-                  />
-                </Field>
-                <Field label="Aadhaar Card">
-                  <UploadBox
-                    label="Upload Aadhaar card"
-                    hint="JPG, PNG or PDF"
-                    value={form.aadhaarFile}
-                    onChange={setF('aadhaarFile')}
-                  />
-                </Field>
-                <Field label="PAN Card">
-                  <UploadBox
-                    label="Upload PAN card"
-                    hint="JPG, PNG or PDF"
-                    value={form.panFile}
-                    onChange={setF('panFile')}
-                  />
-                </Field>
-              </div>
-            </SectionBlock>
-
+            {/* Family Details */}
             <SectionBlock icon="👨‍👩‍👧" title="Family Details">
               <FamilyMembersSection members={members} onChange={setMembers} />
             </SectionBlock>
 
+            {/* Nominee Details */}
             <SectionBlock icon="📝" title="Nominee Details">
               <div className="form-grid-3">
                 <Field label="Nominee Name">
@@ -457,4 +565,17 @@ export default function CustomerEdit() {
       </div>
     </div>
   );
+}
+
+function kycBanner(type) {
+  const colors = {
+    green: { background: '#f0fdf4', border: '1.5px solid #86efac' },
+    red:   { background: '#fef2f2', border: '1.5px solid #fca5a5' },
+    amber: { background: '#fffbeb', border: '1.5px solid #fcd34d' },
+  };
+  return {
+    display: 'flex', alignItems: 'flex-start', gap: 10,
+    borderRadius: 8, padding: '12px 14px', marginBottom: 18,
+    ...colors[type],
+  };
 }
