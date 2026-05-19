@@ -55,7 +55,7 @@ export default function AgentCreate() {
         <div className="page-title-row">
           <div className="page-icon">👤</div>
           <div>
-            <div className="page-title">Add Agent / POS</div>
+            <div className="page-title">Add Agent</div>
             <div className="page-subtitle">
               Register a new agent or POS user
             </div>

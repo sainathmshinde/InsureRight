@@ -17,6 +17,7 @@ import {
 import { PRODUCTS, PRODUCTS_BY_TYPE, POLICY_TYPE_ICON, PREMIUM_CHART } from "../product/productData";
 import { AGENTS as KMD_AGENTS } from "../agent/agentData";
 import { INITIAL_LEADS, CAMPAIGNS } from "../crm/crmData";
+import { POLICY_MOCK } from "./PolicyList";
 
 // ── Shared customer data (same source of truth as CustomerList) ────────────
 const CUSTOMERS = [
@@ -364,18 +365,47 @@ export default function BuyPolicy() {
     ? (CUSTOMERS.find((c) => c.id === Number(preselectedId)) ?? null)
     : null;
 
-  // Unified initial customer — self (customer role) OR broker-preselected OR none
-  const initialCustomer = selfCustomer ?? preselectedCustomer;
+  // Resume pending payment via ?proposalId=PRO-2025-XXXX
+  const resumeProposalId = searchParams.get("proposalId");
+  const resumePolicy = resumeProposalId
+    ? (POLICY_MOCK.find(p => p.proposalId === resumeProposalId) ?? null)
+    : null;
+  const resumeCustomer = resumePolicy ? (() => {
+    const found = CUSTOMERS.find(c => c.name === resumePolicy.customerName);
+    return {
+      id:      found?.id ?? resumePolicy.customerId,
+      name:    resumePolicy.customerName,
+      mobile:  resumePolicy.mobile.replace(' ', ''),
+      email:   found?.email ?? '',
+      address: found?.address ?? '',
+      kyc:     found?.kyc ?? 'Verified',
+      familyMembers: found?.familyMembers ?? [],
+    };
+  })() : null;
+  const resumeCart = resumePolicy ? [{
+    id:         resumePolicy.id,
+    name:       resumePolicy.product,
+    provider:   resumePolicy.icName,
+    policyType: resumePolicy.type,
+    code:       resumePolicy.proposalId,
+    premium:    resumePolicy.premium,
+    sumInsured: resumePolicy.sumInsured ?? '',
+    coverage:   '',
+    ageBandId:  '',
+  }] : null;
 
-  // Step state — skip Step 0 when customer already known
-  const [step, setStep] = useState(initialCustomer ? 1 : 0);
+  // Unified initial customer — self (customer role) OR broker-preselected OR resume OR none
+  const initialCustomer = selfCustomer ?? preselectedCustomer ?? resumeCustomer;
+
+  // Step state — jump to payment (5) when resuming a pending proposal
+  const [step, setStep] = useState(resumePolicy ? 5 : initialCustomer ? 1 : 0);
 
   // Step 0 — customer selection (agent/broker only)
   const [custSearch, setCustSearch] = useState("");
   const [selectedCustomer, setSelectedCustomer] = useState(initialCustomer);
 
   // Step 1 — insurance type
-  const [insuranceType, setInsuranceType] = useState(null);
+  const [insuranceType, setInsuranceType] = useState(resumePolicy?.type ?? null);
 
   // Step 2 — members / vehicle — start with Self only; family added on demand
   const [members, setMembers] = useState(
@@ -393,7 +423,7 @@ export default function BuyPolicy() {
   });
 
   // Step 2 — product selection
-  const [cart, setCart] = useState([]);
+  const [cart, setCart] = useState(resumeCart ?? []);
   const [productSels, setProductSels] = useState({});  // per-product {sumInsured,ageBandId,coverage,premium}
 
   // Step 4 — proposal — pre-fill from customer record
@@ -1545,6 +1575,25 @@ export default function BuyPolicy() {
       ══════════════════════════════════════════════════════════════════ */}
       {step === 5 && cart.length > 0 && (
         <div className="payment-layout">
+          {/* Resume banner */}
+          {resumePolicy && (
+            <div style={{
+              gridColumn: '1 / -1',
+              display: 'flex', alignItems: 'center', gap: 12,
+              background: '#fef3c7', border: '1.5px solid #f59e0b',
+              borderRadius: 'var(--r-md)', padding: '12px 18px', marginBottom: 4,
+            }}>
+              <span style={{ fontSize: 20 }}>⏳</span>
+              <div>
+                <div style={{ fontWeight: 700, fontSize: 13.5, color: '#92400e' }}>Resuming Pending Payment</div>
+                <div style={{ fontSize: 12.5, color: '#78350f', marginTop: 2 }}>
+                  Proposal <span style={{ fontFamily: 'monospace', fontWeight: 700 }}>{resumePolicy.proposalId}</span>
+                  {' · '}{resumePolicy.customerName}{' · '}₹{resumePolicy.premium.toLocaleString()}
+                </div>
+              </div>
+            </div>
+          )}
+
           {/* Order summary */}
           <div className="card payment-summary-card">
             <div className="card-header">

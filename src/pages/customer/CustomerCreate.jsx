@@ -107,7 +107,7 @@ export default function CustomerCreate() {
         <div className="card-body">
           <form onSubmit={handleSubmit}>
             {/* KYC — FIRST */}
-            <SectionBlock icon="🪪" title="KYC (OCR + API)">
+            <SectionBlock icon="🪪" title="KYC">
               {kycFetched && (
                 <div style={{
                   background: '#f0fdf4', border: '1.5px solid #86efac', borderRadius: 8,

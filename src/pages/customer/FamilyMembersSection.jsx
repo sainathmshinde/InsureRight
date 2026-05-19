@@ -12,7 +12,7 @@ const MEMBER_TYPES = [
   { value: 'Sibling',        label: 'Sibling',          icon: '🧑' },
 ]
 export const TYPE_ICON = Object.fromEntries(MEMBER_TYPES.map(t => [t.value, t.icon]))
-const EMPTY = { type: 'Spouse', name: '', dob: '', gender: '', preExisting: '' }
+const EMPTY = { type: 'Spouse', name: '', dob: '', gender: '' }
 
 function calcAge(dob) {
   if (!dob) return null
@@ -58,7 +58,6 @@ export default function FamilyMembersSection({ members = [], onChange }) {
                   <div style={{ fontWeight: 600, fontSize: 13.5, color: 'var(--text)' }}>{m.name}</div>
                   <div style={{ fontSize: 12, color: 'var(--text-3)', marginTop: 2 }}>
                     {m.type}{m.gender ? ` · ${m.gender}` : ''}{age !== null ? ` · Age: ${age} yrs` : ''}{m.dob ? ` (${m.dob})` : ''}
-                    {m.preExisting ? <span style={{ color: '#d97706', marginLeft: 6 }}>⚠ {m.preExisting}</span> : null}
                   </div>
                 </div>
                 <button type="button" className="btn btn-ghost btn-sm" onClick={() => startEdit(m)} style={{ flexShrink: 0 }}>Edit</button>
@@ -102,9 +101,6 @@ export default function FamilyMembersSection({ members = [], onChange }) {
                 <option>Female</option>
                 <option>Other</option>
               </Select>
-            </Field>
-            <Field label="Pre-existing Diseases">
-              <Input placeholder="e.g. Diabetes, Hypertension (leave blank if none)" value={draft.preExisting} onChange={setD('preExisting')} />
             </Field>
           </div>
           {draft.dob && (

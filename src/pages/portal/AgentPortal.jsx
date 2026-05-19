@@ -8,9 +8,9 @@ const SALES_STATS = [
   { label: 'CRM Leads',       value: '8', sub: '3 interested',        color: '#0a7ea4', bg: '#e0f4fb' },
 ]
 const SALES_CAMPAIGNS = [
-  { name: 'Summer Health Drive 2025',  type: 'Promotional', leads: 5, purchased: 2 },
-  { name: 'Renewal Reminder Q2',       type: 'Renewal',     leads: 4, purchased: 2 },
-  { name: 'Motor Insurance Awareness', type: 'Awareness',   leads: 3, purchased: 1 },
+  { name: 'BPP Campaign_2026-2027', leads: 5, purchased: 2 },
+  { name: 'BPP Campaign',           leads: 4, purchased: 2 },
+  { name: 'SBI_STP_Campaign',       leads: 3, purchased: 1 },
 ]
 // Customers with purchased policies (CRM leads 1,6,9,11,14 assigned to Ravi)
 const SALES_RECENT_CUSTOMERS = [
@@ -28,9 +28,9 @@ const CALLING_STATS = [
   { label: 'Active Campaigns', value: '3',  sub: '7 interested leads',  color: '#0a7ea4', bg: '#e0f4fb' },
 ]
 const CALLING_CAMPAIGNS = [
-  { name: 'Summer Health Drive 2025', type: 'Promotional', leads: 5, purchased: 2 },
-  { name: 'New Member Onboarding',    type: 'Onboarding',  leads: 8, purchased: 3 },
-  { name: 'Festival Season Offer',    type: 'Seasonal',    leads: 5, purchased: 2 },
+  { name: 'BPP Campaign_2026-2027', leads: 8, purchased: 3 },
+  { name: 'Campaign 1',             leads: 5, purchased: 2 },
+  { name: 'BPP Campaign',           leads: 5, purchased: 2 },
 ]
 const CALLING_RECENT_CUSTOMERS = [
   { name: 'Aarav Sharma',  policy: 'Star Comprehensive Health', status: 'Active',  renewal: '10/04/2026' },

@@ -17,9 +17,9 @@ const RECENT_AGENTS = [
 ]
 
 const ACTIVE_CAMPAIGNS = [
-  { name: 'Summer Health Drive 2025',   type: 'Promotional', agents: 3, leads: 15 },
-  { name: 'Renewal Reminder Q2',         type: 'Renewal',     agents: 3, leads: 10 },
-  { name: 'Motor Insurance Awareness',   type: 'Awareness',   agents: 2, leads: 5  },
+  { name: 'BPP Campaign_2026-2027', agents: 3, leads: 21, status: 'Active'    },
+  { name: 'SBI_STP_Campaign',       agents: 2, leads: 38, status: 'Completed' },
+  { name: 'BPP Campaign',           agents: 3, leads: 36, status: 'Completed' },
 ]
 
 const QUICK_ACTIONS = [

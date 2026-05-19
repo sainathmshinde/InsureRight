@@ -29,9 +29,10 @@ export default function PolicyList() {
   const { user } = useAuth()
   const isCustomer = user?.role === 'customer'
 
-  const [search, setSearch]       = useState('')
-  const [typeFilter, setType]     = useState('')
-  const [statusFilter, setStatus] = useState('')
+  const [search, setSearch]         = useState('')
+  const [typeFilter, setType]       = useState('')
+  const [statusFilter, setStatus]   = useState('')
+  const [paymentFilter, setPayment] = useState('')
 
   const scopedData = isCustomer ? MOCK.filter(p => p.customerId === user.id) : MOCK
 
@@ -39,8 +40,9 @@ export default function PolicyList() {
     const q = search.toLowerCase()
     return (
       (p.customerName.toLowerCase().includes(q) || p.proposalId.toLowerCase().includes(q) || p.policyNo.toLowerCase().includes(q)) &&
-      (typeFilter   ? p.type   === typeFilter   : true) &&
-      (statusFilter ? p.status === statusFilter : true)
+      (typeFilter    ? p.type          === typeFilter    : true) &&
+      (statusFilter  ? p.status        === statusFilter  : true) &&
+      (paymentFilter ? p.paymentStatus === paymentFilter : true)
     )
   })
   const pg     = usePagination(filtered, 10)
@@ -78,7 +80,7 @@ export default function PolicyList() {
             </Button>
           )}
           {row.paymentStatus === 'Pending' && (
-            <Button variant="primary" size="sm" onClick={() => navigate('/policy/buy')}>Pay Now</Button>
+            <Button variant="primary" size="sm" onClick={() => navigate(`/policy/buy?proposalId=${row.proposalId}`)}>Pay Now</Button>
           )}
         </div>
       )},
@@ -131,8 +133,14 @@ export default function PolicyList() {
               <option>Pending</option>
               <option>Cancelled</option>
             </select>
-            {(search || typeFilter || statusFilter) && (
-              <Button variant="ghost" size="sm" onClick={() => { handle(setSearch)(''); handle(setType)(''); handle(setStatus)('') }}>Clear</Button>
+            <select className="field-select" style={{ width: 160 }} value={paymentFilter} onChange={e => handle(setPayment)(e.target.value)}>
+              <option value="">All Payments</option>
+              <option>Paid</option>
+              <option>Pending</option>
+              <option>Failed</option>
+            </select>
+            {(search || typeFilter || statusFilter || paymentFilter) && (
+              <Button variant="ghost" size="sm" onClick={() => { handle(setSearch)(''); handle(setType)(''); handle(setStatus)(''); handle(setPayment)('') }}>Clear</Button>
             )}
           </div>
 
@@ -206,7 +214,7 @@ export default function PolicyList() {
                         )}
                         {row.paymentStatus === 'Pending' && (
                           <Button variant="primary" size="sm" style={{ flex: 1, justifyContent: 'center' }}
-                            onClick={() => navigate('/policy/buy')}>
+                            onClick={() => navigate(`/policy/buy?proposalId=${row.proposalId}`)}>
                             💳 Pay Now
                           </Button>
                         )}

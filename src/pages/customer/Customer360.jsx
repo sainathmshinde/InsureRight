@@ -199,7 +199,101 @@ const MOCK = {
   },
 }
 
-const TABS = ['Policies', 'Payments', 'Interactions', 'Family']
+// Documents mock — Aadhaar + PAN per customer
+const DOCS = {
+  1:  { aadhaar: { number: '2345 6789 0123', name: 'Aarav Sharma',  dob: '15/03/1990', gender: 'Male',   address: '14, Green Valley Apts, Andheri West, Mumbai – 400058', status: 'Verified' }, pan: { number: 'AABPS1234C', name: 'AARAV SHARMA',  fatherName: 'SURESH SHARMA',   dob: '15/03/1990', status: 'Verified' } },
+  2:  { aadhaar: { number: '3456 7890 1234', name: 'Rohit Sharma',  dob: '20/11/1990', gender: 'Male',   address: '45 MG Road, Pune – 411001', status: 'Pending'  }, pan: { number: 'BBRPS2345D', name: 'ROHIT SHARMA',  fatherName: 'MOHAN SHARMA',    dob: '20/11/1990', status: 'Pending'  } },
+  3:  { aadhaar: { number: '4567 8901 2345', name: 'Divya Nair',    dob: '05/06/1978', gender: 'Female', address: '7/B Koramangala, Bangalore – 560034',              status: 'Verified' }, pan: { number: 'CCCDN3456E', name: 'DIVYA NAIR',    fatherName: 'KRISHNA NAIR',    dob: '05/06/1978', status: 'Verified' } },
+  4:  { aadhaar: { number: '5678 9012 3456', name: 'Vijay Patil',   dob: '30/09/1995', gender: 'Male',   address: '23 Shivaji Nagar, Nashik – 422001',               status: 'Rejected' }, pan: { number: 'DDPVP4567F', name: 'VIJAY PATIL',   fatherName: 'DATTATRAY PATIL', dob: '30/09/1995', status: 'Rejected' } },
+  5:  { aadhaar: { number: '6789 0123 4567', name: 'Suresh Kumar',  dob: '20/03/1985', gender: 'Male',   address: '101 Deccan Gymkhana, Pune – 411004',              status: 'Verified' }, pan: { number: 'EESKP5678G', name: 'SURESH KUMAR',  fatherName: 'RAMESH KUMAR',    dob: '20/03/1985', status: 'Verified' } },
+  6:  { aadhaar: { number: '7890 1234 5678', name: 'Vikram Rao',    dob: '20/08/1975', gender: 'Male',   address: 'B-5 Sector 18, Noida – 201301',                  status: 'Verified' }, pan: { number: 'FFRVR6789H', name: 'VIKRAM RAO',    fatherName: 'SUBBA RAO',       dob: '20/08/1975', status: 'Verified' } },
+  7:  { aadhaar: { number: '8901 2345 6789', name: 'Kavita Pillai', dob: '01/12/1993', gender: 'Female', address: '56 Jubilee Hills, Hyderabad – 500033',            status: 'Verified' }, pan: { number: 'GGKPK7890J', name: 'KAVITA PILLAI', fatherName: 'SURESH PILLAI',   dob: '01/12/1993', status: 'Verified' } },
+  8:  { aadhaar: { number: '9012 3456 7890', name: 'Arjun Singh',   dob: '22/03/1987', gender: 'Male',   address: '8 Andheri West, Mumbai – 400053',                status: 'Verified' }, pan: { number: 'HHASP8901K', name: 'ARJUN SINGH',   fatherName: 'BALVIR SINGH',    dob: '22/03/1987', status: 'Verified' } },
+  9:  { aadhaar: { number: '0123 4567 8901', name: 'Priya Mehta',   dob: '10/07/1992', gender: 'Female', address: '33 Fort Kochi, Kerala – 682001',                 status: 'Verified' }, pan: { number: 'IIPMP9012L', name: 'PRIYA MEHTA',   fatherName: 'SANJAY MEHTA',    dob: '10/07/1992', status: 'Verified' } },
+  10: { aadhaar: { number: '1234 5678 9012', name: 'Rahul Gupta',   dob: '05/01/1980', gender: 'Male',   address: 'C-9 Civil Lines, Delhi – 110054',                status: 'Verified' }, pan: { number: 'JJRGP0123M', name: 'RAHUL GUPTA',   fatherName: 'ANIL GUPTA',      dob: '05/01/1980', status: 'Verified' } },
+  11: { aadhaar: { number: '2345 6789 1122', name: 'Ritu Singh',    dob: '18/05/1996', gender: 'Female', address: '12 Raja Park, Jaipur – 302004',                  status: 'Pending'  }, pan: null },
+  12: { aadhaar: { number: '3456 7890 2233', name: 'Ajay Iyer',     dob: '30/10/1983', gender: 'Male',   address: '4 T Nagar, Chennai – 600017',                    status: 'Rejected' }, pan: { number: 'KKAIP1234N', name: 'AJAY IYER',     fatherName: 'KRISHNAN IYER',   dob: '30/10/1983', status: 'Rejected' } },
+}
+
+const STATUS_COLOR = { Verified: { bg: '#dcfce7', border: '#86efac', text: '#15803d' }, Pending: { bg: '#fef3c7', border: '#fcd34d', text: '#92400e' }, Rejected: { bg: '#fee2e2', border: '#fca5a5', text: '#b91c1c' } }
+
+function DocCard({ type, data, customerName }) {
+  const isAadhaar = type === 'aadhaar'
+  const sc = STATUS_COLOR[data.status] ?? STATUS_COLOR.Pending
+  return (
+    <div style={{ border: '1.5px solid var(--border)', borderRadius: 'var(--r-lg)', overflow: 'hidden', background: '#fff', boxShadow: '0 2px 8px rgba(0,0,0,.06)' }}>
+      {/* Card header bar */}
+      <div style={{ background: isAadhaar ? 'linear-gradient(135deg,#f97316,#ea580c)' : 'linear-gradient(135deg,#1d4ed8,#1e40af)', padding: '14px 18px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+          <span style={{ fontSize: 26 }}>{isAadhaar ? '🪪' : '💳'}</span>
+          <div>
+            <div style={{ color: '#fff', fontWeight: 700, fontSize: 15, letterSpacing: 0.3 }}>{isAadhaar ? 'Aadhaar Card' : 'PAN Card'}</div>
+            <div style={{ color: 'rgba(255,255,255,.75)', fontSize: 11.5 }}>{isAadhaar ? 'Unique Identification Authority of India' : 'Income Tax Department, Govt. of India'}</div>
+          </div>
+        </div>
+        <span style={{ fontSize: 12, fontWeight: 600, padding: '4px 10px', borderRadius: 99, background: sc.bg, color: sc.text, border: `1px solid ${sc.border}` }}>{data.status}</span>
+      </div>
+
+      {/* Card body — document visual */}
+      <div style={{ padding: '18px 20px' }}>
+        {isAadhaar ? (
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px 20px' }}>
+            <div style={{ gridColumn: '1 / -1' }}>
+              <div style={{ fontSize: 10.5, color: 'var(--text-3)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '.5px', marginBottom: 3 }}>Aadhaar Number</div>
+              <div style={{ fontFamily: 'monospace', fontSize: 22, fontWeight: 700, letterSpacing: 3, color: 'var(--text)' }}>
+                {'XXXX XXXX ' + data.number.slice(-4)}
+              </div>
+            </div>
+            <div>
+              <div style={{ fontSize: 10.5, color: 'var(--text-3)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '.5px', marginBottom: 2 }}>Name</div>
+              <div style={{ fontWeight: 600, fontSize: 14 }}>{data.name}</div>
+            </div>
+            <div>
+              <div style={{ fontSize: 10.5, color: 'var(--text-3)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '.5px', marginBottom: 2 }}>Date of Birth</div>
+              <div style={{ fontWeight: 600, fontSize: 14 }}>{data.dob}</div>
+            </div>
+            <div>
+              <div style={{ fontSize: 10.5, color: 'var(--text-3)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '.5px', marginBottom: 2 }}>Gender</div>
+              <div style={{ fontWeight: 600, fontSize: 14 }}>{data.gender}</div>
+            </div>
+            <div style={{ gridColumn: '1 / -1' }}>
+              <div style={{ fontSize: 10.5, color: 'var(--text-3)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '.5px', marginBottom: 2 }}>Address</div>
+              <div style={{ fontSize: 13, color: 'var(--text-2)', lineHeight: 1.5 }}>{data.address}</div>
+            </div>
+          </div>
+        ) : (
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px 20px' }}>
+            <div style={{ gridColumn: '1 / -1' }}>
+              <div style={{ fontSize: 10.5, color: 'var(--text-3)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '.5px', marginBottom: 3 }}>PAN Number</div>
+              <div style={{ fontFamily: 'monospace', fontSize: 22, fontWeight: 700, letterSpacing: 3, color: 'var(--text)' }}>{data.number}</div>
+            </div>
+            <div>
+              <div style={{ fontSize: 10.5, color: 'var(--text-3)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '.5px', marginBottom: 2 }}>Name</div>
+              <div style={{ fontWeight: 600, fontSize: 14 }}>{data.name}</div>
+            </div>
+            <div>
+              <div style={{ fontSize: 10.5, color: 'var(--text-3)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '.5px', marginBottom: 2 }}>Date of Birth</div>
+              <div style={{ fontWeight: 600, fontSize: 14 }}>{data.dob}</div>
+            </div>
+            <div style={{ gridColumn: '1 / -1' }}>
+              <div style={{ fontSize: 10.5, color: 'var(--text-3)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '.5px', marginBottom: 2 }}>Father's Name</div>
+              <div style={{ fontWeight: 600, fontSize: 14 }}>{data.fatherName}</div>
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* Footer actions */}
+      <div style={{ borderTop: '1px solid var(--border)', padding: '10px 18px', background: 'var(--surface-2)', display: 'flex', gap: 8 }}>
+        <button className="btn btn-ghost btn-sm">🔍 View Full</button>
+        <button className="btn btn-ghost btn-sm">⬇ Download</button>
+        {data.status === 'Rejected' && <button className="btn btn-secondary btn-sm" style={{ marginLeft: 'auto' }}>🔄 Re-upload</button>}
+      </div>
+    </div>
+  )
+}
+
+const TABS = ['Policies', 'Payments', 'Interactions', 'Family', 'Documents']
 
 export default function Customer360() {
   const { id } = useParams()
@@ -242,14 +336,6 @@ export default function Customer360() {
         ].map(s => (
           <span key={s.label} className={`badge ${s.cls}`}>{s.label}: {s.value}</span>
         ))}
-      </div>
-
-      {/* Quick actions */}
-      <div style={{ display: 'flex', gap: 10, marginBottom: 20, flexWrap: 'wrap' }}>
-        <button className="btn btn-primary btn-sm">🔄 Renew Policy</button>
-        <button className="btn btn-secondary btn-sm">📋 Endorsement</button>
-        <button className="btn btn-secondary btn-sm">⏰ Send Reminder</button>
-        <button className="btn btn-ghost btn-sm">📞 Call Customer</button>
       </div>
 
       {/* Tabs */}
@@ -325,6 +411,53 @@ export default function Customer360() {
               ))}
             </div>
           )}
+
+          {/* Documents */}
+          {tab === 4 && (() => {
+            const docs = DOCS[id]
+            if (!docs) return <div style={{ padding: '32px 0', textAlign: 'center', color: 'var(--text-3)' }}>No documents found.</div>
+            return (
+              <div>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(340px, 1fr))', gap: 20 }}>
+                  {/* Aadhaar */}
+                  {docs.aadhaar
+                    ? <DocCard type="aadhaar" data={docs.aadhaar} customerName={c.name} />
+                    : (
+                      <div style={{ border: '1.5px dashed var(--border)', borderRadius: 'var(--r-lg)', padding: '40px 24px', textAlign: 'center', color: 'var(--text-3)' }}>
+                        <div style={{ fontSize: 36, marginBottom: 10 }}>🪪</div>
+                        <div style={{ fontWeight: 600, marginBottom: 4 }}>Aadhaar not uploaded</div>
+                        <button className="btn btn-secondary btn-sm" style={{ marginTop: 12 }}>Upload Aadhaar</button>
+                      </div>
+                    )
+                  }
+                  {/* PAN */}
+                  {docs.pan
+                    ? <DocCard type="pan" data={docs.pan} customerName={c.name} />
+                    : (
+                      <div style={{ border: '1.5px dashed var(--border)', borderRadius: 'var(--r-lg)', padding: '40px 24px', textAlign: 'center', color: 'var(--text-3)' }}>
+                        <div style={{ fontSize: 36, marginBottom: 10 }}>💳</div>
+                        <div style={{ fontWeight: 600, marginBottom: 4 }}>PAN not uploaded</div>
+                        <button className="btn btn-secondary btn-sm" style={{ marginTop: 12 }}>Upload PAN</button>
+                      </div>
+                    )
+                  }
+                </div>
+                {/* Overall KYC note */}
+                {c.kyc === 'Rejected' && (
+                  <div style={{ marginTop: 18, display: 'flex', gap: 10, padding: '12px 16px', background: '#fee2e2', border: '1px solid #fca5a5', borderRadius: 'var(--r-md)' }}>
+                    <span>🚫</span>
+                    <div style={{ fontSize: 13, color: '#b91c1c' }}>One or more documents have been rejected. Please request the customer to resubmit correct documents to complete KYC.</div>
+                  </div>
+                )}
+                {c.kyc === 'Pending' && (
+                  <div style={{ marginTop: 18, display: 'flex', gap: 10, padding: '12px 16px', background: '#fef3c7', border: '1px solid #fcd34d', borderRadius: 'var(--r-md)' }}>
+                    <span>⚠️</span>
+                    <div style={{ fontSize: 13, color: '#92400e' }}>Documents are uploaded and pending verification. KYC will be marked Verified once approved.</div>
+                  </div>
+                )}
+              </div>
+            )
+          })()}
 
           {/* Family Members */}
           {tab === 3 && (

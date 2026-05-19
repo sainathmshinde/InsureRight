@@ -510,6 +510,17 @@ export default function CampaignCreate() {
     setForm((p) => ({ ...p, [f]: fromInputDate(e.target.value) }));
   const setBool = (f) => (val) => setForm((p) => ({ ...p, [f]: val }));
 
+  const [productSearch, setProductSearch] = useState("");
+  const filteredProducts = PRODUCTS.filter((p) => {
+    const q = productSearch.toLowerCase();
+    return (
+      p.name.toLowerCase().includes(q) ||
+      p.provider.toLowerCase().includes(q) ||
+      p.policyType.toLowerCase().includes(q) ||
+      p.code.toLowerCase().includes(q)
+    );
+  });
+
   const [assocSearch, setAssocSearch] = useState("");
   const [assocOpen, setAssocOpen] = useState(false);
 
@@ -707,25 +718,23 @@ export default function CampaignCreate() {
             {/* ── 2. Product Mapping ────────────────────── */}
             <SectionBlock icon="📦" title="Product Mapping">
               <div style={{ marginBottom: 4 }}>
-                <div
-                  style={{
-                    fontSize: 13,
-                    color: "var(--text-3)",
-                    marginBottom: 12,
-                  }}
-                >
-                  Select products to promote in this campaign
-                  {form.selectedProducts.length > 0 && (
-                    <span
-                      style={{
-                        marginLeft: 8,
-                        fontWeight: 600,
-                        color: "var(--brand)",
-                      }}
-                    >
-                      · {form.selectedProducts.length} selected
-                    </span>
-                  )}
+                <div style={{ display: "flex", alignItems: "center", marginBottom: 12, gap: 12 }}>
+                  <input
+                    type="text"
+                    className="field-input"
+                    placeholder="Search products…"
+                    value={productSearch}
+                    onChange={(e) => setProductSearch(e.target.value)}
+                    style={{ width: 220, fontSize: 13 }}
+                  />
+                  <div style={{ fontSize: 13, color: "var(--text-3)" }}>
+                    Select products to promote in this campaign
+                    {form.selectedProducts.length > 0 && (
+                      <span style={{ marginLeft: 8, fontWeight: 600, color: "var(--brand)" }}>
+                        · {form.selectedProducts.length} selected
+                      </span>
+                    )}
+                  </div>
                 </div>
                 <div
                   style={{
@@ -735,7 +744,12 @@ export default function CampaignCreate() {
                     gap: 10,
                   }}
                 >
-                  {PRODUCTS.map((p) => {
+                  {filteredProducts.length === 0 && (
+                    <div style={{ gridColumn: "1 / -1", textAlign: "center", padding: "24px 0", color: "var(--text-3)", fontSize: 13 }}>
+                      No products match "{productSearch}"
+                    </div>
+                  )}
+                  {filteredProducts.map((p) => {
                     const sel = form.selectedProducts.includes(p.id);
                     const m = PTYPE_META[p.policyType] ?? PTYPE_META.Other;
                     const icon = POLICY_TYPE_ICON[p.policyType] ?? "📋";
@@ -895,6 +909,7 @@ export default function CampaignCreate() {
                       <option>Lapsed Customers</option>
                       <option>New Registrations</option>
                       <option>High Value Customers</option>
+                      <option>Corporate</option>
                     </Select>
                   </Field>
                   <Field label="Age Range">

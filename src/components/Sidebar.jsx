@@ -14,6 +14,8 @@ import {
   LogoutIcon,
   ReportIcon,
   DocumentIcon,
+  BankIcon,
+  GroupIcon,
 } from "../icons";
 import { useAuth } from "../context/AuthContext";
 
@@ -31,6 +33,24 @@ const BROKER_NAV = [
     children: [
       { label: "All Agents",  path: "/agent" },
       { label: "Add Agent",   path: "/agent/create" },
+    ],
+  },
+  {
+    key: "organisation",
+    label: "Organisations",
+    icon: BankIcon,
+    children: [
+      { label: "All Organisations", path: "/organisation" },
+      { label: "Add Organisation",  path: "/organisation/create" },
+    ],
+  },
+  {
+    key: "association",
+    label: "Associations",
+    icon: GroupIcon,
+    children: [
+      { label: "All Associations", path: "/association" },
+      { label: "Add Association",  path: "/association/create" },
     ],
   },
   {
@@ -66,7 +86,6 @@ const BROKER_NAV = [
     icon: PolicyIcon,
     children: [
       { label: "Policy Issuance", path: "/policy" },
-      { label: "Buy Policy",      path: "/policy/buy" },
     ],
   },
   {
@@ -133,7 +152,6 @@ const AGENT_NAV = [
     icon: PolicyIcon,
     children: [
       { label: "Policy Issuance", path: "/policy" },
-      { label: "Buy Policy",      path: "/policy/buy" },
     ],
   },
   {
@@ -250,17 +268,6 @@ export default function Sidebar({ mobileOpen = false, onMobileClose }) {
             </button>
           )}
         </div>
-
-        {/* ── User pill (expanded only) ── */}
-        {!collapsed && user && (
-          <div style={S.userPill}>
-            <div style={S.userAvatar}>{initials}</div>
-            <div style={{ flex: 1, minWidth: 0 }}>
-              <div style={S.userName}>{user.name}</div>
-              <div style={S.userRole}>{user.role.charAt(0).toUpperCase() + user.role.slice(1)}</div>
-            </div>
-          </div>
-        )}
 
         {/* ── Nav ── */}
         <nav style={{ ...S.nav, alignItems: collapsed ? "center" : "stretch" }}>

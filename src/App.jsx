@@ -53,6 +53,16 @@ import CampaignEdit   from "./pages/campaign/CampaignEdit";
 import PolicyList from "./pages/policy/PolicyList";
 import BuyPolicy  from "./pages/policy/BuyPolicy";
 
+// Organisation pages
+import OrganisationList from "./pages/organisation/OrganisationList";
+import OrganisationEdit from "./pages/organisation/OrganisationEdit";
+import { OrganisationProvider } from "./pages/organisation/OrganisationContext";
+
+// Association pages
+import AssociationList from "./pages/association/AssociationList";
+import AssociationEdit from "./pages/association/AssociationEdit";
+import { AssociationProvider } from "./pages/association/AssociationContext";
+
 // CRM
 import CrmPage from "./pages/crm/CrmPage";
 import Reports        from "./pages/reports/Reports";
@@ -82,6 +92,8 @@ export default function App() {
   return (
     <BrowserRouter>
       <AuthProvider>
+      <OrganisationProvider>
+      <AssociationProvider>
       <CustomerProvider>
         <Routes>
           {/* ── Public auth routes (no sidebar/topbar) ── */}
@@ -147,6 +159,18 @@ export default function App() {
                   <Route path=":id/edit" element={<AgentEdit />} />
                 </Route>
 
+                <Route path="organisation">
+                  <Route index element={<OrganisationList />} />
+                  <Route path="create" element={<OrganisationEdit />} />
+                  <Route path=":id/edit" element={<OrganisationEdit />} />
+                </Route>
+
+                <Route path="association">
+                  <Route index element={<AssociationList />} />
+                  <Route path="create" element={<AssociationEdit />} />
+                  <Route path=":id/edit" element={<AssociationEdit />} />
+                </Route>
+
                 <Route path="product">
                   <Route index element={<ProductList />} />
                   <Route path="create" element={<ProductCreate />} />
@@ -185,6 +209,8 @@ export default function App() {
           <Route path="*" element={<Navigate to="/login" replace />} />
         </Routes>
       </CustomerProvider>
+      </AssociationProvider>
+      </OrganisationProvider>
       </AuthProvider>
     </BrowserRouter>
   );

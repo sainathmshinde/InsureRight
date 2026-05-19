@@ -341,6 +341,22 @@ export default function ProductForm({
       {/* ── 1. Basic Information ──────────────────── */}
       <SectionBlock icon="📦" title="Basic Information">
         <div className="form-grid">
+          <Field label="Insurance Type" required style={{ gridColumn: '1 / -1' }}>
+            <Select
+              value={form.insuranceType}
+              onChange={set("insuranceType")}
+              required
+            >
+              <option value="">Select type</option>
+              <option>Health</option>
+              <option>Motor</option>
+              <option>Life</option>
+              <option>Travel</option>
+              <option>Home</option>
+              <option>Fire</option>
+              <option>Marine</option>
+            </Select>
+          </Field>
           <Field label="Product Name" required>
             <Input
               placeholder="e.g. Star Comprehensive Health"
@@ -356,22 +372,6 @@ export default function ProductForm({
               onChange={set("productCode")}
               required
             />
-          </Field>
-          <Field label="Insurance Type" required>
-            <Select
-              value={form.insuranceType}
-              onChange={set("insuranceType")}
-              required
-            >
-              <option value="">Select type</option>
-              <option>Health</option>
-              <option>Motor</option>
-              <option>Life</option>
-              <option>Travel</option>
-              <option>Home</option>
-              <option>Fire</option>
-              <option>Marine</option>
-            </Select>
           </Field>
           <Field label="Insurance Company (IC)" required>
             <Select value={form.icName} onChange={set("icName")} required>
@@ -833,7 +833,7 @@ export default function ProductForm({
               <option>Single AC Room</option>
             </Select>
           </Field>
-          <Field label="Disease Restrictions" className="col-span-2">
+          <Field label="Waiting Period For Disease" className="col-span-2">
             <Textarea
               placeholder="e.g. Pre-existing diseases covered after 36 months, Maternity after 2 years…"
               value={form.diseaseRestrictions}
@@ -844,7 +844,7 @@ export default function ProductForm({
       </SectionBlock>
 
       {/* ── 6. Terms & Conditions ────────────────── */}
-      <SectionBlock icon="📜" title="Terms & Conditions (AI-Editable)">
+      <SectionBlock >
         <div className="form-grid">
           <Field label="Eligibility Criteria" required>
             <Textarea

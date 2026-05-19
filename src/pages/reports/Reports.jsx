@@ -19,34 +19,46 @@ const SALES_AGENTS = [
 
 const CAMPAIGNS = [
   {
-    id: 1, name: "Summer Health Drive 2025", type: "Promotional", status: "Active",
+    id: 1,  name: "Campaign 1",                                status: "Completed",
     callingAgents: ["Pooja Desai", "Amit Tiwari"],
     salesAgents:   ["Ravi Kulkarni", "Priya Nambiar"],
     leadsGenerated: 43, converted: 18, policiesSold: 12, premiumCollected: 102000,
   },
   {
-    id: 2, name: "Renewal Reminder Q2", type: "Renewal", status: "Active",
-    callingAgents: ["Sunita Rao", "Meena Kapoor"],
+    id: 5,  name: "Campaign OPD and DIGIT PAYMENT PROTECTION", status: "Closed",
+    callingAgents: ["Sunita Rao"],
     salesAgents:   ["Anjali Verma"],
-    leadsGenerated: 29, converted: 22, policiesSold: 18, premiumCollected: 153000,
+    leadsGenerated: 29, converted: 11, policiesSold: 8,  premiumCollected: 68400,
   },
   {
-    id: 3, name: "New Member Onboarding", type: "Onboarding", status: "Active",
+    id: 6,  name: "BPP Campaign",                              status: "Completed",
     callingAgents: ["Pooja Desai", "Rajiv Sharma"],
-    salesAgents:   ["Deepak Menon", "Sanjay Iyer"],
+    salesAgents:   ["Deepak Menon"],
     leadsGenerated: 36, converted: 14, policiesSold: 9,  premiumCollected: 76500,
   },
   {
-    id: 4, name: "Motor Insurance Awareness", type: "Awareness", status: "Completed",
-    callingAgents: ["Amit Tiwari", "Sunita Rao"],
-    salesAgents:   ["Ravi Kulkarni"],
-    leadsGenerated: 51, converted: 21, policiesSold: 15, premiumCollected: 72000,
+    id: 7,  name: "Test Campaign",                              status: "Completed",
+    callingAgents: ["Amit Tiwari"],
+    salesAgents:   ["Sanjay Iyer"],
+    leadsGenerated: 12, converted: 4,  policiesSold: 3,  premiumCollected: 24000,
   },
   {
-    id: 5, name: "Festival Season Offer", type: "Seasonal", status: "Completed",
+    id: 8,  name: "SBI_STP_Campaign",                          status: "Completed",
     callingAgents: ["Meena Kapoor", "Rajiv Sharma"],
-    salesAgents:   ["Priya Nambiar", "Anjali Verma"],
+    salesAgents:   ["Priya Nambiar"],
     leadsGenerated: 38, converted: 17, policiesSold: 13, premiumCollected: 110500,
+  },
+  {
+    id: 11, name: "BPP Campaign_2026-2027",                    status: "Active",
+    callingAgents: ["Pooja Desai", "Sunita Rao"],
+    salesAgents:   ["Ravi Kulkarni", "Deepak Menon"],
+    leadsGenerated: 21, converted: 8,  policiesSold: 5,  premiumCollected: 47500,
+  },
+  {
+    id: 12, name: "Standalone campaign",                        status: "Completed",
+    callingAgents: ["Amit Tiwari"],
+    salesAgents:   ["Anjali Verma"],
+    leadsGenerated: 18, converted: 7,  policiesSold: 5,  premiumCollected: 38000,
   },
 ];
 
