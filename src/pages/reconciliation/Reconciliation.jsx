@@ -218,35 +218,21 @@ export default function Reconciliation() {
               )}
             </div>
 
-            {/* Data source info */}
-            <div style={{ marginTop: 24, display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
-              <div>
-                <label style={{ fontSize: 12.5, fontWeight: 600, color: "var(--text-2)", display: "block", marginBottom: 6 }}>
-                  Data Source
-                </label>
-                <select className="input" style={{ width: "100%" }}>
-                  <option value="">Select source</option>
-                  <option>Star Health Insurance</option>
-                  <option>HDFC ERGO</option>
-                  <option>ICICI Lombard</option>
-                  <option>Bajaj Allianz</option>
-                  <option>New India Assurance</option>
-                  <option>LIC</option>
-                  <option>Aggregator Portal</option>
-                  <option>Other</option>
-                </select>
-              </div>
-              <div>
-                <label style={{ fontSize: 12.5, fontWeight: 600, color: "var(--text-2)", display: "block", marginBottom: 6 }}>
-                  Period
-                </label>
-                <select className="input" style={{ width: "100%" }}>
-                  <option>April 2025</option>
-                  <option>March 2025</option>
-                  <option>February 2025</option>
-                  <option>Q4 FY 2024–25</option>
-                </select>
-              </div>
+            {/* Campaign */}
+            <div style={{ marginTop: 24 }}>
+              <label style={{ fontSize: 12.5, fontWeight: 600, color: "var(--text-2)", display: "block", marginBottom: 6 }}>
+                Campaign
+              </label>
+              <select className="field-select" style={{ width: "100%" }}>
+                <option value="">All Campaigns</option>
+                <option>Campaign 1</option>
+                <option>Campaign OPD and DIGIT PAYMENT PROTECTION</option>
+                <option>BPP Campaign</option>
+                <option>Test Campaign</option>
+                <option>SBI_STP_Campaign</option>
+                <option>BPP Campaign_2026-2027</option>
+                <option>Standalone campaign</option>
+              </select>
             </div>
 
             <div style={{ marginTop: 28, display: "flex", justifyContent: "flex-end" }}>

@@ -67,6 +67,8 @@ import { AssociationProvider } from "./pages/association/AssociationContext";
 import CrmPage from "./pages/crm/CrmPage";
 import Reports        from "./pages/reports/Reports";
 import Reconciliation from "./pages/reconciliation/Reconciliation";
+import UpdatePayment   from "./pages/payment/UpdatePayment";
+import ExtractPayments from "./pages/payment/ExtractPayments";
 
 // Portals
 import BrokerPortal    from "./pages/portal/BrokerPortal";
@@ -197,8 +199,10 @@ export default function App() {
                   <Route path=":id/edit" element={<BrokerEdit />} />
                 </Route>
 
-                <Route path="reports"        element={<Reports />} />
+                <Route path="reports"         element={<Reports />} />
                 <Route path="reconciliation" element={<Reconciliation />} />
+                <Route path="update-payment"  element={<UpdatePayment />} />
+                <Route path="extract-payments" element={<ExtractPayments />} />
               </Route>
 
               <Route path="*" element={<Navigate to="/dashboard" replace />} />

@@ -16,6 +16,8 @@ import {
   DocumentIcon,
   BankIcon,
   GroupIcon,
+  PaymentIcon,
+  DownloadPolicyIcon,
 } from "../icons";
 import { useAuth } from "../context/AuthContext";
 
@@ -86,6 +88,22 @@ const BROKER_NAV = [
     icon: PolicyIcon,
     children: [
       { label: "Policy Issuance", path: "/policy" },
+    ],
+  },
+  {
+    key: "update-payment",
+    label: "Update Payment",
+    icon: PaymentIcon,
+    children: [
+      { label: "Offline Payments", path: "/update-payment" },
+    ],
+  },
+  {
+    key: "extract-payments",
+    label: "Extract Payments",
+    icon: DownloadPolicyIcon,
+    children: [
+      { label: "Extract Customer & Payments", path: "/extract-payments" },
     ],
   },
   {
