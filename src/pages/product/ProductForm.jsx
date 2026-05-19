@@ -899,19 +899,6 @@ export default function ProductForm({
         </div>
       </SectionBlock>
 
-      {/* ── 7. IC API Mapping ──────────────────────── */}
-      <SectionBlock icon="🔌" title="IC API Mapping">
-        <div className="form-grid">
-          <Field label="IC API Product ID">
-            <Input
-              placeholder="e.g. SHI_COMP_HEALTH_V2"
-              value={form.icApiProductId}
-              onChange={set("icApiProductId")}
-            />
-          </Field>
-        </div>
-      </SectionBlock>
-
       <FormActions onCancel={onCancel} submitLabel={submitLabel} />
     </form>
   );
