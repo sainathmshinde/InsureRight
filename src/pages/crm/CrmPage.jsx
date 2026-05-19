@@ -63,9 +63,17 @@ export default function CrmPage() {
     ? leads.filter(l => l.claimedBy === myAgentId)
     : []
 
-  // Sales agent's assigned leads
+  // Campaigns where this sales agent has at least one lead assigned
+  const salesAgentCampaigns = isSalesAgent
+    ? CAMPAIGNS.filter(c => leads.some(l => l.campaignId === c.id && l.salesAssignedTo === myAgentId))
+    : []
+
+  // Sales agent's assigned leads, optionally filtered by selected campaign
   const mySalesLeads = isSalesAgent
-    ? leads.filter(l => l.salesAssignedTo === myAgentId)
+    ? leads.filter(l =>
+        l.salesAssignedTo === myAgentId &&
+        (selectedCampaignId ? l.campaignId === Number(selectedCampaignId) : true)
+      )
     : []
 
   // Broker: all leads for selected campaign
@@ -225,7 +233,7 @@ export default function CrmPage() {
                 <Field label="Select Campaign">
                   <Select value={selectedCampaignId} onChange={e => setSelectedCampaignId(e.target.value)}>
                     <option value="">{availCampaigns.length === 0 ? 'No campaigns assigned' : 'Select a campaign'}</option>
-                    {availCampaigns.map(c => <option key={c.id} value={c.id}>{c.name} ({c.type})</option>)}
+                    {availCampaigns.map(c => <option key={c.id} value={c.id}>{c.name}{c.type ? ` · ${c.type}` : ''}</option>)}
                   </Select>
                 </Field>
               </div>
@@ -283,9 +291,24 @@ export default function CrmPage() {
               </div>
             </div>
 
-            <SectionTitle>🎯 My Assigned Leads</SectionTitle>
+            {salesAgentCampaigns.length > 0 && (
+              <div className="form-grid" style={{ marginBottom: 20 }}>
+                <Field label="Filter by Campaign">
+                  <Select value={selectedCampaignId} onChange={e => setSelectedCampaignId(e.target.value)}>
+                    <option value="">All Campaigns</option>
+                    {salesAgentCampaigns.map(c => (
+                      <option key={c.id} value={c.id}>{c.name}{c.type ? ` · ${c.type}` : ''}</option>
+                    ))}
+                  </Select>
+                </Field>
+              </div>
+            )}
+
+            <SectionTitle>🎯 My Assigned Leads{selectedCampaignId ? ` — ${campaignName(Number(selectedCampaignId))}` : ''}</SectionTitle>
             {mySalesLeads.length === 0 ? (
-              <div style={{ textAlign: 'center', padding: '40px 0', color: 'var(--text-3)', fontSize: 13.5 }}>No leads assigned to you yet.</div>
+              <div style={{ textAlign: 'center', padding: '40px 0', color: 'var(--text-3)', fontSize: 13.5 }}>
+                {selectedCampaignId ? 'No leads in this campaign.' : 'No leads assigned to you yet.'}
+              </div>
             ) : (
               <>
                 <SummaryChips rows={mySalesLeads} />
@@ -313,7 +336,7 @@ export default function CrmPage() {
               <Field label="Campaign">
                 <Select value={selectedCampaignId} onChange={e => setSelectedCampaignId(e.target.value)} disabled={availCampaigns.length === 0}>
                   <option value="">{availCampaigns.length === 0 ? 'No campaigns assigned' : 'Select a campaign'}</option>
-                  {availCampaigns.map(c => <option key={c.id} value={c.id}>{c.name} ({c.type})</option>)}
+                  {availCampaigns.map(c => <option key={c.id} value={c.id}>{c.name}{c.type ? ` · ${c.type}` : ''}</option>)}
                 </Select>
               </Field>
             </div>

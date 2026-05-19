@@ -59,11 +59,6 @@ export default function CampaignList() {
           {row.isCampaignOpen ? 'Open' : 'Closed'}
         </span>
       )},
-    { key: 'documentName', label: 'Document',
-      render: row => row.documentName
-        ? <span style={{ fontSize: 12, color: 'var(--brand)', fontFamily: 'monospace' }}>📎 {row.documentName}</span>
-        : <span style={{ color: 'var(--text-3)' }}>—</span>
-    },
     { key: 'sentStatus', label: 'Sent',
       render: row => row.sentStatus === null
         ? <span style={{ color: 'var(--text-3)' }}>—</span>

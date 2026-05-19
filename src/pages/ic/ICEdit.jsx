@@ -42,6 +42,9 @@ export default function ICEdit() {
                 <Field label="IC Code" required>
                   <Input placeholder="e.g. SHI" value={form.code || ''} onChange={set('code')} required />
                 </Field>
+                <Field label="Branch">
+                  <Input placeholder="e.g. Mumbai" value={form.branch || ''} onChange={set('branch')} />
+                </Field>
                 <Field label="Contact Person">
                   <Input placeholder="Primary contact name" value={form.contactPerson || ''} onChange={set('contactPerson')} />
                 </Field>

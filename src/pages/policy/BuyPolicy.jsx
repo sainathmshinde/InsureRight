@@ -1,5 +1,7 @@
 import { useState, useMemo } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
+import Pagination from "../../components/Pagination";
+import usePagination from "../../components/usePagination";
 import { useAuth } from "../../context/AuthContext";
 import { Field, Input, Select, Textarea } from "../../components/fields";
 import {
@@ -548,6 +550,9 @@ export default function BuyPolicy() {
     );
   }, [custSearch, baseCustomers]);
 
+  const custPg = usePagination(filteredCustomers, 12);
+  const handleCustSearch = (v) => { setCustSearch(v); custPg.reset(); };
+
   // When customer is selected, pre-fill downstream state (including saved family members)
   const handleSelectCustomer = (c) => {
     setSelectedCustomer(c);
@@ -635,22 +640,27 @@ export default function BuyPolicy() {
       ══════════════════════════════════════════════════════════════════ */}
       {step === 0 && (
         <div>
-          {/* Header + search bar */}
-          <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 18, flexWrap: "wrap" }}>
-            <div style={{ position: "relative", flex: 1, minWidth: 260 }}>
-              <span style={{ position: "absolute", left: 12, top: "50%", transform: "translateY(-50%)", color: "var(--text-3)", fontSize: 15, pointerEvents: "none" }}>🔍</span>
+          {/* Search + count + add */}
+          <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 14 }}>
+            <div style={{ position: "relative", flex: 1 }}>
+              <span style={{ position: "absolute", left: 11, top: "50%", transform: "translateY(-50%)", color: "var(--text-3)", fontSize: 14, pointerEvents: "none" }}>🔍</span>
               <input
                 className="field-input"
-                style={{ paddingLeft: 38, width: "100%" }}
+                style={{ paddingLeft: 34 }}
                 placeholder={isSalesAgent ? "Search your assigned customers…" : "Search by name, mobile or email…"}
                 value={custSearch}
-                onChange={(e) => setCustSearch(e.target.value)}
+                onChange={(e) => handleCustSearch(e.target.value)}
                 autoFocus
               />
             </div>
-            <div style={{ fontSize: 13, color: "var(--text-3)", whiteSpace: "nowrap" }}>
-              {filteredCustomers.length} customer{filteredCustomers.length !== 1 ? "s" : ""}
-            </div>
+            <span style={{ fontSize: 12.5, color: "var(--text-3)", whiteSpace: "nowrap", background: "var(--surface-2)", border: "1px solid var(--border)", borderRadius: 20, padding: "4px 12px" }}>
+              {filteredCustomers.length} customers
+            </span>
+            {!isSalesAgent && (
+              <button className="btn btn-secondary btn-sm" style={{ whiteSpace: "nowrap", flexShrink: 0 }} onClick={() => navigate("/customer/create")}>
+                <CustomerIcon size={14} /> + Add New
+              </button>
+            )}
           </div>
 
           {/* Customer grid */}
@@ -661,19 +671,15 @@ export default function BuyPolicy() {
               <div style={{ fontSize: 13 }}>Try a different name, mobile or email</div>
             </div>
           ) : (
+            <>
             <div style={{
               display: "grid",
-              gridTemplateColumns: "repeat(auto-fill, minmax(320px, 1fr))",
-              gap: 12,
-              maxHeight: 520,
-              overflowY: "auto",
-              paddingRight: 4,
-              paddingBottom: 2,
+              gridTemplateColumns: "repeat(auto-fill, minmax(240px, 1fr))",
+              gap: 8,
             }}>
-              {filteredCustomers.map((c) => {
+              {custPg.slice.map((c) => {
                 const isSelected = selectedCustomer?.id === c.id;
                 const isRejected = c.kyc === "Rejected";
-                const age = c.dob ? Math.floor((Date.now() - new Date(c.dob)) / (365.25 * 24 * 3600 * 1000)) : null;
                 return (
                   <button
                     key={c.id}
@@ -689,74 +695,49 @@ export default function BuyPolicy() {
                       padding: 0,
                     }}
                   >
-                    {/* Card header */}
-                    <div style={{
-                      display: "flex", alignItems: "center", gap: 12,
-                      padding: "13px 16px 11px",
-                      borderBottom: `1px solid ${isSelected ? "rgba(124,58,237,.15)" : "var(--border)"}`,
-                      background: isSelected ? "rgba(124,58,237,.06)" : "var(--surface-2)",
-                    }}>
-                      <Avatar name={c.name} size={42} fontSize={15} />
+                    <div style={{ padding: "12px 14px", display: "flex", alignItems: "center", gap: 11 }}>
+                      <Avatar name={c.name} size={38} fontSize={13} />
                       <div style={{ flex: 1, minWidth: 0 }}>
-                        <div style={{ fontWeight: 700, fontSize: 14.5, color: "var(--text)", marginBottom: 3, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-                          {c.name}
-                        </div>
-                        <div style={{ display: "flex", alignItems: "center", gap: 6, flexWrap: "wrap" }}>
-                          <StatusBadge status={c.kyc} />
-                          {c.policies > 0 && (
-                            <span style={{ fontSize: 11, color: "var(--text-3)", background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 99, padding: "1px 8px" }}>
-                              {c.policies} {c.policies === 1 ? "policy" : "policies"}
-                            </span>
+                        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 6, marginBottom: 4 }}>
+                          <div style={{ fontWeight: 700, fontSize: 13.5, color: "var(--text)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                            {c.name}
+                          </div>
+                          {isSelected && (
+                            <div style={{ width: 20, height: 20, borderRadius: "50%", background: "var(--brand)", color: "#fff", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 11, fontWeight: 700, flexShrink: 0 }}>✓</div>
                           )}
                         </div>
-                      </div>
-                      {isSelected && (
-                        <div style={{ width: 26, height: 26, borderRadius: "50%", background: "var(--brand)", color: "#fff", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, fontWeight: 700, flexShrink: 0 }}>✓</div>
-                      )}
-                    </div>
-
-                    {/* Card body — customer details */}
-                    <div style={{ padding: "11px 16px", display: "grid", gridTemplateColumns: "1fr 1fr", gap: "7px 12px" }}>
-                      <div>
-                        <div style={{ fontSize: 10.5, color: "var(--text-3)", fontWeight: 600, textTransform: "uppercase", letterSpacing: ".4px", marginBottom: 2 }}>Mobile</div>
-                        <div style={{ fontSize: 13, fontWeight: 500, color: "var(--text)" }}>📱 {c.mobile}</div>
-                      </div>
-                      <div>
-                        <div style={{ fontSize: 10.5, color: "var(--text-3)", fontWeight: 600, textTransform: "uppercase", letterSpacing: ".4px", marginBottom: 2 }}>Gender</div>
-                        <div style={{ fontSize: 13, fontWeight: 500, color: "var(--text)" }}>{c.gender ?? "—"}</div>
-                      </div>
-                      <div>
-                        <div style={{ fontSize: 10.5, color: "var(--text-3)", fontWeight: 600, textTransform: "uppercase", letterSpacing: ".4px", marginBottom: 2 }}>Email</div>
-                        <div style={{ fontSize: 12.5, color: "var(--blue)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>✉ {c.email}</div>
-                      </div>
-                      <div>
-                        <div style={{ fontSize: 10.5, color: "var(--text-3)", fontWeight: 600, textTransform: "uppercase", letterSpacing: ".4px", marginBottom: 2 }}>Age / DOB</div>
-                        <div style={{ fontSize: 13, fontWeight: 500, color: "var(--text)" }}>
-                          {age !== null ? `${age} yrs` : "—"}
-                          <span style={{ fontSize: 11, color: "var(--text-3)", marginLeft: 5 }}>({c.dob})</span>
+                        <div style={{ display: "flex", alignItems: "center", gap: 5, marginBottom: 6 }}>
+                          <span style={{ fontSize: 11, color: "var(--text-3)", fontWeight: 500 }}>KYC:</span>
+                          <StatusBadge status={c.kyc} />
+                        </div>
+                        <div style={{ display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap" }}>
+                          <span style={{ fontSize: 12, color: "var(--text-2)", whiteSpace: "nowrap" }}>📱 {c.mobile}</span>
+                          <span style={{ fontSize: 11, color: "var(--text-3)" }}>·</span>
+                          <span style={{ fontSize: 12, color: "var(--blue)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", minWidth: 0 }}>✉ {c.email}</span>
                         </div>
                       </div>
-                      {c.address && (
-                        <div style={{ gridColumn: "1 / -1" }}>
-                          <div style={{ fontSize: 10.5, color: "var(--text-3)", fontWeight: 600, textTransform: "uppercase", letterSpacing: ".4px", marginBottom: 2 }}>Address</div>
-                          <div style={{ fontSize: 12.5, color: "var(--text-2)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>📍 {c.address}</div>
-                        </div>
-                      )}
                     </div>
                   </button>
                 );
               })}
             </div>
+            {custPg.total > 12 && (
+              <Pagination total={custPg.total} page={custPg.page} perPage={custPg.perPage} onPage={custPg.onPage} onPerPage={custPg.onPerPage} />
+            )}
+            </>
           )}
 
-          {/* Footer row */}
-          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginTop: 18, flexWrap: "wrap", gap: 12 }}>
-            {!isSalesAgent ? (
-              <button className="btn btn-secondary btn-sm" onClick={() => navigate("/customer/create")}>
-                <CustomerIcon size={14} /> + Add New Customer
-              </button>
-            ) : <div />}
-            <Button disabled={!selectedCustomer} onClick={next} style={{ minWidth: 240 }}>
+          {/* Sticky continue bar */}
+          <div style={{
+            position: "sticky", bottom: 0, zIndex: 20,
+            marginTop: 16, padding: "12px 16px",
+            background: selectedCustomer ? "#ede9fb" : "#fff",
+            border: `1.5px solid ${selectedCustomer ? "rgba(124,58,237,.25)" : "var(--border)"}`,
+            borderRadius: 12, transition: "all .2s",
+            boxShadow: "0 -4px 20px rgba(0,0,0,.08)",
+            display: "flex", alignItems: "center", justifyContent: "flex-end",
+          }}>
+            <Button disabled={!selectedCustomer} onClick={next} style={{ minWidth: 260 }}>
               Continue with {selectedCustomer ? selectedCustomer.name : "selected customer"} →
             </Button>
           </div>
@@ -769,59 +750,70 @@ export default function BuyPolicy() {
       {step === 1 && (
         <div>
           {selectedCustomer && <KYCWarning kyc={selectedCustomer.kyc} />}
-          <div style={{ textAlign: "center", marginBottom: 28 }}>
-            <div style={{ fontSize: 16, fontWeight: 600, marginBottom: 6 }}>
-              What type of insurance?
-            </div>
-            <div className="text-muted">
-              Select the insurance type for {selectedCustomer?.name}
-            </div>
+
+          {/* Context strip */}
+          <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 16, padding: "10px 14px", background: "var(--surface-2)", border: "1px solid var(--border)", borderRadius: 10 }}>
+            <span style={{ fontSize: 13 }}>👤</span>
+            <span style={{ fontSize: 13, color: "var(--text-2)" }}>Buying for</span>
+            <span style={{ fontSize: 13, fontWeight: 700, color: "var(--text)" }}>{selectedCustomer?.name}</span>
+            <span style={{ fontSize: 12, color: "var(--text-3)", marginLeft: "auto" }}>Select an insurance type to continue</span>
           </div>
-          <div style={{
-            display: "grid",
-            gridTemplateColumns: "repeat(auto-fill, minmax(200px, 1fr))",
-            gap: 14,
-          }}>
+
+          {/* 3 × 2 grid of horizontal cards */}
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 10 }}>
             {[
-              { type: "Health",  icon: "🏥", label: "Health Insurance",   desc: "Base policy, top-up, OPD & more" },
-              { type: "Motor",   icon: "🚗", label: "Motor Insurance",    desc: "Car & two-wheeler comprehensive cover" },
-              { type: "Life",    icon: "❤️", label: "Life Insurance",     desc: "Term, whole life & endowment plans" },
-              { type: "Travel",  icon: "✈️", label: "Travel Insurance",   desc: "Domestic & international trip cover" },
-              { type: "Home",    icon: "🏠", label: "Home Insurance",     desc: "Structure & contents protection" },
-              { type: "Business",icon: "🏢", label: "Business Insurance", desc: "Fire, liability & commercial cover" },
-            ].map(({ type, icon, label, desc }) => (
-              <button
-                key={type}
-                type="button"
-                onClick={() => { setInsuranceType(type); next(); }}
-                style={{
-                  padding: "24px 20px", borderRadius: 14,
-                  cursor: "pointer", fontFamily: "inherit",
-                  border: "2px solid var(--border)",
-                  background: "var(--surface)",
-                  boxShadow: "0 1px 4px rgba(0,0,0,.06)",
-                  textAlign: "center", transition: "all .15s",
-                }}
-                onMouseEnter={e => {
-                  e.currentTarget.style.border = "2px solid var(--brand)";
-                  e.currentTarget.style.background = "var(--brand-light)";
-                  e.currentTarget.style.boxShadow = "0 4px 16px rgba(124,58,237,.12)";
-                }}
-                onMouseLeave={e => {
-                  e.currentTarget.style.border = "2px solid var(--border)";
-                  e.currentTarget.style.background = "var(--surface)";
-                  e.currentTarget.style.boxShadow = "0 1px 4px rgba(0,0,0,.06)";
-                }}
-              >
-                <div style={{ fontSize: 38, marginBottom: 10 }}>{icon}</div>
-                <div style={{ fontWeight: 700, fontSize: 14, marginBottom: 6, color: "var(--text)" }}>
-                  {label}
-                </div>
-                <div style={{ fontSize: 12, color: "var(--text-3)", lineHeight: 1.5 }}>
-                  {desc}
-                </div>
-              </button>
-            ))}
+              { type: "Health",   icon: "🏥", label: "Health",   desc: "Hospitalisation, OPD, top-up & more" },
+              { type: "Motor",    icon: "🚗", label: "Motor",    desc: "Car & two-wheeler comprehensive cover" },
+              { type: "Life",     icon: "❤️", label: "Life",     desc: "Term, endowment & ULIP plans" },
+              { type: "Travel",   icon: "✈️", label: "Travel",   desc: "Domestic & international trips" },
+              { type: "Home",     icon: "🏠", label: "Home",     desc: "Structure & contents protection" },
+              { type: "Business", icon: "🏢", label: "Business", desc: "Fire, liability & commercial cover" },
+            ].map(({ type, icon, label, desc }) => {
+              const disabled = type !== "Health";
+              return (
+                <button
+                  key={type}
+                  type="button"
+                  disabled={disabled}
+                  onClick={() => { setInsuranceType(type); next(); }}
+                  title={disabled ? "Coming soon" : undefined}
+                  style={{
+                    display: "flex", alignItems: "center", gap: 14,
+                    padding: "14px 16px", borderRadius: 12, textAlign: "left",
+                    cursor: disabled ? "not-allowed" : "pointer", fontFamily: "inherit",
+                    border: "1.5px solid var(--border)",
+                    background: disabled ? "var(--surface-2)" : "var(--surface)",
+                    boxShadow: "0 1px 3px rgba(0,0,0,.05)",
+                    opacity: disabled ? 0.5 : 1,
+                    transition: "all .13s",
+                  }}
+                  onMouseEnter={e => {
+                    if (disabled) return;
+                    e.currentTarget.style.border = "1.5px solid var(--brand)";
+                    e.currentTarget.style.background = "var(--brand-light)";
+                    e.currentTarget.style.boxShadow = "0 4px 14px rgba(124,58,237,.12)";
+                    e.currentTarget.style.transform = "translateY(-1px)";
+                  }}
+                  onMouseLeave={e => {
+                    if (disabled) return;
+                    e.currentTarget.style.border = "1.5px solid var(--border)";
+                    e.currentTarget.style.background = "var(--surface)";
+                    e.currentTarget.style.boxShadow = "0 1px 3px rgba(0,0,0,.05)";
+                    e.currentTarget.style.transform = "none";
+                  }}
+                >
+                  <span style={{ fontSize: 28, lineHeight: 1, flexShrink: 0 }}>{icon}</span>
+                  <div style={{ minWidth: 0 }}>
+                    <div style={{ fontWeight: 700, fontSize: 13.5, color: "var(--text)", marginBottom: 3 }}>
+                      {label}
+                      {disabled && <span style={{ fontSize: 10, fontWeight: 500, color: "var(--text-3)", marginLeft: 7, background: "var(--border)", borderRadius: 4, padding: "1px 6px" }}>Coming soon</span>}
+                    </div>
+                    <div style={{ fontSize: 12, color: "var(--text-3)", lineHeight: 1.4 }}>{desc}</div>
+                  </div>
+                  {!disabled && <span style={{ marginLeft: "auto", fontSize: 14, color: "var(--text-3)", flexShrink: 0 }}>›</span>}
+                </button>
+              );
+            })}
           </div>
         </div>
       )}
