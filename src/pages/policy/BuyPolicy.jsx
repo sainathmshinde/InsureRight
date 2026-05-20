@@ -16,7 +16,7 @@ import {
   PaymentIcon,
   CustomerIcon,
 } from "../../icons";
-import { PRODUCTS, PRODUCTS_BY_TYPE, POLICY_TYPE_ICON, PREMIUM_CHART } from "../product/productData";
+import { PRODUCTS, PRODUCTS_BY_TYPE, POLICY_TYPE_ICON, PREMIUM_CHART, PRODUCT_DETAILS } from "../product/productData";
 import { AGENTS as KMD_AGENTS } from "../agent/agentData";
 import { INITIAL_LEADS, CAMPAIGNS } from "../crm/crmData";
 import { POLICY_MOCK } from "./PolicyList";
@@ -195,7 +195,6 @@ const CUSTOMERS = [
 
 const STEPS = [
   "Select Customer",
-  "Insurance Type",
   "Select Product",
   "Members",
   "Proposal",
@@ -399,15 +398,15 @@ export default function BuyPolicy() {
   // Unified initial customer — self (customer role) OR broker-preselected OR resume OR none
   const initialCustomer = selfCustomer ?? preselectedCustomer ?? resumeCustomer;
 
-  // Step state — jump to payment (5) when resuming a pending proposal
-  const [step, setStep] = useState(resumePolicy ? 5 : initialCustomer ? 1 : 0);
+  // Step state — jump to payment (4) when resuming a pending proposal
+  const [step, setStep] = useState(resumePolicy ? 4 : initialCustomer ? 1 : 0);
 
   // Step 0 — customer selection (agent/broker only)
   const [custSearch, setCustSearch] = useState("");
   const [selectedCustomer, setSelectedCustomer] = useState(initialCustomer);
 
-  // Step 1 — insurance type
-  const [insuranceType, setInsuranceType] = useState(resumePolicy?.type ?? null);
+  // Insurance type — defaulted to Health (type selection step is hidden)
+  const [insuranceType, setInsuranceType] = useState(resumePolicy?.type ?? "Health");
 
   // Step 2 — members / vehicle — start with Self only; family added on demand
   const [members, setMembers] = useState(
@@ -424,9 +423,10 @@ export default function BuyPolicy() {
     fuelType: "",
   });
 
-  // Step 2 — product selection
+  // Step 1 — product selection
   const [cart, setCart] = useState(resumeCart ?? []);
   const [productSels, setProductSels] = useState({});  // per-product {sumInsured,ageBandId,coverage,premium}
+  const [viewingProduct, setViewingProduct] = useState(null); // product detail modal
 
   // Step 4 — proposal — pre-fill from customer record
   const [proposal, setProposal] = useState({
@@ -446,6 +446,10 @@ export default function BuyPolicy() {
   // Step 5 — payment
   const [payMethod, setPayMethod] = useState("UPI");
   const [upiId, setUpiId] = useState("");
+
+  // Step 3 — nominees & terms
+  const [nominees, setNominees] = useState([{ id: 1, name: '', relation: '', age: '', share: '100' }]);
+  const [termsAccepted, setTermsAccepted] = useState(false);
 
   // Step 6 — result
   const [policyResults, setPolicyResults] = useState([]);
@@ -478,6 +482,65 @@ export default function BuyPolicy() {
     }));
   };
   const setV = (f) => (e) => setVehicle((v) => ({ ...v, [f]: e.target.value }));
+  // Nominee helpers
+  const addNominee = () => {
+    setNominees(prev => {
+      const n    = prev.length + 1;
+      const base = Math.floor(100 / n);
+      const rem  = 100 - base * n;
+      return [
+        ...prev.map((x, i) => ({ ...x, share: String(base + (i === 0 ? rem : 0)) })),
+        { id: Date.now(), name: '', relation: '', age: '', share: String(base) },
+      ];
+    });
+  };
+  const removeNominee = (id) => {
+    setNominees(prev => {
+      if (prev.length <= 1) return prev;
+      const filtered = prev.filter(n => n.id !== id);
+      const total    = filtered.reduce((s, n) => s + (Number(n.share) || 0), 0);
+      const diff     = 100 - total;
+      return diff !== 0
+        ? filtered.map((n, i) => i === 0 ? { ...n, share: String((Number(n.share) || 0) + diff) } : n)
+        : filtered;
+    });
+  };
+  const updateNominee = (id, field, val) =>
+    setNominees(prev => prev.map(n => n.id === id ? { ...n, [field]: val } : n));
+
+  const [nomineeAutoFilled, setNomineeAutoFilled] = useState({});
+
+  const updateNomineeRelation = (id, relation) => {
+    const family  = selectedCustomer?.familyMembers ?? [];
+    const allData = [...members, ...family];
+    let autoName = '';
+    let autoAge  = '';
+
+    if (relation === 'Spouse') {
+      const m = allData.find(m => m.type === 'Spouse');
+      if (m) { autoName = m.name; autoAge = calcAge(m.dob); }
+    } else if (relation === 'Son') {
+      const m = allData.find(m => (m.type === 'Child 1' || m.type === 'Child 2') && m.gender === 'Male')
+             ?? allData.find(m => m.type === 'Child 1' || m.type === 'Child 2');
+      if (m) { autoName = m.name; autoAge = calcAge(m.dob); }
+    } else if (relation === 'Daughter') {
+      const m = allData.find(m => (m.type === 'Child 1' || m.type === 'Child 2') && m.gender === 'Female')
+             ?? allData.find(m => m.type === 'Child 1' || m.type === 'Child 2');
+      if (m) { autoName = m.name; autoAge = calcAge(m.dob); }
+    }
+
+    setNominees(prev => prev.map(n => n.id === id ? {
+      ...n, relation,
+      ...(autoName ? { name: autoName } : {}),
+      ...(autoAge  ? { age:  autoAge  } : {}),
+    } : n));
+
+    if (autoName || autoAge) {
+      setNomineeAutoFilled(prev => ({ ...prev, [id]: true }));
+      setTimeout(() => setNomineeAutoFilled(prev => ({ ...prev, [id]: false })), 1500);
+    }
+  };
+
   const next = () => setStep((s) => Math.min(s + 1, STEPS.length - 1));
   const back = () => {
     if (isCustomer && step === 1)        { navigate("/policy");   return; }
@@ -516,6 +579,27 @@ export default function BuyPolicy() {
     selfSpouse2Children: 'Self + Spouse + 2 Children',
   };
 
+  const COV_MEMBERS = {
+    selfOnly:            ['Self'],
+    selfSpouse:          ['Self', 'Spouse'],
+    selfSpouse2Children: ['Self', 'Spouse', 'Child 1', 'Child 2'],
+  };
+
+  const ensureMembersFor = (coverage) => {
+    const needed = COV_MEMBERS[coverage] ?? ['Self'];
+    setMembers(prev => {
+      const existing = new Set(prev.map(m => m.type));
+      const additions = needed
+        .filter(t => !existing.has(t))
+        .map(type => {
+          const slot  = FAMILY_SLOTS.find(s => s.type === type);
+          const saved = selectedCustomer?.familyMembers?.find(m => m.type === type);
+          return { type, name: saved?.name ?? '', dob: saved?.dob ?? '', gender: saved?.gender ?? slot?.genderDefault ?? '' };
+        });
+      return additions.length ? [...prev, ...additions] : prev;
+    });
+  };
+
   const coverageOpts = (row) => [
     row?.selfOnly            != null && { key: 'selfOnly',            label: 'Self',                       value: row.selfOnly },
     row?.selfSpouse          != null && { key: 'selfSpouse',          label: 'Self + Spouse',               value: row.selfSpouse },
@@ -532,10 +616,14 @@ export default function BuyPolicy() {
     const allCampaignProducts = agentCampaignProductIds
       ? PRODUCTS.filter(p => agentCampaignProductIds.has(p.id))
       : PRODUCTS;
-    if (insuranceType === "Health") return allCampaignProducts;
-    const byType = PRODUCTS_BY_TYPE[insuranceType] ?? [];
-    if (!agentCampaignProductIds) return byType;
-    return byType.filter(p => agentCampaignProductIds.has(p.id));
+    const pool = insuranceType === "Health"
+      ? allCampaignProducts
+      : (agentCampaignProductIds
+          ? (PRODUCTS_BY_TYPE[insuranceType] ?? []).filter(p => agentCampaignProductIds.has(p.id))
+          : (PRODUCTS_BY_TYPE[insuranceType] ?? []));
+    const score = p =>
+      (PRODUCT_DETAILS[p.id] ? 1 : 0) + ((PREMIUM_CHART[p.id]?.length ?? 0) > 0 ? 1 : 0);
+    return [...pool].sort((a, b) => score(b) - score(a));
   }, [insuranceType, agentCampaignProductIds]);
 
   // Customer search filter — sales agents already scoped to their assigned customers
@@ -584,19 +672,26 @@ export default function BuyPolicy() {
   const removeMember = (type) =>
     setMembers((prev) => prev.filter((m) => m.type !== type));
   const updateMember = (type, field, val) =>
-    setMembers((prev) =>
-      prev.map((m) => (m.type === type ? { ...m, [field]: val } : m)),
-    );
+    setMembers(prev => {
+      if (prev.find(m => m.type === type)) {
+        return prev.map(m => m.type === type ? { ...m, [field]: val } : m);
+      }
+      const slot = FAMILY_SLOTS.find(s => s.type === type);
+      const saved = selectedCustomer?.familyMembers?.find(m => m.type === type);
+      return [...prev, { type, name: saved?.name ?? '', dob: saved?.dob ?? '', gender: saved?.gender ?? slot?.genderDefault ?? '', [field]: val }];
+    });
 
-  // Finalize payment — generate one policy per cart item
+  // Finalize payment — generate one proposal per cart item (policy pending issuance)
   const submitPayment = () => {
-    const rand = () => Math.floor(Math.random() * 900000 + 100000);
+    const rand4 = () => Math.floor(Math.random() * 9000 + 1000);
+    const rand6 = () => Math.floor(Math.random() * 900000 + 100000);
     setPolicyResults(cart.map(p => ({
-      policyNo:   `KMD/2025/${rand()}`,
-      proposalId: `PRO-2025-${Math.floor(Math.random() * 9000 + 1000)}`,
-      product:    p.name,
-      provider:   p.provider,
-      customer:   selectedCustomer?.name,
+      referenceNo: `REF-${rand6()}`,
+      proposalId:  `PRO-2025-${rand4()}`,
+      product:     p.name,
+      provider:    p.provider,
+      customer:    selectedCustomer?.name,
+      premium:     p.premium,
     })));
     next();
   };
@@ -745,380 +840,269 @@ export default function BuyPolicy() {
       )}
 
       {/* ══════════════════════════════════════════════════════════════════
-          STEP 1 — Insurance Type
+          STEP 2 — Members & Premium
+      ══════════════════════════════════════════════════════════════════ */}
+      {step === 2 && (
+        <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+          <div>
+            <div style={{ fontWeight: 700, fontSize: 15, color: "var(--text)" }}>Member Details &amp; Premium</div>
+            <div style={{ fontSize: 13, color: "var(--text-3)", marginTop: 2 }}>
+              Select coverage type for each product — member details will appear based on your selection
+            </div>
+          </div>
+
+          {cart.length === 0 ? (
+            <div style={{ textAlign: "center", padding: "48px 0", color: "var(--text-3)" }}>
+              <div style={{ fontSize: 32, marginBottom: 10 }}>📦</div>
+              <div style={{ fontWeight: 600 }}>No products selected</div>
+              <div style={{ fontSize: 13, marginTop: 4 }}>Go back and select at least one product</div>
+            </div>
+          ) : (
+            <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+              {cart.map(p => {
+                const sel       = psel(p.id);
+                const chartRows = PREMIUM_CHART[p.id] ?? [];
+                const uniqueSIs = [...new Set(chartRows.map(r => r.sumInsured))];
+                const hasAB     = chartRows.some(r => r.ageBandId != null);
+                const rowBands  = hasAB
+                  ? [...new Set(chartRows.filter(r => r.sumInsured === Number(sel.sumInsured)).map(r => String(r.ageBandId)))]
+                  : [];
+                const activeRow   = matchRow(p.id, sel.sumInsured, sel.ageBandId);
+                const covOpts     = coverageOpts(activeRow);
+                const icon        = POLICY_TYPE_ICON[p.policyType] ?? "📋";
+                const neededTypes = COV_MEMBERS[sel.coverage] ?? [];
+                const hasMissingMembers = neededTypes.some(t => {
+                  if (t === "Self") return false;
+                  const m = members.find(x => x.type === t);
+                  return !m?.name || !m?.dob;
+                });
+
+                return (
+                  <div key={p.id} style={{ border: "1.5px solid var(--border)", borderRadius: 14, overflow: "hidden", background: "#fff", boxShadow: "0 2px 8px rgba(0,0,0,.05)" }}>
+                    {/* Product header */}
+                    <div style={{ display: "flex", alignItems: "center", gap: 10, padding: "12px 16px", background: "var(--surface-2)", borderBottom: "1px solid var(--border)" }}>
+                      <div style={{ width: 34, height: 34, borderRadius: 8, background: "#fff", border: "1px solid var(--border)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 17, flexShrink: 0 }}>{icon}</div>
+                      <div style={{ flex: 1, minWidth: 0 }}>
+                        <div style={{ fontWeight: 700, fontSize: 13.5, color: "var(--text)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{p.name}</div>
+                        <div style={{ fontSize: 11.5, color: "var(--text-3)" }}>{p.provider} · <span style={{ fontFamily: "monospace" }}>{p.code}</span></div>
+                      </div>
+                    </div>
+
+                    <div style={{ padding: "14px 16px", display: "flex", flexDirection: "column", gap: 16 }}>
+
+                      {/* SI + Age Band */}
+                      {chartRows.length > 0 && (
+                        <div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
+                          <div style={{ minWidth: 160 }}>
+                            <div style={{ fontSize: 11, color: "var(--text-3)", fontWeight: 600, textTransform: "uppercase", letterSpacing: ".4px", marginBottom: 5 }}>Sum Insured</div>
+                            <select className="field-select" value={sel.sumInsured}
+                              onChange={e => {
+                                const si    = e.target.value;
+                                const bands = hasAB ? [...new Set(chartRows.filter(r => r.sumInsured === Number(si)).map(r => String(r.ageBandId)))] : [];
+                                const band  = bands[0] ?? '';
+                                const row   = matchRow(p.id, si, band);
+                                const cov   = row?.selfOnly != null ? 'selfOnly' : '';
+                                setPsel(p.id, { sumInsured: si, ageBandId: band, coverage: cov, premium: row?.[cov] ?? null });
+                                if (cov) ensureMembersFor(cov);
+                              }}
+                              style={{ fontSize: 13, padding: "6px 10px", width: "100%" }}>
+                              {uniqueSIs.map(si => <option key={si} value={String(si)}>₹{si.toLocaleString("en-IN")}</option>)}
+                            </select>
+                          </div>
+                          {hasAB && rowBands.length > 0 && (
+                            <div style={{ minWidth: 130 }}>
+                              <div style={{ fontSize: 11, color: "var(--text-3)", fontWeight: 600, textTransform: "uppercase", letterSpacing: ".4px", marginBottom: 5 }}>Age Band</div>
+                              <select className="field-select" value={sel.ageBandId}
+                                onChange={e => {
+                                  const band = e.target.value;
+                                  const row  = matchRow(p.id, sel.sumInsured, band);
+                                  const cov  = sel.coverage && row?.[sel.coverage] != null ? sel.coverage : (row?.selfOnly != null ? 'selfOnly' : '');
+                                  setPsel(p.id, { ageBandId: band, coverage: cov, premium: row?.[cov] ?? null });
+                                  if (cov) ensureMembersFor(cov);
+                                }}
+                                style={{ fontSize: 13, padding: "6px 10px", width: "100%" }}>
+                                {rowBands.map(b => <option key={b} value={b}>Band {b}</option>)}
+                              </select>
+                            </div>
+                          )}
+                        </div>
+                      )}
+
+                      {/* Coverage options */}
+                      {covOpts.length > 0 && (
+                        <div>
+                          <div style={{ fontSize: 11, color: "var(--text-3)", fontWeight: 600, textTransform: "uppercase", letterSpacing: ".4px", marginBottom: 7 }}>Coverage Type</div>
+                          <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+                            {covOpts.map(opt => {
+                              const active = sel.coverage === opt.key;
+                              return (
+                                <label key={opt.key} style={{
+                                  display: "flex", alignItems: "center", gap: 10,
+                                  padding: "10px 14px", borderRadius: 9, cursor: "pointer",
+                                  background: active ? "var(--brand-light)" : "#fafafa",
+                                  border: `1.5px solid ${active ? "var(--brand)" : "var(--border)"}`,
+                                  borderLeft: `4px solid ${active ? "var(--brand)" : "var(--border)"}`,
+                                  transition: "all .15s",
+                                }}>
+                                  <input type="radio" name={`cov2-${p.id}`} checked={active}
+                                    onChange={() => {
+                                      setPsel(p.id, { coverage: opt.key, premium: opt.value });
+                                      ensureMembersFor(opt.key);
+                                    }}
+                                    style={{ accentColor: "var(--brand)", width: 15, height: 15, flexShrink: 0 }} />
+                                  <span style={{ flex: 1, fontSize: 13.5, color: active ? "var(--brand)" : "var(--text-2)", fontWeight: active ? 600 : 400 }}>{opt.label}</span>
+                                  <span style={{ fontWeight: 800, fontSize: 15, color: active ? "var(--brand)" : "var(--text)", flexShrink: 0 }}>₹{opt.value.toLocaleString("en-IN")}</span>
+                                </label>
+                              );
+                            })}
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Insured Members — driven by coverage selection */}
+                      {neededTypes.length > 0 && (
+                        <div style={{ background: "var(--surface-2)", borderRadius: 10, padding: "12px 14px" }}>
+                          <div style={{ fontSize: 11, color: "var(--text-3)", fontWeight: 600, textTransform: "uppercase", letterSpacing: ".5px", marginBottom: 10 }}>
+                            Insured Members
+                          </div>
+                          <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+                            {neededTypes.map(type => {
+                              const m           = members.find(x => x.type === type);
+                              const isSelf      = type === "Self";
+                              const slot        = FAMILY_SLOTS.find(s => s.type === type);
+                              const missingName = !isSelf && !m?.name;
+                              const missingDob  = !isSelf && !m?.dob;
+                              const age         = m?.dob ? Math.floor((Date.now() - new Date(m.dob)) / (365.25 * 24 * 3600 * 1000)) : null;
+                              return (
+                                <div key={type} style={{
+                                  display: "grid",
+                                  gridTemplateColumns: "110px 1fr 150px 110px",
+                                  gap: 8, alignItems: "center",
+                                  padding: "10px 12px", borderRadius: 9, background: "#fff",
+                                  border: `1.5px solid ${(missingName || missingDob) ? "#f59e0b" : isSelf ? "rgba(124,58,237,.3)" : "var(--border)"}`,
+                                  transition: "border-color .2s",
+                                }}>
+                                  <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                                    <span style={{ fontSize: 17 }}>{slot?.icon}</span>
+                                    <div>
+                                      <div style={{ fontSize: 12.5, fontWeight: 700, color: isSelf ? "var(--brand)" : "var(--text)", lineHeight: 1.2 }}>{slot?.label}</div>
+                                      {isSelf && <div style={{ fontSize: 10.5, color: "var(--brand)", fontWeight: 500 }}>Primary</div>}
+                                      {age !== null && <div style={{ fontSize: 10.5, color: "var(--text-3)" }}>{age} yrs</div>}
+                                    </div>
+                                  </div>
+                                  <input
+                                    className="field-input"
+                                    placeholder={missingName ? "Enter full name" : "Full name"}
+                                    value={m?.name ?? ""}
+                                    onChange={e => updateMember(type, "name", e.target.value)}
+                                    disabled={isSelf}
+                                    style={{ fontSize: 12.5, padding: "6px 9px", width: "100%", borderColor: missingName ? "#f59e0b" : undefined }}
+                                  />
+                                  <input
+                                    type="date"
+                                    className="field-input"
+                                    value={m?.dob ?? ""}
+                                    onChange={e => updateMember(type, "dob", e.target.value)}
+                                    disabled={isSelf}
+                                    style={{ fontSize: 12.5, padding: "6px 9px", width: "100%", borderColor: missingDob ? "#f59e0b" : undefined }}
+                                  />
+                                  {isSelf ? (
+                                    <input className="field-input" value={m?.gender ?? ""} disabled
+                                      style={{ fontSize: 12.5, padding: "6px 9px", width: "100%", background: "var(--surface-2)", color: "var(--text-2)" }} />
+                                  ) : (
+                                    <select className="field-select" value={m?.gender ?? ""}
+                                      onChange={e => updateMember(type, "gender", e.target.value)}
+                                      style={{ fontSize: 12.5, padding: "6px 9px", width: "100%" }}>
+                                      <option value="">Gender</option>
+                                      <option>Male</option>
+                                      <option>Female</option>
+                                      <option>Other</option>
+                                    </select>
+                                  )}
+                                </div>
+                              );
+                            })}
+                          </div>
+                          {hasMissingMembers && (
+                            <div style={{ display: "flex", alignItems: "center", gap: 6, marginTop: 8, fontSize: 12, color: "#92400e", fontWeight: 500, background: "#fffbeb", border: "1px solid #f59e0b", borderRadius: 6, padding: "6px 10px" }}>
+                              ⚠ Please fill in the highlighted member details before continuing
+                            </div>
+                          )}
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Premium footer */}
+                    {sel.premium != null && (
+                      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "10px 16px", background: "var(--surface-2)", borderTop: "1px solid var(--border)" }}>
+                        <span style={{ fontSize: 12, color: "var(--text-3)", fontWeight: 500 }}>Annual Premium</span>
+                        <span style={{ fontSize: 16, fontWeight: 800, color: "var(--brand)" }}>₹{sel.premium.toLocaleString("en-IN")}</span>
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          )}
+
+          {/* Sticky total + continue footer */}
+          <div style={{
+            position: "sticky", bottom: 0, zIndex: 20, marginTop: 8,
+            background: cart.some(x => psel(x.id).premium != null) ? "var(--brand-light)" : "#fff",
+            border: `2px solid ${cart.some(x => psel(x.id).premium != null) ? "rgba(124,58,237,.3)" : "var(--border)"}`,
+            borderRadius: 12, padding: "12px 18px",
+            boxShadow: "0 -4px 20px rgba(0,0,0,.09)",
+            display: "flex", alignItems: "center", gap: 16, flexWrap: "wrap",
+            transition: "all .2s",
+          }}>
+            {cart.some(x => psel(x.id).premium != null) ? (
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <div style={{ fontSize: 12, color: "var(--text-3)", fontWeight: 600, marginBottom: 2 }}>
+                  {cart.length} product{cart.length > 1 ? "s" : ""} · Total Premium
+                </div>
+                <div style={{ display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap" }}>
+                  <span style={{ fontSize: 22, fontWeight: 800, color: "var(--text)" }}>
+                    ₹{cart.reduce((s, x) => s + (psel(x.id).premium ?? 0), 0).toLocaleString("en-IN")}
+                  </span>
+                  <span style={{ fontSize: 11.5, color: "var(--text-3)" }}>
+                    {cart.map(x => `${x.name.split(" ")[0]}: ₹${(psel(x.id).premium ?? 0).toLocaleString("en-IN")}`).join("  +  ")}
+                  </span>
+                </div>
+              </div>
+            ) : (
+              <div style={{ flex: 1, fontSize: 13, color: "var(--text-3)" }}>
+                Select coverage for each product to see total premium
+              </div>
+            )}
+            <button
+              className="btn btn-primary"
+              disabled={cart.length === 0}
+              onClick={next}
+              style={{ flexShrink: 0, minWidth: 200 }}
+            >
+              Continue to Proposal →
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* ══════════════════════════════════════════════════════════════════
+          STEP 1 — Select Products
       ══════════════════════════════════════════════════════════════════ */}
       {step === 1 && (
         <div>
           {selectedCustomer && <KYCWarning kyc={selectedCustomer.kyc} />}
 
-          {/* Context strip */}
-          <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 16, padding: "10px 14px", background: "var(--surface-2)", border: "1px solid var(--border)", borderRadius: 10 }}>
-            <span style={{ fontSize: 13 }}>👤</span>
-            <span style={{ fontSize: 13, color: "var(--text-2)" }}>Buying for</span>
-            <span style={{ fontSize: 13, fontWeight: 700, color: "var(--text)" }}>{selectedCustomer?.name}</span>
-            <span style={{ fontSize: 12, color: "var(--text-3)", marginLeft: "auto" }}>Select an insurance type to continue</span>
-          </div>
-
-          {/* 3 × 2 grid of horizontal cards */}
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 10 }}>
-            {[
-              { type: "Health",   icon: "🏥", label: "Health",   desc: "Hospitalisation, OPD, top-up & more" },
-              { type: "Motor",    icon: "🚗", label: "Motor",    desc: "Car & two-wheeler comprehensive cover" },
-              { type: "Life",     icon: "❤️", label: "Life",     desc: "Term, endowment & ULIP plans" },
-              { type: "Travel",   icon: "✈️", label: "Travel",   desc: "Domestic & international trips" },
-              { type: "Home",     icon: "🏠", label: "Home",     desc: "Structure & contents protection" },
-              { type: "Business", icon: "🏢", label: "Business", desc: "Fire, liability & commercial cover" },
-            ].map(({ type, icon, label, desc }) => {
-              const disabled = type !== "Health";
-              return (
-                <button
-                  key={type}
-                  type="button"
-                  disabled={disabled}
-                  onClick={() => { setInsuranceType(type); next(); }}
-                  title={disabled ? "Coming soon" : undefined}
-                  style={{
-                    display: "flex", alignItems: "center", gap: 14,
-                    padding: "14px 16px", borderRadius: 12, textAlign: "left",
-                    cursor: disabled ? "not-allowed" : "pointer", fontFamily: "inherit",
-                    border: "1.5px solid var(--border)",
-                    background: disabled ? "var(--surface-2)" : "var(--surface)",
-                    boxShadow: "0 1px 3px rgba(0,0,0,.05)",
-                    opacity: disabled ? 0.5 : 1,
-                    transition: "all .13s",
-                  }}
-                  onMouseEnter={e => {
-                    if (disabled) return;
-                    e.currentTarget.style.border = "1.5px solid var(--brand)";
-                    e.currentTarget.style.background = "var(--brand-light)";
-                    e.currentTarget.style.boxShadow = "0 4px 14px rgba(124,58,237,.12)";
-                    e.currentTarget.style.transform = "translateY(-1px)";
-                  }}
-                  onMouseLeave={e => {
-                    if (disabled) return;
-                    e.currentTarget.style.border = "1.5px solid var(--border)";
-                    e.currentTarget.style.background = "var(--surface)";
-                    e.currentTarget.style.boxShadow = "0 1px 3px rgba(0,0,0,.05)";
-                    e.currentTarget.style.transform = "none";
-                  }}
-                >
-                  <span style={{ fontSize: 28, lineHeight: 1, flexShrink: 0 }}>{icon}</span>
-                  <div style={{ minWidth: 0 }}>
-                    <div style={{ fontWeight: 700, fontSize: 13.5, color: "var(--text)", marginBottom: 3 }}>
-                      {label}
-                      {disabled && <span style={{ fontSize: 10, fontWeight: 500, color: "var(--text-3)", marginLeft: 7, background: "var(--border)", borderRadius: 4, padding: "1px 6px" }}>Coming soon</span>}
-                    </div>
-                    <div style={{ fontSize: 12, color: "var(--text-3)", lineHeight: 1.4 }}>{desc}</div>
-                  </div>
-                  {!disabled && <span style={{ marginLeft: "auto", fontSize: 14, color: "var(--text-3)", flexShrink: 0 }}>›</span>}
-                </button>
-              );
-            })}
-          </div>
-        </div>
-      )}
-
-      {/* ══════════════════════════════════════════════════════════════════
-          STEP 3 — Members
-      ══════════════════════════════════════════════════════════════════ */}
-      {step === 3 && (
-        <div className="card">
-          <div className="card-body">
-            {false ? (
-              <div>
-                <div
-                  style={{ fontWeight: 600, fontSize: 15, marginBottom: 20 }}
-                >
-                  Vehicle Details
-                </div>
-                <div className="form-grid">
-                  <Field label="Make / Brand" required>
-                    <Input
-                      placeholder="e.g. Maruti Suzuki"
-                      value={vehicle.make}
-                      onChange={setV("make")}
-                      required
-                    />
-                  </Field>
-                  <Field label="Model" required>
-                    <Input
-                      placeholder="e.g. Swift Dzire"
-                      value={vehicle.model}
-                      onChange={setV("model")}
-                      required
-                    />
-                  </Field>
-                  <Field label="Variant">
-                    <Input
-                      placeholder="e.g. ZXI+"
-                      value={vehicle.variant}
-                      onChange={setV("variant")}
-                    />
-                  </Field>
-                  <Field label="Fuel Type" required>
-                    <Select
-                      value={vehicle.fuelType}
-                      onChange={setV("fuelType")}
-                      required
-                    >
-                      <option value="">Select fuel type</option>
-                      {["Petrol", "Diesel", "Electric", "CNG", "Hybrid"].map(
-                        (x) => (
-                          <option key={x}>{x}</option>
-                        ),
-                      )}
-                    </Select>
-                  </Field>
-                  <Field label="Year of Manufacture" required>
-                    <Input
-                      placeholder="e.g. 2021"
-                      value={vehicle.year}
-                      onChange={setV("year")}
-                      required
-                    />
-                  </Field>
-                  <Field label="Registration Number" required>
-                    <Input
-                      placeholder="e.g. MH02AB1234"
-                      value={vehicle.regNo}
-                      onChange={setV("regNo")}
-                      required
-                      style={{ textTransform: "uppercase" }}
-                    />
-                  </Field>
-                </div>
-              </div>
-            ) : (
-              <div>
-                {/* Header */}
-                <div style={{ marginBottom: 20 }}>
-                  <div style={{ fontWeight: 600, fontSize: 15 }}>
-                    Family Members to Cover
-                  </div>
-                  <div
-                    style={{
-                      fontSize: 13,
-                      color: "var(--text-3)",
-                      marginTop: 3,
-                    }}
-                  >
-                    Premium is calculated based on age and number of insured
-                    members
-                  </div>
-                </div>
-
-                {/* Quick-add pills — only shows slots not yet added */}
-                {(() => {
-                  const addedTypes = members.map((m) => m.type);
-                  const available = FAMILY_SLOTS.filter(
-                    (s) => s.type !== "Self" && !addedTypes.includes(s.type),
-                  );
-                  if (available.length === 0) return null;
-                  return (
-                    <div style={{ marginBottom: 20 }}>
-                      <div
-                        style={{
-                          fontSize: 11.5,
-                          color: "var(--text-3)",
-                          marginBottom: 8,
-                          fontWeight: 600,
-                          textTransform: "uppercase",
-                          letterSpacing: ".5px",
-                        }}
-                      >
-                        + Add Member
-                      </div>
-                      <div
-                        style={{ display: "flex", flexWrap: "wrap", gap: 8 }}
-                      >
-                        {available.map((slot) => (
-                          <button
-                            key={slot.type}
-                            type="button"
-                            onClick={() => addMember(slot.type)}
-                            style={{
-                              display: "flex",
-                              alignItems: "center",
-                              gap: 6,
-                              padding: "7px 14px",
-                              borderRadius: 99,
-                              border: "1.5px dashed var(--brand)",
-                              background: "var(--brand-light)",
-                              color: "var(--brand)",
-                              fontWeight: 600,
-                              fontSize: 13,
-                              cursor: "pointer",
-                              fontFamily: "inherit",
-                              transition: "all .12s",
-                            }}
-                          >
-                            <span>{slot.icon}</span> {slot.label}
-                          </button>
-                        ))}
-                      </div>
-                    </div>
-                  );
-                })()}
-
-                {/* Member cards */}
-                <div
-                  style={{ display: "flex", flexDirection: "column", gap: 12 }}
-                >
-                  {members.map((m) => {
-                    const slot = FAMILY_SLOTS.find((s) => s.type === m.type);
-                    const isSelf = m.type === "Self";
-                    const age = m.dob
-                      ? Math.floor(
-                          (new Date() - new Date(m.dob)) /
-                            (365.25 * 24 * 3600 * 1000),
-                        )
-                      : null;
-                    return (
-                      <div
-                        key={m.type}
-                        style={{
-                          border: `1.5px solid ${isSelf ? "var(--brand)" : "var(--border)"}`,
-                          borderRadius: "var(--r-md)",
-                          padding: "14px 18px",
-                          background: isSelf
-                            ? "var(--brand-light)"
-                            : "var(--surface)",
-                        }}
-                      >
-                        {/* Row header */}
-                        <div
-                          style={{
-                            display: "flex",
-                            justifyContent: "space-between",
-                            alignItems: "center",
-                            marginBottom: 14,
-                          }}
-                        >
-                          <div
-                            style={{
-                              display: "flex",
-                              alignItems: "center",
-                              gap: 10,
-                            }}
-                          >
-                            <span style={{ fontSize: 22 }}>{slot?.icon}</span>
-                            <div>
-                              <span
-                                style={{
-                                  fontWeight: 700,
-                                  fontSize: 14,
-                                  color: isSelf
-                                    ? "var(--brand)"
-                                    : "var(--text)",
-                                }}
-                              >
-                                {slot?.label}
-                              </span>
-                              {isSelf && (
-                                <span
-                                  style={{
-                                    fontSize: 12,
-                                    color: "var(--brand)",
-                                    marginLeft: 8,
-                                    fontWeight: 500,
-                                  }}
-                                >
-                                  Primary Insured
-                                </span>
-                              )}
-                              {age !== null && (
-                                <span
-                                  style={{
-                                    fontSize: 12,
-                                    color: "var(--text-3)",
-                                    marginLeft: 8,
-                                  }}
-                                >
-                                  Age: {age} yrs
-                                </span>
-                              )}
-                            </div>
-                          </div>
-                          {!isSelf && (
-                            <button
-                              type="button"
-                              className="btn btn-danger btn-sm"
-                              onClick={() => removeMember(m.type)}
-                            >
-                              Remove
-                            </button>
-                          )}
-                        </div>
-
-                        {/* Fields */}
-                        <div
-                          style={{
-                            display: "grid",
-                            gridTemplateColumns: "1fr 1fr 1fr",
-                            gap: 12,
-                          }}
-                        >
-                          <Field label="Full Name" required>
-                            <Input
-                              placeholder="Full name"
-                              value={m.name}
-                              onChange={(e) =>
-                                updateMember(m.type, "name", e.target.value)
-                              }
-                              disabled={isSelf}
-                            />
-                          </Field>
-                          <Field label="Date of Birth" required>
-                            <Input
-                              type="date"
-                              value={m.dob}
-                              onChange={(e) =>
-                                updateMember(m.type, "dob", e.target.value)
-                              }
-                              disabled={isSelf}
-                            />
-                          </Field>
-                          <Field label="Gender" required>
-                            <Select
-                              value={m.gender}
-                              onChange={(e) =>
-                                updateMember(m.type, "gender", e.target.value)
-                              }
-                              disabled={isSelf}
-                            >
-                              <option value="">Select gender</option>
-                              <option>Male</option>
-                              <option>Female</option>
-                              <option>Other</option>
-                            </Select>
-                          </Field>
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 16, flexWrap: "wrap", gap: 8 }}>
+            <div>
+              <div style={{ fontSize: 15, fontWeight: 700, color: "var(--text)" }}>Select Products</div>
+              <div style={{ fontSize: 13, color: "var(--text-3)", marginTop: 2 }}>Click a card to select, then view full details before continuing</div>
+            </div>
+            {cart.length > 0 && (
+              <span style={{ fontSize: 13, fontWeight: 600, color: "var(--brand)", background: "var(--brand-light)", border: "1px solid rgba(124,58,237,.2)", borderRadius: 20, padding: "4px 14px" }}>
+                {cart.length} selected
+              </span>
             )}
-
-            <div className="actions-row">
-              <button className="btn btn-primary" onClick={next}>
-                Continue to Proposal →
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* ══════════════════════════════════════════════════════════════════
-          STEP 2 — Select Product (from campaign assignments)
-      ══════════════════════════════════════════════════════════════════ */}
-      {step === 2 && (
-        <div>
-          <div style={{ textAlign: "center", marginBottom: 28 }}>
-            <div style={{ fontSize: 16, fontWeight: 600, marginBottom: 6 }}>Select Products</div>
-            <div className="text-muted">
-              Choose products and select a coverage option for each
-            </div>
           </div>
 
           {availableProducts.length === 0 ? (
@@ -1128,232 +1112,313 @@ export default function BuyPolicy() {
               <div style={{ fontSize: 13 }}>No products are assigned to your campaigns</div>
             </div>
           ) : (
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(300px, 1fr))", gap: 14, alignItems: "start" }}>
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))", gap: 14 }}>
               {availableProducts.map(p => {
                 const inCart    = !!cart.find(x => x.id === p.id);
-                const sel       = psel(p.id);
                 const chartRows = PREMIUM_CHART[p.id] ?? [];
                 const uniqueSIs = [...new Set(chartRows.map(r => r.sumInsured))];
-                const hasAB     = chartRows.some(r => r.ageBandId != null);
-                const rowBands  = hasAB
-                  ? [...new Set(chartRows.filter(r => r.sumInsured === Number(sel.sumInsured)).map(r => String(r.ageBandId)))]
-                  : [];
-                const activeRow = matchRow(p.id, sel.sumInsured, sel.ageBandId);
-                const covOpts   = coverageOpts(activeRow);
+                const firstRow  = chartRows[0];
+                const covKeys   = ['selfOnly','selfSpouse','selfSpouse2Children'].filter(k => firstRow?.[k] != null);
                 const icon      = POLICY_TYPE_ICON[p.policyType] ?? "📋";
-
                 return (
                   <div key={p.id} style={{
-                    borderRadius: 14,
-                    border: `2px solid ${inCart ? "var(--brand)" : "var(--border)"}`,
-                    background: "#fff",
-                    boxShadow: inCart ? "0 4px 18px rgba(124,58,237,.13)" : "0 1px 4px rgba(0,0,0,.06)",
-                    overflow: "hidden",
-                    transition: "border-color .15s, box-shadow .18s",
-                  }}>
-
-                    {/* ── Header ──────────────────────────────── */}
-                    <div style={{
-                      display: "flex", alignItems: "center", gap: 10,
-                      padding: "11px 13px",
-                      background: inCart ? "rgba(124,58,237,.04)" : "var(--surface-2)",
-                      borderBottom: `1px solid ${inCart ? "rgba(124,58,237,.15)" : "var(--border)"}`,
-                    }}>
-                      <input
-                        type="checkbox"
-                        checked={inCart}
+                    borderRadius: 12, overflow: "hidden", background: "#fff",
+                    border: `1.5px solid ${inCart ? "var(--brand)" : "var(--border)"}`,
+                    boxShadow: inCart ? "0 2px 12px rgba(124,58,237,.10)" : "0 1px 4px rgba(0,0,0,.05)",
+                    transition: "border-color .15s, box-shadow .15s",
+                    cursor: "pointer",
+                  }}
+                  onClick={() => toggleCart(p)}
+                  >
+                    {/* Header */}
+                    <div style={{ display: "flex", alignItems: "center", gap: 10, padding: "13px 14px", borderBottom: "1px solid var(--border)", background: "#fff" }}>
+                      <input type="checkbox" checked={inCart}
                         onChange={() => toggleCart(p)}
-                        style={{ width: 16, height: 16, cursor: "pointer", accentColor: "var(--brand)", flexShrink: 0 }}
-                      />
-                      <div style={{
-                        width: 34, height: 34, borderRadius: 9, flexShrink: 0,
-                        background: inCart ? "var(--brand)" : "var(--surface)",
-                        border: `1px solid ${inCart ? "var(--brand)" : "var(--border)"}`,
-                        display: "flex", alignItems: "center", justifyContent: "center",
-                        fontSize: 16, transition: "all .15s",
-                      }}>{icon}</div>
+                        onClick={e => e.stopPropagation()}
+                        style={{ width: 16, height: 16, cursor: "pointer", accentColor: "var(--brand)", flexShrink: 0 }} />
+                      <div style={{ width: 36, height: 36, borderRadius: 9, flexShrink: 0, background: "var(--surface-2)", border: "1px solid var(--border)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18 }}>{icon}</div>
                       <div style={{ flex: 1, minWidth: 0 }}>
-                        <div style={{ fontWeight: 700, fontSize: 12.5, lineHeight: 1.3, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", color: "var(--text)" }}>
-                          {p.name}
-                        </div>
-                        <div style={{ fontSize: 11, color: "var(--text-3)", marginTop: 1, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-                          {p.provider}
-                        </div>
+                        <div style={{ fontWeight: 700, fontSize: 13, color: "var(--text)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{p.name}</div>
+                        <div style={{ fontSize: 11.5, color: "var(--text-3)", marginTop: 2, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{p.provider}</div>
                       </div>
+                      {inCart && <div style={{ width: 22, height: 22, borderRadius: "50%", background: "var(--brand)", color: "#fff", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 11, fontWeight: 700, flexShrink: 0 }}>✓</div>}
                     </div>
 
-                    {/* ── Detail strip ────────────────────────── */}
-                    <div style={{ padding: "7px 13px", background: "var(--brand-light)", borderBottom: "1px solid rgba(124,58,237,.15)", fontSize: 11.5 }}>
+                    {/* Detail strip */}
+                    <div style={{ padding: "6px 14px", background: "var(--surface-2)", borderBottom: "1px solid var(--border)", fontSize: 11.5 }}>
                       <div style={{ display: "flex", flexWrap: "wrap", gap: "3px 14px", color: "var(--text-2)" }}>
-                        <span><span style={{ color: "var(--text-3)" }}>Code </span>
-                          <span style={{ fontFamily: "monospace", fontWeight: 700, color: "var(--brand)" }}>{p.code}</span></span>
-                        <span><span style={{ color: "var(--text-3)" }}>Type </span><strong>{p.policyType}</strong></span>
+                        <span><span style={{ color: "var(--text-3)" }}>Code </span><span style={{ fontFamily: "monospace", fontWeight: 600, color: "var(--text)" }}>{p.code}</span></span>
+                        <span><span style={{ color: "var(--text-3)" }}>Type </span><strong style={{ color: "var(--text)" }}>{p.policyType}</strong></span>
                         <span style={{ color: "var(--green)", fontWeight: 600 }}>● Active</span>
                       </div>
                     </div>
 
-                    {/* ── Body ────────────────────────────────── */}
-                    <div style={{ padding: "11px 13px" }}>
-                      {chartRows.length === 0 ? (
-                        <div style={{ fontSize: 12, color: "var(--text-3)", padding: "6px 0", fontStyle: "italic" }}>
-                          Contact for premium details
+                    {/* Key info */}
+                    <div style={{ padding: "12px 14px" }}>
+                      {uniqueSIs.length > 0 && (
+                        <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 10 }}>
+                          <span style={{ fontSize: 11.5, color: "var(--text-3)" }}>Sum Insured:</span>
+                          <span style={{ fontSize: 12.5, fontWeight: 600, color: "var(--text)" }}>
+                            ₹{Math.min(...uniqueSIs).toLocaleString("en-IN")}
+                            {uniqueSIs.length > 1 && ` – ₹${Math.max(...uniqueSIs).toLocaleString("en-IN")}`}
+                          </span>
                         </div>
-                      ) : (
-                        <>
-                          {/* Controls row: Sum Insured + Age Band */}
-                          <div style={{ display: "flex", gap: 8, marginBottom: 10 }}>
-                            <div style={{ flex: 1, minWidth: 0 }}>
-                              <div style={{ fontSize: 10.5, color: "var(--text-3)", fontWeight: 600, marginBottom: 3, textTransform: "uppercase", letterSpacing: ".4px" }}>Sum Insured</div>
-                              <select
-                                className="field-select"
-                                value={sel.sumInsured}
-                                onChange={e => {
-                                  const si    = e.target.value;
-                                  const bands = hasAB ? [...new Set(chartRows.filter(r => r.sumInsured === Number(si)).map(r => String(r.ageBandId)))] : [];
-                                  const band  = bands[0] ?? '';
-                                  const row   = matchRow(p.id, si, band);
-                                  const cov   = row?.selfOnly != null ? 'selfOnly' : '';
-                                  setPsel(p.id, { sumInsured: si, ageBandId: band, coverage: cov, premium: row?.[cov] ?? null });
-                                }}
-                                style={{ width: "100%", fontSize: 12, padding: "5px 8px" }}
-                              >
-                                {uniqueSIs.map(si => (
-                                  <option key={si} value={String(si)}>₹{si.toLocaleString("en-IN")}</option>
-                                ))}
-                              </select>
-                            </div>
-                            {hasAB && rowBands.length > 0 && (
-                              <div style={{ flex: 1, minWidth: 0 }}>
-                                <div style={{ fontSize: 10.5, color: "var(--text-3)", fontWeight: 600, marginBottom: 3, textTransform: "uppercase", letterSpacing: ".4px" }}>Age Band</div>
-                                <select
-                                  className="field-select"
-                                  value={sel.ageBandId}
-                                  onChange={e => {
-                                    const band = e.target.value;
-                                    const row  = matchRow(p.id, sel.sumInsured, band);
-                                    const cov  = sel.coverage && row?.[sel.coverage] != null ? sel.coverage : (row?.selfOnly != null ? 'selfOnly' : '');
-                                    setPsel(p.id, { ageBandId: band, coverage: cov, premium: row?.[cov] ?? null });
-                                  }}
-                                  style={{ width: "100%", fontSize: 12, padding: "5px 8px" }}
-                                >
-                                  {rowBands.map(b => <option key={b} value={b}>Band {b}</option>)}
-                                </select>
-                              </div>
-                            )}
-                          </div>
-
-                          {/* Coverage options — compact radio rows */}
-                          {covOpts.length > 0 && (
-                            <div style={{ borderTop: "1px solid var(--border)", paddingTop: 8, display: "flex", flexDirection: "column", gap: 2 }}>
-                              {covOpts.map(opt => {
-                                const active = sel.coverage === opt.key;
-                                return (
-                                  <label key={opt.key} style={{
-                                    display: "flex", alignItems: "center", gap: 9,
-                                    padding: "6px 8px", borderRadius: 8, cursor: "pointer",
-                                    background: active ? "rgba(124,58,237,.07)" : "transparent",
-                                    border: `1px solid ${active ? "rgba(124,58,237,.2)" : "transparent"}`,
-                                    transition: "all .12s",
-                                  }}>
-                                    <input
-                                      type="radio"
-                                      name={`cov-${p.id}`}
-                                      checked={active}
-                                      onChange={() => setPsel(p.id, { coverage: opt.key, premium: opt.value })}
-                                      style={{ accentColor: "var(--brand)", flexShrink: 0, width: 14, height: 14 }}
-                                    />
-                                    <span style={{ flex: 1, fontSize: 12, color: active ? "var(--brand)" : "var(--text-2)", fontWeight: active ? 600 : 400 }}>
-                                      {opt.label}
-                                    </span>
-                                    <span style={{ fontWeight: 700, fontSize: 13, color: active ? "var(--brand)" : "var(--text)", letterSpacing: "-0.2px", flexShrink: 0 }}>
-                                      ₹{opt.value.toLocaleString("en-IN")}
-                                    </span>
-                                  </label>
-                                );
-                              })}
-                            </div>
-                          )}
-                        </>
+                      )}
+                      {covKeys.length > 0 && (
+                        <div style={{ display: "flex", gap: 5, flexWrap: "wrap" }}>
+                          {covKeys.includes('selfOnly') && <span style={{ fontSize: 11, background: "var(--surface-2)", border: "1px solid var(--border)", borderRadius: 4, padding: "2px 8px", color: "var(--text-2)" }}>Self</span>}
+                          {covKeys.includes('selfSpouse') && <span style={{ fontSize: 11, background: "var(--surface-2)", border: "1px solid var(--border)", borderRadius: 4, padding: "2px 8px", color: "var(--text-2)" }}>Self + Spouse</span>}
+                          {covKeys.includes('selfSpouse2Children') && <span style={{ fontSize: 11, background: "var(--surface-2)", border: "1px solid var(--border)", borderRadius: 4, padding: "2px 8px", color: "var(--text-2)" }}>Family</span>}
+                        </div>
                       )}
                     </div>
 
-                    {/* ── Selected premium footer ──────────────── */}
-                    {inCart && sel.premium != null && (
-                      <div style={{
-                        display: "flex", justifyContent: "space-between", alignItems: "center",
-                        padding: "7px 13px",
-                        background: "rgba(124,58,237,.06)",
-                        borderTop: "1px solid rgba(124,58,237,.15)",
-                      }}>
-                        <span style={{ fontSize: 11, color: "var(--brand)", fontWeight: 500 }}>Selected premium</span>
-                        <span style={{ fontSize: 14, fontWeight: 800, color: "var(--brand)" }}>
-                          ₹{sel.premium.toLocaleString("en-IN")}
-                        </span>
-                      </div>
-                    )}
+                    {/* Footer */}
+                    <div style={{ padding: "9px 14px", borderTop: "1px solid var(--border)", display: "flex", justifyContent: "flex-end" }} onClick={e => e.stopPropagation()}>
+                      <button
+                        className="btn btn-ghost btn-sm"
+                        style={{ fontSize: 12 }}
+                        onClick={e => { e.stopPropagation(); setViewingProduct(p); }}
+                      >
+                        View Details →
+                      </button>
+                    </div>
                   </div>
                 );
               })}
             </div>
           )}
 
-          {/* ── Sticky footer bar ── */}
+          {/* Sticky footer */}
           <div style={{
-            position: "sticky", bottom: 0, zIndex: 20,
-            marginTop: 20, display: "flex", alignItems: "center", justifyContent: "space-between",
+            position: "sticky", bottom: 0, zIndex: 20, marginTop: 20,
+            display: "flex", alignItems: "center", justifyContent: "space-between",
             gap: 16, padding: "14px 20px",
-            background: cart.length > 0 ? "#ede9fb" : "#fff",
-            border: `1.5px solid ${cart.length > 0 ? "rgba(124,58,237,.25)" : "var(--border)"}`,
+            background: cart.length > 0 ? "var(--brand-light)" : "#fff",
+            border: `2px solid ${cart.length > 0 ? "var(--brand)" : "var(--border)"}`,
             borderRadius: 12, transition: "all .2s",
-            boxShadow: "0 -4px 20px rgba(0,0,0,.08)",
+            boxShadow: cart.length > 0 ? "0 -4px 20px rgba(124,58,237,.12)" : "0 -4px 20px rgba(0,0,0,.06)",
           }}>
-            <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
-              <div>
-                <div style={{ fontSize: 11, color: "var(--text-3)", fontWeight: 500 }}>Selected</div>
-                <div style={{ fontWeight: 700, fontSize: 16, color: "var(--text)" }}>
-                  {cart.length} {cart.length === 1 ? "product" : "products"}
-                </div>
-              </div>
-              {cart.length > 0 && (
-                <>
-                  <div style={{ width: 1, height: 32, background: "var(--border)" }} />
-                  <div>
-                    <div style={{ fontSize: 11, color: "var(--text-3)", fontWeight: 500 }}>Total Premium</div>
-                    <div style={{ fontWeight: 800, fontSize: 16, color: "var(--brand)" }}>
-                      ₹{cart.reduce((s, x) => s + (x.premium ?? 0), 0).toLocaleString("en-IN")}
-                    </div>
-                  </div>
-                </>
-              )}
+            <div style={{ fontSize: 13.5, color: "var(--text-2)" }}>
+              {cart.length === 0
+                ? "Select at least one product to continue"
+                : <><strong style={{ color: "var(--text)" }}>{cart.length} product{cart.length > 1 ? "s" : ""}</strong> selected — choose premium details on next screen</>
+              }
             </div>
-            <button className="btn btn-primary" disabled={cart.length === 0} onClick={next} style={{ flexShrink: 0 }}>
+            <button className="btn btn-primary" disabled={cart.length === 0} onClick={next} style={{ flexShrink: 0, minWidth: 140 }}>
               Continue →
             </button>
           </div>
         </div>
       )}
 
+      {/* ── Product Brochure Modal ───────────────────────────────────────── */}
+      {viewingProduct && (() => {
+        const p         = viewingProduct;
+        const details   = PRODUCT_DETAILS[p.id];
+        const chartRows = PREMIUM_CHART[p.id] ?? [];
+        const icon      = POLICY_TYPE_ICON[p.policyType] ?? "📋";
+        const inCart    = !!cart.find(x => x.id === p.id);
+
+        const sectionHead = (text) => (
+          <div style={{ fontSize: 11, fontWeight: 700, color: "var(--brand)", textTransform: "uppercase", letterSpacing: ".6px", marginBottom: 10, display: "flex", alignItems: "center", gap: 6 }}>
+            <div style={{ flex: 1, height: 1, background: "var(--border)" }} />
+            <span>{text}</span>
+            <div style={{ flex: 1, height: 1, background: "var(--border)" }} />
+          </div>
+        );
+
+        return (
+          <div
+            style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,.5)", zIndex: 2000, display: "flex", alignItems: "center", justifyContent: "center", padding: 20 }}
+            onClick={() => setViewingProduct(null)}
+          >
+            <div
+              style={{ background: "#fff", borderRadius: 18, width: "100%", maxWidth: 640, maxHeight: "90vh", overflow: "hidden", display: "flex", flexDirection: "column", boxShadow: "0 32px 80px rgba(0,0,0,.25)" }}
+              onClick={e => e.stopPropagation()}
+            >
+              {/* ── Hero header ── */}
+              <div style={{ background: "linear-gradient(135deg, var(--brand) 0%, #4f46e5 100%)", padding: "22px 24px 20px", color: "#fff", flexShrink: 0 }}>
+                <div style={{ display: "flex", alignItems: "flex-start", gap: 14 }}>
+                  <div style={{ width: 48, height: 48, borderRadius: 13, background: "rgba(255,255,255,.18)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 24, flexShrink: 0 }}>{icon}</div>
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div style={{ fontWeight: 800, fontSize: 16, lineHeight: 1.3, marginBottom: 3 }}>{p.name}</div>
+                    <div style={{ fontSize: 12.5, opacity: .8, marginBottom: details ? 8 : 0 }}>{p.provider} &nbsp;·&nbsp; <span style={{ fontFamily: "monospace", background: "rgba(255,255,255,.15)", borderRadius: 4, padding: "1px 6px" }}>{p.code}</span></div>
+                    {details?.tagline && (
+                      <div style={{ fontSize: 13, fontStyle: "italic", opacity: .92, lineHeight: 1.5 }}>"{details.tagline}"</div>
+                    )}
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => setViewingProduct(null)}
+                    style={{ width: 30, height: 30, borderRadius: "50%", border: "1.5px solid rgba(255,255,255,.4)", background: "rgba(255,255,255,.15)", cursor: "pointer", color: "#fff", fontSize: 18, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}
+                  >×</button>
+                </div>
+
+                {/* Highlight chips */}
+                {details?.highlights && (
+                  <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginTop: 16 }}>
+                    {details.highlights.map(h => (
+                      <div key={h.label} style={{ background: "rgba(255,255,255,.15)", border: "1px solid rgba(255,255,255,.25)", borderRadius: 8, padding: "6px 12px", backdropFilter: "blur(4px)" }}>
+                        <div style={{ fontSize: 10, opacity: .7, textTransform: "uppercase", letterSpacing: ".5px", marginBottom: 1 }}>{h.label}</div>
+                        <div style={{ fontSize: 13, fontWeight: 700 }}>{h.icon} {h.value}</div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              {/* ── Scrollable body ── */}
+              <div style={{ flex: 1, overflowY: "auto", padding: "20px 24px", display: "flex", flexDirection: "column", gap: 20 }}>
+
+                {details ? (<>
+
+                  {/* About */}
+                  <div>
+                    {sectionHead("About This Plan")}
+                    <p style={{ margin: 0, fontSize: 13.5, color: "var(--text-2)", lineHeight: 1.75 }}>{details.description}</p>
+                  </div>
+
+                  {/* Who should buy */}
+                  {details.target?.length > 0 && (
+                    <div>
+                      {sectionHead("Who Should Buy")}
+                      <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+                        {details.target.map((t, i) => (
+                          <div key={i} style={{ display: "flex", alignItems: "flex-start", gap: 8, fontSize: 13, color: "var(--text-2)" }}>
+                            <span style={{ color: "var(--brand)", fontWeight: 700, flexShrink: 0, marginTop: 1 }}>→</span>
+                            <span>{t}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Key benefits */}
+                  {details.benefits?.length > 0 && (
+                    <div>
+                      {sectionHead("Key Benefits")}
+                      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "7px 14px" }}>
+                        {details.benefits.map((b, i) => (
+                          <div key={i} style={{ display: "flex", alignItems: "flex-start", gap: 7, fontSize: 13, color: "var(--text-2)" }}>
+                            <span style={{ color: "#16a34a", fontWeight: 800, flexShrink: 0, marginTop: 1 }}>✓</span>
+                            <span style={{ lineHeight: 1.5 }}>{b}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Covered / Not covered */}
+                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+                    {details.covered?.length > 0 && (
+                      <div style={{ background: "#f0fdf4", border: "1px solid #bbf7d0", borderRadius: 10, padding: "12px 14px" }}>
+                        <div style={{ fontSize: 11, fontWeight: 700, color: "#15803d", textTransform: "uppercase", letterSpacing: ".5px", marginBottom: 8 }}>✅ What's Covered</div>
+                        {details.covered.map((c, i) => (
+                          <div key={i} style={{ fontSize: 12.5, color: "#166534", lineHeight: 1.6, paddingLeft: 8, borderLeft: "2px solid #86efac", marginBottom: 4 }}>{c}</div>
+                        ))}
+                      </div>
+                    )}
+                    {details.notCovered?.length > 0 && (
+                      <div style={{ background: "#fff7ed", border: "1px solid #fed7aa", borderRadius: 10, padding: "12px 14px" }}>
+                        <div style={{ fontSize: 11, fontWeight: 700, color: "#c2410c", textTransform: "uppercase", letterSpacing: ".5px", marginBottom: 8 }}>⚠ Not Covered</div>
+                        {details.notCovered.map((c, i) => (
+                          <div key={i} style={{ fontSize: 12.5, color: "#9a3412", lineHeight: 1.6, paddingLeft: 8, borderLeft: "2px solid #fdba74", marginBottom: 4 }}>{c}</div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+
+                </>) : (
+                  /* Fallback: basic info grid for products without PRODUCT_DETAILS */
+                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
+                    {[["Code", p.code], ["Policy Type", p.policyType], ["Provider", p.provider], ["Status", "Active"]].map(([k, v]) => (
+                      <div key={k} style={{ background: "var(--surface-2)", borderRadius: 8, padding: "10px 14px" }}>
+                        <div style={{ fontSize: 11, color: "var(--text-3)", fontWeight: 600, textTransform: "uppercase", letterSpacing: ".4px", marginBottom: 3 }}>{k}</div>
+                        <div style={{ fontSize: 13, fontWeight: 600, color: "var(--text)", fontFamily: k === "Code" ? "monospace" : "inherit" }}>{v}</div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                {/* Premium chart */}
+                {chartRows.length > 0 && (
+                  <div>
+                    {sectionHead("Premium Chart (Annual, incl. GST)")}
+                    <div style={{ overflowX: "auto", borderRadius: 8, border: "1px solid var(--border)" }}>
+                      <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 12.5 }}>
+                        <thead>
+                          <tr style={{ background: "var(--surface-2)", borderBottom: "1.5px solid var(--border)" }}>
+                            <th style={{ padding: "8px 12px", textAlign: "left", fontWeight: 600, color: "var(--text-3)", whiteSpace: "nowrap" }}>Sum Insured</th>
+                            {chartRows[0]?.ageBandId != null && <th style={{ padding: "8px 12px", textAlign: "left", fontWeight: 600, color: "var(--text-3)" }}>Age Band</th>}
+                            {chartRows[0]?.selfOnly != null && <th style={{ padding: "8px 12px", textAlign: "right", fontWeight: 600, color: "var(--text-3)" }}>Self</th>}
+                            {chartRows.some(r => r.selfSpouse != null) && <th style={{ padding: "8px 12px", textAlign: "right", fontWeight: 600, color: "var(--text-3)" }}>Self + Spouse</th>}
+                            {chartRows.some(r => r.selfSpouse2Children != null) && <th style={{ padding: "8px 12px", textAlign: "right", fontWeight: 600, color: "var(--text-3)" }}>Family</th>}
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {chartRows.map((r, i) => (
+                            <tr key={i} style={{ borderBottom: "1px solid var(--border)", background: i % 2 === 0 ? "#fff" : "var(--surface-2)" }}>
+                              <td style={{ padding: "8px 12px", fontWeight: 600, whiteSpace: "nowrap" }}>₹{r.sumInsured.toLocaleString("en-IN")}</td>
+                              {r.ageBandId != null && <td style={{ padding: "8px 12px", color: "var(--text-2)" }}>Band {r.ageBandId}</td>}
+                              {chartRows[0]?.selfOnly != null && <td style={{ padding: "8px 12px", textAlign: "right" }}>{r.selfOnly != null ? `₹${r.selfOnly.toLocaleString("en-IN")}` : "—"}</td>}
+                              {chartRows.some(x => x.selfSpouse != null) && <td style={{ padding: "8px 12px", textAlign: "right" }}>{r.selfSpouse != null ? `₹${r.selfSpouse.toLocaleString("en-IN")}` : "—"}</td>}
+                              {chartRows.some(x => x.selfSpouse2Children != null) && <td style={{ padding: "8px 12px", textAlign: "right" }}>{r.selfSpouse2Children != null ? `₹${r.selfSpouse2Children.toLocaleString("en-IN")}` : "—"}</td>}
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                )}
+
+                {/* Declaration */}
+                {p.disclaimer && (
+                  <div style={{ background: "#fffbeb", border: "1px solid #f59e0b", borderRadius: 8, padding: "12px 14px", fontSize: 12, color: "#78350f", lineHeight: 1.7 }}>
+                    <div style={{ fontWeight: 700, marginBottom: 4 }}>⚠ Declaration</div>
+                    {p.disclaimer}
+                  </div>
+                )}
+              </div>
+
+              {/* ── Sticky CTA footer ── */}
+              <div style={{ padding: "14px 24px", borderTop: "1px solid var(--border)", background: "#fff", flexShrink: 0, display: "flex", gap: 10 }}>
+                <button
+                  className="btn btn-ghost"
+                  style={{ flex: 1 }}
+                  onClick={() => setViewingProduct(null)}
+                >
+                  Close
+                </button>
+                <button
+                  className={`btn ${inCart ? "btn-ghost" : "btn-primary"}`}
+                  style={{ flex: 2 }}
+                  onClick={() => { toggleCart(p); setViewingProduct(null); }}
+                >
+                  {inCart ? "✓ Selected — Remove from Cart" : "＋ Add to Cart"}
+                </button>
+              </div>
+            </div>
+          </div>
+        );
+      })()}
+
       {/* ══════════════════════════════════════════════════════════════════
-          STEP 4 — Proposal Form
+          STEP 3 — Proposal Form
       ══════════════════════════════════════════════════════════════════ */}
-      {step === 4 && cart.length > 0 && (
-        <div>
-          {/* Selected plans summary */}
-          <div style={{
-            background: "var(--brand-light)", borderRadius: "var(--r-md)",
-            padding: "14px 18px", marginBottom: 24,
-            border: "1.5px solid rgba(124,58,237,.25)",
-          }}>
+      {step === 3 && cart.length > 0 && (() => {
+        const nomineesTotal = nominees.reduce((s, n) => s + (Number(n.share) || 0), 0);
+        const canProceed = proposal.declaration && termsAccepted && nomineesTotal === 100;
+        return (
+        <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+
+          {/* Selected Plans Summary */}
+          <div style={{ background: "var(--brand-light)", borderRadius: 12, padding: "14px 18px", border: "1.5px solid rgba(124,58,237,.25)" }}>
             <div style={{ fontSize: 11, fontWeight: 600, color: "var(--brand)", textTransform: "uppercase", letterSpacing: ".5px", marginBottom: 10 }}>
               Selected Plans
             </div>
             {cart.map((p, i) => (
-              <div key={p.id} style={{
-                display: "flex", justifyContent: "space-between", alignItems: "center",
-                padding: "7px 0",
-                borderBottom: i < cart.length - 1 ? "1px solid rgba(124,58,237,.12)" : "none",
-                fontSize: 13,
-              }}>
+              <div key={p.id} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "7px 0", borderBottom: i < cart.length - 1 ? "1px solid rgba(124,58,237,.12)" : "none", fontSize: 13 }}>
                 <div style={{ display: "flex", alignItems: "center", gap: 8, minWidth: 0 }}>
                   <span style={{ fontSize: 16, flexShrink: 0 }}>{POLICY_TYPE_ICON[p.policyType] ?? "📋"}</span>
                   <div style={{ minWidth: 0 }}>
@@ -1377,195 +1442,217 @@ export default function BuyPolicy() {
             </div>
           </div>
 
+          {/* Covered Family Members */}
           <div className="card">
-            <div className="card-body">
-              {/* Policyholder details */}
-              <div className="section-block">
-                <div className="section-heading">👤 Policy Holder Details</div>
-                <div
-                  style={{
-                    background: "var(--surface-2)",
-                    borderRadius: "var(--r-sm)",
-                    padding: "8px 12px",
-                    marginBottom: 16,
-                    fontSize: 12.5,
-                    color: "var(--text-3)",
-                  }}
-                >
-                  ℹ Auto-filled from customer record — edit only if needed
-                </div>
-                <div className="form-grid">
-                  <Field label="Full Name" required>
-                    <Input
-                      value={proposal.customerName}
-                      onChange={setP("customerName")}
-                      required
-                    />
-                  </Field>
-                  <Field label="Mobile" required>
-                    <Input
-                      type="tel"
-                      value={proposal.mobile}
-                      onChange={setP("mobile")}
-                      required
-                    />
-                  </Field>
-                  <Field label="Email">
-                    <Input
-                      type="email"
-                      value={proposal.email}
-                      onChange={setP("email")}
-                    />
-                  </Field>
-                  <Field label="Address" required>
-                    <Input
-                      value={proposal.address}
-                      onChange={setP("address")}
-                      required
-                    />
-                  </Field>
-                </div>
-              </div>
-
-              {/* Medical info — shown for health-related policy types */}
-              {["Base Policy", "Top Up Policy", "OPD", "Age Band Premium", "Super Top Up"].includes(insuranceType) && (
-                <div className="section-block">
-                  <div className="section-heading">🏥 Medical Information</div>
-                  <div className="form-grid">
-                    <Field
-                      label="Any pre-existing medical conditions?"
-                      required
-                    >
-                      <Select
-                        value={proposal.medicalHistory}
-                        onChange={setP("medicalHistory")}
-                      >
-                        <option value="No">No</option>
-                        <option value="Yes">Yes</option>
-                      </Select>
-                    </Field>
-                    {proposal.medicalHistory === "Yes" && (
-                      <Field label="Describe conditions">
-                        <Textarea
-                          placeholder="e.g. Diabetes (Type 2), Hypertension…"
-                          value={proposal.preExisting}
-                          onChange={setP("preExisting")}
-                        />
-                      </Field>
-                    )}
-                  </div>
-                </div>
-              )}
-
-              {/* Nominee */}
-              <div className="section-block">
-                <div className="section-heading">📝 Nominee Details</div>
-                <div className="form-grid-3">
-                  <Field label="Nominee Name" required>
-                    <Input
-                      placeholder="Full name"
-                      value={proposal.nomineeName}
-                      onChange={setP("nomineeName")}
-                      required
-                    />
-                  </Field>
-                  <Field label="Relation" required>
-                    <Select
-                      value={proposal.nomineeRelation}
-                      onChange={handleNomineeRelation}
-                      required
-                    >
-                      <option value="">Select relation</option>
-                      {["Spouse", "Child", "Parent", "Sibling", "Other"].map(
-                        (r) => (
-                          <option key={r}>{r}</option>
-                        ),
+            <div className="card-header">
+              <span style={{ fontWeight: 700, fontSize: 14 }}>👨‍👩‍👧 Covered Members</span>
+              <span style={{ fontSize: 12, color: "var(--text-3)", marginLeft: 8 }}>{members.length} member{members.length > 1 ? "s" : ""} covered under this policy</span>
+            </div>
+            <div className="card-body" style={{ padding: "12px 16px" }}>
+              <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+                {members.map(m => {
+                  const slot  = FAMILY_SLOTS.find(s => s.type === m.type);
+                  const isSelf = m.type === "Self";
+                  const age   = m.dob ? Math.floor((Date.now() - new Date(m.dob)) / (365.25 * 24 * 3600 * 1000)) : null;
+                  return (
+                    <div key={m.type} style={{
+                      display: "flex", alignItems: "center", gap: 12, padding: "10px 14px",
+                      borderRadius: 9,
+                      background: isSelf ? "var(--brand-light)" : "var(--surface-2)",
+                      border: `1.5px solid ${isSelf ? "rgba(124,58,237,.25)" : "var(--border)"}`,
+                    }}>
+                      <span style={{ fontSize: 20, flexShrink: 0 }}>{slot?.icon}</span>
+                      <div style={{ flex: 1, minWidth: 0 }}>
+                        <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                          <span style={{ fontWeight: 700, fontSize: 13, color: isSelf ? "var(--brand)" : "var(--text)" }}>{slot?.label}</span>
+                          {isSelf && <span style={{ fontSize: 11, color: "var(--brand)", fontWeight: 600, background: "rgba(124,58,237,.1)", borderRadius: 4, padding: "1px 6px" }}>Primary Insured</span>}
+                        </div>
+                        <div style={{ fontSize: 12, color: "var(--text-3)", marginTop: 2 }}>
+                          {m.name || "—"}{age != null ? ` · ${age} yrs` : ""}{m.gender ? ` · ${m.gender}` : ""}
+                        </div>
+                      </div>
+                      {m.dob && (
+                        <div style={{ fontSize: 11.5, color: "var(--text-3)", flexShrink: 0 }}>
+                          {new Date(m.dob).toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" })}
+                        </div>
                       )}
-                    </Select>
-                  </Field>
-                  <Field label="Share %" required>
-                    <Input
-                      type="number"
-                      min="1"
-                      max="100"
-                      value={proposal.nomineeShare}
-                      onChange={setP("nomineeShare")}
-                      required
-                    />
-                  </Field>
-                  <Field label="Nominee Age" required>
-                    <Input
-                      type="number"
-                      min="1"
-                      max="100"
-                      placeholder="e.g. 35"
-                      value={proposal.nomineeAge}
-                      onChange={setP("nomineeAge")}
-                      required
-                    />
-                  </Field>
-                </div>
-              </div>
-
-              {/* Declaration */}
-              <div className="section-block">
-                <div className="section-heading">✅ Declaration</div>
-                <label
-                  style={{
-                    display: "flex",
-                    gap: 12,
-                    cursor: "pointer",
-                    alignItems: "flex-start",
-                  }}
-                >
-                  <input
-                    type="checkbox"
-                    checked={proposal.declaration}
-                    onChange={(e) =>
-                      setProposal((p) => ({
-                        ...p,
-                        declaration: e.target.checked,
-                      }))
-                    }
-                    style={{ marginTop: 3, accentColor: "var(--brand)" }}
-                  />
-                  <span
-                    style={{
-                      fontSize: 13.5,
-                      color: "var(--text-2)",
-                      lineHeight: 1.65,
-                    }}
-                  >
-                    I declare that all information provided is true and correct.
-                    I understand that any misrepresentation may result in
-                    rejection of claim or cancellation of policy. I consent to
-                    sharing this data with the insurer for policy issuance.
-                  </span>
-                </label>
-              </div>
-
-              <div className="actions-row">
-                <button type="button" className="btn btn-ghost" onClick={back}>
-                  ← Back
-                </button>
-                <button
-                  type="button"
-                  className="btn btn-primary"
-                  disabled={!proposal.declaration}
-                  onClick={next}
-                >
-                  Proceed to Payment →
-                </button>
+                    </div>
+                  );
+                })}
               </div>
             </div>
           </div>
+
+          {/* Nominee Details */}
+          <div className="card">
+            <div className="card-header" style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+              <div>
+                <span style={{ fontWeight: 700, fontSize: 14 }}>📝 Nominee Details</span>
+                <span style={{ fontSize: 12, color: "var(--text-3)", marginLeft: 8 }}>Total share must equal 100%</span>
+              </div>
+              {nominees.length < 4 && (
+                <button type="button" className="btn btn-secondary btn-sm" onClick={addNominee}>
+                  + Add Nominee
+                </button>
+              )}
+            </div>
+            <div className="card-body">
+              {/* Column headers */}
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 140px 80px 90px 36px", gap: 8, marginBottom: 6, padding: "0 2px" }}>
+                {["Full Name", "Relation", "Age", "Share %", ""].map(h => (
+                  <div key={h} style={{ fontSize: 11, fontWeight: 600, color: "var(--text-3)", textTransform: "uppercase", letterSpacing: ".4px" }}>{h}</div>
+                ))}
+              </div>
+
+              <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+                {nominees.map((n) => (
+                  <div key={n.id} style={{
+                    display: "grid", gridTemplateColumns: "1fr 140px 80px 90px 36px",
+                    gap: 8, alignItems: "center",
+                    padding: "10px 10px", borderRadius: 9,
+                    background: "var(--surface-2)", border: "1.5px solid var(--border)",
+                  }}>
+                    <div style={{ position: "relative" }}>
+                      <input className="field-input" placeholder="Full name" value={n.name}
+                        onChange={e => updateNominee(n.id, "name", e.target.value)}
+                        style={{
+                          fontSize: 12.5, padding: "6px 9px", width: "100%",
+                          transition: "border-color .4s, box-shadow .4s",
+                          ...(nomineeAutoFilled[n.id] && n.name ? {
+                            borderColor: "#16a34a",
+                            boxShadow: "0 0 0 3px rgba(22,163,74,.15)",
+                          } : {}),
+                        }} />
+                      {nomineeAutoFilled[n.id] && n.name && (
+                        <span style={{
+                          position: "absolute", right: 8, top: "50%", transform: "translateY(-50%)",
+                          fontSize: 10, color: "#16a34a", fontWeight: 700, pointerEvents: "none",
+                          animation: "fadeIn .2s ease",
+                        }}>✓ auto</span>
+                      )}
+                    </div>
+                    <select className="field-select" value={n.relation}
+                      onChange={e => updateNomineeRelation(n.id, e.target.value)}
+                      style={{ fontSize: 12.5, padding: "6px 9px" }}>
+                      <option value="">Relation</option>
+                      {["Spouse", "Son", "Daughter", "Father", "Mother", "Brother", "Sister", "Other"].map(r => (
+                        <option key={r}>{r}</option>
+                      ))}
+                    </select>
+                    <div style={{ position: "relative" }}>
+                      <input type="number" className="field-input" placeholder="Age" value={n.age} min="1" max="100"
+                        onChange={e => updateNominee(n.id, "age", e.target.value)}
+                        style={{
+                          fontSize: 12.5, padding: "6px 9px", width: "100%",
+                          transition: "border-color .4s, box-shadow .4s",
+                          ...(nomineeAutoFilled[n.id] && n.age ? {
+                            borderColor: "#16a34a",
+                            boxShadow: "0 0 0 3px rgba(22,163,74,.15)",
+                          } : {}),
+                        }} />
+                      {nomineeAutoFilled[n.id] && n.age && (
+                        <span style={{ position: "absolute", right: 4, top: "50%", transform: "translateY(-50%)", fontSize: 9, color: "#16a34a", fontWeight: 700, pointerEvents: "none" }}>✓</span>
+                      )}
+                    </div>
+                    <div style={{ position: "relative" }}>
+                      <input type="number" className="field-input" placeholder="%" value={n.share} min="1" max="100"
+                        onChange={e => updateNominee(n.id, "share", e.target.value)}
+                        style={{ fontSize: 12.5, padding: "6px 28px 6px 9px" }} />
+                      <span style={{ position: "absolute", right: 8, top: "50%", transform: "translateY(-50%)", fontSize: 12, color: "var(--text-3)", pointerEvents: "none" }}>%</span>
+                    </div>
+                    <button type="button" onClick={() => removeNominee(n.id)} disabled={nominees.length === 1}
+                      style={{ width: 32, height: 32, borderRadius: 6, border: "1.5px solid var(--border)", background: nominees.length === 1 ? "var(--surface-2)" : "#fff0f0", color: nominees.length === 1 ? "var(--text-3)" : "var(--red)", cursor: nominees.length === 1 ? "not-allowed" : "pointer", fontSize: 18, display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "inherit", transition: "all .12s" }}>
+                      ×
+                    </button>
+                  </div>
+                ))}
+              </div>
+
+              {/* Share % progress bar */}
+              <div style={{ marginTop: 14 }}>
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 5 }}>
+                  <span style={{ fontSize: 12, color: "var(--text-3)", fontWeight: 500 }}>Total Share Allocated</span>
+                  <span style={{ fontSize: 13, fontWeight: 700, color: nomineesTotal === 100 ? "var(--green)" : nomineesTotal > 100 ? "var(--red)" : "#d97706" }}>
+                    {nomineesTotal}%&nbsp;
+                    {nomineesTotal === 100 ? "✓ Complete" : nomineesTotal > 100 ? `— ${nomineesTotal - 100}% over` : `— ${100 - nomineesTotal}% remaining`}
+                  </span>
+                </div>
+                <div style={{ height: 7, borderRadius: 4, background: "var(--border)", overflow: "hidden" }}>
+                  <div style={{
+                    height: "100%", borderRadius: 4, transition: "width .3s ease, background-color .2s",
+                    width: `${Math.min(nomineesTotal, 100)}%`,
+                    background: nomineesTotal === 100 ? "var(--green)" : nomineesTotal > 100 ? "var(--red)" : "var(--brand)",
+                  }} />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Declaration & Terms */}
+          <div className="card">
+            <div className="card-header">
+              <span style={{ fontWeight: 700, fontSize: 14 }}>📜 Declaration &amp; Acceptance</span>
+            </div>
+            <div className="card-body" style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+              <label style={{
+                display: "flex", alignItems: "flex-start", gap: 12, cursor: "pointer",
+                padding: "13px 14px", borderRadius: 10,
+                background: proposal.declaration ? "var(--brand-light)" : "var(--surface-2)",
+                border: `1.5px solid ${proposal.declaration ? "rgba(124,58,237,.3)" : "var(--border)"}`,
+                transition: "all .15s",
+              }}>
+                <input type="checkbox" checked={proposal.declaration}
+                  onChange={e => setProposal(p => ({ ...p, declaration: e.target.checked }))}
+                  style={{ marginTop: 2, accentColor: "var(--brand)", width: 16, height: 16, flexShrink: 0 }} />
+                <span style={{ fontSize: 13.5, color: "var(--text-2)", lineHeight: 1.7 }}>
+                  I declare that all information provided is true and correct. I understand that any misrepresentation may result in rejection of claim or cancellation of policy. I consent to sharing this data with the insurer for policy issuance.
+                </span>
+              </label>
+              <label style={{
+                display: "flex", alignItems: "flex-start", gap: 12, cursor: "pointer",
+                padding: "13px 14px", borderRadius: 10,
+                background: termsAccepted ? "var(--brand-light)" : "var(--surface-2)",
+                border: `1.5px solid ${termsAccepted ? "rgba(124,58,237,.3)" : "var(--border)"}`,
+                transition: "all .15s",
+              }}>
+                <input type="checkbox" checked={termsAccepted}
+                  onChange={e => setTermsAccepted(e.target.checked)}
+                  style={{ marginTop: 2, accentColor: "var(--brand)", width: 16, height: 16, flexShrink: 0 }} />
+                <span style={{ fontSize: 13.5, color: "var(--text-2)", lineHeight: 1.7 }}>
+                  I have read and agree to the{" "}
+                  <span style={{ color: "var(--brand)", fontWeight: 600, textDecoration: "underline", cursor: "pointer" }}>Terms &amp; Conditions</span>
+                  {" "}and{" "}
+                  <span style={{ color: "var(--brand)", fontWeight: 600, textDecoration: "underline", cursor: "pointer" }}>Privacy Policy</span>.
+                  I authorise KM Dastur &amp; Co. to process my application and share necessary details with the insurance company.
+                </span>
+              </label>
+            </div>
+          </div>
+
+          <div className="actions-row">
+            <button type="button" className="btn btn-ghost" onClick={back}>← Back</button>
+            <button
+              type="button"
+              className="btn btn-primary"
+              disabled={!canProceed}
+              onClick={next}
+              style={{ minWidth: 220 }}
+            >
+              {nomineesTotal !== 100
+                ? `Nominees: ${nomineesTotal}% / 100%`
+                : !proposal.declaration || !termsAccepted
+                ? "Accept all declarations to proceed"
+                : "Proceed to Payment →"}
+            </button>
+          </div>
         </div>
-      )}
+        );
+      })()}
 
       {/* ══════════════════════════════════════════════════════════════════
-          STEP 5 — Payment
+          STEP 4 — Payment
       ══════════════════════════════════════════════════════════════════ */}
-      {step === 5 && cart.length > 0 && (
+      {step === 4 && cart.length > 0 && (
         <div className="payment-layout">
           {/* Resume banner */}
           {resumePolicy && (
@@ -1592,33 +1679,6 @@ export default function BuyPolicy() {
               <span className="card-title">Order Summary</span>
             </div>
             <div className="card-body">
-              {/* Customer */}
-              {selectedCustomer && (
-                <div
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    gap: 10,
-                    padding: "10px 0",
-                    borderBottom: "1px solid var(--border)",
-                    marginBottom: 12,
-                  }}
-                >
-                  <Avatar
-                    name={selectedCustomer.name}
-                    size={32}
-                    fontSize={12}
-                  />
-                  <div>
-                    <div style={{ fontWeight: 600, fontSize: 13 }}>
-                      {selectedCustomer.name}
-                    </div>
-                    <div style={{ fontSize: 12, color: "var(--text-3)" }}>
-                      {selectedCustomer.mobile}
-                    </div>
-                  </div>
-                </div>
-              )}
               {/* Products in cart */}
               <div style={{ marginBottom: 4 }}>
                 {cart.map((p, i) => (
@@ -1658,6 +1718,117 @@ export default function BuyPolicy() {
                   </div>
                 ))}
               </div>
+
+              {/* Insured Members */}
+              {members.length > 0 && (
+                <div style={{ margin: "4px 0 2px" }}>
+                  <div style={{
+                    display: "flex", alignItems: "center", gap: 7,
+                    padding: "7px 10px", marginBottom: 6,
+                    background: "var(--brand-light)", borderRadius: 8,
+                    border: "1px solid rgba(124,58,237,.15)",
+                  }}>
+                    <span style={{ fontSize: 14 }}>👥</span>
+                    <span style={{ fontSize: 11, fontWeight: 700, color: "var(--brand)", textTransform: "uppercase", letterSpacing: ".6px" }}>
+                      Insured Members
+                    </span>
+                    <span style={{ marginLeft: "auto", fontSize: 11, fontWeight: 600, color: "var(--brand)", background: "rgba(124,58,237,.12)", borderRadius: 10, padding: "1px 8px" }}>
+                      {members.length}
+                    </span>
+                  </div>
+                  <div style={{ display: "flex", flexDirection: "column", gap: 3, marginBottom: 10 }}>
+                    {members.map((m, i) => (
+                      <div key={m.type} style={{
+                        display: "flex", alignItems: "center", gap: 10,
+                        padding: "7px 10px", borderRadius: 8,
+                        background: i % 2 === 0 ? "var(--surface-2)" : "#fff",
+                        border: "1px solid var(--border)",
+                        transition: "background .15s",
+                      }}>
+                        <div style={{
+                          width: 28, height: 28, borderRadius: "50%", flexShrink: 0,
+                          background: i === 0 ? "var(--brand)" : "#e0e7ff",
+                          color: i === 0 ? "#fff" : "#4338ca",
+                          display: "flex", alignItems: "center", justifyContent: "center",
+                          fontSize: 11, fontWeight: 800,
+                        }}>
+                          {(m.name || m.type).charAt(0).toUpperCase()}
+                        </div>
+                        <div style={{ flex: 1, minWidth: 0 }}>
+                          <div style={{ fontWeight: 600, fontSize: 13, color: "var(--text)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                            {m.name || <span style={{ color: "var(--text-3)", fontStyle: "italic", fontWeight: 400 }}>Name not entered</span>}
+                          </div>
+                          {m.dob && (
+                            <div style={{ fontSize: 11.5, color: "var(--text-3)", marginTop: 1 }}>DOB: {m.dob}</div>
+                          )}
+                        </div>
+                        <div style={{ textAlign: "right", flexShrink: 0 }}>
+                          <div style={{ fontSize: 13, fontWeight: 600, color: i === 0 ? "var(--brand)" : "var(--text-2)" }}>
+                            {m.type}
+                          </div>
+                          {m.gender && (
+                            <div style={{ fontSize: 11, color: "var(--text-3)", marginTop: 1 }}>{m.gender}</div>
+                          )}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Nominees */}
+              {nominees.length > 0 && (
+                <div style={{ margin: "2px 0 6px" }}>
+                  <div style={{
+                    display: "flex", alignItems: "center", gap: 7,
+                    padding: "7px 10px", marginBottom: 6,
+                    background: "#fdf4ff", borderRadius: 8,
+                    border: "1px solid #e9d5ff",
+                  }}>
+                    <span style={{ fontSize: 14 }}>📋</span>
+                    <span style={{ fontSize: 11, fontWeight: 700, color: "#7c3aed", textTransform: "uppercase", letterSpacing: ".6px" }}>
+                      Nominees
+                    </span>
+                    <span style={{ marginLeft: "auto", fontSize: 11, fontWeight: 600, color: "#7c3aed", background: "#ede9fe", borderRadius: 10, padding: "1px 8px" }}>
+                      {nominees.length}
+                    </span>
+                  </div>
+                  <div style={{ display: "flex", flexDirection: "column", gap: 3, marginBottom: 10 }}>
+                    {nominees.map((n, i) => (
+                      <div key={n.id} style={{
+                        display: "flex", alignItems: "center", gap: 10,
+                        padding: "7px 10px", borderRadius: 8,
+                        background: i % 2 === 0 ? "var(--surface-2)" : "#fff",
+                        border: "1px solid var(--border)",
+                        transition: "background .15s",
+                      }}>
+                        <div style={{
+                          width: 28, height: 28, borderRadius: "50%", flexShrink: 0,
+                          background: n.name ? "#ede9fe" : "var(--surface-2)",
+                          color: n.name ? "#7c3aed" : "var(--text-3)",
+                          border: n.name ? "none" : "1px solid var(--border)",
+                          display: "flex", alignItems: "center", justifyContent: "center",
+                          fontSize: 11, fontWeight: 800,
+                        }}>
+                          {n.name ? n.name.charAt(0).toUpperCase() : "?"}
+                        </div>
+                        <div style={{ flex: 1, minWidth: 0 }}>
+                          <div style={{ fontWeight: 600, fontSize: 13, color: "var(--text)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                            {n.name || <span style={{ color: "var(--text-3)", fontStyle: "italic", fontWeight: 400 }}>Name not entered</span>}
+                          </div>
+                          <div style={{ fontSize: 11.5, color: "var(--text-3)", marginTop: 1 }}>
+                            {[n.relation, n.age ? `${n.age} yrs` : null].filter(Boolean).join(" · ") || "—"}
+                          </div>
+                        </div>
+                        <div style={{ textAlign: "right", flexShrink: 0 }}>
+                          <div style={{ fontSize: 14, fontWeight: 700, color: "var(--brand)" }}>{n.share || "0"}%</div>
+                          <div style={{ fontSize: 11, color: "var(--text-3)" }}>share</div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
 
               {/* Summary rows */}
               {[
@@ -1875,73 +2046,26 @@ export default function BuyPolicy() {
       )}
 
       {/* ══════════════════════════════════════════════════════════════════
-          STEP 6 — Policy Issued
+          STEP 5 — Payment Received
       ══════════════════════════════════════════════════════════════════ */}
-      {step === 6 && policyResults.length > 0 && (
-        <div style={{ maxWidth: 660, margin: "0 auto" }}>
+      {step === 5 && policyResults.length > 0 && (
+        <div style={{ maxWidth: 480, margin: "0 auto" }}>
           <div className="card">
-            <div className="card-body" style={{ textAlign: "center", padding: "40px 32px" }}>
-              <div style={{ fontSize: 68, marginBottom: 18 }}>🎉</div>
-              <div style={{ fontWeight: 700, fontSize: 22, color: "var(--green)", marginBottom: 8 }}>
-                {policyResults.length > 1
-                  ? `${policyResults.length} Policies Issued Successfully!`
-                  : "Policy Issued Successfully!"}
+            <div className="card-body" style={{ textAlign: "center", padding: "52px 32px 44px" }}>
+              <div style={{ fontSize: 64, marginBottom: 20 }}>✅</div>
+              <div style={{ fontWeight: 800, fontSize: 22, color: "var(--text)", marginBottom: 10 }}>
+                Payment Received Successfully
               </div>
-              <div style={{ color: "var(--text-3)", marginBottom: 28, lineHeight: 1.6 }}>
-                Policies for <strong>{policyResults[0].customer}</strong> have been activated.
-                Confirmations have been sent to the customer's registered email.
+              <div style={{ fontSize: 14, color: "var(--text-3)", lineHeight: 1.7, marginBottom: 32 }}>
+                Payment for <strong style={{ color: "var(--text)" }}>{policyResults[0].customer}</strong> has been confirmed.
+                Your policy will be issued shortly.
               </div>
-
-              {/* One card per policy */}
-              <div style={{ display: "flex", flexDirection: "column", gap: 14, marginBottom: 28, textAlign: "left" }}>
-                {policyResults.map((r, i) => (
-                  <div key={r.policyNo} style={{
-                    background: "var(--surface-2)", borderRadius: "var(--r-md)",
-                    padding: "18px 22px", border: "1px solid var(--border)",
-                  }}>
-                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
-                      <span style={{ fontWeight: 700, fontSize: 14 }}>
-                        Policy {i + 1} — {r.product}
-                      </span>
-                      <StatusBadge status="Issued" />
-                    </div>
-                    {[
-                      ["Proposal ID",   r.proposalId],
-                      ["Policy Number", r.policyNo],
-                      ["Provider",      r.provider],
-                    ].map(([k, v]) => (
-                      <div key={k} style={{
-                        display: "flex", justifyContent: "space-between", alignItems: "center",
-                        padding: "6px 0", borderBottom: "1px solid var(--border)", fontSize: 13,
-                      }}>
-                        <span style={{ color: "var(--text-2)", fontWeight: 500 }}>{k}</span>
-                        <span style={{ fontWeight: 600 }}>{v}</span>
-                      </div>
-                    ))}
-                  </div>
-                ))}
-              </div>
-
-              {/* Summary */}
-              <div style={{
-                background: "var(--brand-light)", borderRadius: "var(--r-md)",
-                padding: "12px 20px", marginBottom: 28,
-                display: "flex", justifyContent: "space-between", alignItems: "center",
-              }}>
-                <span style={{ fontWeight: 600, fontSize: 14 }}>
-                  {policyResults.length} {policyResults.length === 1 ? "Policy" : "Policies"} Issued
-                </span>
-                <span style={{ fontWeight: 600, fontSize: 13, color: "var(--amber)" }}>
-                  Premium — Contact for details
-                </span>
-              </div>
-
               <div style={{ display: "flex", gap: 12, justifyContent: "center" }}>
-                <button className="btn btn-secondary" onClick={() => navigate("/policy")}>
+                <button className="btn btn-ghost" onClick={() => navigate("/policy")}>
                   View All Policies
                 </button>
                 <button className="btn btn-primary" onClick={() => navigate("/policy")}>
-                  ⬇ Download All Policies
+                  Go to Dashboard
                 </button>
               </div>
             </div>
