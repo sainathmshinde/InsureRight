@@ -1,4 +1,5 @@
 import { useNavigate, useParams } from 'react-router-dom'
+import { EditIcon } from '../../icons'
 import { useBrokerForm, INITIAL } from './useBrokerForm'
 import BrokerForm from './BrokerForm'
 import { BROKER_MAP } from './brokerData'
@@ -64,7 +65,7 @@ export default function BrokerEdit() {
     <div>
       <div className="page-header">
         <div className="page-title-row">
-          <div className="page-icon">✏️</div>
+          <div className="page-icon"><EditIcon /></div>
           <div>
             <div className="page-title">{isProfile ? 'Edit My Profile' : 'Edit Broker'}</div>
             <div className="page-subtitle">{isProfile ? 'Update your firm and contact details' : 'Update broker information'}</div>

@@ -1,12 +1,12 @@
-import { useState } from 'react'
+﻿import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../../context/AuthContext'
 
 const STATS = [
-  { label: 'Total Agents',      value: '12',      sub: '9 active',            color: '#7c3aed', bg: '#f5f3ff' },
-  { label: 'Total Customers',   value: '248',     sub: '+14 this month',      color: '#0a7ea4', bg: '#e0f4fb' },
-  { label: 'Policies Issued',   value: '183',     sub: 'This financial year',  color: '#2d7d46', bg: '#e6f4ea' },
-  { label: 'Premium Collected', value: '₹24.5L',  sub: 'April 2025',          color: '#a05c00', bg: '#fff3e0' },
+  { label: 'Total Agents',      value: '12',      sub: '9 active',            color: '#7c3aed', bg: '#ede9fe' },
+  { label: 'Total Customers',   value: '248',     sub: '+14 this month',      color: '#1d4ed8', bg: '#dbeafe' },
+  { label: 'Policies Issued',   value: '183',     sub: 'This financial year',  color: '#15803d', bg: '#dcfce7' },
+  { label: 'Premium Collected', value: '₹24.5L',  sub: 'April 2025',          color: '#b45309', bg: '#fef3c7' },
 ]
 
 const RECENT_AGENTS = [
@@ -24,10 +24,10 @@ const ACTIVE_CAMPAIGNS = [
 ]
 
 const QUICK_ACTIONS = [
-  { label: 'Add Agent',    path: '/agent/create',    color: '#7c3aed', bg: '#f5f3ff' },
-  { label: 'Add Customer', path: '/customer/create', color: '#0a7ea4', bg: '#e0f4fb' },
-  { label: 'Add Campaign', path: '/campaign/create', color: '#2d7d46', bg: '#e6f4ea' },
-  { label: 'Add Product',  path: '/product/create',  color: '#a05c00', bg: '#fff3e0' },
+  { label: 'Add Agent',    path: '/agent/create',    color: '#7c3aed', bg: '#ede9fe' },
+  { label: 'Add Customer', path: '/customer/create', color: '#1d4ed8', bg: '#dbeafe' },
+  { label: 'Add Campaign', path: '/campaign/create', color: '#15803d', bg: '#dcfce7' },
+  { label: 'Add Product',  path: '/product/create',  color: '#b45309', bg: '#fef3c7' },
 ]
 
 const CAMPAIGNS_LIST = [
@@ -111,38 +111,42 @@ function DonutChart({ title, segments, note }) {
     return { ...seg, dash, dashOffset, pct }
   })
   return (
-    <div style={{ border: '1.5px solid #d4c9f0', borderRadius: 14, padding: '18px 16px 14px', background: '#fff', boxShadow: '0 2px 12px rgba(124,58,237,.07)' }}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
-        <svg width="120" height="120" viewBox="0 0 100 100" style={{ flexShrink: 0 }}>
-          {arcs.map((arc, i) => (
-            <circle
-              key={i} cx="50" cy="50" r={r}
-              fill="none" stroke={arc.color} strokeWidth="22"
-              strokeDasharray={`${arc.dash} ${circumference - arc.dash}`}
-              strokeDashoffset={arc.dashOffset}
-              style={{ transform: 'rotate(-90deg)', transformOrigin: '50px 50px' }}
-            />
-          ))}
-          <text x="50" y="46" textAnchor="middle" fontSize="7" fontWeight="600" fill="#9d94b8">Total</text>
-          <text x="50" y="58" textAnchor="middle" fontSize="9" fontWeight="800" fill="#1a1628">
-            {total.toLocaleString('en-IN')}
-          </text>
-        </svg>
-        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 12 }}>
-          {arcs.map((arc, i) => (
-            <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 7 }}>
-              <div style={{ width: 10, height: 10, borderRadius: '50%', background: arc.color, flexShrink: 0 }} />
-              <div style={{ flex: 1, fontSize: 12, color: '#5c5573', fontWeight: 600, lineHeight: 1.3 }}>{arc.label}</div>
-              <div style={{ fontSize: 14, fontWeight: 800, color: '#1a1628', flexShrink: 0 }}>{arc.value.toLocaleString('en-IN')}</div>
-              <div style={{ fontSize: 11, color: '#9d94b8', width: 28, textAlign: 'right', flexShrink: 0 }}>{Math.round(arc.pct * 100)}%</div>
-            </div>
-          ))}
+    <div style={{ border: '1.5px solid #e8d5ff', borderRadius: 14, overflow: 'hidden', background: 'linear-gradient(160deg,#fdf4ff 0%,#ffffff 65%)', boxShadow: '0 2px 16px rgba(168,85,247,.13),0 1px 4px rgba(251,113,133,.08)' }}>
+      {/* gradient accent strip */}
+      <div style={{ height: 4, background: 'linear-gradient(90deg,#fb7185 0%,#a855f7 100%)' }} />
+      <div style={{ padding: '16px 16px 14px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
+          <svg width="120" height="120" viewBox="0 0 100 100" style={{ flexShrink: 0 }}>
+            {arcs.map((arc, i) => (
+              <circle
+                key={i} cx="50" cy="50" r={r}
+                fill="none" stroke={arc.color} strokeWidth="22"
+                strokeDasharray={`${arc.dash} ${circumference - arc.dash}`}
+                strokeDashoffset={arc.dashOffset}
+                style={{ transform: 'rotate(-90deg)', transformOrigin: '50px 50px' }}
+              />
+            ))}
+            <text x="50" y="46" textAnchor="middle" fontSize="7" fontWeight="600" fill="var(--text-3)">Total</text>
+            <text x="50" y="58" textAnchor="middle" fontSize="9" fontWeight="800" fill="#0f172a">
+              {total.toLocaleString('en-IN')}
+            </text>
+          </svg>
+          <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 10 }}>
+            {arcs.map((arc, i) => (
+              <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                <div style={{ width: 11, height: 11, borderRadius: 3, background: arc.color, flexShrink: 0 }} />
+                <div style={{ flex: 1, fontSize: 12, color: '#374151', fontWeight: 600, lineHeight: 1.3 }}>{arc.label}</div>
+                <div style={{ fontSize: 15, fontWeight: 800, color: '#0f172a', flexShrink: 0 }}>{arc.value.toLocaleString('en-IN')}</div>
+                <div style={{ fontSize: 11.5, fontWeight: 700, color: arc.color, width: 34, textAlign: 'right', flexShrink: 0 }}>{Math.round(arc.pct * 100)}%</div>
+              </div>
+            ))}
+          </div>
         </div>
+        {note && (
+          <div style={{ fontSize: 11.5, color: 'var(--text-3)', marginTop: 10, textAlign: 'center' }}>{note}</div>
+        )}
+        <div style={{ fontWeight: 700, fontSize: 13.5, background: 'linear-gradient(90deg,#fb7185,#a855f7)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text', textAlign: 'center', borderTop: '1px solid #e8d5ff', paddingTop: 10, marginTop: 12 }}>{title}</div>
       </div>
-      {note && (
-        <div style={{ fontSize: 11.5, color: '#9d94b8', marginTop: 10, textAlign: 'center' }}>{note}</div>
-      )}
-      <div style={{ fontWeight: 700, fontSize: 14, color: '#1a1628', textAlign: 'center', borderTop: '1px solid #ede9f8', paddingTop: 10, marginTop: 12 }}>{title}</div>
     </div>
   )
 }
@@ -174,14 +178,14 @@ export default function BrokerPortal() {
           {/* Filters */}
           <div style={{ display: 'flex', gap: 14, alignItems: 'flex-end', marginBottom: 8, flexWrap: 'wrap' }}>
             <div style={{ flex: '1 1 220px' }}>
-              <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: '#9d94b8', marginBottom: 5 }}>Campaign Name</label>
+              <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: 'var(--text-3)', marginBottom: 5 }}>Campaign Name</label>
               <select className="field-select" style={{ width: '100%' }} value={campaignFilter} onChange={e => setCampaignFilter(e.target.value)}>
                 <option value="">All Campaigns</option>
                 {CAMPAIGNS_LIST.map(c => <option key={c}>{c}</option>)}
               </select>
             </div>
             <div style={{ flex: '1 1 220px' }}>
-              <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: '#9d94b8', marginBottom: 5 }}>Association</label>
+              <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: 'var(--text-3)', marginBottom: 5 }}>Association</label>
               <select className="field-select" style={{ width: '100%' }} value={assocFilter} onChange={e => setAssocFilter(e.target.value)}>
                 <option value="">All Associations</option>
                 {ASSOCIATIONS_LIST.map(a => <option key={a}>{a}</option>)}
@@ -204,32 +208,32 @@ export default function BrokerPortal() {
             <DonutChart
               title="Customer Details"
               segments={[
-                { label: 'Engaged',     value: mis.engagedCustomer,    color: '#7c3aed' },
-                { label: 'Non-Engaged', value: mis.nonEngagedCustomer, color: '#0a7ea4' },
+                { label: 'Engaged',     value: mis.engagedCustomer,    color: '#fb7185' },
+                { label: 'Non-Engaged', value: mis.nonEngagedCustomer, color: '#e9d5ff' },
               ]}
             />
 
             <DonutChart
               title="Policy Overview"
               segments={[
-                { label: 'Policy Purchased', value: mis.policyPurchased, color: '#7c3aed' },
-                { label: 'Policy Pending',   value: mis.policyPending,   color: '#0a7ea4' },
+                { label: 'Policy Purchased', value: mis.policyPurchased, color: '#a855f7' },
+                { label: 'Policy Pending',   value: mis.policyPending,   color: '#f9a8d4' },
               ]}
             />
 
             <DonutChart
               title="Payment Initiates"
               segments={[
-                { label: 'RTGS',   value: mis.rtgsInitiated,   color: '#7c3aed' },
-                { label: 'Cheque', value: mis.chequeInitiated, color: '#0a7ea4' },
+                { label: 'RTGS',   value: mis.rtgsInitiated,   color: '#fb7185' },
+                { label: 'Cheque', value: mis.chequeInitiated, color: '#a855f7' },
               ]}
             />
 
             <DonutChart
               title="Online vs Offline"
               segments={[
-                { label: 'Online',  value: mis.onlinePurchased,  color: '#7c3aed' },
-                { label: 'Offline', value: mis.offlinePurchased, color: '#0a7ea4' },
+                { label: 'Online',  value: mis.onlinePurchased,  color: '#a855f7' },
+                { label: 'Offline', value: mis.offlinePurchased, color: '#fb7185' },
               ]}
               note={`of ${mis.policyPurchased.toLocaleString('en-IN')} total policies purchased`}
             />
@@ -237,16 +241,16 @@ export default function BrokerPortal() {
             <DonutChart
               title="Payment Pending / Rejected"
               segments={[
-                { label: 'Pending',  value: mis.paymentPending,  color: '#d97706' },
-                { label: 'Rejected', value: mis.paymentRejected, color: '#e5383b' },
+                { label: 'Pending',  value: mis.paymentPending,  color: '#f9a8d4' },
+                { label: 'Rejected', value: mis.paymentRejected, color: '#fb7185' },
               ]}
             />
 
             <DonutChart
               title="Offline Purchased"
               segments={[
-                { label: 'RTGS',   value: mis.rtgsPurchased,   color: '#7c3aed' },
-                { label: 'Cheque', value: mis.chequePurchased, color: '#0a7ea4' },
+                { label: 'RTGS',   value: mis.rtgsPurchased,   color: '#fb7185' },
+                { label: 'Cheque', value: mis.chequePurchased, color: '#a855f7' },
               ]}
             />
 
@@ -260,7 +264,7 @@ export default function BrokerPortal() {
           <div key={s.label} style={{ background: '#fff', border: '1px solid #e8e4f0', borderRadius: 12, padding: '20px 22px' }}>
             <div style={{ fontSize: 28, fontWeight: 800, color: s.color }}>{s.value}</div>
             <div style={{ fontSize: 13.5, fontWeight: 600, color: '#1a1628', marginTop: 4 }}>{s.label}</div>
-            <div style={{ fontSize: 12, color: '#9d94b8', marginTop: 2 }}>{s.sub}</div>
+            <div style={{ fontSize: 12, color: 'var(--text-3)', marginTop: 2 }}>{s.sub}</div>
           </div>
         ))}
       </div>
@@ -299,7 +303,7 @@ export default function BrokerPortal() {
                       {a.status}
                     </span>
                   </div>
-                  <div style={{ fontSize: 12, color: '#9d94b8' }}>{a.license} &nbsp;·&nbsp; {a.customers} customers</div>
+                  <div style={{ fontSize: 12, color: 'var(--text-3)' }}>{a.license} &nbsp;·&nbsp; {a.customers} customers</div>
                 </div>
               ))}
             </div>
@@ -312,7 +316,7 @@ export default function BrokerPortal() {
                   {RECENT_AGENTS.map(a => (
                     <tr key={a.name}>
                       <td style={{ fontWeight: 500 }}>{a.name}</td>
-                      <td style={{ color: '#9d94b8' }}>{a.license}</td>
+                      <td style={{ color: 'var(--text-3)' }}>{a.license}</td>
                       <td>{a.customers}</td>
                       <td>
                         <span style={{ padding: '2px 9px', borderRadius: 99, fontSize: 11.5, fontWeight: 600, background: a.status === 'Active' ? '#e6f4ea' : '#f1f3f4', color: a.status === 'Active' ? '#2d7d46' : '#5f6368' }}>
@@ -338,7 +342,7 @@ export default function BrokerPortal() {
               {ACTIVE_CAMPAIGNS.map(c => (
                 <div key={c.name} style={{ padding: '12px 14px', border: '1px solid #e8e4f0', borderRadius: 10, background: '#faf9fc' }}>
                   <div style={{ fontWeight: 600, fontSize: 13.5, marginBottom: 4 }}>{c.name}</div>
-                  <div style={{ display: 'flex', gap: 16, fontSize: 12, color: '#9d94b8', flexWrap: 'wrap' }}>
+                  <div style={{ display: 'flex', gap: 16, fontSize: 12, color: 'var(--text-3)', flexWrap: 'wrap' }}>
                     <span>Agents: {c.agents}</span>
                     <span>Leads: {c.leads}</span>
                   </div>
@@ -353,3 +357,4 @@ export default function BrokerPortal() {
     </div>
   )
 }
+

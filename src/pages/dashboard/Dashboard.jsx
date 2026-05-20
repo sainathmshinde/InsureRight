@@ -1,4 +1,4 @@
-import { useNavigate } from 'react-router-dom'
+﻿import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../../context/AuthContext'
 import { AGENTS } from '../agent/agentData'
 import { CUSTOMER_MOCK } from '../customer/CustomerList'
@@ -17,9 +17,9 @@ export default function Dashboard() {
 ═══════════════════════════════════════════════════════ */
 const BROKER_QUICK = [
   { label: 'Add Agent',    path: '/agent/create',    icon: '👤', color: '#7c3aed' },
-  { label: 'Add Customer', path: '/customer/create', icon: '🧑', color: '#0891b2' },
-  { label: 'Buy Policy',   path: '/policy/buy',      icon: '📋', color: '#059669' },
-  { label: 'Add Product',  path: '/product/create',  icon: '📦', color: '#d97706' },
+  { label: 'Add Customer', path: '/customer/create', icon: '🧑', color: '#1d4ed8' },
+  { label: 'Buy Policy',   path: '/policy/buy',      icon: '📋', color: '#15803d' },
+  { label: 'Add Product',  path: '/product/create',  icon: '📦', color: '#b45309' },
   { label: 'New Campaign', path: '/campaign/create', icon: '📣', color: '#dc2626' },
 ]
 const BROKER_ACTIVITY = [
@@ -46,10 +46,10 @@ function BrokerDashboard({ user }) {
   const activeProducts = PRODUCT_MOCK.filter(p => p.status === 'Active').length
 
   const brokerStats = [
-    { label: 'Total Agents',    value: totalAgents,    sub: `${activeAgents} active`,         color: '#7c3aed', bg: '#f5f3ff', icon: '👤' },
-    { label: 'Total Customers', value: totalCustomers, sub: `${verifiedKyc} KYC verified`,    color: '#0891b2', bg: '#ecfeff', icon: '🧑‍🤝‍🧑' },
-    { label: 'Active Policies', value: activePolicies, sub: `${pendingPayment} pending payment`, color: '#059669', bg: '#f0fdf4', icon: '📋' },
-    { label: 'Products Listed', value: totalProducts,  sub: `${activeProducts} active`,       color: '#d97706', bg: '#fffbeb', icon: '📦' },
+    { label: 'Total Agents',    value: totalAgents,    sub: `${activeAgents} active`,            gradient: 'var(--grad-purple)', icon: '👤' },
+    { label: 'Total Customers', value: totalCustomers, sub: `${verifiedKyc} KYC verified`,       gradient: 'var(--grad-blue)',   icon: '🧑‍🤝‍🧑' },
+    { label: 'Active Policies', value: activePolicies, sub: `${pendingPayment} pending payment`, gradient: 'var(--grad-teal)',   icon: '📋' },
+    { label: 'Products Listed', value: totalProducts,  sub: `${activeProducts} active`,          gradient: 'var(--grad-coral)',  icon: '📦' },
   ]
 
   return (
@@ -68,15 +68,15 @@ function BrokerDashboard({ user }) {
 
       <div style={S.statsGrid}>
         {brokerStats.map(s => (
-          <div key={s.label} style={{ ...S.statCard, background: s.bg }}>
+          <div key={s.label} style={{ ...S.statCard, background: s.gradient, border: 'none', borderLeft: 'none', boxShadow: '0 4px 18px rgba(0,0,0,0.13)' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
               <div>
-                <div style={S.statLabel}>{s.label}</div>
-                <div style={{ ...S.statValue, color: s.color }}>{s.value}</div>
+                <div style={{ ...S.statLabel, color: 'rgba(255,255,255,0.92)' }}>{s.label}</div>
+                <div style={{ ...S.statValue, color: '#fff' }}>{s.value}</div>
               </div>
-              <div style={{ ...S.statIcon, background: s.color + '22', color: s.color }}>{s.icon}</div>
+              <div style={{ ...S.statIcon, background: 'rgba(255,255,255,0.22)', color: '#fff' }}>{s.icon}</div>
             </div>
-            <div style={{ ...S.statSub, color: s.color + 'cc' }}>{s.sub}</div>
+            <div style={{ ...S.statSub, color: 'rgba(255,255,255,0.86)' }}>{s.sub}</div>
           </div>
         ))}
       </div>
@@ -114,9 +114,9 @@ function BrokerDashboard({ user }) {
    AGENT DASHBOARD
 ═══════════════════════════════════════════════════════ */
 const AGENT_QUICK = [
-  { label: 'Add Customer',  path: '/customer/create',  icon: '🧑', color: '#0891b2' },
-  { label: 'Buy Policy',    path: '/policy/buy',       icon: '📋', color: '#059669' },
-  { label: 'Commission',    path: '/agent/commission', icon: '💰', color: '#d97706' },
+  { label: 'Add Customer',  path: '/customer/create',  icon: '🧑', color: '#1d4ed8' },
+  { label: 'Buy Policy',    path: '/policy/buy',       icon: '📋', color: '#15803d' },
+  { label: 'Commission',    path: '/agent/commission', icon: '💰', color: '#b45309' },
   { label: 'All Customers', path: '/customer',         icon: '👥', color: '#7c3aed' },
 ]
 
@@ -131,15 +131,15 @@ function AgentDashboard({ user }) {
   const myPendingPay     = myPolicies.filter(p => p.paymentStatus === 'Pending').length
 
   const agentStats = [
-    { label: 'My Customers',       value: myCustomers.length,  sub: `${myCustomers.filter(c => c.kyc === 'Verified').length} KYC verified`, color: '#7c3aed', bg: '#f5f3ff', icon: '🧑‍🤝‍🧑' },
-    { label: 'Policies Issued',    value: myActivePolicies,    sub: `${myPendingPay} pending payment`,   color: '#059669', bg: '#f0fdf4', icon: '📋' },
-    { label: 'Commission (Month)', value: '₹15,200',           sub: '↑ 12% vs last month',              color: '#d97706', bg: '#fffbeb', icon: '💰' },
-    { label: 'YTD Commission',     value: '₹1,24,500',         sub: 'Target: ₹2,00,000',               color: '#0891b2', bg: '#ecfeff', icon: '📈' },
+    { label: 'My Customers',       value: myCustomers.length,  sub: `${myCustomers.filter(c => c.kyc === 'Verified').length} KYC verified`, gradient: 'var(--grad-purple)', icon: '🧑‍🤝‍🧑' },
+    { label: 'Policies Issued',    value: myActivePolicies,    sub: `${myPendingPay} pending payment`,   gradient: 'var(--grad-blue)',   icon: '📋' },
+    { label: 'Commission (Month)', value: '₹15,200',           sub: '↑ 12% vs last month',              gradient: 'var(--grad-teal)',   icon: '💰' },
+    { label: 'YTD Commission',     value: '₹1,24,500',         sub: 'Target: ₹2,00,000',                gradient: 'var(--grad-coral)',  icon: '📈' },
   ]
 
   return (
     <div style={S.page}>
-      <div style={{ ...S.banner, background: 'linear-gradient(120deg,#0891b2 0%,#0e7490 100%)' }}>
+      <div style={{ ...S.banner, background: 'var(--grad-purple)' }}>
         <div>
           <div style={S.greetTxt}>{greet}, {user?.name?.split(' ')[0]} 👋</div>
           <div style={S.companytxt}>Agent · {user?.company}</div>
@@ -153,15 +153,15 @@ function AgentDashboard({ user }) {
 
       <div style={S.statsGrid}>
         {agentStats.map(s => (
-          <div key={s.label} style={{ ...S.statCard, background: s.bg }}>
+          <div key={s.label} style={{ ...S.statCard, background: s.gradient, border: 'none', borderLeft: 'none', boxShadow: '0 4px 18px rgba(0,0,0,0.13)' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
               <div>
-                <div style={S.statLabel}>{s.label}</div>
-                <div style={{ ...S.statValue, color: s.color, fontSize: typeof s.value === 'string' && s.value.startsWith('₹') ? 22 : 30 }}>{s.value}</div>
+                <div style={{ ...S.statLabel, color: 'rgba(255,255,255,0.92)' }}>{s.label}</div>
+                <div style={{ ...S.statValue, color: '#fff', fontSize: typeof s.value === 'string' && s.value.startsWith('₹') ? 22 : 30 }}>{s.value}</div>
               </div>
-              <div style={{ ...S.statIcon, background: s.color + '22', color: s.color }}>{s.icon}</div>
+              <div style={{ ...S.statIcon, background: 'rgba(255,255,255,0.22)', color: '#fff' }}>{s.icon}</div>
             </div>
-            <div style={{ ...S.statSub, color: s.color + 'cc' }}>{s.sub}</div>
+            <div style={{ ...S.statSub, color: 'rgba(255,255,255,0.86)' }}>{s.sub}</div>
           </div>
         ))}
       </div>
@@ -186,7 +186,7 @@ function AgentDashboard({ user }) {
           </div>
           {myCustomers.slice(0, 5).map((c, i) => (
             <div key={i} style={S.actRow}>
-              <div style={{ ...S.initCircle, background: '#0891b222', color: '#0891b2' }}>
+              <div style={{ ...S.initCircle, background: '#f3f4f6', color: '#374151' }}>
                 {c.name.split(' ').map(w => w[0]).join('').slice(0, 2)}
               </div>
               <div style={{ flex: 1 }}>
@@ -213,12 +213,12 @@ function AgentDashboard({ user }) {
    CUSTOMER DASHBOARD
 ═══════════════════════════════════════════════════════ */
 const CUST_QUICK = [
-  { label: 'Buy New Policy',   path: '/policy/buy',        icon: '🛒', color: '#059669' },
+  { label: 'Buy New Policy',   path: '/policy/buy',        icon: '🛒', color: '#15803d' },
   { label: 'Policy Catalogue', path: '/policy-catalogue',  icon: '📚', color: '#7c3aed' },
-  { label: 'View Policies',    path: '/policy',            icon: '📋', color: '#0891b2' },
-  { label: 'Update Profile',   path: '/profile/edit',      icon: '✏️', color: '#d97706' },
+  { label: 'View Policies',    path: '/policy',            icon: '📋', color: '#1d4ed8' },
+  { label: 'Update Profile',   path: '/profile/edit',      icon: '✏️', color: '#b45309' },
   { label: 'Health Plans',     path: '/insurance/health',  icon: '🏥', color: '#dc2626' },
-  { label: 'File a Claim',     path: '/policy',            icon: '📝', color: '#6d28d9' },
+  { label: 'File a Claim',     path: '/policy',            icon: '📝', color: '#7c3aed' },
 ]
 
 const POLICY_ADS = [
@@ -310,10 +310,10 @@ function CustomerDashboard({ user }) {
   }, 0)
 
   const custStats = [
-    { label: 'Active Policies',  value: activePols.length,                                          sub: `${myPolicies.length} total`,        color: '#059669', bg: '#f0fdf4', icon: '📋' },
-    { label: 'Total Coverage',   value: totalCoverage >= 100000 ? `₹${(totalCoverage/100000).toFixed(0)}L` : totalCoverage ? `₹${totalCoverage}` : '₹0', sub: 'Combined sum insured', color: '#7c3aed', bg: '#f5f3ff', icon: '🛡️' },
-    { label: 'Renewal In',       value: nextRenewal ? `${Math.max(0, daysUntil(nextRenewal.endDate))} days` : '—', sub: nextRenewal ? fmtDate(nextRenewal.endDate) : 'No active policy', color: '#d97706', bg: '#fffbeb', icon: '🗓️' },
-    { label: 'Claims Filed',     value: 0,                                                          sub: 'No claims this year',               color: '#0891b2', bg: '#ecfeff', icon: '📝' },
+    { label: 'Active Policies',  value: activePols.length,                                          sub: `${myPolicies.length} total`,        gradient: 'var(--grad-purple)', icon: '📋' },
+    { label: 'Total Coverage',   value: totalCoverage >= 100000 ? `₹${(totalCoverage/100000).toFixed(0)}L` : totalCoverage ? `₹${totalCoverage}` : '₹0', sub: 'Combined sum insured', gradient: 'var(--grad-blue)', icon: '🛡️' },
+    { label: 'Renewal In',       value: nextRenewal ? `${Math.max(0, daysUntil(nextRenewal.endDate))} days` : '—', sub: nextRenewal ? fmtDate(nextRenewal.endDate) : 'No active policy', gradient: 'var(--grad-teal)', icon: '🗓️' },
+    { label: 'Claims Filed',     value: 0,                                                          sub: 'No claims this year',               gradient: 'var(--grad-coral)', icon: '📝' },
   ]
 
   return (
@@ -343,15 +343,15 @@ function CustomerDashboard({ user }) {
       {/* ── Stats ── */}
       <div style={S.statsGrid}>
         {custStats.map(s => (
-          <div key={s.label} style={{ ...S.statCard, background: s.bg }}>
+          <div key={s.label} style={{ ...S.statCard, background: s.gradient, border: 'none', borderLeft: 'none', boxShadow: '0 4px 18px rgba(0,0,0,0.13)' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
               <div>
-                <div style={S.statLabel}>{s.label}</div>
-                <div style={{ ...S.statValue, color: s.color, fontSize: typeof s.value === 'string' && s.value.length > 5 ? 22 : 30 }}>{s.value}</div>
+                <div style={{ ...S.statLabel, color: 'rgba(255,255,255,0.92)' }}>{s.label}</div>
+                <div style={{ ...S.statValue, color: '#fff', fontSize: typeof s.value === 'string' && s.value.length > 5 ? 22 : 30 }}>{s.value}</div>
               </div>
-              <div style={{ ...S.statIcon, background: s.color + '22', color: s.color }}>{s.icon}</div>
+              <div style={{ ...S.statIcon, background: 'rgba(255,255,255,0.22)', color: '#fff' }}>{s.icon}</div>
             </div>
-            <div style={{ ...S.statSub, color: s.color + 'cc' }}>{s.sub}</div>
+            <div style={{ ...S.statSub, color: 'rgba(255,255,255,0.86)' }}>{s.sub}</div>
           </div>
         ))}
       </div>
@@ -375,14 +375,14 @@ function CustomerDashboard({ user }) {
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 5, marginBottom: 16 }}>
                   {ad.bullets.map(b => (
                     <div key={b} style={{ display: 'flex', alignItems: 'center', gap: 7, fontSize: 12, color: 'rgba(255,255,255,0.85)' }}>
-                      <span style={{ fontSize: 10, color: 'rgba(255,255,255,0.6)' }}>✓</span> {b}
+                      <span style={{ fontSize: 10, color: 'rgba(255,255,255,.88)' }}>✓</span> {b}
                     </div>
                   ))}
                 </div>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                   <div>
                     <div style={{ fontSize: 18, fontWeight: 800, color: '#fff' }}>{ad.stat}</div>
-                    <div style={{ fontSize: 10.5, color: 'rgba(255,255,255,0.55)' }}>{ad.statLabel}</div>
+                    <div style={{ fontSize: 10.5, color: 'rgba(255,255,255,.82)' }}>{ad.statLabel}</div>
                   </div>
                   <button onClick={e => { e.stopPropagation(); navigate(ad.path) }}
                     style={{ padding: '8px 18px', borderRadius: 9, border: 'none', background: 'rgba(255,255,255,0.22)', color: '#fff', fontWeight: 700, fontSize: 13, cursor: 'pointer', fontFamily: 'inherit', backdropFilter: 'blur(4px)' }}>
@@ -550,33 +550,33 @@ function CustomerDashboard({ user }) {
 /* ── Shared styles ── */
 const S = {
   page:        { display: 'flex', flexDirection: 'column', gap: 20 },
-  banner:      { background: 'linear-gradient(120deg,#7c3aed 0%,#4f1d96 100%)', borderRadius: 14, padding: '24px 28px', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' },
+  banner:      { background: 'linear-gradient(135deg,#fb7185 0%,#a855f7 100%)', borderRadius: 14, padding: '24px 28px', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' },
   greetTxt:    { fontSize: 20, fontWeight: 700, color: '#fff', marginBottom: 4 },
-  companytxt:  { fontSize: 13.5, color: '#ddd6fe', marginBottom: 2 },
-  irdaiTxt:    { fontSize: 11.5, color: '#a78bfa' },
-  todayBox:    { background: 'rgba(255,255,255,0.15)', border: '1px solid rgba(255,255,255,0.2)', borderRadius: 10, padding: '10px 16px', textAlign: 'center', flexShrink: 0 },
-  todayLbl:    { fontSize: 10, color: '#c4b5fd', textTransform: 'uppercase', letterSpacing: '.8px' },
+  companytxt:  { fontSize: 13.5, color: 'rgba(255,255,255,0.92)', marginBottom: 2 },
+  irdaiTxt:    { fontSize: 11.5, color: 'rgba(255,255,255,0.88)' },
+  todayBox:    { background: 'rgba(255,255,255,0.18)', border: '1px solid rgba(255,255,255,0.30)', borderRadius: 10, padding: '10px 16px', textAlign: 'center', flexShrink: 0 },
+  todayLbl:    { fontSize: 10, color: 'rgba(255,255,255,0.88)', textTransform: 'uppercase', letterSpacing: '.8px' },
   todayDate:   { fontSize: 13, fontWeight: 600, color: '#fff', marginTop: 3 },
   statsGrid:   { display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 14 },
-  statCard:    { borderRadius: 12, padding: '16px 18px', border: '1px solid rgba(0,0,0,0.04)' },
-  statLabel:   { fontSize: 11.5, color: '#6b7280', fontWeight: 500, marginBottom: 5, textTransform: 'uppercase', letterSpacing: '.3px' },
-  statValue:   { fontSize: 30, fontWeight: 800, lineHeight: 1 },
-  statSub:     { fontSize: 11.5, marginTop: 8, fontWeight: 500 },
+  statCard:    { background: '#fff', borderRadius: 12, padding: '16px 18px', border: '1px solid #e5e7eb', borderLeft: '4px solid transparent' },
+  statLabel:   { fontSize: 11.5, color: 'var(--text-2)', fontWeight: 500, marginBottom: 5, textTransform: 'uppercase', letterSpacing: '.3px' },
+  statValue:   { fontSize: 30, fontWeight: 800, lineHeight: 1, color: '#111827' },
+  statSub:     { fontSize: 11.5, marginTop: 8, fontWeight: 500, color: 'var(--text-3)' },
   statIcon:    { width: 36, height: 36, borderRadius: 9, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 17, flexShrink: 0 },
   row:         { display: 'flex', gap: 16, alignItems: 'flex-start' },
-  card:        { background: '#fff', borderRadius: 12, padding: '18px 20px', border: '1px solid #f0edf8' },
-  cardTitle:   { fontSize: 13.5, fontWeight: 700, color: '#1a1628', marginBottom: 14 },
+  card:        { background: '#fff', borderRadius: 12, padding: '18px 20px', border: '1px solid #e5e7eb' },
+  cardTitle:   { fontSize: 13.5, fontWeight: 700, color: '#111827', marginBottom: 14 },
   quickGrid:   { display: 'flex', flexDirection: 'column', gap: 8, minWidth: 190 },
-  quickBtn:    { display: 'flex', alignItems: 'center', gap: 11, padding: '9px 11px', borderRadius: 8, border: '1px solid #f0edf8', background: '#faf9fc', cursor: 'pointer', fontFamily: 'inherit', textAlign: 'left' },
+  quickBtn:    { display: 'flex', alignItems: 'center', gap: 11, padding: '9px 11px', borderRadius: 8, border: '1px solid #e5e7eb', background: '#f9fafb', cursor: 'pointer', fontFamily: 'inherit', textAlign: 'left' },
   quickIcon:   { width: 30, height: 30, borderRadius: 7, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 14, flexShrink: 0 },
-  quickLabel:  { fontSize: 13, fontWeight: 500, color: '#1a1628' },
-  actRow:      { display: 'flex', alignItems: 'flex-start', gap: 11, padding: '9px 0', borderBottom: '1px solid #f5f3ff' },
+  quickLabel:  { fontSize: 13, fontWeight: 500, color: '#111827' },
+  actRow:      { display: 'flex', alignItems: 'flex-start', gap: 11, padding: '9px 0', borderBottom: '1px solid #f3f4f6' },
   actIcon:     { fontSize: 18, lineHeight: 1, flexShrink: 0, marginTop: 1 },
-  actText:     { fontSize: 13, color: '#1a1628', fontWeight: 500 },
-  actTime:     { fontSize: 11.5, color: '#9d94b8', marginTop: 2 },
+  actText:     { fontSize: 13, color: '#111827', fontWeight: 500 },
+  actTime:     { fontSize: 11.5, color: 'var(--text-3)', marginTop: 2 },
   initCircle:  { width: 34, height: 34, borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 12, fontWeight: 700, flexShrink: 0 },
   badge:       { padding: '3px 9px', borderRadius: 99, fontSize: 11.5, fontWeight: 600, flexShrink: 0 },
   linkBtn:     { background: 'none', border: 'none', color: '#7c3aed', fontSize: 12.5, cursor: 'pointer', fontFamily: 'inherit', fontWeight: 600, padding: 0 },
-  progressTrack: { height: 6, background: '#f0edf8', borderRadius: 99, overflow: 'hidden' },
+  progressTrack: { height: 6, background: '#e5e7eb', borderRadius: 99, overflow: 'hidden' },
   progressBar:   { height: '100%', borderRadius: 99, transition: 'width .4s ease' },
 }

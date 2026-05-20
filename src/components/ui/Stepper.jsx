@@ -13,7 +13,7 @@ export function Stepper({ steps, current }) {
         </div>
         <div style={{ height: 5, background: 'var(--border)', borderRadius: 99, overflow: 'hidden' }}>
           <div style={{
-            height: '100%', borderRadius: 99, background: 'var(--brand)',
+            height: '100%', borderRadius: 99, background: 'var(--grad-purple)',
             width: `${((current + 1) / steps.length) * 100}%`,
             transition: 'width .3s ease',
           }} />
@@ -26,9 +26,9 @@ export function Stepper({ steps, current }) {
               <div key={i} style={{ display: 'flex', alignItems: 'center', flex: i < steps.length - 1 ? 1 : 0 }}>
                 <div style={{
                   width: 20, height: 20, borderRadius: '50%', flexShrink: 0,
-                  background: done ? 'var(--green)' : active ? 'var(--brand)' : 'var(--border)',
+                  background: done ? 'var(--green)' : active ? 'var(--grad-purple)' : 'var(--border)',
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  fontSize: 10, fontWeight: 700, color: done || active ? '#fff' : 'var(--text-3)',
+                  fontSize: 10, fontWeight: 700, color: done || active ? '#fff' : 'var(--text-2)',
                 }}>
                   {done ? '✓' : i + 1}
                 </div>
@@ -51,11 +51,11 @@ export function Stepper({ steps, current }) {
               <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', minWidth: 72 }}>
                 <div style={{
                   width: 36, height: 36, borderRadius: '50%',
-                  background: done ? 'var(--green)' : active ? 'var(--brand)' : 'var(--surface-2)',
-                  border: `2px solid ${done ? 'var(--green)' : active ? 'var(--brand)' : 'var(--border)'}`,
+                  background: done ? 'var(--green)' : active ? 'var(--grad-purple)' : 'var(--surface-2)',
+                  border: `2px solid ${done ? 'var(--green)' : active ? '#a855f7' : 'var(--border)'}`,
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
                   fontWeight: 700, fontSize: 13,
-                  color: done || active ? '#fff' : 'var(--text-3)',
+                  color: done || active ? '#fff' : 'var(--text-2)',
                   transition: 'all .2s', flexShrink: 0,
                 }}>
                   {done ? '✓' : i + 1}

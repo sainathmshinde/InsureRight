@@ -2,36 +2,137 @@
 
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
+/* ═══════════════════════════════════════════════════════════════════
+   THEME VARIABLES — change here, flows everywhere in the app.
+   ─────────────────────────────────────────────────────────────────
+   Palette: brand colors, neutrals, status colors, radii, shadows.
+   Semantic: component-level tokens built on top of the palette.
+   ═══════════════════════════════════════════════════════════════════ */
 :root {
-  --brand:        #7c3aed;
-  --brand-hover:  #6d28d9;
-  --brand-light:  #ede9fe;
-  --brand-mid:    #a78bfa;
-  --brand-dark:   #4c1d95;
+  /* ── Brand palette ────────────────────────────────────────────── */
+  --brand:        #7c3aed;   /* primary accent */
+  --brand-hover:  #6d28d9;   /* primary hover */
+  --brand-light:  #ede9fe;   /* subtle tint */
+  --brand-mid:    #a78bfa;   /* medium */
+  --brand-dark:   #4c1d95;   /* deep shade */
 
+  /* ── Layout ───────────────────────────────────────────────────── */
   --sidebar-w:    230px;
   --topbar-h:     58px;
 
-  --bg:           #f5f4f9;
-  --surface:      #ffffff;
-  --surface-2:    #faf9fc;
-  --border:       #e8e4f0;
+  /* ── Surfaces ─────────────────────────────────────────────────── */
+  --bg:           #f1f5f9;   /* page background */
+  --surface:      #ffffff;   /* card / panel */
+  --surface-2:    #f8fafc;   /* recessed row / header */
+  --border:       #e2e8f0;   /* dividers */
 
-  --text:         #1a1628;
-  --text-2:       #5c5573;
-  --text-3:       #9d94b8;
+  /* ── Text ─────────────────────────────────────────────────────── */
+  --text:         #0f172a;   /* primary text */
+  --text-2:       #374151;   /* secondary text */
+  --text-3:       #64748b;   /* muted / placeholder — AA-compliant on white */
 
-  --green:        #059669;  --green-bg:  #d1fae5;
+  /* ── Status colors ────────────────────────────────────────────── */
+  --green:        #15803d;  --green-bg:  #dcfce7;
   --red:          #dc2626;  --red-bg:    #fee2e2;
-  --amber:        #d97706;  --amber-bg:  #fef3c7;
-  --blue:         #2563eb;  --blue-bg:   #dbeafe;
+  --amber:        #b45309;  --amber-bg:  #fef3c7;
+  --blue:         #1d4ed8;  --blue-bg:   #dbeafe;
 
+  /* ── Radius ────────────────────────────────────────────────────── */
   --r-sm:  6px;
   --r-md:  10px;
   --r-lg:  14px;
 
-  --shadow-sm: 0 1px 4px rgba(100,80,160,0.08);
-  --shadow-md: 0 4px 16px rgba(100,80,160,0.10);
+  /* ── Shadows ───────────────────────────────────────────────────── */
+  --shadow-sm: 0 1px 3px rgba(0,0,0,0.07), 0 1px 2px rgba(0,0,0,0.05);
+  --shadow-md: 0 4px 16px rgba(0,0,0,0.10), 0 2px 4px rgba(0,0,0,0.06);
+
+  /* ════════════════════════════════════════════════════════════════
+     SEMANTIC / COMPONENT TOKENS
+     Change brand above — these auto-update. Or override individually.
+     ════════════════════════════════════════════════════════════════ */
+
+  /* ── Buttons ────────────────────────────────────────────────────
+     btn-primary   : brand fill, white text
+     btn-secondary : brand-light fill, brand-dark text
+     btn-ghost     : white fill, border, dark text
+     btn-danger    : red-light fill, red text
+     btn-success   : green-light fill, green text
+     btn-outline   : transparent fill, brand border+text
+     btn-inverse   : white fill, brand-dark text  (use on dark banners)
+     btn-neutral   : gray fill, dark text */
+  --btn-primary-bg:      var(--grad-purple);
+  --btn-primary-text:    #ffffff;
+  --btn-primary-hover:   var(--grad-purple);
+
+  --btn-secondary-bg:    var(--brand-light);
+  --btn-secondary-text:  var(--brand-dark);
+  --btn-secondary-hover: #ddd6fe;
+
+  --btn-ghost-bg:        #ffffff;
+  --btn-ghost-text:      var(--text-2);
+  --btn-ghost-border:    #94a3b8;
+  --btn-ghost-hover-bg:  var(--surface-2);
+  --btn-ghost-hover-border: #64748b;
+
+  --btn-danger-bg:       var(--red-bg);
+  --btn-danger-text:     var(--red);
+  --btn-danger-hover:    #fecaca;
+
+  --btn-success-bg:      #f0fdf4;
+  --btn-success-text:    #166534;
+  --btn-success-border:  #86efac;
+
+  --btn-outline-bg:      transparent;
+  --btn-outline-text:    var(--brand);
+  --btn-outline-border:  var(--brand);
+
+  --btn-inverse-bg:      #ffffff;
+  --btn-inverse-text:    var(--brand-dark);
+  --btn-inverse-shadow:  0 2px 8px rgba(0,0,0,.15);
+
+  --btn-neutral-bg:      #f3f4f6;
+  --btn-neutral-text:    var(--text-2);
+  --btn-neutral-border:  #e5e7eb;
+
+  /* ── Banner / dark strips ────────────────────────────────────────
+     Used in: CustomerStrip, sticky payment bars, Dashboard banner */
+  --banner-bg:           var(--grad-purple);
+  --banner-shadow:       0 4px 16px rgba(124,58,237,.28);
+  --banner-text:         #ffffff;
+  --banner-text-muted:   rgba(255,255,255,.82);
+  --banner-text-dim:     rgba(255,255,255,.65);
+
+  /* ── Icons ───────────────────────────────────────────────────────
+     Icon color rule: dark icon on light bg, white on dark bg */
+  --icon-on-light:       var(--text-2);   /* #374151 */
+  --icon-on-dark:        #ffffff;
+
+  /* ── Chips / neutral tags ─────────────────────────────────────── */
+  --chip-bg:             #f3f4f6;
+  --chip-text:           #374151;
+  --chip-border:         #e5e7eb;
+
+  /* ── Stat cards ───────────────────────────────────────────────── */
+  --stat-bg:             var(--surface);
+  --stat-value-text:     #111827;
+  --stat-sub-text:       var(--text-3);
+
+  /* ── Section headings ─────────────────────────────────────────── */
+  --section-head-bg:     var(--surface-2);
+  --section-head-text:   var(--brand);
+  --section-icon-bg:     var(--brand-light);
+
+  /* ── Table hover ──────────────────────────────────────────────── */
+  --table-row-hover:     #f5f3ff;
+
+  /* ── Focus ring ───────────────────────────────────────────────── */
+  --focus-ring:          rgba(124,58,237,.12);
+
+  /* ── Gradients ────────────────────────────────────────────────── */
+  --grad-coral:  linear-gradient(135deg, #f97316 0%, #f472b6 100%);
+  --grad-purple: linear-gradient(135deg, #fb7185 0%, #a855f7 100%);
+  --grad-blue:   linear-gradient(135deg, #3b82f6 0%, #6366f1 100%);
+  --grad-teal:   linear-gradient(135deg, #10b981 0%, #14b8a6 100%);
 }
 
 body {
@@ -61,24 +162,44 @@ body {
 .page-actions  { display: flex; gap: 10px; }
 
 /* ─── Card ──────────────────────────────── */
-.card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--r-lg); box-shadow: var(--shadow-sm); margin-bottom: 20px; }
+.card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--r-lg); box-shadow: var(--shadow-md); margin-bottom: 20px; }
 .card-header { display: flex; align-items: center; justify-content: space-between; padding: 14px 22px; border-bottom: 1px solid var(--border); }
 .card-title  { font-size: 14px; font-weight: 600; }
 .card-body   { padding: 22px; }
 
-/* ─── Section ───────────────────────────── */
-.section-block { margin-bottom: 28px; }
+/* ─── Section (each renders as its own card) ─ */
+.section-block {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  box-shadow: var(--shadow-md);
+  margin-bottom: 16px;
+  overflow: hidden;
+}
 .section-heading {
-  display: flex; align-items: center; gap: 8px;
-  font-size: 11.5px; font-weight: 700; color: var(--brand);
-  text-transform: uppercase; letter-spacing: 0.8px;
-  margin-bottom: 16px; padding-bottom: 10px;
-  border-bottom: 1.5px solid var(--brand-light);
+  display: flex; align-items: center; gap: 10px;
+  padding: 13px 20px;
+  background: var(--section-head-bg);
+  border-bottom: 1.5px solid var(--border);
+  font-size: 12px; font-weight: 700; color: var(--section-head-text);
+  text-transform: uppercase; letter-spacing: 0.7px;
 }
 .section-icon {
-  width: 26px; height: 26px; border-radius: var(--r-sm);
-  background: var(--brand-light);
-  display: flex; align-items: center; justify-content: center; font-size: 13px;
+  width: 28px; height: 28px; border-radius: var(--r-sm);
+  background: var(--section-icon-bg);
+  display: flex; align-items: center; justify-content: center; font-size: 14px;
+  flex-shrink: 0;
+}
+.section-body { padding: 22px 22px 20px; }
+
+/* Outer .card that wraps only a form of section-blocks becomes a transparent shell */
+.card:has(> .card-body > form > .section-block),
+.card:has(> .card-body > form > div > .section-block) {
+  background: none; border: none; box-shadow: none;
+}
+.card:has(> .card-body > form > .section-block) > .card-body,
+.card:has(> .card-body > form > div > .section-block) > .card-body {
+  padding: 0;
 }
 
 /* ─── Form Grid ─────────────────────────── */
@@ -95,22 +216,22 @@ body {
 .field-input, .field-select, .field-textarea {
   width: 100%; height: 40px; padding: 0 12px;
   border: 1.5px solid var(--border); border-radius: var(--r-sm);
-  background: var(--surface-2); color: var(--text);
+  background: #fff; color: var(--text);
   font-size: 13.5px; font-family: inherit; outline: none;
   transition: border-color .15s, background .15s, box-shadow .15s;
 }
 .field-textarea { height: auto; padding: 10px 12px; resize: vertical; min-height: 80px; }
 .field-select {
   cursor: pointer; appearance: none;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%239d94b8' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
   background-repeat: no-repeat; background-position: right 12px center; padding-right: 32px;
 }
 .field-input:focus, .field-select:focus, .field-textarea:focus {
   border-color: var(--brand); background: var(--surface);
-  box-shadow: 0 0 0 3px rgba(124,58,237,.08);
+  box-shadow: 0 0 0 3px var(--focus-ring);
 }
 .field-input:disabled, .field-select:disabled, .field-textarea:disabled {
-  background: #f0eef7; color: var(--text-3); cursor: not-allowed;
+  background: #f3f4f6; color: #6b7280; cursor: not-allowed;
 }
 
 /* ─── Upload Box ─────────────────────────── */
@@ -135,23 +256,90 @@ body {
   transition: background .15s, transform .1s, box-shadow .15s;
 }
 .btn:active { transform: scale(.97); }
-.btn-primary   { background: var(--brand); color: #fff; }
-.btn-primary:hover { background: var(--brand-hover); box-shadow: 0 2px 8px rgba(124,58,237,.3); }
-.btn-secondary { background: var(--brand-light); color: var(--brand); }
-.btn-secondary:hover { background: #ddd6fe; }
-.btn-ghost     { background: transparent; color: var(--text-2); border: 1.5px solid var(--border); }
-.btn-ghost:hover { background: var(--surface-2); }
-.btn-danger    { background: var(--red-bg); color: var(--red); }
-.btn-danger:hover { background: #fecaca; }
-.btn-success   { background: #f0fdf4; color: #166534; border: 1.5px solid #86efac; }
-.btn-success:hover { background: #dcfce7; }
-.btn-sm        { height: 32px; padding: 0 12px; font-size: 12.5px; }
 
-/* ─── Actions Row ────────────────────────── */
+.btn-primary   { background: var(--btn-primary-bg); color: var(--btn-primary-text); }
+.btn-primary:hover { filter: brightness(1.08); box-shadow: 0 4px 12px rgba(147,51,234,.40); }
+
+.btn-secondary { background: var(--btn-secondary-bg); color: var(--btn-secondary-text); font-weight: 600; }
+.btn-secondary:hover { background: var(--btn-secondary-hover); }
+
+.btn-ghost { background: var(--btn-ghost-bg); color: var(--btn-ghost-text); border: 1.5px solid var(--btn-ghost-border); font-weight: 600; }
+.btn-ghost:hover { background: var(--btn-ghost-hover-bg); border-color: var(--btn-ghost-hover-border); color: var(--text); }
+
+.btn-danger { background: var(--btn-danger-bg); color: var(--btn-danger-text); }
+.btn-danger:hover { background: var(--btn-danger-hover); }
+
+.btn-success { background: var(--btn-success-bg); color: var(--btn-success-text); border: 1.5px solid var(--btn-success-border); }
+.btn-success:hover { background: #dcfce7; }
+
+/* btn-outline: transparent fill, brand border — for secondary actions on light bg */
+.btn-outline { background: var(--btn-outline-bg); color: var(--btn-outline-text); border: 1.5px solid var(--btn-outline-border); font-weight: 600; }
+.btn-outline:hover { background: var(--brand-light); }
+
+/* btn-inverse: white fill, brand-dark text — use INSIDE dark banners/strips */
+.btn-inverse {
+  background: var(--btn-inverse-bg); color: var(--btn-inverse-text);
+  border: none; font-weight: 700;
+  box-shadow: var(--btn-inverse-shadow);
+}
+.btn-inverse:hover { opacity: .88; }
+
+/* btn-neutral: gray fill — for less prominent actions */
+.btn-neutral { background: var(--btn-neutral-bg); color: var(--btn-neutral-text); border: 1.5px solid var(--btn-neutral-border); }
+.btn-neutral:hover { background: #e5e7eb; }
+
+.btn-sm  { height: 32px; padding: 0 12px; font-size: 12.5px; }
+.btn-lg  { height: 46px; padding: 0 28px; font-size: 15px; }
+.btn-icon { width: 38px; padding: 0; justify-content: center; }
+
+/* ─── Actions Row — elevated footer bar ─── */
 .actions-row {
   display: flex; gap: 10px; align-items: center; justify-content: flex-end;
-  padding-top: 20px; border-top: 1px solid var(--border); margin-top: 24px;
+  padding: 16px 22px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  box-shadow: var(--shadow-md);
+  margin-top: 8px;
 }
+
+/* ─── Banner (dark gradient strip) ──────── */
+/* Use .banner-dark for any full-width gradient strip (CustomerStrip, sticky bars, Dashboard header) */
+.banner-dark {
+  background: var(--banner-bg);
+  box-shadow: var(--banner-shadow);
+  color: var(--banner-text);
+}
+.banner-dark .banner-text-muted { color: var(--banner-text-muted); }
+.banner-dark .banner-text-dim   { color: var(--banner-text-dim); }
+
+/* ─── Icon utilities ─────────────────────── */
+/* .icon-on-light — SVG icon on any white/light background */
+.icon-on-light { color: var(--icon-on-light); }
+/* .icon-on-dark  — SVG icon on any dark/banner background */
+.icon-on-dark  { color: var(--icon-on-dark); }
+/* .page-icon already handles: brand bg + white icon */
+
+/* ─── Chip / tag ─────────────────────────── */
+/* Neutral tag for SI, coverage, band labels etc. */
+.chip {
+  display: inline-flex; align-items: center;
+  padding: 2px 8px; border-radius: 5px; font-size: 11.5px; font-weight: 500;
+  background: var(--chip-bg); color: var(--chip-text); border: 1px solid var(--chip-border);
+}
+.chip-brand {
+  background: var(--brand-light); color: var(--brand); border-color: var(--brand-mid);
+}
+
+/* ─── Stat card ──────────────────────────── */
+.stat-card {
+  background: var(--stat-bg); border: 1px solid var(--border);
+  border-radius: var(--r-lg); padding: 18px 20px;
+  box-shadow: var(--shadow-sm);
+}
+.stat-card-value { font-size: 26px; font-weight: 800; color: var(--stat-value-text); line-height: 1.1; }
+.stat-card-label { font-size: 13px; color: var(--text-2); font-weight: 500; margin-bottom: 2px; }
+.stat-card-sub   { font-size: 12px; color: var(--stat-sub-text); margin-top: 4px; }
 
 /* ─── Badges ─────────────────────────────── */
 .badge { display: inline-flex; align-items: center; gap: 4px; padding: 3px 10px; border-radius: 99px; font-size: 12px; font-weight: 500; }
@@ -179,7 +367,7 @@ thead tr { border-bottom: 2px solid var(--border); }
 thead th { padding: 10px 16px; font-size: 12.5px; font-weight: 600; color: var(--text-2); text-align: left; white-space: nowrap; background: var(--surface-2); }
 tbody tr { border-bottom: 1px solid var(--border); transition: background .1s; }
 tbody tr:last-child { border-bottom: none; }
-tbody tr:hover { background: #faf8ff; }
+tbody tr:hover { background: var(--table-row-hover); }
 tbody td { padding: 12px 16px; font-size: 13.5px; }
 
 /* ─── Filter Bar ─────────────────────────── */

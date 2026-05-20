@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from "react";
+﻿import { useState, useRef, useEffect } from "react";
 import { NavLink, useLocation, useNavigate } from "react-router-dom";
 import kmdLogo from "../assets/kmd-logo.svg";
 import {
@@ -270,15 +270,15 @@ export default function Sidebar({ mobileOpen = false, onMobileClose }) {
         style={{ ...S.aside, width: collapsed ? COLLAPSED_W : EXPANDED_W }}
       >
 
-        {/* ── Logo ── */}
+        {/* â”€â”€ Logo â”€â”€ */}
         <div style={{ ...S.logoRow, justifyContent: collapsed ? "center" : "space-between", padding: collapsed ? 0 : "0 16px 0 18px" }}>
           {!collapsed && (
             <img src={kmdLogo} alt="KMD" style={{ width: 36, height: 36, borderRadius: "50%", flexShrink: 0 }} />
           )}
-          {/* Desktop collapse toggle; on mobile show a close × instead */}
+          {/* Desktop collapse toggle; on mobile show a close Ã— instead */}
           {mobileOpen ? (
             <button className="sb-toggle" style={S.toggleBtn} onClick={onMobileClose} title="Close">
-              <span style={{ fontSize: 18, lineHeight: 1 }}>×</span>
+              <CloseIcon />
             </button>
           ) : (
             <button className="sb-toggle" style={S.toggleBtn} onClick={toggle} title={collapsed ? "Expand" : "Collapse"}>
@@ -287,7 +287,7 @@ export default function Sidebar({ mobileOpen = false, onMobileClose }) {
           )}
         </div>
 
-        {/* ── Nav ── */}
+        {/* â”€â”€ Nav â”€â”€ */}
         <nav style={{ ...S.nav, alignItems: collapsed ? "center" : "stretch" }}>
           {activeNav.map(item => {
             const Icon = item.icon;
@@ -305,12 +305,12 @@ export default function Sidebar({ mobileOpen = false, onMobileClose }) {
                   title={collapsed ? item.label : undefined}
                 >
                   <span style={S.iconWrap}>
-                    <Icon size={19} color={moduleActive ? "#fff" : "#7c3aed"} />
+                    <Icon size={19} color={moduleActive ? "#fff" : "#374151"} />
                   </span>
                   {!collapsed && (
                     <>
                       <span style={S.label}>{item.label}</span>
-                      <span style={{ ...S.chevron, transform: isOpen ? "rotate(90deg)" : "rotate(0deg)", color: moduleActive ? "rgba(255,255,255,0.7)" : "#a78bfa" }}>›</span>
+                      <span style={{ ...S.chevron, transform: isOpen ? "rotate(90deg)" : "rotate(0deg)", color: moduleActive ? "rgba(255,255,255,0.7)" : "#a78bfa" }}><ChevronRight /></span>
                     </>
                   )}
                   {collapsed && moduleActive && <span style={S.pip} />}
@@ -333,7 +333,7 @@ export default function Sidebar({ mobileOpen = false, onMobileClose }) {
                 {/* Flyout (collapsed) */}
                 {flyOpen && (
                   <div style={S.flyout} onMouseEnter={keepOpen} onMouseLeave={onLeave}>
-                    <div style={S.flyoutHead}><Icon size={13} color="#7c3aed" /><span>{item.label}</span></div>
+                    <div style={S.flyoutHead}><Icon size={13} color="#374151" /><span>{item.label}</span></div>
                     {item.children.map(child => (
                       <NavLink key={child.path} to={child.path} end={child.path === "/" + item.key}
                         className="sb-fly"
@@ -349,7 +349,7 @@ export default function Sidebar({ mobileOpen = false, onMobileClose }) {
           })}
         </nav>
 
-        {/* ── Logout button ── */}
+        {/* â”€â”€ Logout button â”€â”€ */}
         <div style={S.logoutWrap}>
           <button className="sb-logout" style={{ ...S.logoutBtn, justifyContent: collapsed ? "center" : "flex-start" }}
             onClick={handleLogout} title="Sign Out">
@@ -362,9 +362,23 @@ export default function Sidebar({ mobileOpen = false, onMobileClose }) {
   );
 }
 
+function ChevronRight() {
+  return (
+    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+      <polyline points="9 18 15 12 9 6"/>
+    </svg>
+  );
+}
+function CloseIcon() {
+  return (
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#374151" strokeWidth="2.2" strokeLinecap="round">
+      <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+    </svg>
+  );
+}
 function IconCollapse() {
   return (
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#7c3aed" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#374151" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
       <line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="14" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/>
       <polyline points="17 9 21 12 17 15"/>
     </svg>
@@ -372,7 +386,7 @@ function IconCollapse() {
 }
 function IconExpand() {
   return (
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#7c3aed" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#374151" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
       <line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="14" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/>
       <polyline points="21 9 17 12 21 15"/>
     </svg>
@@ -391,7 +405,7 @@ const S = {
   nav:       { padding: "8px 8px", display: "flex", flexDirection: "column", gap: 3, flex: 1 },
   navBtn:    { display: "flex", alignItems: "center", gap: 9, padding: "9px 10px", borderRadius: 8, fontSize: 13.5, fontWeight: 500, color: "#1a1628", background: "none", border: "none", cursor: "pointer", width: "100%", textAlign: "left", transition: "background .13s,color .13s", fontFamily: "inherit", position: "relative", whiteSpace: "nowrap", overflow: "hidden" },
   navBtnCollapsed: { width: 44, height: 44, padding: 0, justifyContent: "center", gap: 0, borderRadius: 10 },
-  navBtnActive:    { background: "#7c3aed", color: "#fff" },
+  navBtnActive:    { background: "linear-gradient(135deg,#fb7185 0%,#a855f7 100%)", color: "#fff" },
   iconWrap:  { display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, width: 22, height: 22 },
   label:     { flex: 1, fontSize: 13.5 },
   chevron:   { fontSize: 17, display: "inline-block", transition: "transform .2s", lineHeight: 1 },
@@ -407,3 +421,4 @@ const S = {
   logoutWrap:{ borderTop: "1.5px solid #e8e4f0", padding: "10px 10px" },
   logoutBtn: { display: "flex", alignItems: "center", width: "100%", padding: "9px 10px", borderRadius: 8, border: "none", background: "none", cursor: "pointer", fontFamily: "inherit", transition: "background .12s,color .12s", color: "#dc2626" },
 };
+

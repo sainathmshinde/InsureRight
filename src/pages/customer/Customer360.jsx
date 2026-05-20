@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { TYPE_ICON } from './FamilyMembersSection'
+import { CustomerIcon } from '../../icons'
 
 function calcAge(dob) {
   if (!dob) return null
@@ -314,7 +315,7 @@ export default function Customer360() {
       {/* Header */}
       <div className="page-header">
         <div className="page-title-row">
-          <div className="page-icon">👥</div>
+          <div className="page-icon"><CustomerIcon /></div>
           <div>
             <div className="page-title">{c.name}</div>
             <div className="page-subtitle">{c.mobile} · {c.email}</div>

@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { Field, Input, Select, SectionBlock } from '../../components/Field'
+import { EditIcon } from '../../icons'
 import { IC_MAP } from './icData'
 
 export default function ICEdit() {
@@ -19,7 +20,7 @@ export default function ICEdit() {
     <div>
       <div className="page-header">
         <div className="page-title-row">
-          <div className="page-icon">✏️</div>
+          <div className="page-icon"><EditIcon /></div>
           <div>
             <div className="page-title">Edit Insurance Company</div>
             <div className="page-subtitle">Update IC master information</div>

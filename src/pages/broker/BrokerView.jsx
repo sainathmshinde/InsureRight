@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { useAuth } from '../../context/AuthContext'
+import { BrokerIcon } from '../../icons'
 import { BROKER_MAP } from './brokerData'
 
 const tabs = ['Basic Info', 'KYC', 'Contact & Address', 'Bank Details', 'Agreement']
@@ -50,7 +51,7 @@ export default function BrokerView() {
       {/* Header */}
       <div className="page-header">
         <div className="page-title-row">
-          <div className="page-icon">🏢</div>
+          <div className="page-icon"><BrokerIcon /></div>
           <div>
             <div className="page-title">{isProfile ? 'My Profile' : b.brokerName}</div>
             <div className="page-subtitle">{b.companyName} · {b.licenseNumber}</div>

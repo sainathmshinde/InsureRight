@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+﻿import { useState, useMemo } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import Pagination from "../../components/Pagination";
 import usePagination from "../../components/usePagination";
@@ -254,29 +254,61 @@ function Avatar({ name, size = 40, fontSize = 16 }) {
 
 // ── Persistent "policy for" customer strip ─────────────────────────────────
 function CustomerStrip({ customer, onChangeCustomer, canChange = true }) {
+  const kycColor = customer.kyc === "Verified" ? "#4ade80" : customer.kyc === "Pending" ? "#fbbf24" : "#f87171";
   return (
     <div className="bp-cust-strip" style={{
-      display: "flex", alignItems: "center", gap: 12, flexWrap: "wrap",
-      background: "var(--surface)", border: "1.5px solid var(--brand-light)",
-      borderRadius: "var(--r-md)", padding: "11px 16px", marginBottom: 20,
-      boxShadow: "0 2px 8px rgba(124,58,237,.07)",
+      display: "flex", alignItems: "center", gap: 14, flexWrap: "wrap",
+      background: "linear-gradient(135deg, #fb7185 0%, #a855f7 100%)",
+      borderRadius: "var(--r-lg)", padding: "13px 18px", marginBottom: 20,
+      boxShadow: "0 4px 16px rgba(168,85,247,.30)",
     }}>
-      <Avatar name={customer.name} size={36} fontSize={13} />
+      {/* Avatar with white ring */}
+      <div style={{
+        width: 42, height: 42, borderRadius: "50%", flexShrink: 0,
+        background: "rgba(255,255,255,.18)", border: "2px solid rgba(255,255,255,.5)",
+        display: "flex", alignItems: "center", justifyContent: "center",
+        fontSize: 15, fontWeight: 800, color: "#fff",
+      }}>
+        {customer.name.split(" ").map(w => w[0]).join("").slice(0, 2).toUpperCase()}
+      </div>
+
+      {/* Info */}
       <div style={{ flex: 1, minWidth: 0 }}>
-        <div style={{ display: "flex", alignItems: "center", gap: 7, flexWrap: "wrap" }}>
-          <span style={{ fontWeight: 700, fontSize: 14 }}>{customer.name}</span>
-          <StatusBadge status={customer.kyc} />
+        <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
+          <span style={{ fontWeight: 700, fontSize: 14.5, color: "#fff" }}>{customer.name}</span>
+          <span style={{
+            fontSize: 11, fontWeight: 700, padding: "2px 8px", borderRadius: 20,
+            background: "rgba(255,255,255,.15)", color: kycColor,
+            border: `1px solid ${kycColor}55`,
+          }}>
+            {customer.kyc === "Verified" ? "✓" : "●"} {customer.kyc}
+          </span>
         </div>
-        <div className="bp-cust-detail" style={{ fontSize: 12, color: "var(--text-3)", marginTop: 2 }}>
-          📱 {customer.mobile}
-          <span className="bp-cust-email"> · ✉ {customer.email}</span>
+        <div className="bp-cust-detail" style={{ fontSize: 12, color: "rgba(255,255,255,.9)", marginTop: 3, display: "flex", gap: 10, flexWrap: "wrap" }}>
+          <span>📱 {customer.mobile}</span>
+          <span className="bp-cust-email">✉ {customer.email}</span>
         </div>
       </div>
-      <div className="bp-cust-actions" style={{ display: "flex", alignItems: "center", gap: 8, flexShrink: 0 }}>
-        {canChange && (
-          <button className="btn btn-ghost btn-sm" onClick={onChangeCustomer}>Change Customer</button>
-        )}
-      </div>
+
+      {/* Action */}
+      {canChange && (
+        <div className="bp-cust-actions" style={{ flexShrink: 0 }}>
+          <button
+            onClick={onChangeCustomer}
+            style={{
+              height: 34, padding: "0 16px", borderRadius: 8, cursor: "pointer",
+              background: "#fff", border: "none",
+              color: "#4c1d95", fontSize: 13, fontWeight: 700, fontFamily: "inherit",
+              transition: "opacity .15s",
+              boxShadow: "0 2px 6px rgba(0,0,0,.15)",
+            }}
+            onMouseEnter={e => e.currentTarget.style.opacity = ".85"}
+            onMouseLeave={e => e.currentTarget.style.opacity = "1"}
+          >
+            Change Customer
+          </button>
+        </div>
+      )}
     </div>
   );
 }
@@ -784,8 +816,8 @@ export default function BuyPolicy() {
                       textAlign: "left", cursor: "pointer", fontFamily: "inherit",
                       borderRadius: 14, overflow: "hidden",
                       border: `2px solid ${isSelected ? "var(--brand)" : isRejected ? "#fecdd3" : "var(--border)"}`,
-                      background: isSelected ? "var(--brand-light)" : isRejected ? "#fff8f8" : "#fff",
-                      boxShadow: isSelected ? "0 4px 16px rgba(124,58,237,.14)" : "0 1px 4px rgba(0,0,0,.06)",
+                      background: isSelected ? "#f5f3ff" : isRejected ? "#fff8f8" : "#fff",
+                      boxShadow: isSelected ? "0 4px 16px rgba(124,58,237,.18)" : "0 1px 4px rgba(0,0,0,.06)",
                       transition: "all .14s",
                       padding: 0,
                     }}
@@ -825,14 +857,24 @@ export default function BuyPolicy() {
           {/* Sticky continue bar */}
           <div style={{
             position: "sticky", bottom: 0, zIndex: 20,
-            marginTop: 16, padding: "12px 16px",
-            background: selectedCustomer ? "#ede9fb" : "#fff",
-            border: `1.5px solid ${selectedCustomer ? "rgba(124,58,237,.25)" : "var(--border)"}`,
+            marginTop: 16, padding: "13px 18px",
+            background: selectedCustomer
+              ? "linear-gradient(135deg, #4c1d95 0%, #7c3aed 100%)"
+              : "#fff",
+            border: `1.5px solid ${selectedCustomer ? "transparent" : "var(--border)"}`,
             borderRadius: 12, transition: "all .2s",
-            boxShadow: "0 -4px 20px rgba(0,0,0,.08)",
+            boxShadow: selectedCustomer
+              ? "0 -4px 24px rgba(76,29,149,.35)"
+              : "0 -2px 12px rgba(0,0,0,.06)",
             display: "flex", alignItems: "center", justifyContent: "flex-end",
           }}>
-            <Button disabled={!selectedCustomer} onClick={next} style={{ minWidth: 260 }}>
+            <Button disabled={!selectedCustomer} onClick={next} style={{
+              minWidth: 260,
+              ...(selectedCustomer ? {
+                background: "#fff", color: "#4c1d95",
+                boxShadow: "0 2px 8px rgba(0,0,0,.15)",
+              } : {}),
+            }}>
               Continue with {selectedCustomer ? selectedCustomer.name : "selected customer"} →
             </Button>
           </div>
@@ -939,7 +981,7 @@ export default function BuyPolicy() {
                                 <label key={opt.key} style={{
                                   display: "flex", alignItems: "center", gap: 10,
                                   padding: "10px 14px", borderRadius: 9, cursor: "pointer",
-                                  background: active ? "var(--brand-light)" : "#fafafa",
+                                  background: "#fff",
                                   border: `1.5px solid ${active ? "var(--brand)" : "var(--border)"}`,
                                   borderLeft: `4px solid ${active ? "var(--brand)" : "var(--border)"}`,
                                   transition: "all .15s",
@@ -950,8 +992,8 @@ export default function BuyPolicy() {
                                       ensureMembersFor(opt.key);
                                     }}
                                     style={{ accentColor: "var(--brand)", width: 15, height: 15, flexShrink: 0 }} />
-                                  <span style={{ flex: 1, fontSize: 13.5, color: active ? "var(--brand)" : "var(--text-2)", fontWeight: active ? 600 : 400 }}>{opt.label}</span>
-                                  <span style={{ fontWeight: 800, fontSize: 15, color: active ? "var(--brand)" : "var(--text)", flexShrink: 0 }}>₹{opt.value.toLocaleString("en-IN")}</span>
+                                  <span style={{ flex: 1, fontSize: 13.5, color: "var(--text)", fontWeight: active ? 700 : 400 }}>{opt.label}</span>
+                                  <span style={{ fontWeight: 800, fontSize: 15, color: active ? "var(--brand-dark)" : "var(--text)", flexShrink: 0 }}>₹{opt.value.toLocaleString("en-IN")}</span>
                                 </label>
                               );
                             })}
@@ -979,14 +1021,14 @@ export default function BuyPolicy() {
                                   gridTemplateColumns: "110px 1fr 150px 110px",
                                   gap: 8, alignItems: "center",
                                   padding: "10px 12px", borderRadius: 9, background: "#fff",
-                                  border: `1.5px solid ${(missingName || missingDob) ? "#f59e0b" : isSelf ? "rgba(124,58,237,.3)" : "var(--border)"}`,
+                                  border: `1.5px solid ${(missingName || missingDob) ? "#f59e0b" : "var(--border)"}`,
                                   transition: "border-color .2s",
                                 }}>
                                   <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
                                     <span style={{ fontSize: 17 }}>{slot?.icon}</span>
                                     <div>
-                                      <div style={{ fontSize: 12.5, fontWeight: 700, color: isSelf ? "var(--brand)" : "var(--text)", lineHeight: 1.2 }}>{slot?.label}</div>
-                                      {isSelf && <div style={{ fontSize: 10.5, color: "var(--brand)", fontWeight: 500 }}>Primary</div>}
+                                      <div style={{ fontSize: 12.5, fontWeight: 700, color: "var(--text)", lineHeight: 1.2 }}>{slot?.label}</div>
+                                      {isSelf && <div style={{ fontSize: 10.5, color: "var(--text-3)", fontWeight: 600 }}>Primary</div>}
                                       {age !== null && <div style={{ fontSize: 10.5, color: "var(--text-3)" }}>{age} yrs</div>}
                                     </div>
                                   </div>
@@ -1008,7 +1050,7 @@ export default function BuyPolicy() {
                                   />
                                   {isSelf ? (
                                     <input className="field-input" value={m?.gender ?? ""} disabled
-                                      style={{ fontSize: 12.5, padding: "6px 9px", width: "100%", background: "var(--surface-2)", color: "var(--text-2)" }} />
+                                      style={{ fontSize: 12.5, padding: "6px 9px", width: "100%", background: "#f3f4f6", color: "var(--text-2)" }} />
                                   ) : (
                                     <select className="field-select" value={m?.gender ?? ""}
                                       onChange={e => updateMember(type, "gender", e.target.value)}
@@ -1046,43 +1088,58 @@ export default function BuyPolicy() {
           )}
 
           {/* Sticky total + continue footer */}
-          <div style={{
-            position: "sticky", bottom: 0, zIndex: 20, marginTop: 8,
-            background: cart.some(x => psel(x.id).premium != null) ? "var(--brand-light)" : "#fff",
-            border: `2px solid ${cart.some(x => psel(x.id).premium != null) ? "rgba(124,58,237,.3)" : "var(--border)"}`,
-            borderRadius: 12, padding: "12px 18px",
-            boxShadow: "0 -4px 20px rgba(0,0,0,.09)",
-            display: "flex", alignItems: "center", gap: 16, flexWrap: "wrap",
-            transition: "all .2s",
-          }}>
-            {cart.some(x => psel(x.id).premium != null) ? (
-              <div style={{ flex: 1, minWidth: 0 }}>
-                <div style={{ fontSize: 12, color: "var(--text-3)", fontWeight: 600, marginBottom: 2 }}>
-                  {cart.length} product{cart.length > 1 ? "s" : ""} · Total Premium
-                </div>
-                <div style={{ display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap" }}>
-                  <span style={{ fontSize: 22, fontWeight: 800, color: "var(--text)" }}>
-                    ₹{cart.reduce((s, x) => s + (psel(x.id).premium ?? 0), 0).toLocaleString("en-IN")}
-                  </span>
-                  <span style={{ fontSize: 11.5, color: "var(--text-3)" }}>
-                    {cart.map(x => `${x.name.split(" ")[0]}: ₹${(psel(x.id).premium ?? 0).toLocaleString("en-IN")}`).join("  +  ")}
-                  </span>
-                </div>
+          {(() => {
+            const hasPremium = cart.some(x => psel(x.id).premium != null);
+            return (
+              <div style={{
+                position: "sticky", bottom: 0, zIndex: 20, marginTop: 8,
+                background: hasPremium
+                  ? "linear-gradient(135deg, #fb7185 0%, #a855f7 100%)"
+                  : "#fff",
+                border: `2px solid ${hasPremium ? "transparent" : "var(--border)"}`,
+                borderRadius: 12, padding: "12px 18px",
+                boxShadow: hasPremium
+                  ? "0 -4px 24px rgba(168,85,247,.30)"
+                  : "0 -2px 12px rgba(0,0,0,.06)",
+                display: "flex", alignItems: "center", gap: 16, flexWrap: "wrap",
+                transition: "all .2s",
+              }}>
+                {hasPremium ? (
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div style={{ fontSize: 11.5, color: "rgba(255,255,255,.94)", fontWeight: 600, marginBottom: 2, textTransform: "uppercase", letterSpacing: ".4px" }}>
+                      {cart.length} product{cart.length > 1 ? "s" : ""} · Total Premium
+                    </div>
+                    <div style={{ display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap" }}>
+                      <span style={{ fontSize: 24, fontWeight: 800, color: "#fff" }}>
+                        ₹{cart.reduce((s, x) => s + (psel(x.id).premium ?? 0), 0).toLocaleString("en-IN")}
+                      </span>
+                      <span style={{ fontSize: 11.5, color: "rgba(255,255,255,.94)" }}>
+                        {cart.map(x => `${x.name.split(" ")[0]}: ₹${(psel(x.id).premium ?? 0).toLocaleString("en-IN")}`).join("  +  ")}
+                      </span>
+                    </div>
+                  </div>
+                ) : (
+                  <div style={{ flex: 1, fontSize: 13, color: "var(--text-3)" }}>
+                    Select coverage for each product to see total premium
+                  </div>
+                )}
+                <button
+                  className="btn btn-primary"
+                  disabled={cart.length === 0}
+                  onClick={next}
+                  style={{
+                    flexShrink: 0, minWidth: 200,
+                    ...(hasPremium ? {
+                      background: "#fff", color: "#4c1d95", fontWeight: 700,
+                      boxShadow: "0 2px 8px rgba(0,0,0,.15)",
+                    } : {}),
+                  }}
+                >
+                  Continue to Proposal →
+                </button>
               </div>
-            ) : (
-              <div style={{ flex: 1, fontSize: 13, color: "var(--text-3)" }}>
-                Select coverage for each product to see total premium
-              </div>
-            )}
-            <button
-              className="btn btn-primary"
-              disabled={cart.length === 0}
-              onClick={next}
-              style={{ flexShrink: 0, minWidth: 200 }}
-            >
-              Continue to Proposal →
-            </button>
-          </div>
+            );
+          })()}
         </div>
       )}
 
@@ -1099,7 +1156,7 @@ export default function BuyPolicy() {
               <div style={{ fontSize: 13, color: "var(--text-3)", marginTop: 2 }}>Click a card to select, then view full details before continuing</div>
             </div>
             {cart.length > 0 && (
-              <span style={{ fontSize: 13, fontWeight: 600, color: "var(--brand)", background: "var(--brand-light)", border: "1px solid rgba(124,58,237,.2)", borderRadius: 20, padding: "4px 14px" }}>
+              <span style={{ fontSize: 13, fontWeight: 700, color: "#fff", background: "var(--brand-dark)", borderRadius: 20, padding: "4px 14px" }}>
                 {cart.length} selected
               </span>
             )}
@@ -1194,18 +1251,28 @@ export default function BuyPolicy() {
             position: "sticky", bottom: 0, zIndex: 20, marginTop: 20,
             display: "flex", alignItems: "center", justifyContent: "space-between",
             gap: 16, padding: "14px 20px",
-            background: cart.length > 0 ? "var(--brand-light)" : "#fff",
-            border: `2px solid ${cart.length > 0 ? "var(--brand)" : "var(--border)"}`,
+            background: cart.length > 0
+              ? "linear-gradient(135deg, #4c1d95 0%, #7c3aed 100%)"
+              : "#fff",
+            border: `2px solid ${cart.length > 0 ? "transparent" : "var(--border)"}`,
             borderRadius: 12, transition: "all .2s",
-            boxShadow: cart.length > 0 ? "0 -4px 20px rgba(124,58,237,.12)" : "0 -4px 20px rgba(0,0,0,.06)",
+            boxShadow: cart.length > 0
+              ? "0 -4px 24px rgba(76,29,149,.35)"
+              : "0 -2px 12px rgba(0,0,0,.06)",
           }}>
-            <div style={{ fontSize: 13.5, color: "var(--text-2)" }}>
+            <div style={{ fontSize: 13.5, color: cart.length > 0 ? "rgba(255,255,255,.75)" : "var(--text-3)" }}>
               {cart.length === 0
                 ? "Select at least one product to continue"
-                : <><strong style={{ color: "var(--text)" }}>{cart.length} product{cart.length > 1 ? "s" : ""}</strong> selected — choose premium details on next screen</>
+                : <><strong style={{ color: "#fff", fontWeight: 700 }}>{cart.length} product{cart.length > 1 ? "s" : ""}</strong> selected — choose premium details on next screen</>
               }
             </div>
-            <button className="btn btn-primary" disabled={cart.length === 0} onClick={next} style={{ flexShrink: 0, minWidth: 140 }}>
+            <button className="btn btn-primary" disabled={cart.length === 0} onClick={next} style={{
+              flexShrink: 0, minWidth: 140,
+              ...(cart.length > 0 ? {
+                background: "#fff", color: "#4c1d95", fontWeight: 700,
+                boxShadow: "0 2px 8px rgba(0,0,0,.15)",
+              } : {}),
+            }}>
               Continue →
             </button>
           </div>
@@ -1243,7 +1310,7 @@ export default function BuyPolicy() {
                   <div style={{ width: 48, height: 48, borderRadius: 13, background: "rgba(255,255,255,.18)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 24, flexShrink: 0 }}>{icon}</div>
                   <div style={{ flex: 1, minWidth: 0 }}>
                     <div style={{ fontWeight: 800, fontSize: 16, lineHeight: 1.3, marginBottom: 3 }}>{p.name}</div>
-                    <div style={{ fontSize: 12.5, opacity: .8, marginBottom: details ? 8 : 0 }}>{p.provider} &nbsp;·&nbsp; <span style={{ fontFamily: "monospace", background: "rgba(255,255,255,.15)", borderRadius: 4, padding: "1px 6px" }}>{p.code}</span></div>
+                    <div style={{ fontSize: 12.5, color: "rgba(255,255,255,.94)", marginBottom: details ? 8 : 0 }}>{p.provider} &nbsp;·&nbsp; <span style={{ fontFamily: "monospace", background: "rgba(255,255,255,.15)", borderRadius: 4, padding: "1px 6px" }}>{p.code}</span></div>
                     {details?.tagline && (
                       <div style={{ fontSize: 13, fontStyle: "italic", opacity: .92, lineHeight: 1.5 }}>"{details.tagline}"</div>
                     )}
@@ -1260,7 +1327,7 @@ export default function BuyPolicy() {
                   <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginTop: 16 }}>
                     {details.highlights.map(h => (
                       <div key={h.label} style={{ background: "rgba(255,255,255,.15)", border: "1px solid rgba(255,255,255,.25)", borderRadius: 8, padding: "6px 12px", backdropFilter: "blur(4px)" }}>
-                        <div style={{ fontSize: 10, opacity: .7, textTransform: "uppercase", letterSpacing: ".5px", marginBottom: 1 }}>{h.label}</div>
+                        <div style={{ fontSize: 10, color: "rgba(255,255,255,.82)", textTransform: "uppercase", letterSpacing: ".5px", marginBottom: 1 }}>{h.label}</div>
                         <div style={{ fontSize: 13, fontWeight: 700 }}>{h.icon} {h.value}</div>
                       </div>
                     ))}
@@ -1413,30 +1480,30 @@ export default function BuyPolicy() {
         <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
 
           {/* Selected Plans Summary */}
-          <div style={{ background: "var(--brand-light)", borderRadius: 12, padding: "14px 18px", border: "1.5px solid rgba(124,58,237,.25)" }}>
-            <div style={{ fontSize: 11, fontWeight: 600, color: "var(--brand)", textTransform: "uppercase", letterSpacing: ".5px", marginBottom: 10 }}>
+          <div style={{ background: "#fff", borderRadius: 12, padding: "14px 18px", border: "1.5px solid #e5e7eb", borderLeft: "4px solid var(--brand)" }}>
+            <div style={{ fontSize: 11, fontWeight: 700, color: "#6b7280", textTransform: "uppercase", letterSpacing: ".5px", marginBottom: 10 }}>
               Selected Plans
             </div>
             {cart.map((p, i) => (
-              <div key={p.id} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "7px 0", borderBottom: i < cart.length - 1 ? "1px solid rgba(124,58,237,.12)" : "none", fontSize: 13 }}>
+              <div key={p.id} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "7px 0", borderBottom: i < cart.length - 1 ? "1px solid #f3f4f6" : "none", fontSize: 13 }}>
                 <div style={{ display: "flex", alignItems: "center", gap: 8, minWidth: 0 }}>
                   <span style={{ fontSize: 16, flexShrink: 0 }}>{POLICY_TYPE_ICON[p.policyType] ?? "📋"}</span>
                   <div style={{ minWidth: 0 }}>
-                    <div style={{ fontWeight: 600, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{p.name}</div>
+                    <div style={{ fontWeight: 600, color: "#111827", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{p.name}</div>
                     <div style={{ fontSize: 11, color: "var(--text-3)" }}>
                       {p.sumInsured ? `₹${Number(p.sumInsured).toLocaleString("en-IN")} SI` : ""}
                       {p.coverage ? ` · ${COV_LABEL[p.coverage] ?? p.coverage}` : ""}
                     </div>
                   </div>
                 </div>
-                <span style={{ fontWeight: 700, color: "var(--brand)", flexShrink: 0, marginLeft: 12 }}>
+                <span style={{ fontWeight: 700, color: "#111827", flexShrink: 0, marginLeft: 12 }}>
                   {p.premium != null ? `₹${p.premium.toLocaleString("en-IN")}` : "—"}
                 </span>
               </div>
             ))}
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", paddingTop: 10, marginTop: 2, borderTop: "1.5px solid rgba(124,58,237,.2)" }}>
-              <span style={{ fontSize: 12, fontWeight: 600, color: "var(--text-2)" }}>Total Premium</span>
-              <span style={{ fontSize: 16, fontWeight: 800, color: "var(--brand)" }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", paddingTop: 10, marginTop: 2, borderTop: "1.5px solid #e5e7eb" }}>
+              <span style={{ fontSize: 12, fontWeight: 600, color: "#6b7280" }}>Total Premium</span>
+              <span style={{ fontSize: 18, fontWeight: 800, color: "#111827" }}>
                 ₹{cart.reduce((s, x) => s + (x.premium ?? 0), 0).toLocaleString("en-IN")}
               </span>
             </div>
@@ -1458,14 +1525,14 @@ export default function BuyPolicy() {
                     <div key={m.type} style={{
                       display: "flex", alignItems: "center", gap: 12, padding: "10px 14px",
                       borderRadius: 9,
-                      background: isSelf ? "var(--brand-light)" : "var(--surface-2)",
-                      border: `1.5px solid ${isSelf ? "rgba(124,58,237,.25)" : "var(--border)"}`,
+                      background: "#fff",
+                      border: "1.5px solid #e5e7eb",
                     }}>
                       <span style={{ fontSize: 20, flexShrink: 0 }}>{slot?.icon}</span>
                       <div style={{ flex: 1, minWidth: 0 }}>
                         <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-                          <span style={{ fontWeight: 700, fontSize: 13, color: isSelf ? "var(--brand)" : "var(--text)" }}>{slot?.label}</span>
-                          {isSelf && <span style={{ fontSize: 11, color: "var(--brand)", fontWeight: 600, background: "rgba(124,58,237,.1)", borderRadius: 4, padding: "1px 6px" }}>Primary Insured</span>}
+                          <span style={{ fontWeight: 700, fontSize: 13, color: "#111827" }}>{slot?.label}</span>
+                          {isSelf && <span style={{ fontSize: 10.5, color: "#fff", fontWeight: 700, background: "#4c1d95", borderRadius: 4, padding: "1px 7px" }}>Primary</span>}
                         </div>
                         <div style={{ fontSize: 12, color: "var(--text-3)", marginTop: 2 }}>
                           {m.name || "—"}{age != null ? ` · ${age} yrs` : ""}{m.gender ? ` · ${m.gender}` : ""}
@@ -1597,8 +1664,8 @@ export default function BuyPolicy() {
               <label style={{
                 display: "flex", alignItems: "flex-start", gap: 12, cursor: "pointer",
                 padding: "13px 14px", borderRadius: 10,
-                background: proposal.declaration ? "var(--brand-light)" : "var(--surface-2)",
-                border: `1.5px solid ${proposal.declaration ? "rgba(124,58,237,.3)" : "var(--border)"}`,
+                background: proposal.declaration ? "#f5f3ff" : "#fff",
+                border: `1.5px solid ${proposal.declaration ? "var(--brand)" : "var(--border)"}`,
                 transition: "all .15s",
               }}>
                 <input type="checkbox" checked={proposal.declaration}
@@ -1611,8 +1678,8 @@ export default function BuyPolicy() {
               <label style={{
                 display: "flex", alignItems: "flex-start", gap: 12, cursor: "pointer",
                 padding: "13px 14px", borderRadius: 10,
-                background: termsAccepted ? "var(--brand-light)" : "var(--surface-2)",
-                border: `1.5px solid ${termsAccepted ? "rgba(124,58,237,.3)" : "var(--border)"}`,
+                background: termsAccepted ? "#f5f3ff" : "#fff",
+                border: `1.5px solid ${termsAccepted ? "var(--brand)" : "var(--border)"}`,
                 transition: "all .15s",
               }}>
                 <input type="checkbox" checked={termsAccepted}
@@ -1700,17 +1767,17 @@ export default function BuyPolicy() {
                     </div>
                     <div style={{ display: "flex", gap: 8, marginTop: 6, flexWrap: "wrap" }}>
                       {p.sumInsured && (
-                        <span style={{ fontSize: 11, background: "var(--surface-2)", border: "1px solid var(--border)", borderRadius: 5, padding: "2px 7px", color: "var(--text-2)", fontWeight: 500 }}>
+                        <span style={{ fontSize: 11, background: "#f3f4f6", border: "1px solid #e5e7eb", borderRadius: 5, padding: "2px 7px", color: "#374151", fontWeight: 500 }}>
                           SI: ₹{Number(p.sumInsured).toLocaleString("en-IN")}
                         </span>
                       )}
                       {p.coverage && (
-                        <span style={{ fontSize: 11, background: "var(--brand-light)", border: "1px solid rgba(124,58,237,.2)", borderRadius: 5, padding: "2px 7px", color: "var(--brand)", fontWeight: 500 }}>
+                        <span style={{ fontSize: 11, background: "#f3f4f6", border: "1px solid #e5e7eb", borderRadius: 5, padding: "2px 7px", color: "#374151", fontWeight: 500 }}>
                           {COV_LABEL[p.coverage] ?? p.coverage}
                         </span>
                       )}
                       {p.ageBandId && (
-                        <span style={{ fontSize: 11, background: "var(--surface-2)", border: "1px solid var(--border)", borderRadius: 5, padding: "2px 7px", color: "var(--text-2)", fontWeight: 500 }}>
+                        <span style={{ fontSize: 11, background: "#f3f4f6", border: "1px solid #e5e7eb", borderRadius: 5, padding: "2px 7px", color: "#374151", fontWeight: 500 }}>
                           Band {p.ageBandId}
                         </span>
                       )}
@@ -1724,15 +1791,15 @@ export default function BuyPolicy() {
                 <div style={{ margin: "4px 0 2px" }}>
                   <div style={{
                     display: "flex", alignItems: "center", gap: 7,
-                    padding: "7px 10px", marginBottom: 6,
-                    background: "var(--brand-light)", borderRadius: 8,
-                    border: "1px solid rgba(124,58,237,.15)",
+                    padding: "7px 12px", marginBottom: 6,
+                    background: "var(--surface-2)", borderRadius: 8,
+                    border: "1px solid var(--border)",
                   }}>
-                    <span style={{ fontSize: 14 }}>👥</span>
+                    <span style={{ fontSize: 13 }}>👥</span>
                     <span style={{ fontSize: 11, fontWeight: 700, color: "var(--brand)", textTransform: "uppercase", letterSpacing: ".6px" }}>
                       Insured Members
                     </span>
-                    <span style={{ marginLeft: "auto", fontSize: 11, fontWeight: 600, color: "var(--brand)", background: "rgba(124,58,237,.12)", borderRadius: 10, padding: "1px 8px" }}>
+                    <span style={{ marginLeft: "auto", fontSize: 11, fontWeight: 700, color: "var(--brand)", background: "var(--brand-light)", borderRadius: 10, padding: "1px 8px" }}>
                       {members.length}
                     </span>
                   </div>
@@ -1741,21 +1808,19 @@ export default function BuyPolicy() {
                       <div key={m.type} style={{
                         display: "flex", alignItems: "center", gap: 10,
                         padding: "7px 10px", borderRadius: 8,
-                        background: i % 2 === 0 ? "var(--surface-2)" : "#fff",
-                        border: "1px solid var(--border)",
-                        transition: "background .15s",
+                        background: "#fff",
+                        border: "1px solid #e5e7eb",
                       }}>
                         <div style={{
                           width: 28, height: 28, borderRadius: "50%", flexShrink: 0,
-                          background: i === 0 ? "var(--brand)" : "#e0e7ff",
-                          color: i === 0 ? "#fff" : "#4338ca",
+                          background: "#1e293b", color: "#fff",
                           display: "flex", alignItems: "center", justifyContent: "center",
                           fontSize: 11, fontWeight: 800,
                         }}>
                           {(m.name || m.type).charAt(0).toUpperCase()}
                         </div>
                         <div style={{ flex: 1, minWidth: 0 }}>
-                          <div style={{ fontWeight: 600, fontSize: 13, color: "var(--text)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                          <div style={{ fontWeight: 600, fontSize: 13, color: "#111827", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
                             {m.name || <span style={{ color: "var(--text-3)", fontStyle: "italic", fontWeight: 400 }}>Name not entered</span>}
                           </div>
                           {m.dob && (
@@ -1763,7 +1828,7 @@ export default function BuyPolicy() {
                           )}
                         </div>
                         <div style={{ textAlign: "right", flexShrink: 0 }}>
-                          <div style={{ fontSize: 13, fontWeight: 600, color: i === 0 ? "var(--brand)" : "var(--text-2)" }}>
+                          <div style={{ fontSize: 13, fontWeight: 600, color: "#374151" }}>
                             {m.type}
                           </div>
                           {m.gender && (
@@ -1781,15 +1846,15 @@ export default function BuyPolicy() {
                 <div style={{ margin: "2px 0 6px" }}>
                   <div style={{
                     display: "flex", alignItems: "center", gap: 7,
-                    padding: "7px 10px", marginBottom: 6,
-                    background: "#fdf4ff", borderRadius: 8,
-                    border: "1px solid #e9d5ff",
+                    padding: "7px 12px", marginBottom: 6,
+                    background: "var(--surface-2)", borderRadius: 8,
+                    border: "1px solid var(--border)",
                   }}>
-                    <span style={{ fontSize: 14 }}>📋</span>
-                    <span style={{ fontSize: 11, fontWeight: 700, color: "#7c3aed", textTransform: "uppercase", letterSpacing: ".6px" }}>
+                    <span style={{ fontSize: 13 }}>📋</span>
+                    <span style={{ fontSize: 11, fontWeight: 700, color: "var(--brand)", textTransform: "uppercase", letterSpacing: ".6px" }}>
                       Nominees
                     </span>
-                    <span style={{ marginLeft: "auto", fontSize: 11, fontWeight: 600, color: "#7c3aed", background: "#ede9fe", borderRadius: 10, padding: "1px 8px" }}>
+                    <span style={{ marginLeft: "auto", fontSize: 11, fontWeight: 700, color: "var(--brand)", background: "var(--brand-light)", borderRadius: 10, padding: "1px 8px" }}>
                       {nominees.length}
                     </span>
                   </div>
@@ -1798,22 +1863,21 @@ export default function BuyPolicy() {
                       <div key={n.id} style={{
                         display: "flex", alignItems: "center", gap: 10,
                         padding: "7px 10px", borderRadius: 8,
-                        background: i % 2 === 0 ? "var(--surface-2)" : "#fff",
-                        border: "1px solid var(--border)",
-                        transition: "background .15s",
+                        background: "#fff",
+                        border: "1px solid #e5e7eb",
                       }}>
                         <div style={{
                           width: 28, height: 28, borderRadius: "50%", flexShrink: 0,
-                          background: n.name ? "#ede9fe" : "var(--surface-2)",
-                          color: n.name ? "#7c3aed" : "var(--text-3)",
-                          border: n.name ? "none" : "1px solid var(--border)",
+                          background: n.name ? "#1e293b" : "#f3f4f6",
+                          color: n.name ? "#fff" : "var(--text-3)",
+                          border: n.name ? "none" : "1px solid #e5e7eb",
                           display: "flex", alignItems: "center", justifyContent: "center",
                           fontSize: 11, fontWeight: 800,
                         }}>
                           {n.name ? n.name.charAt(0).toUpperCase() : "?"}
                         </div>
                         <div style={{ flex: 1, minWidth: 0 }}>
-                          <div style={{ fontWeight: 600, fontSize: 13, color: "var(--text)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                          <div style={{ fontWeight: 600, fontSize: 13, color: "#111827", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
                             {n.name || <span style={{ color: "var(--text-3)", fontStyle: "italic", fontWeight: 400 }}>Name not entered</span>}
                           </div>
                           <div style={{ fontSize: 11.5, color: "var(--text-3)", marginTop: 1 }}>
@@ -1821,7 +1885,7 @@ export default function BuyPolicy() {
                           </div>
                         </div>
                         <div style={{ textAlign: "right", flexShrink: 0 }}>
-                          <div style={{ fontSize: 14, fontWeight: 700, color: "var(--brand)" }}>{n.share || "0"}%</div>
+                          <div style={{ fontSize: 14, fontWeight: 700, color: "#111827" }}>{n.share || "0"}%</div>
                           <div style={{ fontSize: 11, color: "var(--text-3)" }}>share</div>
                         </div>
                       </div>
@@ -1917,10 +1981,7 @@ export default function BuyPolicy() {
                       textAlign: "left",
                       minWidth: 150,
                       border: `2px solid ${payMethod === m.key ? "var(--brand)" : "var(--border)"}`,
-                      background:
-                        payMethod === m.key
-                          ? "var(--brand-light)"
-                          : "var(--surface)",
+                      background: payMethod === m.key ? "#f5f3ff" : "#fff",
                       transition: "all .13s",
                     }}
                   >
@@ -2075,3 +2136,4 @@ export default function BuyPolicy() {
     </div>
   );
 }
+

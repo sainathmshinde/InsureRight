@@ -53,7 +53,7 @@ export default function AgentCreate() {
     <div>
       <div className="page-header">
         <div className="page-title-row">
-          <div className="page-icon">👤</div>
+          <div className="page-icon"><AgentIcon /></div>
           <div>
             <div className="page-title">Add Agent</div>
             <div className="page-subtitle">

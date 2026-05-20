@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { useCustomers } from '../../context/CustomerContext'
+import { KYCIcon } from '../../icons'
 
 const doc = (type, params) =>
   `/documents/preview.html?type=${type}&${new URLSearchParams(params)}`
@@ -137,7 +138,7 @@ export default function KYCReview() {
       {/* Page Header */}
       <div className="page-header">
         <div className="page-title-row">
-          <div className="page-icon">🪪</div>
+          <div className="page-icon"><KYCIcon /></div>
           <div>
             <div className="page-title">KYC Review</div>
             <div className="page-subtitle">{cust.name} · Submitted {cust.submittedOn}</div>

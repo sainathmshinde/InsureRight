@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { Field, Input, Select, SectionBlock, UploadBox } from "../../components/Field";
+import { EditIcon } from "../../icons";
 import { useAuth } from "../../context/AuthContext";
 import { useCustomers } from "../../context/CustomerContext";
 import FamilyMembersSection from "./FamilyMembersSection";
@@ -255,7 +256,7 @@ export default function CustomerEdit() {
     <div>
       <div className="page-header">
         <div className="page-title-row">
-          <div className="page-icon">✏️</div>
+          <div className="page-icon"><EditIcon /></div>
           <div>
             <div className="page-title">{isProfile ? "Edit My Profile" : "Edit Customer"}</div>
             <div className="page-subtitle">{isProfile ? "Update your contact details" : "Update customer profile"}</div>

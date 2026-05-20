@@ -3,9 +3,11 @@ export function SectionBlock({ icon, title, children }) {
     <div className="section-block">
       <div className="section-heading">
         {icon && <span className="section-icon">{icon}</span>}
-        {title}
+        <span>{title}</span>
       </div>
-      {children}
+      <div className="section-body">
+        {children}
+      </div>
     </div>
   )
 }

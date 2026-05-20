@@ -7,7 +7,7 @@ import {
   UploadBox,
   SectionBlock,
 } from "../../components/Field";
-import { AgentIcon } from "../../icons";
+import { AgentIcon, EditIcon } from "../../icons";
 import { AGENT_MAP } from "./agentData";
 import { useAuth } from "../../context/AuthContext";
 
@@ -56,7 +56,7 @@ export default function AgentEdit() {
     <div>
       <div className="page-header">
         <div className="page-title-row">
-          <div className="page-icon">✏️</div>
+          <div className="page-icon"><EditIcon /></div>
           <div>
             <div className="page-title">{isProfile ? "Edit My Profile" : "Edit Agent"}</div>
             <div className="page-subtitle">

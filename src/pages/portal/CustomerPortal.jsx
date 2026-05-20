@@ -1,4 +1,4 @@
-import { useState } from 'react'
+﻿import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../../context/AuthContext'
 import { POLICY_MOCK } from '../policy/PolicyList'
@@ -291,7 +291,7 @@ export default function CustomerPortal() {
               {[['50,000+','Happy Customers'],['98%','Claims Settled'],['14,000+','Network Hospitals'],['2 min','Instant Issuance']].map(([v,l]) => (
                 <div key={l} style={{ textAlign:'center' }}>
                   <div style={{ fontSize:16, fontWeight:800, color:'#fff' }}>{v}</div>
-                  <div style={{ fontSize:11, color:'rgba(255,255,255,0.6)' }}>{l}</div>
+                  <div style={{ fontSize:11, color:'rgba(255,255,255,.88)' }}>{l}</div>
                 </div>
               ))}
             </div>
@@ -310,7 +310,7 @@ export default function CustomerPortal() {
                 <div key={item.label} style={{ display:'flex', alignItems:'center', gap:10, padding:'9px 0', borderBottom:'1px solid rgba(255,255,255,0.08)' }}>
                   <span style={{ fontSize:16 }}>{item.icon}</span>
                   <div>
-                    <div style={{ fontSize:10.5, color:'rgba(255,255,255,0.55)' }}>{item.label}</div>
+                    <div style={{ fontSize:10.5, color:'rgba(255,255,255,.82)' }}>{item.label}</div>
                     <div style={{ fontSize:13, fontWeight:700, color:'#fff' }}>{item.value}</div>
                   </div>
                 </div>

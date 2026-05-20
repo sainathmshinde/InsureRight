@@ -1,5 +1,6 @@
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../../context/AuthContext'
+import { AgentIcon } from '../../icons'
 
 function Row({ label, value }) {
   return (
@@ -20,7 +21,7 @@ export default function AgentProfile() {
     <div>
       <div className="page-header">
         <div className="page-title-row">
-          <div className="page-icon">👤</div>
+          <div className="page-icon"><AgentIcon /></div>
           <div>
             <div className="page-title">My Profile</div>
             <div className="page-subtitle">{user.company} · {user.email}</div>

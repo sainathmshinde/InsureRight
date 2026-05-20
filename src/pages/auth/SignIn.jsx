@@ -403,8 +403,8 @@ export default function SignIn() {
                   onClick={() => switchMode(key)}
                   style={{
                     ...S.toggleBtn,
-                    background: loginMode === key ? "#7c3aed" : "transparent",
-                    color:      loginMode === key ? "#fff"    : "#7c3aed",
+                    background: loginMode === key ? "linear-gradient(135deg,#fb7185 0%,#a855f7 100%)" : "transparent",
+                    color:      loginMode === key ? "#fff"    : "#a855f7",
                     fontWeight: loginMode === key ? 600       : 400,
                   }}
                 >
@@ -586,9 +586,9 @@ const S = {
     border: "none", cursor: "pointer", fontSize: 15, lineHeight: 1,
   },
   btn: {
-    background: "#7c3aed", color: "#fff", border: "none", borderRadius: 8,
+    background: "linear-gradient(135deg,#fb7185 0%,#a855f7 100%)", color: "#fff", border: "none", borderRadius: 8,
     padding: "12px", fontSize: 14, fontWeight: 600, cursor: "pointer",
-    fontFamily: "inherit", marginTop: 4, transition: "opacity .15s", letterSpacing: 0.2,
+    fontFamily: "inherit", marginTop: 4, transition: "opacity .15s, filter .15s", letterSpacing: 0.2,
   },
   demoBox: { padding: "13px 15px", background: "#f5f3ff", border: "1px solid #ede9fe", borderRadius: 9 },
   demoHead: { fontSize: 11, fontWeight: 700, color: "#7c3aed", textTransform: "uppercase", letterSpacing: ".6px", marginBottom: 8 },
@@ -600,14 +600,14 @@ const S = {
   },
   regLink: { fontSize: 13, color: "#5c5573", marginTop: 22, textAlign: "center" },
   panel: {
-    flex: 1, background: "linear-gradient(140deg,#7c3aed 0%,#4f1d96 100%)",
+    flex: 1, background: "linear-gradient(135deg,#fb7185 0%,#a855f7 100%)",
     display: "flex", alignItems: "center", justifyContent: "center", padding: 56,
   },
   panelInner: { maxWidth: 420, color: "#fff" },
   shield: { width: 88, height: 88, marginBottom: 22, display: "block", borderRadius: "50%" },
   panelTitle:   { fontSize: 26, fontWeight: 800, margin: "0 0 20px", color: "#fff", lineHeight: 1.2 },
-  panelSection: { fontSize: 11, fontWeight: 700, textTransform: "uppercase", letterSpacing: "1px", color: "#c4b5fd", marginBottom: 6 },
-  panelText:    { fontSize: 13.5, color: "#e9d5ff", lineHeight: 1.75, margin: 0 },
+  panelSection: { fontSize: 11, fontWeight: 700, textTransform: "uppercase", letterSpacing: "1px", color: "rgba(255,255,255,0.70)", marginBottom: 6 },
+  panelText:    { fontSize: 13.5, color: "rgba(255,255,255,0.90)", lineHeight: 1.75, margin: 0 },
   badge: {
     display: "inline-block", background: "rgba(255,255,255,0.15)",
     border: "1px solid rgba(255,255,255,0.25)", color: "#f3e8ff",

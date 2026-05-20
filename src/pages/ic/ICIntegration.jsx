@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { Field, Input, SectionBlock } from '../../components/Field'
+import { IntegrationIcon } from '../../icons'
 
 const MOCK_DATA = {
   1: { apiMappingId: 'MAP-SHI-001', productEndpoint: '/products/list', premiumEndpoint: '/premium/calculate', policyEndpoint: '/policy/issue', webhookUrl: 'https://insureright.in/webhook/shi', timeout: '30', retryCount: '3' },
@@ -28,7 +29,7 @@ export default function ICIntegration() {
     <div>
       <div className="page-header">
         <div className="page-title-row">
-          <div className="page-icon">🔌</div>
+          <div className="page-icon"><IntegrationIcon /></div>
           <div>
             <div className="page-title">IC Integration Setup</div>
             <div className="page-subtitle">{IC_NAMES[id] ?? `IC #${id}`} — API mapping and endpoint configuration</div>
