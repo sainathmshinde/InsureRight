@@ -100,7 +100,7 @@ const MIS_DATA = {
 // ── MIS sub-components ─────────────────────────────────────────────────────────
 function DonutChart({ title, segments, note }) {
   const total = segments.reduce((s, seg) => s + seg.value, 0)
-  const r = 36
+  const r = 34
   const circumference = 2 * Math.PI * r
   let cum = 0
   const arcs = segments.map(seg => {
@@ -111,12 +111,12 @@ function DonutChart({ title, segments, note }) {
     return { ...seg, dash, dashOffset, pct }
   })
   return (
-    <div style={{ border: '1.5px solid #e8d5ff', borderRadius: 14, overflow: 'hidden', background: 'linear-gradient(160deg,#fdf4ff 0%,#ffffff 65%)', boxShadow: '0 2px 16px rgba(168,85,247,.13),0 1px 4px rgba(251,113,133,.08)' }}>
-      {/* gradient accent strip */}
-      <div style={{ height: 4, background: 'linear-gradient(90deg,#fb7185 0%,#a855f7 100%)' }} />
+    <div style={{ borderRadius: 14, overflow: 'hidden', background: '#fff', boxShadow: '0 1px 3px rgba(0,0,0,.07), 0 4px 18px rgba(0,0,0,.06)', border: '1px solid #e2e8f0' }}>
+      <div style={{ height: 4, background: `linear-gradient(90deg,${segments[0]?.color ?? '#7c3aed'},${segments[1]?.color ?? '#0ea5e9'})` }} />
       <div style={{ padding: '16px 16px 14px' }}>
+        <div style={{ fontWeight: 700, fontSize: 13, color: '#374151', marginBottom: 14, textAlign: 'center', letterSpacing: '.2px', textTransform: 'uppercase' }}>{title}</div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
-          <svg width="120" height="120" viewBox="0 0 100 100" style={{ flexShrink: 0 }}>
+          <svg width="110" height="110" viewBox="0 0 100 100" style={{ flexShrink: 0 }}>
             {arcs.map((arc, i) => (
               <circle
                 key={i} cx="50" cy="50" r={r}
@@ -126,26 +126,29 @@ function DonutChart({ title, segments, note }) {
                 style={{ transform: 'rotate(-90deg)', transformOrigin: '50px 50px' }}
               />
             ))}
-            <text x="50" y="46" textAnchor="middle" fontSize="7" fontWeight="600" fill="var(--text-3)">Total</text>
-            <text x="50" y="58" textAnchor="middle" fontSize="9" fontWeight="800" fill="#0f172a">
+            <text x="50" y="46" textAnchor="middle" fontSize="7" fill="#94a3b8" fontWeight="500">Total</text>
+            <text x="50" y="58" textAnchor="middle" fontSize="10" fontWeight="800" fill="#1e293b">
               {total.toLocaleString('en-IN')}
             </text>
           </svg>
-          <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 10 }}>
+          <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 12 }}>
             {arcs.map((arc, i) => (
-              <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                <div style={{ width: 11, height: 11, borderRadius: 3, background: arc.color, flexShrink: 0 }} />
-                <div style={{ flex: 1, fontSize: 12, color: '#374151', fontWeight: 600, lineHeight: 1.3 }}>{arc.label}</div>
-                <div style={{ fontSize: 15, fontWeight: 800, color: '#0f172a', flexShrink: 0 }}>{arc.value.toLocaleString('en-IN')}</div>
-                <div style={{ fontSize: 11.5, fontWeight: 700, color: arc.color, width: 34, textAlign: 'right', flexShrink: 0 }}>{Math.round(arc.pct * 100)}%</div>
+              <div key={i}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 2 }}>
+                  <div style={{ width: 9, height: 9, borderRadius: 2, background: arc.color, flexShrink: 0 }} />
+                  <div style={{ fontSize: 11, color: '#64748b', fontWeight: 600, letterSpacing: '.1px' }}>{arc.label}</div>
+                </div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 7, paddingLeft: 15 }}>
+                  <div style={{ fontSize: 17, fontWeight: 800, color: '#1e293b', lineHeight: 1 }}>{arc.value.toLocaleString('en-IN')}</div>
+                  <span style={{ fontSize: 10.5, fontWeight: 700, color: arc.color, background: `${arc.color}1a`, padding: '2px 7px', borderRadius: 99 }}>{Math.round(arc.pct * 100)}%</span>
+                </div>
               </div>
             ))}
           </div>
         </div>
         {note && (
-          <div style={{ fontSize: 11.5, color: 'var(--text-3)', marginTop: 10, textAlign: 'center' }}>{note}</div>
+          <div style={{ fontSize: 11, color: '#94a3b8', marginTop: 10, textAlign: 'center', fontStyle: 'italic' }}>{note}</div>
         )}
-        <div style={{ fontWeight: 700, fontSize: 13.5, background: 'linear-gradient(90deg,#fb7185,#a855f7)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text', textAlign: 'center', borderTop: '1px solid #e8d5ff', paddingTop: 10, marginTop: 12 }}>{title}</div>
       </div>
     </div>
   )
@@ -173,19 +176,22 @@ export default function BrokerPortal() {
         <div className="card-body">
 
           {/* MIS header */}
-          <div style={{ fontWeight: 700, fontSize: 16, color: '#1a1628', marginBottom: 16 }}>Campaign MIS</div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 18 }}>
+            <div style={{ width: 4, height: 22, borderRadius: 99, background: 'linear-gradient(180deg,#7c3aed,#0ea5e9)' }} />
+            <div style={{ fontWeight: 800, fontSize: 17, color: '#1e293b' }}>Campaign MIS</div>
+          </div>
 
           {/* Filters */}
-          <div style={{ display: 'flex', gap: 14, alignItems: 'flex-end', marginBottom: 8, flexWrap: 'wrap' }}>
+          <div style={{ display: 'flex', gap: 14, alignItems: 'flex-end', marginBottom: 10, flexWrap: 'wrap' }}>
             <div style={{ flex: '1 1 220px' }}>
-              <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: 'var(--text-3)', marginBottom: 5 }}>Campaign Name</label>
+              <label style={{ display: 'block', fontSize: 11.5, fontWeight: 700, color: '#64748b', marginBottom: 5, textTransform: 'uppercase', letterSpacing: '.4px' }}>Campaign Name</label>
               <select className="field-select" style={{ width: '100%' }} value={campaignFilter} onChange={e => setCampaignFilter(e.target.value)}>
                 <option value="">All Campaigns</option>
                 {CAMPAIGNS_LIST.map(c => <option key={c}>{c}</option>)}
               </select>
             </div>
             <div style={{ flex: '1 1 220px' }}>
-              <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: 'var(--text-3)', marginBottom: 5 }}>Association</label>
+              <label style={{ display: 'block', fontSize: 11.5, fontWeight: 700, color: '#64748b', marginBottom: 5, textTransform: 'uppercase', letterSpacing: '.4px' }}>Association</label>
               <select className="field-select" style={{ width: '100%' }} value={assocFilter} onChange={e => setAssocFilter(e.target.value)}>
                 <option value="">All Associations</option>
                 {ASSOCIATIONS_LIST.map(a => <option key={a}>{a}</option>)}
@@ -194,13 +200,13 @@ export default function BrokerPortal() {
             <button
               type="button"
               onClick={handleMisSubmit}
-              style={{ padding: '9px 28px', borderRadius: 8, background: '#7c3aed', color: '#fff', border: 'none', fontWeight: 700, fontSize: 13.5, cursor: 'pointer', fontFamily: 'inherit', flexShrink: 0 }}
+              style={{ padding: '10px 30px', borderRadius: 9, background: 'linear-gradient(135deg,#7c3aed,#0ea5e9)', color: '#fff', border: 'none', fontWeight: 700, fontSize: 13.5, cursor: 'pointer', fontFamily: 'inherit', flexShrink: 0, boxShadow: '0 4px 14px rgba(124,58,237,.35)' }}
             >
-              Submit
+              Apply
             </button>
           </div>
 
-          <div style={{ fontSize: 14, fontWeight: 700, color: '#1a1628', marginBottom: 20 }}>* Count indicates number of customers</div>
+          <div style={{ fontSize: 12.5, fontWeight: 600, color: '#94a3b8', marginBottom: 20 }}>* Count indicates number of customers</div>
 
           {/* MIS grid */}
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
@@ -208,32 +214,32 @@ export default function BrokerPortal() {
             <DonutChart
               title="Customer Details"
               segments={[
-                { label: 'Engaged',     value: mis.engagedCustomer,    color: '#fb7185' },
-                { label: 'Non-Engaged', value: mis.nonEngagedCustomer, color: '#e9d5ff' },
+                { label: 'Engaged',     value: mis.engagedCustomer,    color: '#7c3aed' },
+                { label: 'Non-Engaged', value: mis.nonEngagedCustomer, color: '#f59e0b' },
               ]}
             />
 
             <DonutChart
               title="Policy Overview"
               segments={[
-                { label: 'Policy Purchased', value: mis.policyPurchased, color: '#a855f7' },
-                { label: 'Policy Pending',   value: mis.policyPending,   color: '#f9a8d4' },
+                { label: 'Policy Purchased', value: mis.policyPurchased, color: '#10b981' },
+                { label: 'Policy Pending',   value: mis.policyPending,   color: '#f59e0b' },
               ]}
             />
 
             <DonutChart
               title="Payment Initiates"
               segments={[
-                { label: 'RTGS',   value: mis.rtgsInitiated,   color: '#fb7185' },
-                { label: 'Cheque', value: mis.chequeInitiated, color: '#a855f7' },
+                { label: 'RTGS',   value: mis.rtgsInitiated,   color: '#0ea5e9' },
+                { label: 'Cheque', value: mis.chequeInitiated, color: '#6366f1' },
               ]}
             />
 
             <DonutChart
               title="Online vs Offline"
               segments={[
-                { label: 'Online',  value: mis.onlinePurchased,  color: '#a855f7' },
-                { label: 'Offline', value: mis.offlinePurchased, color: '#fb7185' },
+                { label: 'Online',  value: mis.onlinePurchased,  color: '#6366f1' },
+                { label: 'Offline', value: mis.offlinePurchased, color: '#f59e0b' },
               ]}
               note={`of ${mis.policyPurchased.toLocaleString('en-IN')} total policies purchased`}
             />
@@ -241,16 +247,16 @@ export default function BrokerPortal() {
             <DonutChart
               title="Payment Pending / Rejected"
               segments={[
-                { label: 'Pending',  value: mis.paymentPending,  color: '#f9a8d4' },
-                { label: 'Rejected', value: mis.paymentRejected, color: '#fb7185' },
+                { label: 'Pending',  value: mis.paymentPending,  color: '#f59e0b' },
+                { label: 'Rejected', value: mis.paymentRejected, color: '#ef4444' },
               ]}
             />
 
             <DonutChart
               title="Offline Purchased"
               segments={[
-                { label: 'RTGS',   value: mis.rtgsPurchased,   color: '#fb7185' },
-                { label: 'Cheque', value: mis.chequePurchased, color: '#a855f7' },
+                { label: 'RTGS',   value: mis.rtgsPurchased,   color: '#0ea5e9' },
+                { label: 'Cheque', value: mis.chequePurchased, color: '#7c3aed' },
               ]}
             />
 
@@ -261,10 +267,10 @@ export default function BrokerPortal() {
       {/* Stats */}
       <div className="bd-stats" style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 16 }}>
         {STATS.map(s => (
-          <div key={s.label} style={{ background: '#fff', border: '1px solid #e8e4f0', borderRadius: 12, padding: '20px 22px' }}>
-            <div style={{ fontSize: 28, fontWeight: 800, color: s.color }}>{s.value}</div>
-            <div style={{ fontSize: 13.5, fontWeight: 600, color: '#1a1628', marginTop: 4 }}>{s.label}</div>
-            <div style={{ fontSize: 12, color: 'var(--text-3)', marginTop: 2 }}>{s.sub}</div>
+          <div key={s.label} style={{ background: '#fff', borderRadius: 14, padding: '20px 22px', boxShadow: '0 1px 3px rgba(0,0,0,.06), 0 4px 16px rgba(0,0,0,.05)', border: '1px solid #e2e8f0', borderLeft: `4px solid ${s.color}` }}>
+            <div style={{ fontSize: 11, fontWeight: 700, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '.5px', marginBottom: 8 }}>{s.label}</div>
+            <div style={{ fontSize: 30, fontWeight: 800, color: s.color, lineHeight: 1 }}>{s.value}</div>
+            <div style={{ fontSize: 12, color: '#94a3b8', marginTop: 6 }}>{s.sub}</div>
           </div>
         ))}
       </div>
@@ -272,12 +278,15 @@ export default function BrokerPortal() {
       {/* Quick actions */}
       <div className="card">
         <div className="card-body">
-          <div style={{ fontWeight: 700, fontSize: 15, marginBottom: 14 }}>Quick Actions</div>
-          <div className="bd-quick-actions" style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 10 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 16 }}>
+            <div style={{ width: 4, height: 22, borderRadius: 99, background: 'linear-gradient(180deg,#10b981,#0ea5e9)' }} />
+            <div style={{ fontWeight: 800, fontSize: 16, color: '#1e293b' }}>Quick Actions</div>
+          </div>
+          <div className="bd-quick-actions" style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 12 }}>
             {QUICK_ACTIONS.map(a => (
               <button key={a.label} type="button"
                 onClick={() => navigate(a.path)}
-                style={{ padding: '10px 16px', borderRadius: 8, border: `1.5px solid ${a.color}33`, background: a.bg, color: a.color, fontWeight: 600, fontSize: 13.5, cursor: 'pointer', fontFamily: 'inherit' }}>
+                style={{ padding: '13px 16px', borderRadius: 10, border: 'none', background: a.bg, color: a.color, fontWeight: 700, fontSize: 13.5, cursor: 'pointer', fontFamily: 'inherit', boxShadow: `0 2px 8px ${a.color}22`, transition: 'transform .15s' }}>
                 + {a.label}
               </button>
             ))}
@@ -290,24 +299,27 @@ export default function BrokerPortal() {
         {/* Recent Agents */}
         <div className="card">
           <div className="card-body">
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 14 }}>
-              <div style={{ fontWeight: 700, fontSize: 15 }}>Agents</div>
-              <button type="button" className="btn btn-ghost" style={{ fontSize: 12, padding: '4px 12px' }} onClick={() => navigate('/agent')}>View All</button>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                <div style={{ width: 4, height: 20, borderRadius: 99, background: '#7c3aed' }} />
+                <div style={{ fontWeight: 800, fontSize: 15, color: '#1e293b' }}>Agents</div>
+              </div>
+              <button type="button" className="btn btn-ghost" style={{ fontSize: 12, padding: '4px 12px' }} onClick={() => navigate('/agent')}>View All →</button>
             </div>
-            <div className="bd-agent-cards">
+            <div className="bd-agent-cards" style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
               {RECENT_AGENTS.map(a => (
-                <div key={a.name} style={{ padding: '11px 13px', border: '1px solid #e8e4f0', borderRadius: 10, background: '#faf9fc' }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 }}>
-                    <span style={{ fontWeight: 600, fontSize: 13.5 }}>{a.name}</span>
-                    <span style={{ padding: '2px 9px', borderRadius: 99, fontSize: 11.5, fontWeight: 600, background: a.status === 'Active' ? '#e6f4ea' : '#f1f3f4', color: a.status === 'Active' ? '#2d7d46' : '#5f6368' }}>
-                      {a.status}
-                    </span>
+                <div key={a.name} style={{ padding: '11px 14px', border: '1px solid #e2e8f0', borderRadius: 10, background: '#f8fafc', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <div>
+                    <div style={{ fontWeight: 600, fontSize: 13.5, color: '#1e293b', marginBottom: 3 }}>{a.name}</div>
+                    <div style={{ fontSize: 11.5, color: '#94a3b8' }}>{a.license} · {a.customers} customers</div>
                   </div>
-                  <div style={{ fontSize: 12, color: 'var(--text-3)' }}>{a.license} &nbsp;·&nbsp; {a.customers} customers</div>
+                  <span style={{ padding: '3px 10px', borderRadius: 99, fontSize: 11.5, fontWeight: 700, background: a.status === 'Active' ? '#dcfce7' : '#f1f5f9', color: a.status === 'Active' ? '#15803d' : '#64748b' }}>
+                    {a.status}
+                  </span>
                 </div>
               ))}
             </div>
-            <div className="bd-agent-table table-wrap">
+            <div className="bd-agent-table table-wrap" style={{ display: 'none' }}>
               <table style={{ fontSize: 13 }}>
                 <thead>
                   <tr><th>Name</th><th>License</th><th>Customers</th><th>Status</th></tr>
@@ -316,10 +328,10 @@ export default function BrokerPortal() {
                   {RECENT_AGENTS.map(a => (
                     <tr key={a.name}>
                       <td style={{ fontWeight: 500 }}>{a.name}</td>
-                      <td style={{ color: 'var(--text-3)' }}>{a.license}</td>
+                      <td style={{ color: '#94a3b8' }}>{a.license}</td>
                       <td>{a.customers}</td>
                       <td>
-                        <span style={{ padding: '2px 9px', borderRadius: 99, fontSize: 11.5, fontWeight: 600, background: a.status === 'Active' ? '#e6f4ea' : '#f1f3f4', color: a.status === 'Active' ? '#2d7d46' : '#5f6368' }}>
+                        <span style={{ padding: '2px 9px', borderRadius: 99, fontSize: 11.5, fontWeight: 600, background: a.status === 'Active' ? '#dcfce7' : '#f1f5f9', color: a.status === 'Active' ? '#15803d' : '#64748b' }}>
                           {a.status}
                         </span>
                       </td>
@@ -334,20 +346,27 @@ export default function BrokerPortal() {
         {/* Active Campaigns */}
         <div className="card">
           <div className="card-body">
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 14 }}>
-              <div style={{ fontWeight: 700, fontSize: 15 }}>Active Campaigns</div>
-              <button type="button" className="btn btn-ghost" style={{ fontSize: 12, padding: '4px 12px' }} onClick={() => navigate('/campaign')}>View All</button>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                <div style={{ width: 4, height: 20, borderRadius: 99, background: '#10b981' }} />
+                <div style={{ fontWeight: 800, fontSize: 15, color: '#1e293b' }}>Active Campaigns</div>
+              </div>
+              <button type="button" className="btn btn-ghost" style={{ fontSize: 12, padding: '4px 12px' }} onClick={() => navigate('/campaign')}>View All →</button>
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-              {ACTIVE_CAMPAIGNS.map(c => (
-                <div key={c.name} style={{ padding: '12px 14px', border: '1px solid #e8e4f0', borderRadius: 10, background: '#faf9fc' }}>
-                  <div style={{ fontWeight: 600, fontSize: 13.5, marginBottom: 4 }}>{c.name}</div>
-                  <div style={{ display: 'flex', gap: 16, fontSize: 12, color: 'var(--text-3)', flexWrap: 'wrap' }}>
-                    <span>Agents: {c.agents}</span>
-                    <span>Leads: {c.leads}</span>
+              {ACTIVE_CAMPAIGNS.map((c, i) => {
+                const accentColors = ['#7c3aed', '#0ea5e9', '#10b981']
+                return (
+                  <div key={c.name} style={{ padding: '13px 15px', border: '1px solid #e2e8f0', borderRadius: 10, background: '#f8fafc', borderLeft: `4px solid ${accentColors[i] ?? '#7c3aed'}` }}>
+                    <div style={{ fontWeight: 700, fontSize: 13.5, color: '#1e293b', marginBottom: 6 }}>{c.name}</div>
+                    <div style={{ display: 'flex', gap: 16, fontSize: 12, color: '#64748b' }}>
+                      <span style={{ fontWeight: 600 }}>Agents: <strong style={{ color: '#1e293b' }}>{c.agents}</strong></span>
+                      <span style={{ fontWeight: 600 }}>Leads: <strong style={{ color: '#1e293b' }}>{c.leads}</strong></span>
+                      <span style={{ marginLeft: 'auto', padding: '1px 9px', borderRadius: 99, fontSize: 11, fontWeight: 700, background: c.status === 'Active' ? '#dcfce7' : '#f1f5f9', color: c.status === 'Active' ? '#15803d' : '#64748b' }}>{c.status}</span>
+                    </div>
                   </div>
-                </div>
-              ))}
+                )
+              })}
             </div>
           </div>
         </div>
