@@ -20,6 +20,7 @@ import { PRODUCTS, PRODUCTS_BY_TYPE, POLICY_TYPE_ICON, PREMIUM_CHART, PRODUCT_DE
 import { AGENTS as KMD_AGENTS } from "../agent/agentData";
 import { INITIAL_LEADS, CAMPAIGNS } from "../crm/crmData";
 import { POLICY_MOCK } from "./PolicyList";
+import { ASSOCIATIONS } from "../customer/orgAssocData";
 
 // ── Shared customer data (same source of truth as CustomerList) ────────────
 const CUSTOMERS = [
@@ -316,6 +317,11 @@ function CustomerStrip({ customer, onChangeCustomer, canChange = true }) {
 }
 
 // ── KYC Warning ────────────────────────────────────────────────────────────
+const PAY_LABEL = {
+  fontSize: 11, fontWeight: 600, color: 'var(--text-3)',
+  textTransform: 'uppercase', letterSpacing: '0.05em', display: 'block',
+};
+
 function KYCWarning({ kyc }) {
   if (kyc === "Verified") return null;
   const isRejected = kyc === "Rejected";
@@ -478,8 +484,26 @@ export default function BuyPolicy() {
   });
 
   // Step 5 — payment
-  const [payMethod, setPayMethod] = useState("UPI");
-  const [upiId, setUpiId] = useState("");
+  const [payMode,    setPayMode]    = useState("Online");
+  const [payType,    setPayType]    = useState("Cheque");
+  const [confirmed,  setConfirmed]  = useState(false);
+  // Cheque form
+  const [chequeNo,       setChequeNo]       = useState("");
+  const [chequeBankName, setChequeBankName] = useState("");
+  const [chequeMicr,     setChequeMicr]     = useState("");
+  const [chequeIfsc,     setChequeIfsc]     = useState("");
+  const [chequeDate,     setChequeDate]     = useState("");
+  const [chequeLocation, setChequeLocation] = useState("");
+  const [chequePhoto,    setChequePhoto]    = useState(null);
+  // NEFT form
+  const [neftBankName,   setNeftBankName]   = useState("");
+  const [neftBranch,     setNeftBranch]     = useState("");
+  const [neftAccName,    setNeftAccName]    = useState("");
+  const [neftAccNo,      setNeftAccNo]      = useState("");
+  const [neftIfsc,       setNeftIfsc]       = useState("");
+  const [neftTxnNo,      setNeftTxnNo]      = useState("");
+  const [neftDate,       setNeftDate]       = useState("");
+  const [neftPhoto,      setNeftPhoto]      = useState(null);
 
   // Step 3 — nominees & terms
   const [nominees, setNominees] = useState([{ id: 1, name: '', relation: '', age: '', share: '100' }]);
@@ -1938,168 +1962,222 @@ export default function BuyPolicy() {
           {/* Payment options */}
           <div className="card">
             <div className="card-header">
-              <span className="card-title">Choose Payment Method</span>
+              <span className="card-title">Payment</span>
             </div>
             <div className="card-body">
-              <div
-                style={{
-                  display: "flex",
-                  gap: 12,
-                  marginBottom: 24,
-                  flexWrap: "wrap",
-                }}
-              >
-                {[
-                  {
-                    key: "UPI",
-                    label: "📱 UPI",
-                    desc: "GPay, PhonePe, Paytm, BHIM",
-                  },
-                  {
-                    key: "NEFT",
-                    label: "🏦 NEFT / RTGS",
-                    desc: "Bank transfer",
-                  },
-                  {
-                    key: "Card",
-                    label: "💳 Debit / Credit",
-                    desc: "Visa, Mastercard, RuPay",
-                  },
-                  {
-                    key: "Wallet",
-                    label: "👛 Wallet",
-                    desc: "Paytm, Amazon Pay",
-                  },
-                ].map((m) => (
-                  <button
-                    key={m.key}
-                    type="button"
-                    onClick={() => setPayMethod(m.key)}
-                    style={{
-                      padding: "14px 18px",
-                      borderRadius: "var(--r-md)",
-                      cursor: "pointer",
-                      fontFamily: "inherit",
-                      textAlign: "left",
-                      minWidth: 150,
-                      border: `2px solid ${payMethod === m.key ? "var(--brand)" : "var(--border)"}`,
-                      background: payMethod === m.key ? "#f5f3ff" : "#fff",
-                      transition: "all .13s",
-                    }}
-                  >
-                    <div
-                      style={{ fontSize: 14, fontWeight: 600, marginBottom: 3 }}
-                    >
-                      {m.label}
-                    </div>
-                    <div style={{ fontSize: 12, color: "var(--text-3)" }}>
-                      {m.desc}
-                    </div>
-                  </button>
-                ))}
+              {/* Payment Mode dropdown */}
+              <div style={{ marginBottom: 20, maxWidth: 260 }}>
+                <label style={PAY_LABEL}>Payment Mode</label>
+                <select
+                  className="field-select"
+                  style={{ marginTop: 4 }}
+                  value={payMode}
+                  onChange={e => { setPayMode(e.target.value); setConfirmed(false); }}
+                >
+                  <option value="Online">Online</option>
+                  <option value="Offline">Offline</option>
+                </select>
               </div>
 
-              {payMethod === "UPI" && (
-                <Field label="UPI ID" required>
-                  <Input
-                    placeholder="yourname@okaxis / 9876543210@upi"
-                    value={upiId}
-                    onChange={(e) => setUpiId(e.target.value)}
-                    required
-                  />
-                </Field>
-              )}
-              {payMethod === "NEFT" && (
-                <div
-                  style={{
-                    background: "var(--surface-2)",
-                    border: "1px solid var(--border)",
-                    padding: 18,
-                    borderRadius: "var(--r-md)",
-                    lineHeight: 2.1,
-                    fontSize: 13.5,
-                  }}
-                >
-                  <div style={{ fontWeight: 600, marginBottom: 6 }}>
-                    Bank Transfer Details
+              {/* ── ONLINE ── */}
+              {payMode === "Online" && (
+                <div style={{
+                  background: "var(--surface-2)", border: "1px solid var(--border)",
+                  borderRadius: "var(--r-md)", padding: "20px 22px",
+                }}>
+                  <div style={{ fontSize: 13.5, color: "var(--text-2)", marginBottom: 16, lineHeight: 1.6 }}>
+                    Your payment will be processed securely online. Please confirm that all the policy details
+                    shown above are correct before proceeding.
                   </div>
-                  {[
-                    ["Bank", "HDFC Bank"],
-                    ["Account Name", "InsureRight Platform Pvt Ltd"],
-                    ["Account No.", "50200012345678"],
-                    ["IFSC", "HDFC0001234"],
-                    ["Branch", "Bandra, Mumbai"],
-                  ].map(([k, v]) => (
-                    <div key={k}>
-                      <span
-                        style={{
-                          color: "var(--text-3)",
-                          width: 120,
-                          display: "inline-block",
-                        }}
-                      >
-                        {k}:
-                      </span>
-                      <strong>{v}</strong>
-                    </div>
-                  ))}
-                  <div
-                    style={{
-                      marginTop: 12,
-                      fontSize: 12.5,
-                      color: "var(--amber)",
-                      display: "flex",
-                      gap: 6,
-                    }}
-                  >
-                    <span>⚠</span> Policy will be issued within 2 hours of
-                    payment confirmation
-                  </div>
-                </div>
-              )}
-              {payMethod === "Card" && (
-                <div className="form-grid">
-                  <Field label="Card Number">
-                    <Input placeholder="XXXX XXXX XXXX XXXX" maxLength={19} />
-                  </Field>
-                  <Field label="Cardholder Name">
-                    <Input placeholder="Name as on card" />
-                  </Field>
-                  <Field label="Expiry (MM/YY)">
-                    <Input placeholder="MM/YY" maxLength={5} />
-                  </Field>
-                  <Field label="CVV">
-                    <Input type="password" placeholder="CVV" maxLength={4} />
-                  </Field>
-                </div>
-              )}
-              {payMethod === "Wallet" && (
-                <div style={{ display: "flex", flexWrap: "wrap", gap: 10 }}>
-                  {["Paytm Wallet", "PhonePe", "Amazon Pay", "MobiKwik"].map(
-                    (w) => (
-                      <button
-                        key={w}
-                        type="button"
-                        className="btn btn-ghost btn-sm"
-                      >
-                        {w}
-                      </button>
-                    ),
-                  )}
+                  <label style={{ display: "flex", alignItems: "flex-start", gap: 10, cursor: "pointer" }}>
+                    <input
+                      type="checkbox"
+                      checked={confirmed}
+                      onChange={e => setConfirmed(e.target.checked)}
+                      style={{ marginTop: 2, accentColor: "var(--brand)", width: 16, height: 16 }}
+                    />
+                    <span style={{ fontSize: 13.5, color: "var(--text)" }}>
+                      Check the box to confirm the displayed information.
+                    </span>
+                  </label>
                 </div>
               )}
 
-              <div className="actions-row">
+              {/* ── OFFLINE ── */}
+              {payMode === "Offline" && (() => {
+                const totalPremium = cart.reduce((s, x) => s + (x.premium ?? 0), 0);
+                const customerAssoc = ASSOCIATIONS.find(a => a.id === selectedCustomer?.associationId);
+
+                return (
+                  <div>
+                    {/* Cheque / NEFT tab bar */}
+                    <div style={{
+                      display: "flex", gap: 0, marginBottom: 20,
+                      border: "1px solid var(--border)", borderRadius: "var(--r-md)",
+                      overflow: "hidden", width: "fit-content",
+                    }}>
+                      {["Cheque", "NEFT"].map(t => (
+                        <button
+                          key={t}
+                          type="button"
+                          onClick={() => { setPayType(t); setConfirmed(false); }}
+                          style={{
+                            padding: "9px 32px", border: "none", cursor: "pointer",
+                            fontFamily: "inherit", fontSize: 13.5, fontWeight: 600,
+                            background: payType === t
+                              ? "linear-gradient(135deg, var(--brand) 0%, #a855f7 100%)"
+                              : "var(--surface-2)",
+                            color: payType === t ? "#fff" : "var(--text-2)",
+                            transition: "all .15s",
+                          }}
+                        >
+                          {t}
+                        </button>
+                      ))}
+                    </div>
+
+                    {/* ── CHEQUE FORM ── */}
+                    {payType === "Cheque" && (
+                      <div>
+                        <div className="form-grid">
+                          <Field label="Cheque Number" required>
+                            <Input placeholder="e.g. 001234" value={chequeNo} onChange={e => setChequeNo(e.target.value)} />
+                          </Field>
+                          <Field label="Amount">
+                            <Input value={`₹${totalPremium.toLocaleString("en-IN")}`} readOnly style={{ background: "var(--surface-2)", color: "var(--text-2)" }} />
+                          </Field>
+                          <Field label="Bank Name (on cheque)" required>
+                            <Input placeholder="e.g. State Bank of India" value={chequeBankName} onChange={e => setChequeBankName(e.target.value)} />
+                          </Field>
+                          <Field label="MICR Code">
+                            <Input placeholder="9-digit MICR" maxLength={9} value={chequeMicr} onChange={e => setChequeMicr(e.target.value)} />
+                          </Field>
+                          <Field label="IFSC Code" required>
+                            <Input placeholder="e.g. SBIN0001234" value={chequeIfsc} onChange={e => setChequeIfsc(e.target.value)} />
+                          </Field>
+                          <Field label="Date" required>
+                            <Input type="date" value={chequeDate} onChange={e => setChequeDate(e.target.value)} />
+                          </Field>
+                          <Field label="Association Name">
+                            <Input value={customerAssoc?.name ?? "—"} readOnly style={{ background: "var(--surface-2)", color: "var(--text-2)" }} />
+                          </Field>
+                          <Field label="Association Code">
+                            <Input value={customerAssoc?.associationCode ?? "—"} readOnly style={{ background: "var(--surface-2)", color: "var(--text-2)" }} />
+                          </Field>
+                        </div>
+                        <div style={{ marginTop: 4, marginBottom: 16 }}>
+                          <div style={{ fontSize: 11, fontWeight: 600, color: "var(--text-3)", textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: 6 }}>In Favour Of</div>
+                          <div style={{ fontWeight: 700, fontSize: 14.5, color: "var(--text)" }}>KMD Insurance Brokers Pvt. Ltd.</div>
+                        </div>
+                        <div className="form-grid">
+                          <Field label="Cheque Deposit Location">
+                            <Input placeholder="Branch / location" value={chequeLocation} onChange={e => setChequeLocation(e.target.value)} />
+                          </Field>
+                          <Field label="Cheque Photo">
+                            <input
+                              type="file" accept="image/*"
+                              onChange={e => setChequePhoto(e.target.files[0])}
+                              style={{ fontSize: 13, color: "var(--text-2)", paddingTop: 6 }}
+                            />
+                            {chequePhoto && <div style={{ fontSize: 11.5, color: "var(--success)", marginTop: 4 }}>✓ {chequePhoto.name}</div>}
+                          </Field>
+                        </div>
+                        <label style={{ display: "flex", alignItems: "flex-start", gap: 10, cursor: "pointer", marginTop: 8 }}>
+                          <input
+                            type="checkbox" checked={confirmed} onChange={e => setConfirmed(e.target.checked)}
+                            style={{ marginTop: 2, accentColor: "var(--brand)", width: 16, height: 16 }}
+                          />
+                          <span style={{ fontSize: 13.5, color: "var(--text)" }}>
+                            Check the box to confirm the displayed information.
+                          </span>
+                        </label>
+                      </div>
+                    )}
+
+                    {/* ── NEFT FORM ── */}
+                    {payType === "NEFT" && (
+                      <div>
+                        {/* Bank info card */}
+                        <div style={{
+                          background: "var(--surface-2)", border: "1px solid var(--border)",
+                          borderRadius: "var(--r-md)", padding: "16px 20px", marginBottom: 20,
+                          display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px 24px",
+                        }}>
+                          {[
+                            ["Bank Name",       "Kotak Mahindra Bank"],
+                            ["Branch Name",     "Fort Mumbai"],
+                            ["Account Number",  "6849894510"],
+                            ["IFSC Code",       "KKBK0000957"],
+                          ].map(([k, v]) => (
+                            <div key={k}>
+                              <div style={{ fontSize: 11, color: "var(--text-3)", marginBottom: 2 }}>{k}</div>
+                              <div style={{ fontWeight: 700, fontSize: 13.5 }}>{v}</div>
+                            </div>
+                          ))}
+                        </div>
+                        <div className="form-grid">
+                          <Field label="Bank Name" required>
+                            <Input placeholder="Your bank name" value={neftBankName} onChange={e => setNeftBankName(e.target.value)} />
+                          </Field>
+                          <Field label="Branch Name" required>
+                            <Input placeholder="Branch" value={neftBranch} onChange={e => setNeftBranch(e.target.value)} />
+                          </Field>
+                          <Field label="Account Name" required>
+                            <Input placeholder="Account holder name" value={neftAccName} onChange={e => setNeftAccName(e.target.value)} />
+                          </Field>
+                          <Field label="Account Number" required>
+                            <Input placeholder="Account number" value={neftAccNo} onChange={e => setNeftAccNo(e.target.value)} />
+                          </Field>
+                          <Field label="IFSC Code" required>
+                            <Input placeholder="e.g. KKBK0000957" value={neftIfsc} onChange={e => setNeftIfsc(e.target.value)} />
+                          </Field>
+                          <Field label="Transaction Number" required>
+                            <Input placeholder="UTR / Txn reference" value={neftTxnNo} onChange={e => setNeftTxnNo(e.target.value)} />
+                          </Field>
+                          <Field label="Date" required>
+                            <Input type="date" value={neftDate} onChange={e => setNeftDate(e.target.value)} />
+                          </Field>
+                          <Field label="Amount">
+                            <Input value={`₹${totalPremium.toLocaleString("en-IN")}`} readOnly style={{ background: "var(--surface-2)", color: "var(--text-2)" }} />
+                          </Field>
+                        </div>
+                        <div style={{ marginTop: 4 }}>
+                          <Field label="Payment Photo">
+                            <input
+                              type="file" accept="image/*"
+                              onChange={e => setNeftPhoto(e.target.files[0])}
+                              style={{ fontSize: 13, color: "var(--text-2)", paddingTop: 6 }}
+                            />
+                            {neftPhoto && <div style={{ fontSize: 11.5, color: "var(--success)", marginTop: 4 }}>✓ {neftPhoto.name}</div>}
+                          </Field>
+                        </div>
+                        <label style={{ display: "flex", alignItems: "flex-start", gap: 10, cursor: "pointer", marginTop: 16 }}>
+                          <input
+                            type="checkbox" checked={confirmed} onChange={e => setConfirmed(e.target.checked)}
+                            style={{ marginTop: 2, accentColor: "var(--brand)", width: 16, height: 16 }}
+                          />
+                          <span style={{ fontSize: 13.5, color: "var(--text)" }}>
+                            Check the box to confirm the displayed information.
+                          </span>
+                        </label>
+                      </div>
+                    )}
+                  </div>
+                );
+              })()}
+
+              <div className="actions-row" style={{ marginTop: 24 }}>
                 <button type="button" className="btn btn-ghost" onClick={back}>
-                  ← Back
+                  ← Back To Edit
                 </button>
                 <button
                   type="button"
                   className="btn btn-primary"
                   onClick={submitPayment}
-                  style={{ minWidth: 200 }}
+                  disabled={!confirmed}
+                  style={{ minWidth: 200, opacity: confirmed ? 1 : 0.5, cursor: confirmed ? "pointer" : "not-allowed" }}
                 >
-                  <PaymentIcon size={16} /> Confirm & Issue Policy
+                  <PaymentIcon size={16} /> Submit
                 </button>
               </div>
             </div>
