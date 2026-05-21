@@ -3,7 +3,7 @@ import { useNavigate, useSearchParams } from 'react-router-dom'
 import Pagination from '../../components/Pagination'
 import usePagination from '../../components/usePagination'
 import { Table, PageHeader, KYCBadge, Button, EmptyState } from '../../components/UI'
-import { CustomerIcon } from '../../icons'
+import { CustomerIcon, EditIcon } from '../../icons'
 import { useAuth } from '../../context/AuthContext'
 import { useCustomers, INITIAL_CUSTOMERS } from '../../context/CustomerContext'
 import { ASSOCIATIONS } from './orgAssocData'
@@ -100,13 +100,13 @@ export default function CustomerList() {
           >
             360°
           </Button>
-          <Button
-            variant="ghost"
-            size="sm"
+          <button
+            title="Edit"
             onClick={() => navigate(`/customer/${row.id}/edit`)}
+            style={S.editIconBtn}
           >
-            Edit
-          </Button>
+            <EditIcon size={14} color="#fff" />
+          </button>
         </div>
       ),
     },
@@ -218,6 +218,19 @@ export default function CustomerList() {
 }
 
 const S = {
+  editIconBtn: {
+    display: 'inline-flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    width: 30,
+    height: 30,
+    borderRadius: 8,
+    border: 'none',
+    cursor: 'pointer',
+    background: 'linear-gradient(135deg, #ec4899 0%, #a855f7 100%)',
+    boxShadow: '0 2px 6px rgba(168,85,247,0.35)',
+    flexShrink: 0,
+  },
   filterLabel: {
     fontSize: 11,
     fontWeight: 600,

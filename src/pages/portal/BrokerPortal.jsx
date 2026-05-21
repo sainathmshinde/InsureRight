@@ -594,6 +594,64 @@ export default function BrokerPortal() {
     navigate(`/customer?${params.toString()}`);
   };
 
+  const goToRTGSInitiated = () => {
+    const params = new URLSearchParams();
+    const id = CAMPAIGN_ID_MAP[campaignFilter];
+    if (id) params.set("campaignId", id);
+    params.set("payment", "Initiated");
+    params.set("paymentMode", "Offline");
+    params.set("paymentType", "NEFT");
+    navigate(`/policy?${params.toString()}`);
+  };
+
+  const goToChequeInitiated = () => {
+    const params = new URLSearchParams();
+    const id = CAMPAIGN_ID_MAP[campaignFilter];
+    if (id) params.set("campaignId", id);
+    params.set("payment", "Initiated");
+    params.set("paymentMode", "Offline");
+    params.set("paymentType", "Cheque");
+    navigate(`/policy?${params.toString()}`);
+  };
+
+  const goToOnlinePurchased = () => {
+    const params = new URLSearchParams();
+    const id = CAMPAIGN_ID_MAP[campaignFilter];
+    if (id) params.set("campaignId", id);
+    params.set("paymentMode", "Online");
+    params.set("payment", "Paid");
+    navigate(`/policy?${params.toString()}`);
+  };
+
+  const goToOfflinePurchased = () => {
+    const params = new URLSearchParams();
+    const id = CAMPAIGN_ID_MAP[campaignFilter];
+    if (id) params.set("campaignId", id);
+    params.set("paymentMode", "Offline");
+    params.set("payment", "Paid");
+    navigate(`/policy?${params.toString()}`);
+  };
+
+  const goToChequePurchased = () => {
+    const params = new URLSearchParams();
+    const id = CAMPAIGN_ID_MAP[campaignFilter];
+    if (id) params.set("campaignId", id);
+    params.set("paymentMode", "Offline");
+    params.set("paymentType", "Cheque");
+    params.set("payment", "Paid");
+    navigate(`/policy?${params.toString()}`);
+  };
+
+  const goToRTGSPurchased = () => {
+    const params = new URLSearchParams();
+    const id = CAMPAIGN_ID_MAP[campaignFilter];
+    if (id) params.set("campaignId", id);
+    params.set("paymentMode", "Offline");
+    params.set("paymentType", "NEFT");
+    params.set("payment", "Paid");
+    navigate(`/policy?${params.toString()}`);
+  };
+
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 24 }}>
       {/* ── MIS Section ── */}
@@ -929,12 +987,14 @@ export default function BrokerPortal() {
                   value: mis.rtgsInitiated,
                   color: "#0ea5e9",
                   premium: mis.rtgsInitiatedAmt,
+                  onClick: goToRTGSInitiated,
                 },
                 {
                   label: "Cheque",
                   value: mis.chequeInitiated,
                   color: "#6366f1",
                   premium: mis.chequeInitiatedAmt,
+                  onClick: goToChequeInitiated,
                 },
               ]}
             />
@@ -947,12 +1007,14 @@ export default function BrokerPortal() {
                   value: mis.onlinePurchased,
                   color: "#6366f1",
                   premium: mis.onlinePremium,
+                  onClick: goToOnlinePurchased,
                 },
                 {
                   label: "Offline",
                   value: mis.offlinePurchased,
                   color: "#f59e0b",
                   premium: mis.offlinePremium,
+                  onClick: goToOfflinePurchased,
                 },
               ]}
               note={`of ${mis.policyPurchased.toLocaleString("en-IN")} total policies purchased`}
@@ -986,12 +1048,14 @@ export default function BrokerPortal() {
                   value: mis.rtgsPurchased,
                   color: "#0ea5e9",
                   premium: mis.rtgsPurchasedAmt,
+                  onClick: goToRTGSPurchased,
                 },
                 {
                   label: "Cheque",
                   value: mis.chequePurchased,
                   color: "#7c3aed",
                   premium: mis.chequePurchasedAmt,
+                  onClick: goToChequePurchased,
                 },
               ]}
             />
