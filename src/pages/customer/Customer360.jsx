@@ -294,7 +294,7 @@ function DocCard({ type, data, customerName }) {
   )
 }
 
-const TABS = ['Policies', 'Payments', 'Interactions', 'Family', 'Documents']
+const TABS = ['Family', 'Documents', 'Policies', 'Payments', 'Interactions']
 
 export default function Customer360() {
   const { id } = useParams()
@@ -349,7 +349,7 @@ export default function Customer360() {
 
         <div className="card-body">
           {/* Policies */}
-          {tab === 0 && (
+          {tab === 2 && (
             <div className="table-wrap">
               <table>
                 <thead>
@@ -372,7 +372,7 @@ export default function Customer360() {
           )}
 
           {/* Payments */}
-          {tab === 1 && (
+          {tab === 3 && (
             <div className="table-wrap">
               <table>
                 <thead>
@@ -394,7 +394,7 @@ export default function Customer360() {
           )}
 
           {/* Interaction history */}
-          {tab === 2 && (
+          {tab === 4 && (
             <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
               {c.interactions.map((i, idx) => (
                 <div key={idx} style={{ display: 'flex', gap: 14, padding: '14px 0', borderBottom: idx < c.interactions.length - 1 ? '1px solid var(--border)' : 'none' }}>
@@ -414,7 +414,7 @@ export default function Customer360() {
           )}
 
           {/* Documents */}
-          {tab === 4 && (() => {
+          {tab === 1 && (() => {
             const docs = DOCS[id]
             if (!docs) return <div style={{ padding: '32px 0', textAlign: 'center', color: 'var(--text-3)' }}>No documents found.</div>
             return (
@@ -461,7 +461,7 @@ export default function Customer360() {
           })()}
 
           {/* Family Members */}
-          {tab === 3 && (
+          {tab === 0 && (
             <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
               {c.familyMembers?.length > 0 ? c.familyMembers.map(m => {
                 const age = calcAge(m.dob)
