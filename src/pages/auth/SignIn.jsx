@@ -61,7 +61,7 @@ function OtpInput({ value, onChange }) {
           onPaste={handlePaste}
           style={{
             width: 52, height: 44, textAlign: "center", fontSize: 14, fontWeight: 600,
-            border: `1.5px solid ${d ? "#7c3aed" : "#e2ddf0"}`,
+            border: `1.5px solid ${d ? "#a855f7" : "#e2ddf0"}`,
             borderRadius: 8, outline: "none", fontFamily: "inherit",
             color: "#1a1628", background: d ? "#f5f3ff" : "#faf9fc",
             boxSizing: "border-box", transition: "border-color .15s, background .15s",
@@ -120,7 +120,7 @@ function SignUpView({ onBack }) {
       <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 16, paddingTop: 24 }}>
         <div style={{ fontSize: 48 }}>🎉</div>
         <h2 style={{ ...S.title, textAlign: "center" }}>Registration Successful!</h2>
-        <p style={{ fontSize: 13.5, color: "#9d94b8", textAlign: "center" }}>
+        <p style={{ fontSize: 13.5, color: "#64748b", textAlign: "center" }}>
           Your account has been created. You can now sign in.
         </p>
         <button type="button" style={S.btn} onClick={onBack}>Go to Sign In →</button>
@@ -186,7 +186,7 @@ function SignUpView({ onBack }) {
         <div>
           <label style={S.lbl}>Enter OTP</label>
           <OtpInput value={otp} onChange={v => { setOtp(v); setOtpError(""); }} />
-          <div style={{ fontSize: 11.5, color: "#9d94b8", marginTop: 8 }}>
+          <div style={{ fontSize: 11.5, color: "#64748b", marginTop: 8 }}>
             OTP sent to +91-{mobile}
           </div>
 
@@ -202,7 +202,7 @@ function SignUpView({ onBack }) {
               </button>
               <button
                 type="button"
-                style={{ ...S.btn, flex: 1, marginTop: 0, background: "transparent", color: "#7c3aed", border: "1.5px solid #7c3aed" }}
+                style={{ ...S.btn, flex: 1, marginTop: 0, background: "transparent", color: "#a855f7", border: "1.5px solid #a855f7" }}
                 onClick={handleResendOtp}
               >
                 Resend OTP
@@ -371,6 +371,7 @@ export default function SignIn() {
 
   return (
     <div className="login-page" style={S.page}>
+      <div style={S.wrapper}>
 
       {/* ── Left card ── */}
       <div className="login-card" style={S.card}>
@@ -380,7 +381,7 @@ export default function SignIn() {
           <img src={kmdLogo} alt="KMD" style={S.logoImg} />
           <div>
             <div style={S.brandName}>K.M. Dastur & Co.</div>
-            {/* <div style={S.brandSub}>Insurance Brokers Pvt. Ltd. · IRDAI CB-456/2008</div> */}
+            <div style={{ fontSize: 11, color: "#a855f7", fontWeight: 600, marginTop: 2 }}>Insurance Brokers · IRDAI Registered</div>
           </div>
         </div>
 
@@ -388,8 +389,8 @@ export default function SignIn() {
           <SignUpView onBack={() => setView("signin")} />
         ) : (
           <>
-            <h2 style={S.title}>Welcome back</h2>
-            <p style={S.sub}>Already have an account, Enter your details below.</p>
+            <h2 style={{ ...S.title, background:"linear-gradient(135deg,#fb7185,#a855f7)", WebkitBackgroundClip:"text", WebkitTextFillColor:"transparent", backgroundClip:"text" }}>Welcome back</h2>
+            <p style={S.sub}>Sign in to access your portal</p>
 
             {/* Mode toggle */}
             <div style={S.toggle}>
@@ -444,7 +445,7 @@ export default function SignIn() {
                     <div>
                       <label style={S.lbl}>Enter OTP</label>
                       <OtpInput value={otp} onChange={v => { setOtp(v); setError(""); }} />
-                      <div style={{ fontSize: 11.5, color: "#9d94b8", marginTop: 8 }}>
+                      <div style={{ fontSize: 11.5, color: "#64748b", marginTop: 8 }}>
                         OTP sent to +91-{mobile} ·{" "}
                         <button
                           type="button"
@@ -522,45 +523,61 @@ export default function SignIn() {
       {/* ── Right panel ── */}
       <div className="login-panel" style={S.panel}>
         <div style={S.panelInner}>
-          <img src={kmdLogo} alt="KMD" style={S.shield} />
-          <h3 style={S.panelTitle}>K.M. Dastur Reinsurance Broker</h3>
-          <div style={{ display: "flex", flexDirection: "column", gap: 22, marginBottom: 28 }}>
-            <div>
-              <div style={S.panelSection}>Quality Policy</div>
-              <p style={S.panelText}>K.M. Dastur is committed to satisfy &amp; delight customers by meeting requirements through timely, error free and courteous services and to continually improve the effectiveness of its processes. This is achieved through statutory compliances.</p>
+          <div style={{ display: "flex", alignItems: "center", gap: 14, marginBottom: 18 }}>
+            <img src={kmdLogo} alt="KMD" style={S.shield} />
+            <h3 style={S.panelTitle}>K.M. Dastur Reinsurance Broker</h3>
+          </div>
+          <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+            <div style={S.infoCard}>
+                <div style={S.panelSection}>Quality Policy</div>
+                <p style={S.panelText}>K.M. Dastur is committed to satisfy &amp; delight customers by meeting requirements through timely, error free and courteous services and to continually improve the effectiveness of its processes. This is achieved through statutory compliances.</p>
             </div>
-            <div>
-              <div style={S.panelSection}>Our Vision</div>
-              <p style={S.panelText}>KMD will be recognized as the best professional services company in the insurance industry worldwide.</p>
+            <div style={S.infoCard}>
+                <div style={S.panelSection}>Our Vision</div>
+                <p style={S.panelText}>KMD will be recognized as the best professional services company in the insurance industry worldwide.</p>
             </div>
-            <div>
-              <div style={S.panelSection}>Our Mission</div>
-              <p style={S.panelText}>To render professional services of the highest order and be recognized as a professional company that consistently exceeds the expectations of our clients and our people through commitment to learning, integrity and hard work.</p>
+            <div style={S.infoCard}>
+                <div style={S.panelSection}>Our Mission</div>
+                <p style={S.panelText}>To render professional services of the highest order and be recognized as a professional company that consistently exceeds the expectations of our clients and our people through commitment to learning, integrity and hard work.</p>
             </div>
           </div>
-          {/* <div style={S.badge}>IRDAI Registered Reinsurance Broker · CB-456/2008</div> */}
         </div>
       </div>
+
+      </div>{/* wrapper */}
     </div>
   );
 }
 
 const S = {
-  page: { minHeight: "100vh", display: "flex", background: "#f5f4f9" },
-  card: {
-    width: 460, flexShrink: 0, background: "#fff", padding: "52px 48px",
-    display: "flex", flexDirection: "column", boxShadow: "2px 0 24px rgba(0,0,0,0.07)",
-    overflowY: "auto",
+  page: {
+    minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center",
+    background: "linear-gradient(135deg, #fde8ef 0%, #faf4ff 50%, #ede9fe 100%)",
+    padding: "24px 16px",
   },
-  brand: { display: "flex", alignItems: "center", gap: 13, marginBottom: 40 },
-  logoImg: { width: 48, height: 48, flexShrink: 0, borderRadius: "50%" },
+  wrapper: {
+    display: "flex", width: "100%", maxWidth: 880,
+    borderRadius: 24, background: "#fff",
+    boxShadow: "0 24px 64px rgba(168,85,247,0.18), 0 4px 20px rgba(0,0,0,0.08)",
+    overflow: "hidden",
+  },
+  card: {
+    width: 430, flexShrink: 0, padding: "44px 40px",
+    background: "#fff",
+    display: "flex", flexDirection: "column",
+    overflowY: "auto", maxHeight: "92vh",
+    boxShadow: "4px 0 20px rgba(168,85,247,0.08)",
+    position: "relative", zIndex: 2,
+  },
+  brand: { display: "flex", alignItems: "center", gap: 13, marginBottom: 28, paddingBottom: 22, borderBottom: "1.5px solid #f3e8ff" },
+  logoImg: { width: 46, height: 46, flexShrink: 0, borderRadius: "50%", boxShadow: "0 2px 10px rgba(168,85,247,0.20)" },
   brandName: { fontSize: 15, fontWeight: 700, color: "#1a1628" },
-  brandSub:  { fontSize: 11, color: "#9d94b8", marginTop: 2 },
-  title: { fontSize: 24, fontWeight: 700, color: "#1a1628", margin: "0 0 4px" },
-  sub:   { fontSize: 13.5, color: "#9d94b8", margin: "0 0 20px" },
+  brandSub:  { fontSize: 11, color: "#64748b", marginTop: 2 },
+  title: { fontSize: 26, fontWeight: 800, color: "#1a1628", margin: "0 0 6px" },
+  sub:   { fontSize: 13, color: "#64748b", margin: "0 0 18px" },
   toggle: {
     display: "flex", background: "#f3f0fa", borderRadius: 9,
-    padding: 4, gap: 4, marginBottom: 24,
+    padding: 4, gap: 4, marginBottom: 22,
   },
   toggleBtn: {
     flex: 1, padding: "9px 12px", border: "none", borderRadius: 7,
@@ -570,27 +587,30 @@ const S = {
     background: "#fef2f2", border: "1px solid #fecaca", color: "#dc2626",
     padding: "10px 14px", borderRadius: 8, fontSize: 13, marginBottom: 4,
   },
-  lbl: { display: "block", fontSize: 13, fontWeight: 500, color: "#1a1628", marginBottom: 6 },
+  lbl: { display: "block", fontSize: 12.5, fontWeight: 600, color: "#4a4566", marginBottom: 6, letterSpacing: ".1px" },
   inp: {
-    width: "100%", padding: "10px 14px", border: "1.5px solid #e2ddf0",
-    borderRadius: 8, fontSize: 14, outline: "none", fontFamily: "inherit",
+    width: "100%", padding: "11px 14px", border: "1.5px solid #e8e4f3",
+    borderRadius: 10, fontSize: 14, outline: "none", fontFamily: "inherit",
     color: "#1a1628", background: "#faf9fc", boxSizing: "border-box",
+    boxShadow: "0 1px 4px rgba(168,85,247,0.06)", transition: "border-color .15s",
   },
   sel: {
-    width: "100%", padding: "10px 14px", border: "1.5px solid #e2ddf0",
-    borderRadius: 8, fontSize: 14, outline: "none", fontFamily: "inherit",
-    color: "#1a1628", background: "#faf9fc", boxSizing: "border-box", cursor: "pointer",
+    width: "100%", padding: "11px 14px", border: "1.5px solid #e8e4f3",
+    borderRadius: 10, fontSize: 14, outline: "none", fontFamily: "inherit",
+    color: "#1a1628", background: "#faf9fc", boxSizing: "border-box",
+    boxShadow: "0 1px 4px rgba(168,85,247,0.06)", cursor: "pointer",
   },
   eyeBtn: {
     position: "absolute", right: 12, bottom: 10, background: "none",
     border: "none", cursor: "pointer", fontSize: 15, lineHeight: 1,
   },
   btn: {
-    background: "linear-gradient(135deg,#fb7185 0%,#a855f7 100%)", color: "#fff", border: "none", borderRadius: 8,
+    background: "linear-gradient(135deg,#fb7185 0%,#a855f7 100%)", color: "#fff", border: "none", borderRadius: 10,
     padding: "12px", fontSize: 14, fontWeight: 600, cursor: "pointer",
     fontFamily: "inherit", marginTop: 4, transition: "opacity .15s, filter .15s", letterSpacing: 0.2,
+    boxShadow: "0 4px 14px rgba(168,85,247,0.35)",
   },
-  demoBox: { padding: "13px 15px", background: "#f5f3ff", border: "1px solid #ede9fe", borderRadius: 9 },
+  demoBox: { padding: "13px 15px", background: "#f5f3ff", border: "1px solid #ede9fe", borderRadius: 10 },
   demoHead: { fontSize: 11, fontWeight: 700, color: "#7c3aed", textTransform: "uppercase", letterSpacing: ".6px", marginBottom: 8 },
   demoBtns: { display: "flex", gap: 8, flexWrap: "wrap" },
   demoBtn: {
@@ -598,19 +618,26 @@ const S = {
     border: "1px solid #c4b5fd", borderRadius: 6, fontSize: 12.5,
     cursor: "pointer", fontFamily: "inherit", fontWeight: 500,
   },
-  regLink: { fontSize: 13, color: "#5c5573", marginTop: 22, textAlign: "center" },
+  regLink: { fontSize: 13, color: "#5c5573", marginTop: 18, textAlign: "center" },
   panel: {
-    flex: 1, background: "linear-gradient(135deg,#fb7185 0%,#a855f7 100%)",
-    display: "flex", alignItems: "center", justifyContent: "center", padding: 56,
+    flex: 1, background: "linear-gradient(150deg, #fdf2f8 0%, #f5f0ff 100%)",
+    display: "flex", alignItems: "center", justifyContent: "center", padding: 44,
+    borderRadius: "18px", margin: "10px", marginLeft: "-18px",
+    boxShadow: "0 4px 20px rgba(168,85,247,0.10)", position: "relative", zIndex: 1,
   },
-  panelInner: { maxWidth: 420, color: "#fff" },
-  shield: { width: 88, height: 88, marginBottom: 22, display: "block", borderRadius: "50%" },
-  panelTitle:   { fontSize: 26, fontWeight: 800, margin: "0 0 20px", color: "#fff", lineHeight: 1.2 },
-  panelSection: { fontSize: 11, fontWeight: 700, textTransform: "uppercase", letterSpacing: "1px", color: "rgba(255,255,255,0.70)", marginBottom: 6 },
-  panelText:    { fontSize: 13.5, color: "rgba(255,255,255,0.90)", lineHeight: 1.75, margin: 0 },
+  panelInner: { maxWidth: 400 },
+  shield: { width: 50, height: 50, flexShrink: 0, borderRadius: "50%", opacity: 0.85 },
+  panelTitle:   { fontSize: 18, fontWeight: 800, margin: 0, color: "#4c1d6e", lineHeight: 1.2 },
+  panelSection: { fontSize: 10.5, fontWeight: 800, textTransform: "uppercase", letterSpacing: "1px", color: "#a855f7", marginBottom: 4 },
+  panelText:    { fontSize: 12.5, color: "#6b4e8a", lineHeight: 1.7, margin: 0, fontWeight: 500 },
+  infoCard: {
+    background: "rgba(255,255,255,0.65)",
+    borderRadius: 10, padding: "11px 14px",
+    borderLeft: "3px solid #d8b4fe",
+  },
   badge: {
     display: "inline-block", background: "rgba(255,255,255,0.15)",
-    border: "1px solid rgba(255,255,255,0.25)", color: "#f3e8ff",
+    border: "1px solid rgba(255,255,255,0.28)", color: "#fff",
     padding: "5px 14px", borderRadius: 99, fontSize: 12, fontWeight: 600,
   },
 };

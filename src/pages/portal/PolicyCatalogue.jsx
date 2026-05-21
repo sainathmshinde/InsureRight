@@ -75,7 +75,7 @@ export default function PolicyCatalogue() {
     <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
 
       {/* Header */}
-      <div style={{ background: 'linear-gradient(135deg,#7c3aed 0%,#4c1d95 100%)', borderRadius: 14, padding: '28px 32px', color: '#fff' }}>
+      <div style={{ background: 'linear-gradient(135deg,#fb7185 0%,#a855f7 100%)', borderRadius: 14, padding: '28px 32px', color: '#fff' }}>
         <div style={{ fontSize: 12, color: '#ddd6fe', marginBottom: 6, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '.6px' }}>
           KMD Insurance — Product Catalogue
         </div>

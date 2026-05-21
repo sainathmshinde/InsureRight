@@ -92,7 +92,7 @@ export default function ProductCreate() {
               type="button"
               onClick={() => setMode('api')}
               style={choiceBtn}
-              onMouseEnter={e => { e.currentTarget.style.border = '2px solid var(--brand)'; e.currentTarget.style.boxShadow = '0 6px 20px rgba(124,58,237,.14)'; e.currentTarget.style.transform = 'translateY(-2px)'; }}
+              onMouseEnter={e => { e.currentTarget.style.border = '2px solid var(--brand)'; e.currentTarget.style.boxShadow = '0 6px 20px rgba(168,85,247,.14)'; e.currentTarget.style.transform = 'translateY(-2px)'; }}
               onMouseLeave={e => { e.currentTarget.style.border = '2px solid var(--border)'; e.currentTarget.style.boxShadow = '0 2px 8px rgba(0,0,0,.06)'; e.currentTarget.style.transform = 'none'; }}
             >
               <div style={{ fontSize: 36, marginBottom: 14 }}>🔌</div>
@@ -109,7 +109,7 @@ export default function ProductCreate() {
               type="button"
               onClick={() => setMode('manual')}
               style={choiceBtn}
-              onMouseEnter={e => { e.currentTarget.style.border = '2px solid var(--brand)'; e.currentTarget.style.boxShadow = '0 6px 20px rgba(124,58,237,.14)'; e.currentTarget.style.transform = 'translateY(-2px)'; }}
+              onMouseEnter={e => { e.currentTarget.style.border = '2px solid var(--brand)'; e.currentTarget.style.boxShadow = '0 6px 20px rgba(168,85,247,.14)'; e.currentTarget.style.transform = 'translateY(-2px)'; }}
               onMouseLeave={e => { e.currentTarget.style.border = '2px solid var(--border)'; e.currentTarget.style.boxShadow = '0 2px 8px rgba(0,0,0,.06)'; e.currentTarget.style.transform = 'none'; }}
             >
               <div style={{ fontSize: 36, marginBottom: 14 }}>✏️</div>

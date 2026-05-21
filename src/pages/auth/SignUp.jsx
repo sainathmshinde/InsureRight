@@ -298,7 +298,7 @@ function Step5({ form, setFile, errors }) {
             <input type="file" accept=".pdf,.jpg,.jpeg,.png" style={{ display: 'none' }} onChange={setFile(d.key)} />
             {form[d.key]
               ? <span style={{ color: '#10b981', fontWeight: 500, fontSize: 13 }}>✓ {form[d.key].name}</span>
-              : <span style={{ color: '#9d94b8', fontSize: 13 }}>📎 Click to upload — {d.hint}</span>
+              : <span style={{ color: '#64748b', fontSize: 13 }}>📎 Click to upload — {d.hint}</span>
             }
           </label>
           {errors[d.key] && <div style={SF.err}>{errors[d.key]}</div>}
@@ -377,7 +377,7 @@ function FSelect({ children, ...props }) {
 /* ── Styles ── */
 const S = {
   page:       { minHeight: '100vh', display: 'flex' },
-  panel:      { width: 280, flexShrink: 0, background: 'linear-gradient(160deg,#7c3aed 0%,#4f1d96 100%)', padding: '48px 28px', display: 'flex', flexDirection: 'column' },
+  panel:      { width: 280, flexShrink: 0, background: 'linear-gradient(135deg,#fb7185 0%,#a855f7 100%)', padding: '48px 28px', display: 'flex', flexDirection: 'column' },
   panelInner: { display: 'flex', flexDirection: 'column' },
   logoBox:    { width: 50, height: 50, borderRadius: 12, background: 'rgba(255,255,255,0.2)', color: '#fff', fontWeight: 800, fontSize: 17, display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 14 },
   brandName:  { fontSize: 16, fontWeight: 700, color: '#fff', lineHeight: 1.3 },
@@ -392,14 +392,14 @@ const S = {
   formHeader: { display: 'flex', alignItems: 'center', gap: 14, marginBottom: 18 },
   stepEmoji:  { fontSize: 32, lineHeight: 1 },
   formTitle:  { fontSize: 17, fontWeight: 700, color: '#1a1628' },
-  formSub:    { fontSize: 12.5, color: '#9d94b8', marginTop: 2 },
+  formSub:    { fontSize: 12.5, color: '#64748b', marginTop: 2 },
   progressTrack: { height: 4, background: '#f0edf8', borderRadius: 99, marginBottom: 28, overflow: 'hidden' },
-  progressBar:   { height: '100%', background: 'linear-gradient(90deg,#7c3aed,#a855f7)', borderRadius: 99, transition: 'width .4s ease' },
+  progressBar:   { height: '100%', background: 'linear-gradient(90deg,#fb7185,#a855f7)', borderRadius: 99, transition: 'width .4s ease' },
   fields:     { flex: 1, marginBottom: 24 },
   nav:        { display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingTop: 20, borderTop: '1px solid #f0edf8' },
   backBtn:    { background: 'none', border: '1.5px solid #e2ddf0', color: '#5c5573', borderRadius: 8, padding: '10px 22px', fontSize: 13.5, fontWeight: 500, cursor: 'pointer', fontFamily: 'inherit' },
-  nextBtn:    { background: '#7c3aed', color: '#fff', border: 'none', borderRadius: 8, padding: '10px 26px', fontSize: 13.5, fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit', transition: 'opacity .15s' },
-  loginLink:  { fontSize: 13, color: '#9d94b8', textAlign: 'center', marginTop: 18 },
+  nextBtn:    { background: 'linear-gradient(135deg,#fb7185 0%,#a855f7 100%)', color: '#fff', border: 'none', borderRadius: 8, padding: '10px 26px', fontSize: 13.5, fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit', transition: 'opacity .15s' },
+  loginLink:  { fontSize: 13, color: '#64748b', textAlign: 'center', marginTop: 18 },
   link:       { color: '#7c3aed', fontWeight: 600, textDecoration: 'none' },
 }
 
@@ -414,6 +414,6 @@ const SF = {
   reviewTitle:{ padding: '10px 16px', background: '#f5f3ff', fontSize: 13, fontWeight: 700, color: '#7c3aed', borderBottom: '1px solid #ede9fe' },
   reviewGrid: { display: 'grid', gridTemplateColumns: '1fr 1fr', padding: '8px 0' },
   reviewRow:  { padding: '7px 16px', display: 'flex', flexDirection: 'column', gap: 2 },
-  reviewKey:  { fontSize: 11, color: '#9d94b8', textTransform: 'uppercase', letterSpacing: '.3px' },
+  reviewKey:  { fontSize: 11, color: '#64748b', textTransform: 'uppercase', letterSpacing: '.3px' },
   reviewVal:  { fontSize: 13, fontWeight: 500, color: '#1a1628' },
 }

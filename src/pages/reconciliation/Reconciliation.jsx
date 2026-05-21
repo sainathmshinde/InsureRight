@@ -422,7 +422,7 @@ export default function Reconciliation() {
 
                     {/* DB column */}
                     <div style={{ background: "#f8f9ff", border: "1px solid #e0dff0", borderRadius: 10, overflow: "hidden" }}>
-                      <div style={{ background: "#7c3aed", color: "#fff", padding: "8px 14px", fontWeight: 700, fontSize: 12.5, display: "flex", alignItems: "center", gap: 6 }}>
+                      <div style={{ background: "#a855f7", color: "#fff", padding: "8px 14px", fontWeight: 700, fontSize: 12.5, display: "flex", alignItems: "center", gap: 6 }}>
                         🗄️ Database Record
                       </div>
                       {row.db ? (

@@ -104,7 +104,7 @@ export default function ExtractPayments() {
         <div className="card-body">
 
           <div style={{ fontWeight: 700, fontSize: 15, marginBottom: 4 }}>Select Filters</div>
-          <div style={{ fontSize: 13, color: '#9d94b8', marginBottom: 22 }}>
+          <div style={{ fontSize: 13, color: '#64748b', marginBottom: 22 }}>
             Leave a filter blank to include all values for that field.
           </div>
 
@@ -112,7 +112,7 @@ export default function ExtractPayments() {
           <div style={{ display: 'flex', flexDirection: 'column', gap: 18, marginBottom: 28 }}>
 
             <div>
-              <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: '#9d94b8', marginBottom: 6, textTransform: 'uppercase', letterSpacing: '.4px' }}>
+              <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: '#64748b', marginBottom: 6, textTransform: 'uppercase', letterSpacing: '.4px' }}>
                 Campaign
               </label>
               <select
@@ -127,7 +127,7 @@ export default function ExtractPayments() {
             </div>
 
             <div>
-              <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: '#9d94b8', marginBottom: 6, textTransform: 'uppercase', letterSpacing: '.4px' }}>
+              <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: '#64748b', marginBottom: 6, textTransform: 'uppercase', letterSpacing: '.4px' }}>
                 Payment Type
               </label>
               <select
@@ -142,7 +142,7 @@ export default function ExtractPayments() {
             </div>
 
             <div>
-              <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: '#9d94b8', marginBottom: 6, textTransform: 'uppercase', letterSpacing: '.4px' }}>
+              <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: '#64748b', marginBottom: 6, textTransform: 'uppercase', letterSpacing: '.4px' }}>
                 Payment Status
               </label>
               <select
@@ -165,7 +165,7 @@ export default function ExtractPayments() {
             style={{
               display: 'flex', alignItems: 'center', gap: 10,
               padding: '12px 28px', borderRadius: 10, border: 'none',
-              background: preview.length === 0 ? '#e5e7eb' : 'linear-gradient(135deg,#7c3aed,#5b21b6)',
+              background: preview.length === 0 ? '#e5e7eb' : 'linear-gradient(135deg,#fb7185 0%,#a855f7 100%)',
               color: preview.length === 0 ? '#9ca3af' : '#fff',
               fontWeight: 700, fontSize: 15, cursor: preview.length === 0 ? 'not-allowed' : 'pointer',
               fontFamily: 'inherit', transition: 'opacity .15s', width: '100%', justifyContent: 'center',
@@ -191,7 +191,7 @@ export default function ExtractPayments() {
           </button>
 
           {preview.length === 0 && (
-            <div style={{ textAlign: 'center', fontSize: 13, color: '#9d94b8', marginTop: 10 }}>
+            <div style={{ textAlign: 'center', fontSize: 13, color: '#64748b', marginTop: 10 }}>
               No records match the selected filters.
             </div>
           )}

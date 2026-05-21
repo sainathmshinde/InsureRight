@@ -289,7 +289,7 @@ function CoverageScore({ score }) {
       <div>
         <div style={{ fontSize: 28, fontWeight: 800, color, lineHeight: 1 }}>{score}</div>
         <div style={{ fontSize: 12.5, fontWeight: 600, color, marginTop: 3 }}>{label}</div>
-        <div style={{ fontSize: 11.5, color: '#9d94b8', marginTop: 2 }}>Coverage Score</div>
+        <div style={{ fontSize: 11.5, color: '#64748b', marginTop: 2 }}>Coverage Score</div>
       </div>
     </div>
   )
@@ -360,7 +360,7 @@ function CustomerDashboard({ user }) {
       <div>
         <div style={{ fontSize: 13.5, fontWeight: 700, color: '#1a1628', marginBottom: 12 }}>
           Recommended For You
-          <span style={{ marginLeft: 8, fontSize: 11, fontWeight: 600, color: '#9d94b8', textTransform: 'uppercase', letterSpacing: '.5px' }}>Personalised Plans</span>
+          <span style={{ marginLeft: 8, fontSize: 11, fontWeight: 600, color: '#64748b', textTransform: 'uppercase', letterSpacing: '.5px' }}>Personalised Plans</span>
         </div>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 14 }}>
           {POLICY_ADS.map(ad => (
@@ -408,7 +408,7 @@ function CustomerDashboard({ user }) {
             <div style={{ textAlign: 'center', padding: '32px 0' }}>
               <div style={{ fontSize: 32, marginBottom: 10 }}>📭</div>
               <div style={{ fontSize: 14, fontWeight: 600, color: '#1a1628', marginBottom: 6 }}>No policies yet</div>
-              <div style={{ fontSize: 12.5, color: '#9d94b8', marginBottom: 16 }}>Buy your first policy to get covered</div>
+              <div style={{ fontSize: 12.5, color: '#64748b', marginBottom: 16 }}>Buy your first policy to get covered</div>
               <button onClick={() => navigate('/policy/buy')} style={{ padding: '9px 20px', borderRadius: 8, border: 'none', background: '#059669', color: '#fff', fontWeight: 700, fontSize: 13, cursor: 'pointer', fontFamily: 'inherit' }}>
                 Buy a Policy →
               </button>
@@ -421,14 +421,14 @@ function CustomerDashboard({ user }) {
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 10 }}>
                   <div>
                     <div style={{ fontWeight: 700, fontSize: 14, color: '#1a1628', marginBottom: 2 }}>{p.product}</div>
-                    <div style={{ fontSize: 11.5, color: '#9d94b8' }}>{p.icName} · {p.policyNo ?? p.id}</div>
+                    <div style={{ fontSize: 11.5, color: '#64748b' }}>{p.icName} · {p.policyNo ?? p.id}</div>
                   </div>
                   <span style={{ ...S.badge, background: p.status === 'Active' ? '#dcfce7' : p.status === 'Pending' ? '#fef9c3' : '#fee2e2', color: p.status === 'Active' ? '#166534' : p.status === 'Pending' ? '#854d0e' : '#991b1b' }}>{p.status}</span>
                 </div>
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 10 }}>
                   {[['Sum Insured', p.sumInsured], ['Premium', `₹${p.premium?.toLocaleString()}/yr`], ['Start', fmtDate(p.startDate)], ['Renews', fmtDate(p.endDate)]].map(([k, v]) => (
                     <div key={k}>
-                      <div style={{ fontSize: 10.5, color: '#9d94b8', textTransform: 'uppercase', letterSpacing: '.3px', marginBottom: 2 }}>{k}</div>
+                      <div style={{ fontSize: 10.5, color: '#64748b', textTransform: 'uppercase', letterSpacing: '.3px', marginBottom: 2 }}>{k}</div>
                       <div style={{ fontSize: 12.5, fontWeight: 600, color: '#1a1628' }}>{v}</div>
                     </div>
                   ))}
@@ -462,7 +462,7 @@ function CustomerDashboard({ user }) {
                   <span style={{ width: 20, height: 20, borderRadius: '50%', background: done ? color + '18' : '#f5f3ff', color: done ? color : '#d1d5db', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 11, fontWeight: 700, flexShrink: 0 }}>
                     {done ? '✓' : '✗'}
                   </span>
-                  <span style={{ fontSize: 13, color: done ? '#1a1628' : '#9d94b8', flex: 1, fontWeight: done ? 600 : 400 }}>{label}</span>
+                  <span style={{ fontSize: 13, color: done ? '#1a1628' : '#64748b', flex: 1, fontWeight: done ? 600 : 400 }}>{label}</span>
                   {!done && (
                     <button onClick={() => navigate('/policy-catalogue')} style={{ fontSize: 11, color: color, fontWeight: 700, background: 'none', border: 'none', cursor: 'pointer', fontFamily: 'inherit', padding: 0 }}>+ Add</button>
                   )}
@@ -502,7 +502,7 @@ function CustomerDashboard({ user }) {
               ].map(i => (
                 <div key={i.label} style={{ display: 'flex', alignItems: 'center', gap: 7, fontSize: 12.5 }}>
                   <span style={{ color: i.done ? '#059669' : '#d1d5db', fontWeight: 700 }}>{i.done ? '✓' : '○'}</span>
-                  <span style={{ color: i.done ? '#1a1628' : '#9d94b8', fontWeight: i.done ? 600 : 400 }}>{i.label}</span>
+                  <span style={{ color: i.done ? '#1a1628' : '#64748b', fontWeight: i.done ? 600 : 400 }}>{i.label}</span>
                 </div>
               ))}
             </div>
@@ -519,7 +519,7 @@ function CustomerDashboard({ user }) {
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16, flexWrap: 'wrap', gap: 10 }}>
           <div>
             <div style={{ fontSize: 14, fontWeight: 700, color: '#1a1628' }}>How to File a Claim</div>
-            <div style={{ fontSize: 12.5, color: '#9d94b8', marginTop: 2 }}>24×7 claim support · Call 1800-XXX-XXXX</div>
+            <div style={{ fontSize: 12.5, color: '#64748b', marginTop: 2 }}>24×7 claim support · Call 1800-XXX-XXXX</div>
           </div>
           <button onClick={() => navigate('/policy')} style={{ padding: '7px 16px', borderRadius: 8, border: '1.5px solid #e8e4f0', background: '#faf9fc', color: '#1a1628', fontSize: 12.5, fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit' }}>
             Start Claim →
@@ -532,7 +532,7 @@ function CustomerDashboard({ user }) {
                 {step.icon}
               </div>
               <div>
-                <div style={{ fontSize: 10.5, color: '#9d94b8', marginBottom: 2 }}>Step {step.step}</div>
+                <div style={{ fontSize: 10.5, color: '#64748b', marginBottom: 2 }}>Step {step.step}</div>
                 <div style={{ fontSize: 12.5, fontWeight: 600, color: '#1a1628' }}>{step.label}</div>
               </div>
               {i < CLAIM_STEPS.length - 1 && (

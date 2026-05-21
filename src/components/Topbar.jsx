@@ -98,7 +98,7 @@ function HamburgerIcon() {
 }
 function SearchIcon() {
   return (
-    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#9d94b8" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#64748b" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
       <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
     </svg>
   )
@@ -130,7 +130,7 @@ const S = {
   iconBtn:    { width: 36, height: 36, borderRadius: 6, border: '1.5px solid #e8e4f0', background: '#faf9fc', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative' },
   dot:        { position: 'absolute', top: 4, right: 4, width: 7, height: 7, borderRadius: '50%', border: '1.5px solid #fff' },
   userPill:   { display: 'flex', alignItems: 'center', gap: 10, padding: '4px 10px 4px 4px', border: '1.5px solid #e8e4f0', borderRadius: 10, background: '#faf9fc', cursor: 'pointer', marginLeft: 4, userSelect: 'none' },
-  avatar:     { width: 32, height: 32, borderRadius: 6, background: '#7c3aed', color: '#fff', fontSize: 12, fontWeight: 600, display: 'flex', alignItems: 'center', justifyContent: 'center' },
+  avatar:     { width: 32, height: 32, borderRadius: 6, background: '#a855f7', color: '#fff', fontSize: 12, fontWeight: 600, display: 'flex', alignItems: 'center', justifyContent: 'center' },
   userInfo:   { display: 'flex', flexDirection: 'column', lineHeight: 1.2 },
   userName:   { fontSize: 13, fontWeight: 500, color: '#1a1628' },
   userRole:   { fontSize: 11, color: 'var(--text-3)', maxWidth: 180, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' },

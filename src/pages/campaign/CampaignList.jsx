@@ -67,7 +67,7 @@ export default function CampaignList() {
     { key: 'status', label: 'Status', render: row => <StatusBadge status={row.status} /> },
     { key: 'actions', label: 'Actions',
       render: row => (
-        <Button variant="secondary" size="sm" onClick={() => navigate(`/campaign/${row.id}/edit`)}>Edit</Button>
+        <button type="button" onClick={() => navigate(`/campaign/${row.id}/edit`)} title="Edit" style={{ background: 'linear-gradient(135deg,#fb7185,#a855f7)', border: 'none', borderRadius: 6, cursor: 'pointer', padding: '5px 6px', color: '#fff', display: 'inline-flex', alignItems: 'center', boxShadow: '0 2px 6px rgba(168,85,247,.30)' }}><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"/></svg></button>
       )},
   ]
 
@@ -79,24 +79,35 @@ export default function CampaignList() {
 
       <div className="card">
         <div className="card-body">
-          <div className="filter-bar">
-            <input className="field-input filter-search" placeholder="Search by campaign name…"
-              value={search} onChange={e => handle(setSearch)(e.target.value)} />
-            <select className="field-select" style={{ width: 160 }} value={statusFilter} onChange={e => handle(setStatus)(e.target.value)}>
-              <option value="">All Status</option>
-              <option>Active</option>
-              <option>Completed</option>
-              <option>Scheduled</option>
-              <option>Closed</option>
-              <option>Inactive</option>
-            </select>
-            <select className="field-select" style={{ width: 150 }} value={openFilter} onChange={e => handle(setOpen)(e.target.value)}>
-              <option value="">Open / Closed</option>
-              <option value="true">Open</option>
-              <option value="false">Closed</option>
-            </select>
+          <div style={{ display: 'flex', gap: 14, alignItems: 'flex-end', marginBottom: 18, flexWrap: 'wrap' }}>
+            <div style={{ flex: '1 1 220px' }}>
+              <label style={{ display: 'block', fontSize: 11.5, fontWeight: 700, color: '#64748b', marginBottom: 5, textTransform: 'uppercase', letterSpacing: '.4px' }}>Campaign Name</label>
+              <input className="field-input filter-search" style={{ width: '100%' }} placeholder="Search by campaign name…"
+                value={search} onChange={e => handle(setSearch)(e.target.value)} />
+            </div>
+            <div style={{ flex: '0 0 160px' }}>
+              <label style={{ display: 'block', fontSize: 11.5, fontWeight: 700, color: '#64748b', marginBottom: 5, textTransform: 'uppercase', letterSpacing: '.4px' }}>Status</label>
+              <select className="field-select" style={{ width: '100%' }} value={statusFilter} onChange={e => handle(setStatus)(e.target.value)}>
+                <option value="">All Status</option>
+                <option>Active</option>
+                <option>Completed</option>
+                <option>Scheduled</option>
+                <option>Closed</option>
+                <option>Inactive</option>
+              </select>
+            </div>
+            <div style={{ flex: '0 0 150px' }}>
+              <label style={{ display: 'block', fontSize: 11.5, fontWeight: 700, color: '#64748b', marginBottom: 5, textTransform: 'uppercase', letterSpacing: '.4px' }}>Visibility</label>
+              <select className="field-select" style={{ width: '100%' }} value={openFilter} onChange={e => handle(setOpen)(e.target.value)}>
+                <option value="">Open / Closed</option>
+                <option value="true">Open</option>
+                <option value="false">Closed</option>
+              </select>
+            </div>
             {(search || statusFilter || openFilter) && (
-              <Button variant="ghost" size="sm" onClick={() => { handle(setSearch)(''); handle(setStatus)(''); handle(setOpen)('') }}>Clear</Button>
+              <div style={{ paddingBottom: 1 }}>
+                <Button variant="ghost" size="sm" onClick={() => { handle(setSearch)(''); handle(setStatus)(''); handle(setOpen)('') }}>Clear</Button>
+              </div>
             )}
           </div>
 

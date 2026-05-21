@@ -143,7 +143,7 @@ function DealCard({ deal, navigate }) {
       <div style={{ borderTop:`1px solid ${deal.border}`, padding:'12px 20px', display:'flex', justifyContent:'space-between', alignItems:'center' }}>
         <div>
           <span style={{ fontSize:20, fontWeight:900, color:deal.color }}>{deal.price}</span>
-          <span style={{ fontSize:11.5, color:'#9d94b8' }}> {deal.period}</span>
+          <span style={{ fontSize:11.5, color:'#64748b' }}> {deal.period}</span>
         </div>
         <button onClick={e => { e.stopPropagation(); navigate(deal.path) }}
           style={{ padding:'8px 16px', borderRadius:9, border:'none', background:deal.color, color:'#fff', fontWeight:700, fontSize:12.5, cursor:'pointer', fontFamily:'inherit' }}>
@@ -183,7 +183,7 @@ function DealsCarousel({ deals, navigate }) {
       <div style={{ display:'flex', justifyContent:'space-between', alignItems:'flex-end', marginBottom:16 }}>
         <div>
           <div style={{ fontSize:18, fontWeight:800, color:'#1a1628' }}>Featured Deals &amp; Offers</div>
-          <div style={{ fontSize:13, color:'#9d94b8', marginTop:3 }}>
+          <div style={{ fontSize:13, color:'#64748b', marginTop:3 }}>
             Advisor-recommended plans · Best prices guaranteed
           </div>
         </div>
@@ -349,7 +349,7 @@ export default function CustomerPortal() {
         <div style={{ display:'flex', justifyContent:'space-between', alignItems:'flex-end', marginBottom:14 }}>
           <div>
             <div style={{ fontSize:18, fontWeight:800, color:'#1a1628' }}>What Would You Like to Insure?</div>
-            <div style={{ fontSize:13, color:'#9d94b8', marginTop:3 }}>Click any category to compare plans instantly</div>
+            <div style={{ fontSize:13, color:'#64748b', marginTop:3 }}>Click any category to compare plans instantly</div>
           </div>
           <button onClick={() => navigate('/policy-catalogue')} style={{ fontSize:13, color:'#2d7d46', fontWeight:700, background:'none', border:'none', cursor:'pointer', fontFamily:'inherit' }}>
             All Plans →
@@ -365,7 +365,7 @@ export default function CustomerPortal() {
               {t.badge && <div style={{ position:'absolute', top:-1, right:-1, background:t.color, color:'#fff', fontSize:8.5, fontWeight:800, padding:'2px 6px', borderRadius:'0 12px 0 6px', letterSpacing:.5 }}>{t.badge}</div>}
               <div style={{ fontSize:26, marginBottom:8 }}>{t.icon}</div>
               <div style={{ fontSize:12, fontWeight:700, color: hovered===t.id ? t.color : '#1a1628' }}>{t.label}</div>
-              <div style={{ fontSize:10.5, color:'#9d94b8', marginTop:3, lineHeight:1.3 }}>{t.sub}</div>
+              <div style={{ fontSize:10.5, color:'#64748b', marginTop:3, lineHeight:1.3 }}>{t.sub}</div>
             </div>
           ))}
         </div>
@@ -396,7 +396,7 @@ export default function CustomerPortal() {
               <div style={{ textAlign:'center', padding:'40px 0' }}>
                 <div style={{ fontSize:42, marginBottom:12 }}>🛡️</div>
                 <div style={{ fontSize:15, fontWeight:700, color:'#1a1628', marginBottom:6 }}>No policies yet</div>
-                <div style={{ fontSize:13, color:'#9d94b8', marginBottom:20, maxWidth:300, margin:'0 auto 20px' }}>Protect yourself and your family with the right insurance plan today.</div>
+                <div style={{ fontSize:13, color:'#64748b', marginBottom:20, maxWidth:300, margin:'0 auto 20px' }}>Protect yourself and your family with the right insurance plan today.</div>
                 <button type="button" className="btn btn-primary" style={{ fontSize:13.5, padding:'10px 24px' }} onClick={() => navigate('/policy/buy')}>Buy Your First Policy</button>
               </div>
             ) : myPolicies.map((p, i) => {
@@ -407,7 +407,7 @@ export default function CustomerPortal() {
                   <div style={{ display:'flex', justifyContent:'space-between', alignItems:'flex-start', marginBottom:10 }}>
                     <div>
                       <div style={{ fontWeight:700, fontSize:14, color:'#1a1628', marginBottom:2 }}>{p.product}</div>
-                      <div style={{ fontSize:11.5, color:'#9d94b8' }}>{p.icName} · {p.policyNo || p.proposalId}</div>
+                      <div style={{ fontSize:11.5, color:'#64748b' }}>{p.icName} · {p.policyNo || p.proposalId}</div>
                     </div>
                     <span style={{ padding:'3px 10px', borderRadius:99, fontSize:11.5, fontWeight:600, background: p.status==='Active'?'#e6f4ea':p.status==='Pending'?'#fff3e0':'#fce8e6', color: p.status==='Active'?'#2d7d46':p.status==='Pending'?'#a05c00':'#c0392b' }}>
                       {p.status}
@@ -416,7 +416,7 @@ export default function CustomerPortal() {
                   <div className="cp-pol-details" style={{ display:'grid', gridTemplateColumns:'repeat(4,1fr)', gap:10 }}>
                     {[['Type',p.type],['Sum Insured',p.sumInsured],['Premium',`₹${p.premium?.toLocaleString()}/yr`],['Valid Until',fmtDate(p.endDate)]].map(([k,v]) => (
                       <div key={k}>
-                        <div style={{ fontSize:10.5, color:'#9d94b8', marginBottom:2 }}>{k}</div>
+                        <div style={{ fontSize:10.5, color:'#64748b', marginBottom:2 }}>{k}</div>
                         <div style={{ fontSize:12.5, fontWeight:600, color:'#1a1628' }}>{v}</div>
                       </div>
                     ))}
@@ -467,7 +467,7 @@ export default function CustomerPortal() {
             <div className="card-body" style={{ textAlign:'center' }}>
               <div style={{ fontSize:24, marginBottom:8 }}>🤝</div>
               <div style={{ fontSize:13.5, fontWeight:700, color:'#1a1628', marginBottom:4 }}>Need Expert Advice?</div>
-              <div style={{ fontSize:12, color:'#9d94b8', marginBottom:14, lineHeight:1.5 }}>Talk to our IRDAI-certified advisors for free</div>
+              <div style={{ fontSize:12, color:'#64748b', marginBottom:14, lineHeight:1.5 }}>Talk to our IRDAI-certified advisors for free</div>
               <button style={{ width:'100%', padding:'9px', borderRadius:8, border:'1.5px solid #2d7d46', background:'#e6f4ea', color:'#2d7d46', fontWeight:700, fontSize:13, cursor:'pointer', fontFamily:'inherit' }}>
                 📞 Call Us Free
               </button>
@@ -482,7 +482,7 @@ export default function CustomerPortal() {
       ══════════════════════════════════════════════════ */}
       <div style={{ marginBottom:24 }}>
         <div style={{ fontSize:18, fontWeight:800, color:'#1a1628', marginBottom:4 }}>What Our Customers Say</div>
-        <div style={{ fontSize:13, color:'#9d94b8', marginBottom:14 }}>Trusted by 50,000+ policyholders across India</div>
+        <div style={{ fontSize:13, color:'#64748b', marginBottom:14 }}>Trusted by 50,000+ policyholders across India</div>
         <div className="cp-testimonials" style={{ display:'grid', gridTemplateColumns:'repeat(3,1fr)', gap:14 }}>
           {TESTIMONIALS.map((t, i) => (
             <div key={i} style={{ background:'#fff', border:'1px solid #e8e4f0', borderRadius:12, padding:'18px 20px' }}>
@@ -493,7 +493,7 @@ export default function CustomerPortal() {
                   </div>
                   <div>
                     <div style={{ fontSize:13.5, fontWeight:700, color:'#1a1628' }}>{t.name}</div>
-                    <div style={{ fontSize:11.5, color:'#9d94b8' }}>{t.city}</div>
+                    <div style={{ fontSize:11.5, color:'#64748b' }}>{t.city}</div>
                   </div>
                 </div>
                 <span style={{ fontSize:10.5, background:'#e6f4ea', color:'#2d7d46', padding:'2px 8px', borderRadius:99, fontWeight:600 }}>{t.policy}</span>
@@ -513,7 +513,7 @@ export default function CustomerPortal() {
           <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:20 }}>
             <div>
               <div style={{ fontSize:15, fontWeight:700, color:'#1a1628' }}>How to File a Claim</div>
-              <div style={{ fontSize:12.5, color:'#9d94b8', marginTop:2 }}>Simple 4-step process · 24×7 helpline: 1800-XXX-XXXX</div>
+              <div style={{ fontSize:12.5, color:'#64748b', marginTop:2 }}>Simple 4-step process · 24×7 helpline: 1800-XXX-XXXX</div>
             </div>
             <button type="button" className="btn btn-ghost" style={{ fontSize:12.5, padding:'6px 14px' }} onClick={() => navigate('/policy')}>
               Start Claim →
@@ -532,7 +532,7 @@ export default function CustomerPortal() {
                   {step.icon}
                 </div>
                 <div style={{ fontSize:12.5, fontWeight:700, color:'#1a1628', marginBottom:4 }}>{step.label}</div>
-                <div style={{ fontSize:11.5, color:'#9d94b8', lineHeight:1.5 }}>{step.desc}</div>
+                <div style={{ fontSize:11.5, color:'#64748b', lineHeight:1.5 }}>{step.desc}</div>
               </div>
             ))}
           </div>

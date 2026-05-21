@@ -3,7 +3,7 @@ import { useAuth } from '../../context/AuthContext'
 
 // ── Sales agent (Ravi Kulkarni) data ─────────────────────────────────────────
 const SALES_STATS = [
-  { label: 'My Customers',    value: '8', sub: '+3 this month',       color: '#7c3aed', bg: '#f5f3ff' },
+  { label: 'My Customers',    value: '8', sub: '+3 this month',       color: '#a855f7', bg: '#f5f3ff' },
   { label: 'Policies Issued', value: '5', sub: 'This financial year', color: '#2d7d46', bg: '#e6f4ea' },
   { label: 'CRM Leads',       value: '8', sub: '3 interested',        color: '#0a7ea4', bg: '#e0f4fb' },
 ]
@@ -23,7 +23,7 @@ const SALES_RECENT_CUSTOMERS = [
 
 // ── Calling agent (Pooja Desai) data ─────────────────────────────────────────
 const CALLING_STATS = [
-  { label: 'Leads Claimed',    value: '38', sub: '+2 this month',       color: '#7c3aed', bg: '#f5f3ff' },
+  { label: 'Leads Claimed',    value: '38', sub: '+2 this month',       color: '#a855f7', bg: '#f5f3ff' },
   { label: 'Converted',        value: '27', sub: 'This financial year', color: '#2d7d46', bg: '#e6f4ea' },
   { label: 'Active Campaigns', value: '3',  sub: '7 interested leads',  color: '#0a7ea4', bg: '#e0f4fb' },
 ]
@@ -41,7 +41,7 @@ const CALLING_RECENT_CUSTOMERS = [
 ]
 
 const QUICK_ACTIONS = [
-  { label: 'Add Customer', path: '/customer/create', color: '#7c3aed', bg: '#f5f3ff' },
+  { label: 'Add Customer', path: '/customer/create', color: '#a855f7', bg: '#f5f3ff' },
   { label: 'Buy Policy',   path: '/policy/buy',      color: '#2d7d46', bg: '#e6f4ea' },
   { label: 'CRM',          path: '/crm',             color: '#0a7ea4', bg: '#e0f4fb' },
 ]
@@ -60,10 +60,10 @@ export default function AgentPortal() {
     <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
 
       {/* Welcome banner */}
-      <div className="ap-banner" style={{ background: 'linear-gradient(135deg,#0a7ea4 0%,#065f82 100%)', borderRadius: 14, padding: '28px 32px', color: '#fff' }}>
-        <div style={{ fontSize: 13, color: '#bae6fd', marginBottom: 6, fontWeight: 500 }}>Agent Portal</div>
-        <div className="ap-banner-title" style={{ fontSize: 24, fontWeight: 800, marginBottom: 4 }}>Welcome back, {user?.name} 👋</div>
-        <div style={{ fontSize: 13.5, color: '#e0f2fe' }}>{user?.company}</div>
+      <div className="ap-banner" style={{ background: 'linear-gradient(135deg,#fb7185 0%,#a855f7 100%)', borderRadius: 14, padding: '28px 32px', color: '#fff' }}>
+        <div style={{ fontSize: 13, color: 'rgba(255,255,255,0.75)', marginBottom: 6, fontWeight: 500 }}>Agent Portal</div>
+        <div className="ap-banner-title" style={{ fontSize: 24, fontWeight: 800, marginBottom: 4 }}>Welcome back, {user?.name}</div>
+        <div style={{ fontSize: 13.5, color: 'rgba(255,255,255,0.88)' }}>{user?.company}</div>
       </div>
 
       {/* Stats */}
@@ -72,7 +72,7 @@ export default function AgentPortal() {
           <div key={s.label} style={{ background: '#fff', border: '1px solid #e8e4f0', borderRadius: 12, padding: '20px 22px' }}>
             <div style={{ fontSize: 28, fontWeight: 800, color: s.color }}>{s.value}</div>
             <div style={{ fontSize: 13.5, fontWeight: 600, color: '#1a1628', marginTop: 4 }}>{s.label}</div>
-            <div style={{ fontSize: 12, color: '#9d94b8', marginTop: 2 }}>{s.sub}</div>
+            <div style={{ fontSize: 12, color: '#64748b', marginTop: 2 }}>{s.sub}</div>
           </div>
         ))}
       </div>
@@ -113,9 +113,9 @@ export default function AgentPortal() {
                       {c.status}
                     </span>
                   </div>
-                  <div style={{ fontSize: 12, color: '#9d94b8' }}>{c.policy}</div>
+                  <div style={{ fontSize: 12, color: '#64748b' }}>{c.policy}</div>
                   {c.renewal !== '—' && (
-                    <div style={{ fontSize: 11.5, color: '#9d94b8', marginTop: 2 }}>Renewal: {c.renewal}</div>
+                    <div style={{ fontSize: 11.5, color: '#64748b', marginTop: 2 }}>Renewal: {c.renewal}</div>
                   )}
                 </div>
               ))}
@@ -131,7 +131,7 @@ export default function AgentPortal() {
                   {RECENT_CUSTOMERS.map(c => (
                     <tr key={c.name}>
                       <td style={{ fontWeight: 500 }}>{c.name}</td>
-                      <td style={{ color: '#9d94b8', maxWidth: 120, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{c.policy}</td>
+                      <td style={{ color: '#64748b', maxWidth: 120, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{c.policy}</td>
                       <td>{c.renewal}</td>
                       <td>
                         <span style={{ padding: '2px 9px', borderRadius: 99, fontSize: 11.5, fontWeight: 600, background: c.status === 'Active' ? '#e6f4ea' : c.status === 'Renewal' ? '#fff3e0' : '#f1f3f4', color: c.status === 'Active' ? '#2d7d46' : c.status === 'Renewal' ? '#a05c00' : '#5f6368' }}>
@@ -155,7 +155,7 @@ export default function AgentPortal() {
                 <div key={c.name} style={{ padding: '12px 14px', border: '1px solid #e8e4f0', borderRadius: 10, background: '#faf9fc' }}>
                   <div style={{ fontWeight: 600, fontSize: 13.5, marginBottom: 6 }}>{c.name}</div>
                   <div style={{ display: 'flex', gap: 16, fontSize: 12, flexWrap: 'wrap' }}>
-                    <span style={{ color: '#9d94b8' }}>{c.type}</span>
+                    <span style={{ color: '#64748b' }}>{c.type}</span>
                     <span style={{ color: '#0a7ea4', fontWeight: 500 }}>{c.leads} Leads</span>
                     <span style={{ color: '#2d7d46', fontWeight: 500 }}>{c.purchased} Purchased</span>
                   </div>

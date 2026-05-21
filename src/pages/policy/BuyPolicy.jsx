@@ -194,12 +194,12 @@ const CUSTOMERS = [
 
 
 const STEPS = [
-  "Select Customer",
-  "Select Product",
+  "Customer",
+  "Product",
   "Members",
   "Proposal",
   "Payment",
-  "Policy Issued",
+  "Policy",
 ];
 
 const FAMILY_SLOTS = [
@@ -228,7 +228,7 @@ function Avatar({ name, size = 40, fontSize = 16 }) {
         .slice(0, 2)
         .join("")
     : "?";
-  const colors = ["#7c3aed", "#2563eb", "#059669", "#d97706", "#dc2626"];
+  const colors = ["#a855f7", "#2563eb", "#059669", "#d97706", "#dc2626"];
   const color = colors[(name?.charCodeAt(0) ?? 0) % colors.length];
   return (
     <div
@@ -258,14 +258,15 @@ function CustomerStrip({ customer, onChangeCustomer, canChange = true }) {
   return (
     <div className="bp-cust-strip" style={{
       display: "flex", alignItems: "center", gap: 14, flexWrap: "wrap",
-      background: "linear-gradient(135deg, #fb7185 0%, #a855f7 100%)",
+      background: "#fff",
       borderRadius: "var(--r-lg)", padding: "13px 18px", marginBottom: 20,
-      boxShadow: "0 4px 16px rgba(168,85,247,.30)",
+      boxShadow: "0 1px 4px rgba(0,0,0,.07), 0 4px 16px rgba(0,0,0,.05)",
+      border: "1px solid var(--border)",
     }}>
-      {/* Avatar with white ring */}
+      {/* Avatar */}
       <div style={{
         width: 42, height: 42, borderRadius: "50%", flexShrink: 0,
-        background: "rgba(255,255,255,.18)", border: "2px solid rgba(255,255,255,.5)",
+        background: "linear-gradient(135deg, #fb7185 0%, #a855f7 100%)",
         display: "flex", alignItems: "center", justifyContent: "center",
         fontSize: 15, fontWeight: 800, color: "#fff",
       }}>
@@ -275,16 +276,17 @@ function CustomerStrip({ customer, onChangeCustomer, canChange = true }) {
       {/* Info */}
       <div style={{ flex: 1, minWidth: 0 }}>
         <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
-          <span style={{ fontWeight: 700, fontSize: 14.5, color: "#fff" }}>{customer.name}</span>
+          <span style={{ fontWeight: 700, fontSize: 14.5, color: "#1e293b" }}>{customer.name}</span>
           <span style={{
             fontSize: 11, fontWeight: 700, padding: "2px 8px", borderRadius: 20,
-            background: "rgba(255,255,255,.15)", color: kycColor,
+            background: customer.kyc === "Verified" ? "#dcfce7" : customer.kyc === "Pending" ? "#fef3c7" : "#fee2e2",
+            color: kycColor,
             border: `1px solid ${kycColor}55`,
           }}>
             {customer.kyc === "Verified" ? "✓" : "●"} {customer.kyc}
           </span>
         </div>
-        <div className="bp-cust-detail" style={{ fontSize: 12, color: "rgba(255,255,255,.9)", marginTop: 3, display: "flex", gap: 10, flexWrap: "wrap" }}>
+        <div className="bp-cust-detail" style={{ fontSize: 12, color: "#64748b", marginTop: 3, display: "flex", gap: 10, flexWrap: "wrap" }}>
           <span>📱 {customer.mobile}</span>
           <span className="bp-cust-email">✉ {customer.email}</span>
         </div>
@@ -297,10 +299,10 @@ function CustomerStrip({ customer, onChangeCustomer, canChange = true }) {
             onClick={onChangeCustomer}
             style={{
               height: 34, padding: "0 16px", borderRadius: 8, cursor: "pointer",
-              background: "#fff", border: "none",
-              color: "#4c1d95", fontSize: 13, fontWeight: 700, fontFamily: "inherit",
+              background: "linear-gradient(135deg,#fb7185 0%,#a855f7 100%)", border: "none",
+              color: "#fff", fontSize: 13, fontWeight: 700, fontFamily: "inherit",
               transition: "opacity .15s",
-              boxShadow: "0 2px 6px rgba(0,0,0,.15)",
+              boxShadow: "0 2px 8px rgba(168,85,247,.30)",
             }}
             onMouseEnter={e => e.currentTarget.style.opacity = ".85"}
             onMouseLeave={e => e.currentTarget.style.opacity = "1"}
@@ -817,7 +819,7 @@ export default function BuyPolicy() {
                       borderRadius: 14, overflow: "hidden",
                       border: `2px solid ${isSelected ? "var(--brand)" : isRejected ? "#fecdd3" : "var(--border)"}`,
                       background: isSelected ? "#f5f3ff" : isRejected ? "#fff8f8" : "#fff",
-                      boxShadow: isSelected ? "0 4px 16px rgba(124,58,237,.18)" : "0 1px 4px rgba(0,0,0,.06)",
+                      boxShadow: isSelected ? "0 4px 16px rgba(168,85,247,.18)" : "0 1px 4px rgba(0,0,0,.06)",
                       transition: "all .14s",
                       padding: 0,
                     }}
@@ -859,20 +861,20 @@ export default function BuyPolicy() {
             position: "sticky", bottom: 0, zIndex: 20,
             marginTop: 16, padding: "13px 18px",
             background: selectedCustomer
-              ? "linear-gradient(135deg, #4c1d95 0%, #7c3aed 100%)"
+              ? "linear-gradient(135deg, #fb7185 0%, #a855f7 100%)"
               : "#fff",
             border: `1.5px solid ${selectedCustomer ? "transparent" : "var(--border)"}`,
             borderRadius: 12, transition: "all .2s",
             boxShadow: selectedCustomer
-              ? "0 -4px 24px rgba(76,29,149,.35)"
+              ? "0 -4px 24px rgba(168,85,247,.30)"
               : "0 -2px 12px rgba(0,0,0,.06)",
             display: "flex", alignItems: "center", justifyContent: "flex-end",
           }}>
             <Button disabled={!selectedCustomer} onClick={next} style={{
               minWidth: 260,
               ...(selectedCustomer ? {
-                background: "#fff", color: "#4c1d95",
-                boxShadow: "0 2px 8px rgba(0,0,0,.15)",
+                background: "#fff", color: "#a855f7",
+                boxShadow: "0 2px 8px rgba(0,0,0,.12)",
               } : {}),
             }}>
               Continue with {selectedCustomer ? selectedCustomer.name : "selected customer"} →
@@ -887,8 +889,8 @@ export default function BuyPolicy() {
       {step === 2 && (
         <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
           <div>
-            <div style={{ fontWeight: 700, fontSize: 15, color: "var(--text)" }}>Member Details &amp; Premium</div>
-            <div style={{ fontSize: 13, color: "var(--text-3)", marginTop: 2 }}>
+            <div style={{ fontSize: 20, fontWeight: 800, background: "linear-gradient(135deg,#fb7185,#a855f7)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text" }}>Member Details &amp; Premium</div>
+            <div style={{ fontSize: 13.5, color: "var(--text-2)", marginTop: 3, fontWeight: 500 }}>
               Select coverage type for each product — member details will appear based on your selection
             </div>
           </div>
@@ -925,7 +927,7 @@ export default function BuyPolicy() {
                     <div style={{ display: "flex", alignItems: "center", gap: 10, padding: "12px 16px", background: "var(--surface-2)", borderBottom: "1px solid var(--border)" }}>
                       <div style={{ width: 34, height: 34, borderRadius: 8, background: "#fff", border: "1px solid var(--border)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 17, flexShrink: 0 }}>{icon}</div>
                       <div style={{ flex: 1, minWidth: 0 }}>
-                        <div style={{ fontWeight: 700, fontSize: 13.5, color: "var(--text)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{p.name}</div>
+                        <div style={{ fontWeight: 800, fontSize: 13.5, color: "#7c3aed", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{p.name}</div>
                         <div style={{ fontSize: 11.5, color: "var(--text-3)" }}>{p.provider} · <span style={{ fontFamily: "monospace" }}>{p.code}</span></div>
                       </div>
                     </div>
@@ -1130,8 +1132,8 @@ export default function BuyPolicy() {
                   style={{
                     flexShrink: 0, minWidth: 200,
                     ...(hasPremium ? {
-                      background: "#fff", color: "#4c1d95", fontWeight: 700,
-                      boxShadow: "0 2px 8px rgba(0,0,0,.15)",
+                      background: "#fff", color: "#a855f7", fontWeight: 700,
+                      boxShadow: "0 2px 8px rgba(0,0,0,.12)",
                     } : {}),
                   }}
                 >
@@ -1152,8 +1154,8 @@ export default function BuyPolicy() {
 
           <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 16, flexWrap: "wrap", gap: 8 }}>
             <div>
-              <div style={{ fontSize: 15, fontWeight: 700, color: "var(--text)" }}>Select Products</div>
-              <div style={{ fontSize: 13, color: "var(--text-3)", marginTop: 2 }}>Click a card to select, then view full details before continuing</div>
+              <div style={{ fontSize: 20, fontWeight: 800, background: "linear-gradient(135deg,#fb7185,#a855f7)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text" }}>Select Products</div>
+              <div style={{ fontSize: 13.5, color: "var(--text-2)", marginTop: 3, fontWeight: 500 }}>Click a card to select, then view full details before continuing</div>
             </div>
             {cart.length > 0 && (
               <span style={{ fontSize: 13, fontWeight: 700, color: "#fff", background: "var(--brand-dark)", borderRadius: 20, padding: "4px 14px" }}>
@@ -1181,7 +1183,7 @@ export default function BuyPolicy() {
                   <div key={p.id} style={{
                     borderRadius: 12, overflow: "hidden", background: "#fff",
                     border: `1.5px solid ${inCart ? "var(--brand)" : "var(--border)"}`,
-                    boxShadow: inCart ? "0 2px 12px rgba(124,58,237,.10)" : "0 1px 4px rgba(0,0,0,.05)",
+                    boxShadow: inCart ? "0 2px 12px rgba(168,85,247,.10)" : "0 1px 4px rgba(0,0,0,.05)",
                     transition: "border-color .15s, box-shadow .15s",
                     cursor: "pointer",
                   }}
@@ -1195,8 +1197,8 @@ export default function BuyPolicy() {
                         style={{ width: 16, height: 16, cursor: "pointer", accentColor: "var(--brand)", flexShrink: 0 }} />
                       <div style={{ width: 36, height: 36, borderRadius: 9, flexShrink: 0, background: "var(--surface-2)", border: "1px solid var(--border)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18 }}>{icon}</div>
                       <div style={{ flex: 1, minWidth: 0 }}>
-                        <div style={{ fontWeight: 700, fontSize: 13, color: "var(--text)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{p.name}</div>
-                        <div style={{ fontSize: 11.5, color: "var(--text-3)", marginTop: 2, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{p.provider}</div>
+                        <div style={{ fontWeight: 800, fontSize: 14, color: "#7c3aed", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", letterSpacing: "-.1px" }}>{p.name}</div>
+                        <div style={{ fontSize: 12, color: "var(--text-3)", marginTop: 2, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", fontWeight: 500 }}>{p.provider}</div>
                       </div>
                       {inCart && <div style={{ width: 22, height: 22, borderRadius: "50%", background: "var(--brand)", color: "#fff", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 11, fontWeight: 700, flexShrink: 0 }}>✓</div>}
                     </div>
@@ -1233,8 +1235,8 @@ export default function BuyPolicy() {
                     {/* Footer */}
                     <div style={{ padding: "9px 14px", borderTop: "1px solid var(--border)", display: "flex", justifyContent: "flex-end" }} onClick={e => e.stopPropagation()}>
                       <button
-                        className="btn btn-ghost btn-sm"
-                        style={{ fontSize: 12 }}
+                        className="btn btn-sm"
+                        style={{ fontSize: 12, border: "1.5px solid #a855f7", color: "#7c3aed", background: "#faf5ff", fontWeight: 600 }}
                         onClick={e => { e.stopPropagation(); setViewingProduct(p); }}
                       >
                         View Details →
@@ -1252,25 +1254,25 @@ export default function BuyPolicy() {
             display: "flex", alignItems: "center", justifyContent: "space-between",
             gap: 16, padding: "14px 20px",
             background: cart.length > 0
-              ? "linear-gradient(135deg, #4c1d95 0%, #7c3aed 100%)"
+              ? "linear-gradient(135deg, #fb7185 0%, #a855f7 100%)"
               : "#fff",
             border: `2px solid ${cart.length > 0 ? "transparent" : "var(--border)"}`,
             borderRadius: 12, transition: "all .2s",
             boxShadow: cart.length > 0
-              ? "0 -4px 24px rgba(76,29,149,.35)"
+              ? "0 -4px 24px rgba(168,85,247,.30)"
               : "0 -2px 12px rgba(0,0,0,.06)",
           }}>
-            <div style={{ fontSize: 13.5, color: cart.length > 0 ? "rgba(255,255,255,.75)" : "var(--text-3)" }}>
+            <div style={{ fontSize: 13.5, color: cart.length > 0 ? "#fff" : "var(--text-3)", fontWeight: 500 }}>
               {cart.length === 0
                 ? "Select at least one product to continue"
-                : <><strong style={{ color: "#fff", fontWeight: 700 }}>{cart.length} product{cart.length > 1 ? "s" : ""}</strong> selected — choose premium details on next screen</>
+                : <><strong style={{ color: "#fff", fontWeight: 800 }}>{cart.length} product{cart.length > 1 ? "s" : ""}</strong> selected — choose premium details on next screen</>
               }
             </div>
             <button className="btn btn-primary" disabled={cart.length === 0} onClick={next} style={{
               flexShrink: 0, minWidth: 140,
               ...(cart.length > 0 ? {
-                background: "#fff", color: "#4c1d95", fontWeight: 700,
-                boxShadow: "0 2px 8px rgba(0,0,0,.15)",
+                background: "#fff", color: "#a855f7", fontWeight: 700,
+                boxShadow: "0 2px 8px rgba(0,0,0,.12)",
               } : {}),
             }}>
               Continue →
@@ -1288,7 +1290,7 @@ export default function BuyPolicy() {
         const inCart    = !!cart.find(x => x.id === p.id);
 
         const sectionHead = (text) => (
-          <div style={{ fontSize: 11, fontWeight: 700, color: "var(--brand)", textTransform: "uppercase", letterSpacing: ".6px", marginBottom: 10, display: "flex", alignItems: "center", gap: 6 }}>
+          <div style={{ fontSize: 11, fontWeight: 700, color: "#a855f7", textTransform: "uppercase", letterSpacing: ".6px", marginBottom: 10, display: "flex", alignItems: "center", gap: 6 }}>
             <div style={{ flex: 1, height: 1, background: "var(--border)" }} />
             <span>{text}</span>
             <div style={{ flex: 1, height: 1, background: "var(--border)" }} />
@@ -1305,7 +1307,7 @@ export default function BuyPolicy() {
               onClick={e => e.stopPropagation()}
             >
               {/* ── Hero header ── */}
-              <div style={{ background: "linear-gradient(135deg, var(--brand) 0%, #4f46e5 100%)", padding: "22px 24px 20px", color: "#fff", flexShrink: 0 }}>
+              <div style={{ background: "linear-gradient(135deg, #fb7185 0%, #a855f7 100%)", padding: "22px 24px 20px", color: "#fff", flexShrink: 0 }}>
                 <div style={{ display: "flex", alignItems: "flex-start", gap: 14 }}>
                   <div style={{ width: 48, height: 48, borderRadius: 13, background: "rgba(255,255,255,.18)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 24, flexShrink: 0 }}>{icon}</div>
                   <div style={{ flex: 1, minWidth: 0 }}>
@@ -1353,7 +1355,7 @@ export default function BuyPolicy() {
                       <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
                         {details.target.map((t, i) => (
                           <div key={i} style={{ display: "flex", alignItems: "flex-start", gap: 8, fontSize: 13, color: "var(--text-2)" }}>
-                            <span style={{ color: "var(--brand)", fontWeight: 700, flexShrink: 0, marginTop: 1 }}>→</span>
+                            <span style={{ color: "#a855f7", fontWeight: 700, flexShrink: 0, marginTop: 1 }}>→</span>
                             <span>{t}</span>
                           </div>
                         ))}
@@ -1449,17 +1451,17 @@ export default function BuyPolicy() {
               </div>
 
               {/* ── Sticky CTA footer ── */}
-              <div style={{ padding: "14px 24px", borderTop: "1px solid var(--border)", background: "#fff", flexShrink: 0, display: "flex", gap: 10 }}>
+              <div style={{ padding: "14px 24px", borderTop: "1px solid var(--border)", background: "#fff", flexShrink: 0, display: "flex", gap: 10, alignItems: "center", justifyContent: "flex-end" }}>
                 <button
                   className="btn btn-ghost"
-                  style={{ flex: 1 }}
+                  style={{ height: 44, fontSize: 14, fontWeight: 600, minWidth: 110, justifyContent: "center" }}
                   onClick={() => setViewingProduct(null)}
                 >
                   Close
                 </button>
                 <button
                   className={`btn ${inCart ? "btn-ghost" : "btn-primary"}`}
-                  style={{ flex: 2 }}
+                  style={{ height: 44, fontSize: 14, fontWeight: 600, minWidth: 200, justifyContent: "center" }}
                   onClick={() => { toggleCart(p); setViewingProduct(null); }}
                 >
                   {inCart ? "✓ Selected — Remove from Cart" : "＋ Add to Cart"}
@@ -1489,7 +1491,7 @@ export default function BuyPolicy() {
                 <div style={{ display: "flex", alignItems: "center", gap: 8, minWidth: 0 }}>
                   <span style={{ fontSize: 16, flexShrink: 0 }}>{POLICY_TYPE_ICON[p.policyType] ?? "📋"}</span>
                   <div style={{ minWidth: 0 }}>
-                    <div style={{ fontWeight: 600, color: "#111827", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{p.name}</div>
+                    <div style={{ fontWeight: 700, color: "#7c3aed", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{p.name}</div>
                     <div style={{ fontSize: 11, color: "var(--text-3)" }}>
                       {p.sumInsured ? `₹${Number(p.sumInsured).toLocaleString("en-IN")} SI` : ""}
                       {p.coverage ? ` · ${COV_LABEL[p.coverage] ?? p.coverage}` : ""}
@@ -1532,7 +1534,7 @@ export default function BuyPolicy() {
                       <div style={{ flex: 1, minWidth: 0 }}>
                         <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
                           <span style={{ fontWeight: 700, fontSize: 13, color: "#111827" }}>{slot?.label}</span>
-                          {isSelf && <span style={{ fontSize: 10.5, color: "#fff", fontWeight: 700, background: "#4c1d95", borderRadius: 4, padding: "1px 7px" }}>Primary</span>}
+                          {isSelf && <span style={{ fontSize: 10.5, color: "#fff", fontWeight: 700, background: "linear-gradient(135deg,#fb7185,#a855f7)", borderRadius: 4, padding: "1px 7px" }}>Primary</span>}
                         </div>
                         <div style={{ fontSize: 12, color: "var(--text-3)", marginTop: 2 }}>
                           {m.name || "—"}{age != null ? ` · ${age} yrs` : ""}{m.gender ? ` · ${m.gender}` : ""}
@@ -1757,7 +1759,7 @@ export default function BuyPolicy() {
                       <div style={{ display: "flex", gap: 8, alignItems: "flex-start", minWidth: 0 }}>
                         <span style={{ fontSize: 18, flexShrink: 0, marginTop: 1 }}>{POLICY_TYPE_ICON[p.policyType] ?? "📋"}</span>
                         <div style={{ minWidth: 0 }}>
-                          <div style={{ fontWeight: 600, fontSize: 13, lineHeight: 1.3 }}>{p.name}</div>
+                          <div style={{ fontWeight: 700, fontSize: 13, lineHeight: 1.3, color: "#7c3aed" }}>{p.name}</div>
                           <div style={{ fontSize: 11.5, color: "var(--text-3)", marginTop: 2 }}>{p.provider} · <span style={{ fontFamily: "monospace" }}>{p.code}</span></div>
                         </div>
                       </div>
@@ -2114,7 +2116,7 @@ export default function BuyPolicy() {
           <div className="card">
             <div className="card-body" style={{ textAlign: "center", padding: "52px 32px 44px" }}>
               <div style={{ fontSize: 64, marginBottom: 20 }}>✅</div>
-              <div style={{ fontWeight: 800, fontSize: 22, color: "var(--text)", marginBottom: 10 }}>
+              <div style={{ fontWeight: 800, fontSize: 22, background: "linear-gradient(135deg,#fb7185,#a855f7)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text", marginBottom: 10 }}>
                 Payment Received Successfully
               </div>
               <div style={{ fontSize: 14, color: "var(--text-3)", lineHeight: 1.7, marginBottom: 32 }}>

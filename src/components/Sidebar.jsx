@@ -323,7 +323,7 @@ export default function Sidebar({ mobileOpen = false, onMobileClose }) {
                       <NavLink key={child.path} to={child.path} end={child.path === "/" + item.key}
                         className="sb-child"
                         style={({ isActive }) => ({ ...S.child, ...(isActive ? S.childActive : {}) })}>
-                        <span style={{ ...S.dot, background: location.pathname === child.path ? "#7c3aed" : "#c4b8e8" }} />
+                        <span style={{ ...S.dot, background: location.pathname === child.path ? "#a855f7" : "#c4b8e8" }} />
                         {child.label}
                       </NavLink>
                     ))}
@@ -399,9 +399,9 @@ const S = {
   logoText:  { fontSize: 17, fontWeight: 700, color: "#1a1628", letterSpacing: -0.3, whiteSpace: "nowrap" },
   toggleBtn: { width: 32, height: 32, borderRadius: 7, border: "1.5px solid #e8e4f0", background: "#faf9fc", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, transition: "background .15s" },
   userPill:  { display: "flex", alignItems: "center", gap: 10, padding: "10px 14px", borderBottom: "1px solid #f0edf8", background: "#faf9fc" },
-  userAvatar:{ width: 32, height: 32, borderRadius: 8, background: "#7c3aed", color: "#fff", fontSize: 12, fontWeight: 700, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 },
+  userAvatar:{ width: 32, height: 32, borderRadius: 8, background: "#a855f7", color: "#fff", fontSize: 12, fontWeight: 700, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 },
   userName:  { fontSize: 13, fontWeight: 600, color: "#1a1628", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" },
-  userRole:  { fontSize: 11, color: "#9d94b8", textTransform: "capitalize" },
+  userRole:  { fontSize: 11, color: "#64748b", textTransform: "capitalize" },
   nav:       { padding: "8px 8px", display: "flex", flexDirection: "column", gap: 3, flex: 1 },
   navBtn:    { display: "flex", alignItems: "center", gap: 9, padding: "9px 10px", borderRadius: 8, fontSize: 13.5, fontWeight: 500, color: "#1a1628", background: "none", border: "none", cursor: "pointer", width: "100%", textAlign: "left", transition: "background .13s,color .13s", fontFamily: "inherit", position: "relative", whiteSpace: "nowrap", overflow: "hidden" },
   navBtnCollapsed: { width: 44, height: 44, padding: 0, justifyContent: "center", gap: 0, borderRadius: 10 },

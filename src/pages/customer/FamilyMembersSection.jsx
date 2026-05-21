@@ -60,7 +60,7 @@ export default function FamilyMembersSection({ members = [], onChange }) {
                     {m.type}{m.gender ? ` · ${m.gender}` : ''}{age !== null ? ` · Age: ${age} yrs` : ''}{m.dob ? ` (${m.dob})` : ''}
                   </div>
                 </div>
-                <button type="button" className="btn btn-ghost btn-sm" onClick={() => startEdit(m)} style={{ flexShrink: 0 }}>Edit</button>
+                <button type="button" onClick={() => startEdit(m)} title="Edit" style={{ background: 'linear-gradient(135deg,#fb7185,#a855f7)', border: 'none', borderRadius: 6, cursor: 'pointer', padding: '5px 6px', color: '#fff', display: 'inline-flex', alignItems: 'center', boxShadow: '0 2px 6px rgba(168,85,247,.30)', flexShrink: 0 }}><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"/></svg></button>
                 <button type="button" className="btn btn-danger btn-sm" onClick={() => remove(m.id)} style={{ flexShrink: 0 }}>Remove</button>
               </div>
             )

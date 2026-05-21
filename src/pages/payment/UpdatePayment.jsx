@@ -157,7 +157,7 @@ function StatusPill({ status, onClick }) {
 function DetailRow({ label, value }) {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-      <div style={{ fontSize: 11, color: '#9d94b8', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '.4px' }}>{label}</div>
+      <div style={{ fontSize: 11, color: '#64748b', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '.4px' }}>{label}</div>
       <div style={{ fontSize: 13.5, color: '#1a1628', fontWeight: 500 }}>{value || '—'}</div>
     </div>
   )
@@ -197,15 +197,15 @@ function PaymentModal({ payment, onClose, onAccept, onReject }) {
         {/* Header */}
         <div style={{ padding: '22px 26px 18px', borderBottom: '1.5px solid #f0edf8', display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 12 }}>
           <div>
-            <div style={{ fontSize: 11, color: '#9d94b8', fontWeight: 600, letterSpacing: '.5px', textTransform: 'uppercase', marginBottom: 4 }}>Payment Details</div>
+            <div style={{ fontSize: 11, color: '#64748b', fontWeight: 600, letterSpacing: '.5px', textTransform: 'uppercase', marginBottom: 4 }}>Payment Details</div>
             <div style={{ fontSize: 18, fontWeight: 800, color: '#1a1628' }}>{payment.id}</div>
-            <div style={{ fontSize: 13, color: '#9d94b8', marginTop: 2 }}>{payment.customerName} · {payment.policyNo}</div>
+            <div style={{ fontSize: 13, color: '#64748b', marginTop: 2 }}>{payment.customerName} · {payment.policyNo}</div>
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexShrink: 0 }}>
             <StatusPill status={payment.status} />
             <button
               onClick={onClose}
-              style={{ width: 30, height: 30, borderRadius: 8, border: '1.5px solid #e8e4f0', background: '#faf9fc', cursor: 'pointer', fontSize: 16, display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#9d94b8', lineHeight: 1 }}
+              style={{ width: 30, height: 30, borderRadius: 8, border: '1.5px solid #e8e4f0', background: '#faf9fc', cursor: 'pointer', fontSize: 16, display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#64748b', lineHeight: 1 }}
             >×</button>
           </div>
         </div>
@@ -216,13 +216,13 @@ function PaymentModal({ payment, onClose, onAccept, onReject }) {
           <div style={{ background: 'linear-gradient(135deg,#f5f3ff,#ede9fe)', borderRadius: 12, padding: '16px 20px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 20 }}>
             <div>
               <div style={{ fontSize: 11, color: '#7c3aed', fontWeight: 600, letterSpacing: '.4px', textTransform: 'uppercase' }}>Premium Amount</div>
-              <div style={{ fontSize: 28, fontWeight: 900, color: '#4c1d95', marginTop: 2 }}>{fmt(payment.amount)}</div>
+              <div style={{ fontSize: 28, fontWeight: 900, color: '#a855f7', marginTop: 2 }}>{fmt(payment.amount)}</div>
             </div>
             <div style={{ textAlign: 'right' }}>
               <div style={{ display: 'inline-flex', alignItems: 'center', gap: 6, background: m.bg, color: m.color, border: `1.5px solid`, borderColor: m.bg, borderRadius: 10, padding: '6px 14px', fontSize: 13, fontWeight: 700 }}>
                 <span>{m.icon}</span> {payment.method}
               </div>
-              <div style={{ fontSize: 12, color: '#9d94b8', marginTop: 6 }}>Offline Payment</div>
+              <div style={{ fontSize: 12, color: '#64748b', marginTop: 6 }}>Offline Payment</div>
             </div>
           </div>
 
@@ -278,7 +278,7 @@ function PaymentModal({ payment, onClose, onAccept, onReject }) {
             <div style={{ background: '#fef9f0', border: '1.5px solid #fcd34d', borderRadius: 12, padding: '18px 20px' }}>
               <div style={{ fontWeight: 700, color: '#92400e', fontSize: 14, marginBottom: 14 }}>Reject Payment</div>
               <div style={{ marginBottom: 12 }}>
-                <label style={{ fontSize: 12, fontWeight: 600, color: '#9d94b8', display: 'block', marginBottom: 6 }}>Reason for Rejection *</label>
+                <label style={{ fontSize: 12, fontWeight: 600, color: '#64748b', display: 'block', marginBottom: 6 }}>Reason for Rejection *</label>
                 <select
                   className="field-select"
                   value={reason}
@@ -290,7 +290,7 @@ function PaymentModal({ payment, onClose, onAccept, onReject }) {
                 </select>
               </div>
               <div style={{ marginBottom: 16 }}>
-                <label style={{ fontSize: 12, fontWeight: 600, color: '#9d94b8', display: 'block', marginBottom: 6 }}>Additional Notes (optional)</label>
+                <label style={{ fontSize: 12, fontWeight: 600, color: '#64748b', display: 'block', marginBottom: 6 }}>Additional Notes (optional)</label>
                 <textarea
                   className="field-input"
                   placeholder="Add any additional details…"
@@ -422,8 +422,8 @@ export default function UpdatePayment() {
                 onClick={() => setActiveTab(t)}
                 style={{
                   padding: '6px 16px', borderRadius: 99, fontSize: 13, fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit', border: 'none',
-                  background: activeTab === t ? '#7c3aed' : '#f5f3ff',
-                  color:      activeTab === t ? '#fff'    : '#7c3aed',
+                  background: activeTab === t ? '#a855f7' : '#f5f3ff',
+                  color:      activeTab === t ? '#fff'    : '#a855f7',
                   transition: 'all .13s',
                 }}
               >
@@ -433,44 +433,55 @@ export default function UpdatePayment() {
           </div>
 
           {/* Filters */}
-          <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap', marginBottom: 14, alignItems: 'center' }}>
-            <input
-              className="field-input filter-search"
-              placeholder="Search by payment ID, customer, policy…"
-              value={search}
-              onChange={e => setSearch(e.target.value)}
-              style={{ maxWidth: 300, flex: '1 1 180px' }}
-            />
-            <select
-              className="field-select"
-              value={methodFilter}
-              onChange={e => setMethodFilter(e.target.value)}
-              style={{ width: 190, flexShrink: 0 }}
-            >
-              <option value="">All Methods</option>
-              <option value="Cheque">Cheque</option>
-              <option value="BankTransfer">NEFT / RTGS / IMPS</option>
-            </select>
-            <select
-              className="field-select"
-              value={campaignFilter}
-              onChange={e => setCampaignFilter(e.target.value)}
-              style={{ width: 220, flexShrink: 0 }}
-            >
-              <option value="">All Campaigns</option>
-              {CAMPAIGNS.map(c => (
-                <option key={c.id} value={c.id}>{c.name}</option>
-              ))}
-            </select>
-            {(methodFilter || campaignFilter) && (
-              <button
-                type="button"
-                className="btn btn-ghost"
-                style={{ fontSize: 12, padding: '5px 12px', flexShrink: 0 }}
-                onClick={() => { setMethodFilter(''); setCampaignFilter('') }}
+          <div style={{ display: 'flex', gap: 14, flexWrap: 'wrap', marginBottom: 14, alignItems: 'flex-end' }}>
+            <div style={{ flex: '1 1 220px' }}>
+              <label style={{ display: 'block', fontSize: 11.5, fontWeight: 700, color: '#64748b', marginBottom: 5, textTransform: 'uppercase', letterSpacing: '.4px' }}>Search</label>
+              <input
+                className="field-input filter-search"
+                placeholder="Search by payment ID, customer, policy…"
+                value={search}
+                onChange={e => setSearch(e.target.value)}
+                style={{ width: '100%' }}
+              />
+            </div>
+            <div style={{ flex: '0 0 190px' }}>
+              <label style={{ display: 'block', fontSize: 11.5, fontWeight: 700, color: '#64748b', marginBottom: 5, textTransform: 'uppercase', letterSpacing: '.4px' }}>Payment Method</label>
+              <select
+                className="field-select"
+                value={methodFilter}
+                onChange={e => setMethodFilter(e.target.value)}
+                style={{ width: '100%' }}
               >
-                Clear
-              </button>
+                <option value="">All Methods</option>
+                <option value="Cheque">Cheque</option>
+                <option value="BankTransfer">NEFT / RTGS / IMPS</option>
+              </select>
+            </div>
+            <div style={{ flex: '0 0 220px' }}>
+              <label style={{ display: 'block', fontSize: 11.5, fontWeight: 700, color: '#64748b', marginBottom: 5, textTransform: 'uppercase', letterSpacing: '.4px' }}>Campaign</label>
+              <select
+                className="field-select"
+                value={campaignFilter}
+                onChange={e => setCampaignFilter(e.target.value)}
+                style={{ width: '100%' }}
+              >
+                <option value="">All Campaigns</option>
+                {CAMPAIGNS.map(c => (
+                  <option key={c.id} value={c.id}>{c.name}</option>
+                ))}
+              </select>
+            </div>
+            {(methodFilter || campaignFilter) && (
+              <div style={{ paddingBottom: 1 }}>
+                <button
+                  type="button"
+                  className="btn btn-ghost"
+                  style={{ fontSize: 12, padding: '5px 12px', flexShrink: 0 }}
+                  onClick={() => { setMethodFilter(''); setCampaignFilter('') }}
+                >
+                  Clear
+                </button>
+              </div>
             )}
           </div>
 
@@ -488,28 +499,28 @@ export default function UpdatePayment() {
                   <th>Reference</th>
                   <th>
                     Status
-                    <div style={{ fontSize: 10, fontWeight: 400, color: '#9d94b8', marginTop: 2 }}>click to accept / reject</div>
+                    <div style={{ fontSize: 10, fontWeight: 400, color: '#64748b', marginTop: 2 }}>click to accept / reject</div>
                   </th>
                 </tr>
               </thead>
               <tbody>
                 {filtered.length === 0 ? (
-                  <tr><td colSpan={8} style={{ textAlign: 'center', padding: '32px 0', color: '#9d94b8' }}>No payments found</td></tr>
+                  <tr><td colSpan={8} style={{ textAlign: 'center', padding: '32px 0', color: '#64748b' }}>No payments found</td></tr>
                 ) : filtered.map(p => {
                   const mm = METHOD_META[p.method] ?? METHOD_META['NEFT']
                   return (
                     <tr key={p.id} style={{ cursor: 'pointer' }} onClick={() => setSelected(p)}>
                       <td style={{ fontFamily: 'monospace', fontSize: 12, color: '#7c3aed' }}>{p.id}</td>
                       <td style={{ fontWeight: 500 }}>{p.customerName}</td>
-                      <td style={{ color: '#9d94b8', fontFamily: 'monospace', fontSize: 12 }}>{p.policyNo}</td>
+                      <td style={{ color: '#64748b', fontFamily: 'monospace', fontSize: 12 }}>{p.policyNo}</td>
                       <td>
                         <span style={{ display: 'inline-flex', alignItems: 'center', gap: 5, background: mm.bg, color: mm.color, borderRadius: 6, padding: '2px 9px', fontSize: 12, fontWeight: 600 }}>
                           {mm.icon} {p.method}
                         </span>
                       </td>
                       <td style={{ fontWeight: 600 }}>{fmt(p.amount)}</td>
-                      <td style={{ color: '#9d94b8' }}>{p.initiatedDate}</td>
-                      <td style={{ fontFamily: 'monospace', fontSize: 11.5, color: '#9d94b8' }}>{p.chequeNo || p.referenceNo || '—'}</td>
+                      <td style={{ color: '#64748b' }}>{p.initiatedDate}</td>
+                      <td style={{ fontFamily: 'monospace', fontSize: 11.5, color: '#64748b' }}>{p.chequeNo || p.referenceNo || '—'}</td>
                       <td onClick={e => e.stopPropagation()}>
                         <StatusPill status={p.status} onClick={() => setSelected(p)} />
                       </td>
