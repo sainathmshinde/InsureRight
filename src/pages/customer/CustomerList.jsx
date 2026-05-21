@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useSearchParams } from 'react-router-dom'
 import Pagination from '../../components/Pagination'
 import usePagination from '../../components/usePagination'
 import { Table, PageHeader, KYCBadge, Button, EmptyState } from '../../components/UI'
@@ -8,24 +8,38 @@ import { useAuth } from '../../context/AuthContext'
 import { useCustomers, INITIAL_CUSTOMERS } from '../../context/CustomerContext'
 import { ASSOCIATIONS } from './orgAssocData'
 
+const CAMPAIGNS = [
+  { id: 1,  name: 'Campaign 1' },
+  { id: 5,  name: 'Campaign OPD and DIGIT PAYMENT PROTECTION' },
+  { id: 6,  name: 'BPP Campaign' },
+  { id: 7,  name: 'Test Campaign' },
+  { id: 8,  name: 'SBI_STP_Campaign' },
+  { id: 11, name: 'BPP Campaign_2026-2027' },
+  { id: 12, name: 'Standalone campaign' },
+]
+
 export default function CustomerList() {
   const navigate = useNavigate();
+  const [searchParams]  = useSearchParams();
   const { user } = useAuth();
   const { customers } = useCustomers();
-  const [search, setSearch] = useState("");
-  const [kycFilter, setKycFilter] = useState("");
+  const [search,          setSearch]          = useState("");
+  const [kycFilter,       setKycFilter]       = useState("");
+  const [campaignFilter,  setCampaignFilter]  = useState(searchParams.get('campaignId') ?? "");
+  const [engagedFilter,   setEngagedFilter]   = useState(searchParams.get('engaged')    ?? "");
 
   const scopedData =
     user?.role === "agent"
       ? customers.filter((c) => c.agentId === user.id)
       : customers;
 
-  const filtered = scopedData.filter(
-    (c) =>
-      (c.name.toLowerCase().includes(search.toLowerCase()) ||
-        c.mobile.includes(search)) &&
-      (kycFilter ? c.kyc === kycFilter : true),
-  );
+  const filtered = scopedData.filter((c) => {
+    if (search && !c.name.toLowerCase().includes(search.toLowerCase()) && !c.mobile.includes(search)) return false
+    if (kycFilter      && c.kyc !== kycFilter)                    return false
+    if (campaignFilter && c.campaignId !== Number(campaignFilter)) return false
+    if (engagedFilter  && String(c.engaged) !== engagedFilter)    return false
+    return true
+  });
   const pg = usePagination(filtered, 10);
   const handle = (setter) => (v) => {
     setter(v);
@@ -39,6 +53,16 @@ export default function CustomerList() {
     { key: 'email',    label: 'Email',    style: { color: 'var(--blue)' } },
     { key: 'gender',   label: 'Gender' },
     { key: 'dob',      label: 'DOB' },
+    { key: 'campaign', label: 'Campaign',
+      render: row => row.campaignName
+        ? <span style={{ fontSize: 11.5, color: 'var(--text-2)' }}>{row.campaignName}</span>
+        : <span style={{ color: 'var(--text-3)' }}>—</span>
+    },
+    { key: 'engaged', label: 'Engaged',
+      render: row => row.engaged
+        ? <span style={{ padding: '2px 9px', borderRadius: 99, fontSize: 11.5, fontWeight: 700, background: '#dcfce7', color: '#15803d' }}>Engaged</span>
+        : <span style={{ padding: '2px 9px', borderRadius: 99, fontSize: 11.5, fontWeight: 700, background: '#fffbeb', color: '#b45309' }}>Not Engaged</span>
+    },
     { key: 'association', label: 'Association',
       render: row => {
         const assoc = ASSOCIATIONS.find(a => a.id === row.associationId)
@@ -102,31 +126,65 @@ export default function CustomerList() {
 
       <div className="card">
         <div className="card-body">
-          <div className="filter-bar">
-            <input
-              className="field-input filter-search"
-              placeholder="Search by name or mobile…"
-              value={search}
-              onChange={(e) => handle(setSearch)(e.target.value)}
-            />
-            <select
-              className="field-select"
-              style={{ width: 160 }}
-              value={kycFilter}
-              onChange={(e) => handle(setKycFilter)(e.target.value)}
-            >
-              <option value="">All KYC Status</option>
-              <option>Verified</option>
-              <option>Pending</option>
-              <option>Rejected</option>
-            </select>
-            {(search || kycFilter) && (
+          <div className="filter-bar" style={{ alignItems: 'flex-end' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+              <label style={S.filterLabel}>Search</label>
+              <input
+                className="field-input filter-search"
+                placeholder="Search by name or mobile…"
+                value={search}
+                onChange={(e) => handle(setSearch)(e.target.value)}
+              />
+            </div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+              <label style={S.filterLabel}>Campaign</label>
+              <select
+                className="field-select"
+                style={{ width: 200 }}
+                value={campaignFilter}
+                onChange={(e) => { handle(setCampaignFilter)(e.target.value); handle(setEngagedFilter)("") }}
+              >
+                <option value="">All Campaigns</option>
+                {CAMPAIGNS.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
+              </select>
+            </div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+              <label style={S.filterLabel}>Engagement</label>
+              <select
+                className="field-select"
+                style={{ width: 150 }}
+                value={engagedFilter}
+                onChange={(e) => handle(setEngagedFilter)(e.target.value)}
+                disabled={!campaignFilter}
+              >
+                <option value="">All Engagement</option>
+                <option value="true">Engaged</option>
+                <option value="false">Not Engaged</option>
+              </select>
+            </div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+              <label style={S.filterLabel}>KYC Status</label>
+              <select
+                className="field-select"
+                style={{ width: 160 }}
+                value={kycFilter}
+                onChange={(e) => handle(setKycFilter)(e.target.value)}
+              >
+                <option value="">All KYC Status</option>
+                <option>Verified</option>
+                <option>Pending</option>
+                <option>Rejected</option>
+              </select>
+            </div>
+            {(search || kycFilter || campaignFilter || engagedFilter) && (
               <Button
                 variant="ghost"
                 size="sm"
                 onClick={() => {
                   handle(setSearch)("");
                   handle(setKycFilter)("");
+                  handle(setCampaignFilter)("");
+                  handle(setEngagedFilter)("");
                 }}
               >
                 Clear
@@ -160,6 +218,13 @@ export default function CustomerList() {
 }
 
 const S = {
+  filterLabel: {
+    fontSize: 11,
+    fontWeight: 600,
+    color: 'var(--text-3)',
+    textTransform: 'uppercase',
+    letterSpacing: '0.05em',
+  },
   pendingBtn: {
     background: "#fffbeb",
     border: "1.5px solid #fcd34d",

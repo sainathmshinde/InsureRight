@@ -40,10 +40,27 @@ const CAMPAIGNS_LIST = [
   'Standalone campaign',
 ]
 
+const CAMPAIGN_ID_MAP = {
+  'Campaign 1': 1,
+  'Campaign OPD and DIGIT PAYMENT PROTECTION': 5,
+  'BPP Campaign': 6,
+  'Test Campaign': 7,
+  'SBI_STP_Campaign': 8,
+  'BPP Campaign_2026-2027': 11,
+  'Standalone campaign': 12,
+}
+
 const ASSOCIATIONS_LIST = [
   'Mehta Insurance', 'Priya Brokers', 'Shah Financial',
   'AK Associates', 'Nair & Co.', 'Rao & Partners',
 ]
+
+function fmtPremium(v) {
+  if (!v) return null
+  if (v >= 10000000) return `₹${(v / 10000000).toFixed(2)} Cr`
+  if (v >= 100000)   return `₹${(v / 100000).toFixed(2)} L`
+  return `₹${v.toLocaleString('en-IN')}`
+}
 
 // Mock MIS datasets keyed by campaign name; default = all campaigns combined
 const MIS_DATA = {
@@ -54,6 +71,13 @@ const MIS_DATA = {
     rtgsInitiated: 221,     chequeInitiated: 124,
     rtgsPurchased: 2128,    chequePurchased: 920,
     paymentPending: 8657,   paymentRejected: 945,
+    // Premium amounts (INR)
+    engagedPremium: 16900000,  nonEngagedPremium: 0,
+    policyPurchasedPremium: 16900000, policyPendingPremium: 7680000,
+    onlinePremium: 14400000,   offlinePremium: 2500000,
+    rtgsInitiatedAmt: 188000,  chequeInitiatedAmt: 93000,
+    rtgsPurchasedAmt: 1810000, chequePurchasedAmt: 690000,
+    paymentPendingAmt: 6930000, paymentRejectedAmt: 756000,
   },
   'BPP Campaign_2026-2027': {
     engagedCustomer: 12400, nonEngagedCustomer: 1100,
@@ -62,6 +86,12 @@ const MIS_DATA = {
     rtgsInitiated: 98,      chequeInitiated: 62,
     rtgsPurchased: 980,     chequePurchased: 420,
     paymentPending: 3100,   paymentRejected: 320,
+    engagedPremium: 7040000,   nonEngagedPremium: 0,
+    policyPurchasedPremium: 7040000, policyPendingPremium: 2880000,
+    onlinePremium: 5760000,    offlinePremium: 1280000,
+    rtgsInitiatedAmt: 83300,   chequeInitiatedAmt: 46500,
+    rtgsPurchasedAmt: 833000,  chequePurchasedAmt: 315000,
+    paymentPendingAmt: 2480000, paymentRejectedAmt: 256000,
   },
   'SBI_STP_Campaign': {
     engagedCustomer: 9800, nonEngagedCustomer: 980,
@@ -70,6 +100,12 @@ const MIS_DATA = {
     rtgsInitiated: 72,     chequeInitiated: 41,
     rtgsPurchased: 710,    chequePurchased: 290,
     paymentPending: 2400,  paymentRejected: 280,
+    engagedPremium: 5520000,   nonEngagedPremium: 0,
+    policyPurchasedPremium: 5520000, policyPendingPremium: 2320000,
+    onlinePremium: 4640000,    offlinePremium: 880000,
+    rtgsInitiatedAmt: 61200,   chequeInitiatedAmt: 30750,
+    rtgsPurchasedAmt: 603500,  chequePurchasedAmt: 217500,
+    paymentPendingAmt: 1920000, paymentRejectedAmt: 224000,
   },
   'BPP Campaign': {
     engagedCustomer: 5200, nonEngagedCustomer: 620,
@@ -78,6 +114,12 @@ const MIS_DATA = {
     rtgsInitiated: 38,     chequeInitiated: 18,
     rtgsPurchased: 430,    chequePurchased: 170,
     paymentPending: 1300,  paymentRejected: 190,
+    engagedPremium: 2880000,   nonEngagedPremium: 0,
+    policyPurchasedPremium: 2880000, policyPendingPremium: 1280000,
+    onlinePremium: 2320000,    offlinePremium: 560000,
+    rtgsInitiatedAmt: 32300,   chequeInitiatedAmt: 13500,
+    rtgsPurchasedAmt: 365500,  chequePurchasedAmt: 127500,
+    paymentPendingAmt: 1040000, paymentRejectedAmt: 152000,
   },
   'Campaign OPD and DIGIT PAYMENT PROTECTION': {
     engagedCustomer: 7840, nonEngagedCustomer: 960,
@@ -86,6 +128,12 @@ const MIS_DATA = {
     rtgsInitiated: 54,     chequeInitiated: 28,
     rtgsPurchased: 680,    chequePurchased: 310,
     paymentPending: 2100,  paymentRejected: 380,
+    engagedPremium: 4160000,   nonEngagedPremium: 0,
+    policyPurchasedPremium: 4160000, policyPendingPremium: 2112000,
+    onlinePremium: 3280000,    offlinePremium: 880000,
+    rtgsInitiatedAmt: 45900,   chequeInitiatedAmt: 21000,
+    rtgsPurchasedAmt: 578000,  chequePurchasedAmt: 232500,
+    paymentPendingAmt: 1680000, paymentRejectedAmt: 304000,
   },
   'Campaign 1': {
     engagedCustomer: 2100, nonEngagedCustomer: 310,
@@ -94,6 +142,12 @@ const MIS_DATA = {
     rtgsInitiated: 8,      chequeInitiated: 3,
     rtgsPurchased: 180,    chequePurchased: 80,
     paymentPending: 560,   paymentRejected: 90,
+    engagedPremium: 1120000,   nonEngagedPremium: 0,
+    policyPurchasedPremium: 1120000, policyPendingPremium: 560000,
+    onlinePremium: 880000,     offlinePremium: 240000,
+    rtgsInitiatedAmt: 6800,    chequeInitiatedAmt: 2250,
+    rtgsPurchasedAmt: 153000,  chequePurchasedAmt: 60000,
+    paymentPendingAmt: 448000, paymentRejectedAmt: 72000,
   },
 }
 
@@ -132,18 +186,33 @@ function DonutChart({ title, segments, note }) {
             </text>
           </svg>
           <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 12 }}>
-            {arcs.map((arc, i) => (
-              <div key={i}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 2 }}>
-                  <div style={{ width: 9, height: 9, borderRadius: 2, background: arc.color, flexShrink: 0 }} />
-                  <div style={{ fontSize: 11, color: '#64748b', fontWeight: 600, letterSpacing: '.1px' }}>{arc.label}</div>
+            {arcs.map((arc, i) => {
+              const premiumStr = arc.premium != null ? fmtPremium(arc.premium) : null
+              const clickable  = !!arc.onClick
+              return (
+                <div key={i}
+                  onClick={arc.onClick}
+                  style={{ cursor: clickable ? 'pointer' : 'default', borderRadius: 8, padding: clickable ? '4px 6px' : 0, transition: 'background .15s' }}
+                  onMouseEnter={e => { if (clickable) e.currentTarget.style.background = `${arc.color}12` }}
+                  onMouseLeave={e => { if (clickable) e.currentTarget.style.background = 'transparent' }}
+                >
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 2 }}>
+                    <div style={{ width: 9, height: 9, borderRadius: 2, background: arc.color, flexShrink: 0 }} />
+                    <div style={{ fontSize: 11, color: '#64748b', fontWeight: 600, letterSpacing: '.1px' }}>{arc.label}</div>
+                    {clickable && <span style={{ fontSize: 10, color: arc.color, marginLeft: 2 }}>↗</span>}
+                  </div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 7, paddingLeft: 15 }}>
+                    <div style={{ fontSize: 17, fontWeight: 800, color: '#1e293b', lineHeight: 1 }}>{arc.value.toLocaleString('en-IN')}</div>
+                    <span style={{ fontSize: 10.5, fontWeight: 700, color: arc.color, background: `${arc.color}1a`, padding: '2px 7px', borderRadius: 99 }}>{Math.round(arc.pct * 100)}%</span>
+                  </div>
+                  {premiumStr && (
+                    <div style={{ paddingLeft: 15, fontSize: 11.5, fontWeight: 700, color: '#475569', marginTop: 2 }}>
+                      {premiumStr}
+                    </div>
+                  )}
                 </div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 7, paddingLeft: 15 }}>
-                  <div style={{ fontSize: 17, fontWeight: 800, color: '#1e293b', lineHeight: 1 }}>{arc.value.toLocaleString('en-IN')}</div>
-                  <span style={{ fontSize: 10.5, fontWeight: 700, color: arc.color, background: `${arc.color}1a`, padding: '2px 7px', borderRadius: 99 }}>{Math.round(arc.pct * 100)}%</span>
-                </div>
-              </div>
-            ))}
+              )
+            })}
           </div>
         </div>
         {note && (
@@ -166,6 +235,54 @@ export default function BrokerPortal() {
   const handleMisSubmit = () => {
     const data = MIS_DATA[campaignFilter] ?? MIS_DATA['']
     setMis(data)
+  }
+
+  const goToPolicyPurchased = () => {
+    const params = new URLSearchParams()
+    const id = CAMPAIGN_ID_MAP[campaignFilter]
+    if (id) params.set('campaignId', id)
+    params.set('payment', 'Paid')
+    navigate(`/policy?${params.toString()}`)
+  }
+
+  const goToPaymentRejected = () => {
+    const params = new URLSearchParams()
+    const id = CAMPAIGN_ID_MAP[campaignFilter]
+    if (id) params.set('campaignId', id)
+    params.set('payment', 'Rejected')
+    navigate(`/policy?${params.toString()}`)
+  }
+
+  const goToPaymentPending = () => {
+    const params = new URLSearchParams()
+    const id = CAMPAIGN_ID_MAP[campaignFilter]
+    if (id) params.set('campaignId', id)
+    params.set('payment', 'Pending')
+    navigate(`/policy?${params.toString()}`)
+  }
+
+  const goToPolicyPending = () => {
+    const params = new URLSearchParams()
+    const id = CAMPAIGN_ID_MAP[campaignFilter]
+    if (id) params.set('campaignId', id)
+    params.set('status', 'Pending')
+    navigate(`/policy?${params.toString()}`)
+  }
+
+  const goToEngaged = () => {
+    const params = new URLSearchParams()
+    const id = CAMPAIGN_ID_MAP[campaignFilter]
+    if (id) params.set('campaignId', id)
+    params.set('engaged', 'true')
+    navigate(`/customer?${params.toString()}`)
+  }
+
+  const goToNonEngaged = () => {
+    const params = new URLSearchParams()
+    const id = CAMPAIGN_ID_MAP[campaignFilter]
+    if (id) params.set('campaignId', id)
+    params.set('engaged', 'false')
+    navigate(`/customer?${params.toString()}`)
   }
 
   return (
@@ -206,6 +323,71 @@ export default function BrokerPortal() {
             </button>
           </div>
 
+          {/* Action bar */}
+          {(() => {
+            const totalCustomers = mis.engagedCustomer + mis.nonEngagedCustomer
+            const totalEngaged   = mis.engagedCustomer
+            const items = [
+              {
+                label:   'Non-Engaged Customers',
+                value:   mis.nonEngagedCustomer,
+                pct:     totalCustomers > 0 ? Math.round((mis.nonEngagedCustomer / totalCustomers) * 100) : 0,
+                color:   '#f59e0b',
+                bg:      '#fffbeb',
+                border:  '#fde68a',
+                onClick: goToNonEngaged,
+              },
+              {
+                label:   'Policy Pending',
+                value:   mis.policyPending,
+                pct:     totalEngaged > 0 ? Math.round((mis.policyPending / totalEngaged) * 100) : 0,
+                amount:  mis.policyPendingPremium,
+                color:   '#f97316',
+                bg:      '#fff7ed',
+                border:  '#fed7aa',
+                onClick: goToPolicyPending,
+              },
+              {
+                label:   'Payment Pending',
+                value:   mis.paymentPending,
+                pct:     mis.policyPending > 0 ? Math.round((mis.paymentPending / mis.policyPending) * 100) : 0,
+                amount:  mis.paymentPendingAmt,
+                color:   '#ef4444',
+                bg:      '#fef2f2',
+                border:  '#fecaca',
+                onClick: goToPaymentPending,
+              },
+              {
+                label:   'Payment Rejected',
+                value:   mis.paymentRejected,
+                pct:     mis.policyPending > 0 ? Math.round((mis.paymentRejected / mis.policyPending) * 100) : 0,
+                amount:  mis.paymentRejectedAmt,
+                color:   '#dc2626',
+                bg:      '#fef2f2',
+                border:  '#fca5a5',
+                onClick: goToPaymentRejected,
+              },
+            ]
+            return (
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 12, marginBottom: 16 }}>
+                {items.map(it => (
+                  <div key={it.label} onClick={it.onClick} style={{ background: it.bg, border: `1.5px solid ${it.border}`, borderRadius: 12, padding: '14px 16px', borderLeft: `4px solid ${it.color}`, cursor: it.onClick ? 'pointer' : 'default', transition: 'box-shadow .15s', boxShadow: it.onClick ? '0 1px 4px rgba(0,0,0,.06)' : 'none' }} onMouseEnter={e => { if (it.onClick) e.currentTarget.style.boxShadow = `0 4px 14px ${it.color}33` }} onMouseLeave={e => { if (it.onClick) e.currentTarget.style.boxShadow = '0 1px 4px rgba(0,0,0,.06)' }}>
+                    <div style={{ fontSize: 11, fontWeight: 700, color: '#64748b', textTransform: 'uppercase', letterSpacing: '.4px', marginBottom: 8 }}>{it.label}</div>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
+                      <div style={{ fontSize: 24, fontWeight: 800, color: it.color, lineHeight: 1 }}>{it.value.toLocaleString('en-IN')}</div>
+                      {it.amount != null && (
+                        <div style={{ fontSize: 24, fontWeight: 800, color: it.color, lineHeight: 1 }}>{fmtPremium(it.amount)}</div>
+                      )}
+                    </div>
+                    <div style={{ marginTop: 6 }}>
+                      <span style={{ fontSize: 11, fontWeight: 700, color: it.color, background: `${it.color}1a`, padding: '2px 8px', borderRadius: 99 }}>{it.pct}% of base</span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )
+          })()}
+
           <div style={{ fontSize: 12.5, fontWeight: 600, color: '#94a3b8', marginBottom: 20 }}>* Count indicates number of customers</div>
 
           {/* MIS grid */}
@@ -214,32 +396,32 @@ export default function BrokerPortal() {
             <DonutChart
               title="Customer Details"
               segments={[
-                { label: 'Engaged',     value: mis.engagedCustomer,    color: '#7c3aed' },
-                { label: 'Non-Engaged', value: mis.nonEngagedCustomer, color: '#f59e0b' },
+                { label: 'Engaged',     value: mis.engagedCustomer,    color: '#7c3aed', premium: mis.engagedPremium,    onClick: goToEngaged    },
+                { label: 'Non-Engaged', value: mis.nonEngagedCustomer, color: '#f59e0b', premium: mis.nonEngagedPremium, onClick: goToNonEngaged },
               ]}
             />
 
             <DonutChart
               title="Policy Overview"
               segments={[
-                { label: 'Policy Purchased', value: mis.policyPurchased, color: '#10b981' },
-                { label: 'Policy Pending',   value: mis.policyPending,   color: '#f59e0b' },
+                { label: 'Policy Purchased', value: mis.policyPurchased, color: '#10b981', premium: mis.policyPurchasedPremium, onClick: goToPolicyPurchased },
+                { label: 'Policy Pending',   value: mis.policyPending,   color: '#f59e0b', premium: mis.policyPendingPremium,   onClick: goToPolicyPending },
               ]}
             />
 
             <DonutChart
               title="Payment Initiates"
               segments={[
-                { label: 'RTGS',   value: mis.rtgsInitiated,   color: '#0ea5e9' },
-                { label: 'Cheque', value: mis.chequeInitiated, color: '#6366f1' },
+                { label: 'RTGS',   value: mis.rtgsInitiated,   color: '#0ea5e9', premium: mis.rtgsInitiatedAmt   },
+                { label: 'Cheque', value: mis.chequeInitiated, color: '#6366f1', premium: mis.chequeInitiatedAmt },
               ]}
             />
 
             <DonutChart
               title="Online vs Offline"
               segments={[
-                { label: 'Online',  value: mis.onlinePurchased,  color: '#6366f1' },
-                { label: 'Offline', value: mis.offlinePurchased, color: '#f59e0b' },
+                { label: 'Online',  value: mis.onlinePurchased,  color: '#6366f1', premium: mis.onlinePremium  },
+                { label: 'Offline', value: mis.offlinePurchased, color: '#f59e0b', premium: mis.offlinePremium },
               ]}
               note={`of ${mis.policyPurchased.toLocaleString('en-IN')} total policies purchased`}
             />
@@ -247,16 +429,16 @@ export default function BrokerPortal() {
             <DonutChart
               title="Payment Pending / Rejected"
               segments={[
-                { label: 'Pending',  value: mis.paymentPending,  color: '#f59e0b' },
-                { label: 'Rejected', value: mis.paymentRejected, color: '#ef4444' },
+                { label: 'Pending',  value: mis.paymentPending,  color: '#f59e0b', premium: mis.paymentPendingAmt,  onClick: goToPaymentPending },
+                { label: 'Rejected', value: mis.paymentRejected, color: '#ef4444', premium: mis.paymentRejectedAmt, onClick: goToPaymentRejected },
               ]}
             />
 
             <DonutChart
               title="Offline Purchased"
               segments={[
-                { label: 'RTGS',   value: mis.rtgsPurchased,   color: '#0ea5e9' },
-                { label: 'Cheque', value: mis.chequePurchased, color: '#7c3aed' },
+                { label: 'RTGS',   value: mis.rtgsPurchased,   color: '#0ea5e9', premium: mis.rtgsPurchasedAmt   },
+                { label: 'Cheque', value: mis.chequePurchased, color: '#7c3aed', premium: mis.chequePurchasedAmt },
               ]}
             />
 
