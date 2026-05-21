@@ -1,548 +1,698 @@
-import { useState, useRef } from "react";
-import { UploadIcon, DocumentIcon, CheckIcon } from "../../icons";
+import { useState, useRef } from 'react'
+import { PageHeader } from '../../components/UI'
+import { DocumentIcon } from '../../icons'
+import { POLICY_MOCK } from '../policy/PolicyList'
+import { ASSOCIATIONS } from '../customer/orgAssocData'
+import Pagination from '../../components/Pagination'
+import usePagination from '../../components/usePagination'
 
-// ── Mock database records ────────────────────────────────────────────────────
-const DB_RECORDS = [
-  { policyNo: "POL-2025-001", customerName: "Aarav Sharma",   mobile: "9876543210", icName: "Star Health Insurance", premium: 8500,  sumInsured: 500000, status: "Active",   policyType: "Health" },
-  { policyNo: "POL-2025-002", customerName: "Rohit Sharma",   mobile: "9812000000", icName: "HDFC ERGO",             premium: 6200,  sumInsured: 300000, status: "Active",   policyType: "Health" },
-  { policyNo: "POL-2025-003", customerName: "Divya Nair",     mobile: "9911223344", icName: "ICICI Lombard",         premium: 9100,  sumInsured: 500000, status: "Active",   policyType: "Health" },
-  { policyNo: "POL-2025-004", customerName: "Vijay Patil",    mobile: "9011223344", icName: "Bajaj Allianz",         premium: 4800,  sumInsured: 0,      status: "Lapsed",   policyType: "Motor"  },
-  { policyNo: "POL-2025-005", customerName: "Suresh Kumar",   mobile: "9988001122", icName: "Star Health Insurance", premium: 14000, sumInsured: 300000, status: "Active",   policyType: "Health" },
-  { policyNo: "POL-2025-006", customerName: "Vikram Rao",     mobile: "9944556677", icName: "HDFC ERGO",             premium: 6200,  sumInsured: 250000, status: "Active",   policyType: "Health" },
-  { policyNo: "POL-2025-007", customerName: "Kavita Pillai",  mobile: "9899112233", icName: "LIC",                   premium: 12000, sumInsured: 1000000,status: "Active",   policyType: "Life"   },
-  { policyNo: "POL-2025-008", customerName: "Arjun Singh",    mobile: "9922334455", icName: "Bajaj Allianz",         premium: 4800,  sumInsured: 0,      status: "Active",   policyType: "Motor"  },
-];
+const CAMPAIGNS = [
+  { id: 1,  name: 'Campaign 1' },
+  { id: 5,  name: 'Campaign OPD and DIGIT PAYMENT PROTECTION' },
+  { id: 6,  name: 'BPP Campaign' },
+  { id: 7,  name: 'Test Campaign' },
+  { id: 8,  name: 'SBI_STP_Campaign' },
+  { id: 11, name: 'BPP Campaign_2026-2027' },
+  { id: 12, name: 'Standalone campaign' },
+]
 
-// External records: some match, some have discrepancies, one is new
-const EXT_RECORDS = [
-  { policyNo: "POL-2025-001", customerName: "Aarav Sharma",   mobile: "9876543210", icName: "Star Health Insurance", premium: 8500,  sumInsured: 500000, status: "Active",   policyType: "Health" },
-  { policyNo: "POL-2025-002", customerName: "Rohit Sharma",   mobile: "9812000000", icName: "HDFC ERGO",             premium: 6500,  sumInsured: 300000, status: "Active",   policyType: "Health" }, // premium diff
-  { policyNo: "POL-2025-003", customerName: "Divya Nair",     mobile: "9911223344", icName: "ICICI Lombard",         premium: 9100,  sumInsured: 750000, status: "Active",   policyType: "Health" }, // sumInsured diff
-  { policyNo: "POL-2025-004", customerName: "Vijay Patil",    mobile: "9011223344", icName: "Bajaj Allianz",         premium: 4800,  sumInsured: 0,      status: "Active",   policyType: "Motor"  }, // status diff
-  { policyNo: "POL-2025-005", customerName: "Suresh Kumar",   mobile: "9988001122", icName: "New India Assurance",   premium: 14000, sumInsured: 300000, status: "Active",   policyType: "Health" }, // icName diff
-  { policyNo: "POL-2025-006", customerName: "Vikram Rao",     mobile: "9944556677", icName: "HDFC ERGO",             premium: 6200,  sumInsured: 250000, status: "Active",   policyType: "Health" },
-  { policyNo: "POL-2025-007", customerName: "Kavitha Pillai", mobile: "9899112233", icName: "LIC",                   premium: 12000, sumInsured: 1000000,status: "Active",   policyType: "Life"   }, // name typo
-  { policyNo: "POL-2025-008", customerName: "Arjun Singh",    mobile: "9922334455", icName: "Bajaj Allianz",         premium: 5200,  sumInsured: 0,      status: "Lapsed",   policyType: "Motor"  }, // premium + status diff
-  { policyNo: "POL-2025-009", customerName: "Priya Mehta",    mobile: "9812345678", icName: "ICICI Lombard",         premium: 9100,  sumInsured: 500000, status: "Active",   policyType: "Health" }, // new in external
-];
+const REJECT_REASONS = [
+  'Amount mismatch',
+  'Account number mismatch',
+  'Cheque signature mismatch',
+  'Cheque date expired',
+  'UTR not found',
+  'Duplicate entry',
+  'Insufficient funds',
+  'Customer details mismatch',
+  'Other',
+]
 
-const COMPARE_FIELDS = [
-  { key: "customerName", label: "Customer Name"     },
-  { key: "mobile",       label: "Mobile"            },
-  { key: "icName",       label: "Insurance Company" },
-  { key: "policyType",   label: "Policy Type"       },
-  { key: "premium",      label: "Premium (₹)",      format: v => v ? `₹${Number(v).toLocaleString("en-IN")}` : "—" },
-  { key: "sumInsured",   label: "Sum Insured (₹)",  format: v => v ? `₹${Number(v).toLocaleString("en-IN")}` : "—" },
-  { key: "status",       label: "Status"            },
-];
-
-function buildRows() {
-  const dbMap = Object.fromEntries(DB_RECORDS.map(r => [r.policyNo, r]));
-  const extMap = Object.fromEntries(EXT_RECORDS.map(r => [r.policyNo, r]));
-  const allKeys = [...new Set([...Object.keys(dbMap), ...Object.keys(extMap)])].sort();
-
-  return allKeys.map(policyNo => {
-    const db  = dbMap[policyNo]  ?? null;
-    const ext = extMap[policyNo] ?? null;
-    const diffs = db && ext
-      ? COMPARE_FIELDS.filter(f => String(db[f.key]) !== String(ext[f.key])).map(f => f.key)
-      : [];
-    const recordType = !db ? "new" : !ext ? "missing" : diffs.length === 0 ? "match" : "mismatch";
-    return { policyNo, db, ext, diffs, recordType, action: "pending", narration: "" };
-  });
+const LABEL = {
+  display: 'block', fontSize: 11, fontWeight: 700, color: '#64748b',
+  textTransform: 'uppercase', letterSpacing: '.5px',
 }
 
-const INITIAL_ROWS = buildRows();
+const STATUS_META = {
+  Initiated: { color: '#0369a1', bg: '#e0f2fe', border: '#7dd3fc' },
+  Rejected:  { color: '#dc2626', bg: '#fee2e2', border: '#fca5a5' },
+  Paid:      { color: '#15803d', bg: '#dcfce7', border: '#86efac' },
+}
 
-const RECORD_BADGE = {
-  match:    { label: "Match",    bg: "#e6f4ea", color: "#2d7d46" },
-  mismatch: { label: "Mismatch", bg: "#fff3e0", color: "#a05c00" },
-  new:      { label: "New",      bg: "#e0f4fb", color: "#0a7ea4" },
-  missing:  { label: "Missing",  bg: "#fce7f3", color: "#9d174d" },
-};
+const STATUS_TABS = ['All', 'Initiated', 'Rejected']
 
-const ACTION_STYLE = {
-  accepted: { bg: "#e6f4ea", color: "#2d7d46", border: "#2d7d46" },
-  rejected: { bg: "#fce7f3", color: "#9d174d", border: "#9d174d" },
-  hold:     { bg: "#fff3e0", color: "#a05c00", border: "#a05c00" },
-  pending:  { bg: "#f5f3ff", color: "#7c3aed", border: "#7c3aed" },
-};
+const BASE_DATA = POLICY_MOCK
+  .filter(p => p.paymentStatus === 'Initiated' || p.paymentStatus === 'Rejected')
+  .map((p, i) => {
+    let paymentType = p.paymentType
+    if (paymentType !== 'NEFT' && paymentType !== 'Cheque') {
+      paymentType = i % 2 === 0 ? 'NEFT' : 'Cheque'
+    }
+    return { ...p, paymentType, paymentMode: 'Offline' }
+  })
 
-const FILTER_TABS = ["All", "Pending", "Mismatch", "New", "Missing", "Accepted", "Rejected", "Hold"];
-
-function Val({ value, isDiff }) {
+function StatusPill({ status }) {
+  const m = STATUS_META[status] ?? STATUS_META.Initiated
   return (
     <span style={{
-      display: "inline-block", padding: "2px 8px", borderRadius: 5,
-      background: isDiff ? "#fff3e0" : "transparent",
-      color: isDiff ? "#a05c00" : "inherit",
-      fontWeight: isDiff ? 700 : "inherit",
-      border: isDiff ? "1px solid #fbbf24" : "none",
-      fontSize: 13,
+      padding: '3px 12px', borderRadius: 99, fontSize: 12, fontWeight: 700,
+      background: m.bg, color: m.color, border: `1.5px solid ${m.border}`,
+      display: 'inline-block', whiteSpace: 'nowrap',
     }}>
-      {value || <span style={{ color: "#bbb", fontStyle: "italic" }}>—</span>}
+      {status}
     </span>
-  );
+  )
+}
+
+function fmt(v) { return v ? `₹${Number(v).toLocaleString('en-IN')}` : '—' }
+
+function exportToExcel(rows) {
+  const headers = [
+    'ID', 'Proposal ID', 'Customer Name', 'Mobile', 'Product', 'IC Name',
+    'Premium', 'Payment Mode', 'Pay Type', 'Campaign', 'Payment Status',
+  ]
+  const escape = v => {
+    const s = String(v ?? '')
+    return s.includes(',') || s.includes('"') || s.includes('\n')
+      ? `"${s.replace(/"/g, '""')}"` : s
+  }
+  const csvRows = [
+    headers.join(','),
+    ...rows.map(p => [
+      p.id, p.proposalId, p.customerName, p.mobile, p.product, p.icName,
+      p.premium, p.paymentMode, p.paymentType, p.campaignName, p.paymentStatus,
+    ].map(escape).join(',')),
+  ]
+  // BOM for Excel UTF-8 compatibility
+  const blob = new Blob(['﻿' + csvRows.join('\r\n')], { type: 'text/csv;charset=utf-8;' })
+  const url  = URL.createObjectURL(blob)
+  const a    = document.createElement('a')
+  a.href     = url
+  a.download = `reconciliation_${new Date().toISOString().slice(0,10)}.csv`
+  a.click()
+  URL.revokeObjectURL(url)
+}
+
+// Generate mock "uploaded" data from the records with realistic variations
+function buildUploadedRows(records) {
+  return records.map((r, i) => {
+    const premiumDiff  = i % 6 === 0   // every 6th record has premium mismatch
+    const nameDiff     = i % 11 === 0  // every 11th has name mismatch
+    return {
+      proposalId:   r.proposalId,
+      customerName: nameDiff ? r.customerName.split(' ').reverse().join(' ') : r.customerName,
+      premium:      premiumDiff ? r.premium + 500 : r.premium,
+      paymentType:  r.paymentType,
+      icName:       r.icName,
+      uploadedStatus: 'Paid',  // IC says payment is received
+    }
+  })
 }
 
 export default function Reconciliation() {
-  const [step, setStep]       = useState("upload"); // upload | review | done
-  const [file, setFile]       = useState(null);
-  const [dragging, setDragging] = useState(false);
-  const [rows, setRows]       = useState(INITIAL_ROWS);
-  const [filter, setFilter]   = useState("All");
-  const [expanded, setExpanded] = useState({});
-  const fileRef = useRef();
+  const fileRef = useRef()
 
-  const updateRow = (policyNo, patch) =>
-    setRows(prev => prev.map(r => r.policyNo === policyNo ? { ...r, ...patch } : r));
+  // mode: list | upload | review | done
+  const [mode, setMode] = useState('list')
+  const [file, setFile] = useState(null)
+  const [dragging, setDragging] = useState(false)
 
-  const toggleExpand = (policyNo) =>
-    setExpanded(prev => ({ ...prev, [policyNo]: !prev[policyNo] }));
+  // Live list data — starts from BASE_DATA, updated after reconciliation
+  const [listData, setListData] = useState(BASE_DATA)
 
-  const handleFile = (f) => {
-    if (!f) return;
-    setFile(f);
-  };
+  // Top filter bar
+  const [topCampaign, setTopCampaign] = useState('5')
+  const [topAssoc,    setTopAssoc]    = useState('')
+  const [campaignFilter, setCampaignFilter] = useState('5')
 
-  const handleDrop = (e) => {
-    e.preventDefault();
-    setDragging(false);
-    const f = e.dataTransfer.files[0];
-    if (f) handleFile(f);
-  };
+  // Table filters
+  const [activeTab,    setActiveTab]    = useState('All')
+  const [search,       setSearch]       = useState('')
+  const [statusFilter, setStatusFilter] = useState('')
+  const [payTypeFilter,setPayTypeFilter]= useState('')
 
-  const handleImport = () => {
-    setRows(INITIAL_ROWS.map(r => ({ ...r, action: "pending", narration: "" })));
-    setStep("review");
-  };
+  // Reconcile review state
+  const [reconcileBase,   setReconcileBase]   = useState([])
+  const [uploadedRows,    setUploadedRows]     = useState([])
+  const [rowActions,      setRowActions]       = useState({})
+  const [rowReasons,      setRowReasons]       = useState({})
+  const [countAdj, setCountAdj] = useState({ acceptedInitiated: 0, acceptedRejected: 0, movedToRejected: 0 })
 
-  const handleFinalize = () => setStep("done");
+  const handleApply = () => setCampaignFilter(topCampaign)
 
+  const filtered = listData.filter(p => {
+    const matchTab      = activeTab === 'All' || p.paymentStatus === activeTab
+    const matchCampaign = !campaignFilter || p.campaignId === Number(campaignFilter)
+    const matchStatus   = !statusFilter   || p.paymentStatus === statusFilter
+    const matchPayType  = !payTypeFilter  || p.paymentType   === payTypeFilter
+    const q = search.toLowerCase()
+    const matchSearch   = !search ||
+      p.customerName.toLowerCase().includes(q) ||
+      p.proposalId.toLowerCase().includes(q) ||
+      p.product.toLowerCase().includes(q) ||
+      p.mobile.includes(q)
+    return matchTab && matchCampaign && matchStatus && matchPayType && matchSearch
+  })
+
+  const pg = usePagination(filtered, 10)
   const counts = {
-    total:    rows.length,
-    pending:  rows.filter(r => r.action === "pending").length,
-    accepted: rows.filter(r => r.action === "accepted").length,
-    rejected: rows.filter(r => r.action === "rejected").length,
-    hold:     rows.filter(r => r.action === "hold").length,
-    match:    rows.filter(r => r.recordType === "match").length,
-    mismatch: rows.filter(r => r.recordType === "mismatch").length,
-    new:      rows.filter(r => r.recordType === "new").length,
-    missing:  rows.filter(r => r.recordType === "missing").length,
-  };
+    All:       462 - countAdj.acceptedInitiated - countAdj.acceptedRejected,
+    Initiated: 82  - countAdj.acceptedInitiated - countAdj.movedToRejected,
+    Rejected:  380 - countAdj.acceptedRejected  + countAdj.movedToRejected,
+  }
 
-  const filtered = rows.filter(r => {
-    if (filter === "All")      return true;
-    if (filter === "Pending")  return r.action === "pending";
-    if (filter === "Accepted") return r.action === "accepted";
-    if (filter === "Rejected") return r.action === "rejected";
-    if (filter === "Hold")     return r.action === "hold";
-    if (filter === "Mismatch") return r.recordType === "mismatch";
-    if (filter === "New")      return r.recordType === "new";
-    if (filter === "Missing")  return r.recordType === "missing";
-    return true;
-  });
+  // ── start reconcile ────────────────────────────────────────────────────────
+  const startReconcile = () => {
+    setFile(null)
+    setMode('upload')
+  }
 
-  // ── Upload step ─────────────────────────────────────────────────────────────
-  if (step === "upload") {
+  const handleFile = f => { if (f) setFile(f) }
+
+  const handleSubmitUpload = () => {
+    const base    = filtered  // reconcile against currently filtered records
+    const uploaded = buildUploadedRows(base)
+    setReconcileBase(base)
+    setUploadedRows(uploaded)
+    setRowActions({})
+    setRowReasons({})
+    setMode('review')
+  }
+
+  const setAction = (id, action) =>
+    setRowActions(prev => ({ ...prev, [id]: action }))
+
+  const setReason = (id, reason) =>
+    setRowReasons(prev => ({ ...prev, [id]: reason }))
+
+  const handleFinalize = () => {
+    const acceptedInitiated = reconcileBase.filter(r => rowActions[r.id] === 'accept' && r.paymentStatus === 'Initiated').length
+    const acceptedRejected  = reconcileBase.filter(r => rowActions[r.id] === 'accept' && r.paymentStatus === 'Rejected').length
+    const movedToRejected   = reconcileBase.filter(r => rowActions[r.id] === 'reject' && r.paymentStatus === 'Initiated').length
+
+    setCountAdj(prev => ({
+      acceptedInitiated: prev.acceptedInitiated + acceptedInitiated,
+      acceptedRejected:  prev.acceptedRejected  + acceptedRejected,
+      movedToRejected:   prev.movedToRejected   + movedToRejected,
+    }))
+
+    setListData(prev => prev.map(p => {
+      const action = rowActions[p.id]
+      if (action === 'accept') return { ...p, paymentStatus: 'Paid' }
+      if (action === 'reject') return { ...p, paymentStatus: 'Rejected' }
+      return p
+    }).filter(p => p.paymentStatus !== 'Paid'))
+
+    setMode('done')
+  }
+
+  const reviewCounts = {
+    total:    reconcileBase.length,
+    pending:  reconcileBase.filter(r => !rowActions[r.id]).length,
+    accepted: Object.values(rowActions).filter(a => a === 'accept').length,
+    rejected: Object.values(rowActions).filter(a => a === 'reject').length,
+  }
+
+  // ════════════════════════════════════════════════════════════════════════════
+  // UPLOAD STEP
+  // ════════════════════════════════════════════════════════════════════════════
+  if (mode === 'upload') {
     return (
       <div>
-        <div className="page-header">
-          <div className="page-title-row">
-            <div className="page-icon"><DocumentIcon /></div>
-            <div>
-              <div className="page-title">Reconciliation</div>
-              <div className="page-subtitle">Upload external data and reconcile with database records</div>
-            </div>
-          </div>
-        </div>
+        <PageHeader
+          icon={<DocumentIcon />}
+          title="Reconciliation — Upload"
+          subtitle="Upload the IC / external data file to reconcile against filtered records"
+        >
+          <button className="btn btn-ghost" onClick={() => setMode('list')}>← Back</button>
+        </PageHeader>
 
-        <div className="card" style={{ maxWidth: 680, margin: "0 auto" }}>
+        <div className="card" style={{ maxWidth: 640, margin: '0 auto' }}>
           <div className="card-body">
-            <div style={{ fontWeight: 700, fontSize: 16, marginBottom: 6 }}>Step 1 — Upload External Data</div>
-            <div style={{ fontSize: 13, color: "var(--text-3)", marginBottom: 24, display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 12 }}>
-              <span>
-                Upload the file received from the external source (insurance company, aggregator, or IC portal).
-                Supported formats: CSV, XLSX, XLS.
-              </span>
-              <a
-                href="/reconciliation_sample.csv"
-                download="reconciliation_sample.csv"
-                style={{ whiteSpace: "nowrap", fontSize: 12.5, fontWeight: 600, color: "var(--brand)", textDecoration: "none", border: "1px solid var(--brand)", borderRadius: 6, padding: "4px 12px", flexShrink: 0 }}
-              >
-                ⬇ Download Sample CSV
-              </a>
+            <div style={{ fontWeight: 700, fontSize: 15, marginBottom: 6 }}>Upload Payment Data File</div>
+            <div style={{ fontSize: 13, color: 'var(--text-3)', marginBottom: 24 }}>
+              Upload the Excel or CSV file received from the insurance company. The data will be matched
+              against the <strong>{filtered.length}</strong> records currently filtered on the reconciliation page.
             </div>
 
             {/* Drop zone */}
             <div
-              onDragOver={e => { e.preventDefault(); setDragging(true); }}
+              onDragOver={e => { e.preventDefault(); setDragging(true) }}
               onDragLeave={() => setDragging(false)}
-              onDrop={handleDrop}
+              onDrop={e => { e.preventDefault(); setDragging(false); handleFile(e.dataTransfer.files[0]) }}
               onClick={() => fileRef.current?.click()}
               style={{
-                border: `2px dashed ${dragging ? "var(--brand)" : file ? "#2d7d46" : "var(--border)"}`,
-                borderRadius: 14,
-                background: dragging ? "#f5f3ff" : file ? "#e6f4ea" : "var(--surface-2)",
-                padding: "48px 32px",
-                textAlign: "center",
-                cursor: "pointer",
-                transition: "all .18s",
+                border: `2px dashed ${dragging ? 'var(--brand)' : file ? '#15803d' : 'var(--border)'}`,
+                borderRadius: 14, cursor: 'pointer', textAlign: 'center',
+                padding: '44px 32px', transition: 'all .18s',
+                background: dragging ? '#f5f3ff' : file ? '#f0fdf4' : 'var(--surface-2)',
               }}
             >
               <input
-                ref={fileRef}
-                type="file"
-                accept=".csv,.xlsx,.xls"
-                style={{ display: "none" }}
+                ref={fileRef} type="file" accept=".csv,.xlsx,.xls"
+                style={{ display: 'none' }}
                 onChange={e => handleFile(e.target.files[0])}
               />
               {file ? (
                 <>
                   <div style={{ fontSize: 36, marginBottom: 10 }}>✅</div>
-                  <div style={{ fontWeight: 700, fontSize: 15, color: "#2d7d46" }}>{file.name}</div>
-                  <div style={{ fontSize: 12, color: "var(--text-3)", marginTop: 4 }}>
+                  <div style={{ fontWeight: 700, fontSize: 15, color: '#15803d' }}>{file.name}</div>
+                  <div style={{ fontSize: 12, color: 'var(--text-3)', marginTop: 4 }}>
                     {(file.size / 1024).toFixed(1)} KB · Click to change
                   </div>
                 </>
               ) : (
                 <>
-                  <UploadIcon style={{ width: 40, height: 40, color: "var(--brand)", marginBottom: 12 }} />
+                  <div style={{ fontSize: 36, marginBottom: 10 }}>📂</div>
                   <div style={{ fontWeight: 600, fontSize: 15, marginBottom: 6 }}>
                     Drag & drop your file here
                   </div>
-                  <div style={{ fontSize: 13, color: "var(--text-3)" }}>
+                  <div style={{ fontSize: 13, color: 'var(--text-3)' }}>
                     or click to browse — CSV, XLSX, XLS supported
                   </div>
                 </>
               )}
             </div>
 
-            {/* Campaign */}
-            <div style={{ marginTop: 24 }}>
-              <label style={{ fontSize: 12.5, fontWeight: 600, color: "var(--text-2)", display: "block", marginBottom: 6 }}>
-                Campaign
-              </label>
-              <select className="field-select" style={{ width: "100%" }}>
-                <option value="">All Campaigns</option>
-                <option>Campaign 1</option>
-                <option>Campaign OPD and DIGIT PAYMENT PROTECTION</option>
-                <option>BPP Campaign</option>
-                <option>Test Campaign</option>
-                <option>SBI_STP_Campaign</option>
-                <option>BPP Campaign_2026-2027</option>
-                <option>Standalone campaign</option>
-              </select>
-            </div>
-
-            <div style={{ marginTop: 28, display: "flex", justifyContent: "flex-end" }}>
+            <div style={{ marginTop: 28, display: 'flex', justifyContent: 'flex-end', gap: 10 }}>
+              <button className="btn btn-ghost" onClick={() => setMode('list')}>Cancel</button>
               <button
                 className="btn btn-primary"
                 disabled={!file}
-                onClick={handleImport}
-                style={{ opacity: file ? 1 : 0.5 }}
+                onClick={handleSubmitUpload}
+                style={{ opacity: file ? 1 : 0.5, cursor: file ? 'pointer' : 'not-allowed' }}
               >
-                Import & Compare →
+                Submit & Compare →
               </button>
             </div>
           </div>
         </div>
       </div>
-    );
+    )
   }
 
-  // ── Done step ────────────────────────────────────────────────────────────────
-  if (step === "done") {
+  // ════════════════════════════════════════════════════════════════════════════
+  // DONE STEP
+  // ════════════════════════════════════════════════════════════════════════════
+  if (mode === 'done') {
     return (
       <div>
-        <div className="page-header">
-          <div className="page-title-row">
-            <div className="page-icon"><DocumentIcon /></div>
-            <div>
-              <div className="page-title">Reconciliation Complete</div>
-              <div className="page-subtitle">Summary of reconciliation actions</div>
-            </div>
-          </div>
-        </div>
-
-        <div className="card" style={{ maxWidth: 680, margin: "0 auto" }}>
-          <div className="card-body" style={{ textAlign: "center", padding: "40px 32px" }}>
-            <div style={{ fontSize: 56, marginBottom: 14 }}>✅</div>
+        <PageHeader icon={<DocumentIcon />} title="Reconciliation Complete" subtitle="Summary of actions taken" />
+        <div className="card" style={{ maxWidth: 560, margin: '0 auto' }}>
+          <div className="card-body" style={{ textAlign: 'center', padding: '44px 32px' }}>
+            <div style={{ fontSize: 56, marginBottom: 16 }}>✅</div>
             <div style={{ fontWeight: 800, fontSize: 22, marginBottom: 6 }}>Reconciliation Saved</div>
-            <div style={{ fontSize: 14, color: "var(--text-3)", marginBottom: 32 }}>
-              {file?.name} · {new Date().toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" })}
+            <div style={{ fontSize: 13.5, color: 'var(--text-3)', marginBottom: 32 }}>
+              {file?.name} · {new Date().toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })}
             </div>
-
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 14, marginBottom: 32 }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 14, marginBottom: 32 }}>
               {[
-                { label: "Total Records", value: counts.total,    bg: "#f5f3ff", color: "#7c3aed" },
-                { label: "Accepted",      value: counts.accepted, bg: "#e6f4ea", color: "#2d7d46" },
-                { label: "Rejected",      value: counts.rejected, bg: "#fce7f3", color: "#9d174d" },
-                { label: "On Hold",       value: counts.hold,     bg: "#fff3e0", color: "#a05c00" },
+                { label: 'Total Records', value: reviewCounts.total,    bg: '#f5f3ff', color: '#7c3aed' },
+                { label: 'Accepted (Paid)', value: reviewCounts.accepted, bg: '#dcfce7', color: '#15803d' },
+                { label: 'Rejected',      value: reviewCounts.rejected, bg: '#fee2e2', color: '#dc2626' },
               ].map(k => (
-                <div key={k.label} style={{ background: k.bg, borderRadius: 10, padding: "16px" }}>
+                <div key={k.label} style={{ background: k.bg, borderRadius: 10, padding: '16px' }}>
                   <div style={{ fontSize: 28, fontWeight: 800, color: k.color }}>{k.value}</div>
-                  <div style={{ fontSize: 12, fontWeight: 600, color: "#1a1628", marginTop: 4 }}>{k.label}</div>
+                  <div style={{ fontSize: 12, fontWeight: 600, color: '#1a1628', marginTop: 4 }}>{k.label}</div>
                 </div>
               ))}
             </div>
-
-            {counts.pending > 0 && (
-              <div style={{ background: "#fff3e0", border: "1px solid #fbbf24", borderRadius: 8, padding: "10px 16px", marginBottom: 20, fontSize: 13, color: "#a05c00" }}>
-                ⚠️ {counts.pending} record(s) still pending — review before closing.
+            {reviewCounts.pending > 0 && (
+              <div style={{ background: '#fff3e0', border: '1px solid #fbbf24', borderRadius: 8, padding: '10px 16px', marginBottom: 20, fontSize: 13, color: '#a05c00' }}>
+                ⚠️ {reviewCounts.pending} record(s) were not actioned.
               </div>
             )}
-
-            <div style={{ display: "flex", gap: 12, justifyContent: "center" }}>
-              <button className="btn btn-ghost" onClick={() => { setStep("review"); }}>← Back to Review</button>
-              <button className="btn btn-primary" onClick={() => { setStep("upload"); setFile(null); }}>New Reconciliation</button>
+            <div style={{ display: 'flex', gap: 12, justifyContent: 'center' }}>
+              <button className="btn btn-ghost" onClick={() => setMode('review')}>← Back to Review</button>
+              <button className="btn btn-primary" onClick={() => { setMode('list'); setFile(null); setActiveTab('Rejected'); setStatusFilter('Rejected') }}>Done</button>
             </div>
           </div>
         </div>
       </div>
-    );
+    )
   }
 
-  // ── Review step ──────────────────────────────────────────────────────────────
-  return (
-    <div>
-      <div className="page-header">
-        <div className="page-title-row">
-          <div className="page-icon"><DocumentIcon /></div>
-          <div>
-            <div className="page-title">Reconciliation Review</div>
-            <div className="page-subtitle">
-              {file?.name} · Compare database entries with uploaded data
-            </div>
+  // ════════════════════════════════════════════════════════════════════════════
+  // REVIEW STEP
+  // ════════════════════════════════════════════════════════════════════════════
+  if (mode === 'review') {
+    const allActioned = reviewCounts.pending === 0
+
+    return (
+      <div>
+        <PageHeader
+          icon={<DocumentIcon />}
+          title="Reconciliation Review"
+          subtitle={`${file?.name} · ${reconcileBase.length} records matched`}
+        >
+          <div style={{ display: 'flex', gap: 10 }}>
+            <button className="btn btn-ghost" onClick={() => setMode('upload')}>← Re-upload</button>
+            <button className="btn btn-primary" onClick={handleFinalize}>
+              Finalise →
+            </button>
           </div>
-        </div>
-        <div style={{ display: "flex", gap: 10 }}>
-          <button className="btn btn-ghost" onClick={() => setStep("upload")}>← Re-upload</button>
-          <button
-            className="btn btn-primary"
-            onClick={handleFinalize}
-          >
-            Finalise Reconciliation
-          </button>
-        </div>
-      </div>
+        </PageHeader>
 
-      {/* KPI summary */}
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 14, marginBottom: 20 }}>
-        {[
-          { label: "Total Records", value: counts.total,    bg: "#f5f3ff", color: "#7c3aed" },
-          { label: "Pending",       value: counts.pending,  bg: "#ede9fe", color: "#6d28d9" },
-          { label: "Mismatches",    value: counts.mismatch, bg: "#fff3e0", color: "#a05c00" },
-          { label: "New Records",   value: counts.new,      bg: "#e0f4fb", color: "#0a7ea4" },
-        ].map(k => (
-          <div key={k.label} style={{ background: k.bg, borderRadius: 10, padding: "14px 18px", border: "1px solid var(--border)" }}>
-            <div style={{ fontSize: 28, fontWeight: 800, color: k.color }}>{k.value}</div>
-            <div style={{ fontSize: 12.5, fontWeight: 600, color: "#1a1628", marginTop: 3 }}>{k.label}</div>
-          </div>
-        ))}
-      </div>
-
-      {/* Action summary pills */}
-      <div style={{ display: "flex", gap: 10, marginBottom: 20, flexWrap: "wrap" }}>
-        {[
-          { key: "accepted", label: `✓ Accepted: ${counts.accepted}`, ...ACTION_STYLE.accepted },
-          { key: "rejected", label: `✗ Rejected: ${counts.rejected}`, ...ACTION_STYLE.rejected },
-          { key: "hold",     label: `⏸ On Hold: ${counts.hold}`,       ...ACTION_STYLE.hold     },
-          { key: "match",    label: `= Matched: ${counts.match}`,       bg: "#e6f4ea", color: "#2d7d46", border: "#2d7d46" },
-        ].map(p => (
-          <span key={p.key} style={{
-            padding: "4px 14px", borderRadius: 99, fontSize: 12.5, fontWeight: 600,
-            background: p.bg, color: p.color, border: `1px solid ${p.border}33`,
-          }}>
-            {p.label}
-          </span>
-        ))}
-      </div>
-
-      {/* Filter tabs */}
-      <div style={{ display: "flex", gap: 6, marginBottom: 18, flexWrap: "wrap" }}>
-        {FILTER_TABS.map(t => (
-          <button key={t} type="button" onClick={() => setFilter(t)}
-            style={{
-              padding: "6px 16px", borderRadius: 99, fontSize: 12.5, fontWeight: 600,
-              border: "1.5px solid", cursor: "pointer", fontFamily: "inherit",
-              borderColor: filter === t ? "var(--brand)" : "var(--border)",
-              background: filter === t ? "var(--brand)" : "#fff",
-              color: filter === t ? "#fff" : "var(--text-2)",
+        {/* Review summary pills */}
+        <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap', marginBottom: 20 }}>
+          {[
+            { label: `Total: ${reviewCounts.total}`,    bg: '#f5f3ff', color: '#7c3aed' },
+            { label: `Pending: ${reviewCounts.pending}`, bg: '#fff3e0', color: '#92400e' },
+            { label: `Accepted: ${reviewCounts.accepted}`, bg: '#dcfce7', color: '#15803d' },
+            { label: `Rejected: ${reviewCounts.rejected}`, bg: '#fee2e2', color: '#dc2626' },
+          ].map(p => (
+            <span key={p.label} style={{
+              padding: '5px 16px', borderRadius: 99, fontSize: 13, fontWeight: 700,
+              background: p.bg, color: p.color,
             }}>
-            {t}
-          </button>
-        ))}
-      </div>
+              {p.label}
+            </span>
+          ))}
+        </div>
 
-      {/* Reconciliation cards */}
-      <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
-        {filtered.length === 0 && (
-          <div className="card">
-            <div className="card-body" style={{ textAlign: "center", color: "var(--text-3)", padding: "40px" }}>
-              No records in this filter.
+        {/* Review table */}
+        <div className="card">
+          <div className="card-body" style={{ padding: 0 }}>
+            <div className="table-wrap">
+              <table style={{ fontSize: 13 }}>
+                <thead>
+                  <tr>
+                    <th>Proposal ID</th>
+                    <th>Customer</th>
+                    <th>Product</th>
+                    <th>Pay Type</th>
+                    <th style={{ textAlign: 'center' }}>Local Premium</th>
+                    <th style={{ textAlign: 'center' }}>Uploaded Premium</th>
+                    <th>System Status</th>
+                    <th>IC Status</th>
+                    <th style={{ minWidth: 230 }}>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {reconcileBase.map((rec, i) => {
+                    const up     = uploadedRows[i]
+                    const action = rowActions[rec.id]
+                    const reason = rowReasons[rec.id] ?? ''
+                    const premDiff = up && up.premium !== rec.premium
+                    const nameDiff = up && up.customerName !== rec.customerName
+
+                    return (
+                      <tr key={rec.id} style={{
+                        background: action === 'accept' ? '#f0fdf4' : action === 'reject' ? '#fff5f5' : '#fff',
+                        borderLeft: `3px solid ${action === 'accept' ? '#16a34a' : action === 'reject' ? '#dc2626' : 'transparent'}`,
+                      }}>
+                        <td style={{ fontFamily: 'monospace', fontSize: 11.5, color: '#7c3aed' }}>{rec.proposalId}</td>
+                        <td style={{ fontWeight: 500 }}>
+                          {nameDiff
+                            ? <span title={`Uploaded: ${up.customerName}`} style={{ borderBottom: '1.5px dashed #f59e0b', cursor: 'help' }}>{rec.customerName}</span>
+                            : rec.customerName}
+                        </td>
+                        <td style={{ maxWidth: 160, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', color: 'var(--text-2)' }}>{rec.product}</td>
+                        <td>{rec.paymentType}</td>
+                        <td style={{ textAlign: 'center', fontWeight: 600 }}>{fmt(rec.premium)}</td>
+                        <td style={{ textAlign: 'center', fontWeight: 600, color: premDiff ? '#dc2626' : '#15803d' }}>
+                          {up ? fmt(up.premium) : '—'}
+                          {premDiff && <span title="Mismatch" style={{ marginLeft: 4 }}>⚠</span>}
+                        </td>
+                        <td><StatusPill status={rec.paymentStatus} /></td>
+                        <td>
+                          {up ? <StatusPill status={up.uploadedStatus} /> : '—'}
+                        </td>
+                        <td>
+                          {action === 'accept' && (
+                            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                              <span style={{ fontSize: 12.5, fontWeight: 700, color: '#15803d' }}>✓ Accepted → Paid</span>
+                              <button type="button" onClick={() => setAction(rec.id, null)}
+                                style={{ fontSize: 11, color: '#64748b', background: 'none', border: '1px solid #e2e8f0', borderRadius: 5, padding: '2px 7px', cursor: 'pointer' }}>Undo</button>
+                            </div>
+                          )}
+                          {action === 'reject' && (
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                              <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                                <span style={{ fontSize: 12.5, fontWeight: 700, color: '#dc2626' }}>✕ Rejected</span>
+                                <button type="button" onClick={() => setAction(rec.id, null)}
+                                  style={{ fontSize: 11, color: '#64748b', background: 'none', border: '1px solid #e2e8f0', borderRadius: 5, padding: '2px 7px', cursor: 'pointer' }}>Undo</button>
+                              </div>
+                              {!reason && (
+                                <select
+                                  className="field-select"
+                                  style={{ fontSize: 12, padding: '4px 8px' }}
+                                  value={reason}
+                                  onChange={e => setReason(rec.id, e.target.value)}
+                                >
+                                  <option value="">Select reason…</option>
+                                  {REJECT_REASONS.map(r => <option key={r}>{r}</option>)}
+                                </select>
+                              )}
+                              {reason && <span style={{ fontSize: 11.5, color: '#64748b' }}>{reason}</span>}
+                            </div>
+                          )}
+                          {!action && (
+                            <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+                              <button
+                                type="button"
+                                onClick={() => setAction(rec.id, 'accept')}
+                                style={{
+                                  padding: '5px 14px', borderRadius: 7, border: 'none',
+                                  background: '#16a34a', color: '#fff', fontWeight: 700,
+                                  fontSize: 12.5, cursor: 'pointer', fontFamily: 'inherit',
+                                }}
+                              >
+                                ✓ Accept
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => setAction(rec.id, 'reject')}
+                                style={{
+                                  padding: '5px 14px', borderRadius: 7,
+                                  border: '1.5px solid #dc2626', background: '#fff',
+                                  color: '#dc2626', fontWeight: 700,
+                                  fontSize: 12.5, cursor: 'pointer', fontFamily: 'inherit',
+                                }}
+                              >
+                                ✕ Reject
+                              </button>
+                            </div>
+                          )}
+                        </td>
+                      </tr>
+                    )
+                  })}
+                </tbody>
+              </table>
             </div>
           </div>
-        )}
+        </div>
 
-        {filtered.map(row => {
-          const badge = RECORD_BADGE[row.recordType];
-          const actionStyle = ACTION_STYLE[row.action] ?? ACTION_STYLE.pending;
-          const isOpen = expanded[row.policyNo] ?? (row.recordType !== "match");
-
-          return (
-            <div key={row.policyNo} className="card" style={{ border: `1.5px solid ${row.diffs.length > 0 || row.recordType !== "match" ? "#fbbf2444" : "var(--border)"}` }}>
-              {/* Card header */}
-              <div
-                style={{ padding: "14px 20px", cursor: "pointer", display: "flex", alignItems: "center", gap: 14, borderBottom: isOpen ? "1px solid var(--border)" : "none" }}
-                onClick={() => toggleExpand(row.policyNo)}
-              >
-                <span style={{ fontWeight: 700, fontSize: 14, fontFamily: "monospace", color: "var(--brand)" }}>
-                  {row.policyNo}
-                </span>
-                <span style={{ padding: "2px 10px", borderRadius: 99, fontSize: 11.5, fontWeight: 700, background: badge.bg, color: badge.color }}>
-                  {badge.label}
-                </span>
-                {row.diffs.length > 0 && (
-                  <span style={{ fontSize: 12, color: "#a05c00" }}>
-                    {row.diffs.length} field{row.diffs.length > 1 ? "s" : ""} differ
-                  </span>
-                )}
-                <span style={{ marginLeft: "auto", padding: "2px 12px", borderRadius: 99, fontSize: 12, fontWeight: 600, background: actionStyle.bg, color: actionStyle.color, border: `1px solid ${actionStyle.border}33` }}>
-                  {row.action.charAt(0).toUpperCase() + row.action.slice(1)}
-                </span>
-                <span style={{ fontSize: 16, color: "var(--text-3)", marginLeft: 4 }}>{isOpen ? "▲" : "▼"}</span>
-              </div>
-
-              {isOpen && (
-                <div style={{ padding: "0 20px 20px" }}>
-
-                  {/* Side-by-side comparison */}
-                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16, marginTop: 16, marginBottom: 16 }}>
-
-                    {/* DB column */}
-                    <div style={{ background: "#f8f9ff", border: "1px solid #e0dff0", borderRadius: 10, overflow: "hidden" }}>
-                      <div style={{ background: "#a855f7", color: "#fff", padding: "8px 14px", fontWeight: 700, fontSize: 12.5, display: "flex", alignItems: "center", gap: 6 }}>
-                        🗄️ Database Record
-                      </div>
-                      {row.db ? (
-                        <table style={{ width: "100%", fontSize: 12.5, borderCollapse: "collapse" }}>
-                          <tbody>
-                            {COMPARE_FIELDS.map(f => {
-                              const isDiff = row.diffs.includes(f.key);
-                              const val = f.format ? f.format(row.db[f.key]) : (row.db[f.key] || "—");
-                              return (
-                                <tr key={f.key} style={{ borderBottom: "1px solid #e8e4f0" }}>
-                                  <td style={{ padding: "7px 12px", color: "var(--text-3)", fontWeight: 600, width: "40%", whiteSpace: "nowrap" }}>{f.label}</td>
-                                  <td style={{ padding: "7px 12px" }}><Val value={val} isDiff={isDiff} /></td>
-                                </tr>
-                              );
-                            })}
-                          </tbody>
-                        </table>
-                      ) : (
-                        <div style={{ padding: "20px 14px", color: "var(--text-3)", fontStyle: "italic", fontSize: 13 }}>
-                          No matching record in database
-                        </div>
-                      )}
-                    </div>
-
-                    {/* External column */}
-                    <div style={{ background: "#f0fdf4", border: "1px solid #d1fae5", borderRadius: 10, overflow: "hidden" }}>
-                      <div style={{ background: "#0a7ea4", color: "#fff", padding: "8px 14px", fontWeight: 700, fontSize: 12.5, display: "flex", alignItems: "center", gap: 6 }}>
-                        📤 External Source
-                      </div>
-                      {row.ext ? (
-                        <table style={{ width: "100%", fontSize: 12.5, borderCollapse: "collapse" }}>
-                          <tbody>
-                            {COMPARE_FIELDS.map(f => {
-                              const isDiff = row.diffs.includes(f.key);
-                              const val = f.format ? f.format(row.ext[f.key]) : (row.ext[f.key] || "—");
-                              return (
-                                <tr key={f.key} style={{ borderBottom: "1px solid #d1fae5" }}>
-                                  <td style={{ padding: "7px 12px", color: "var(--text-3)", fontWeight: 600, width: "40%", whiteSpace: "nowrap" }}>{f.label}</td>
-                                  <td style={{ padding: "7px 12px" }}><Val value={val} isDiff={isDiff} /></td>
-                                </tr>
-                              );
-                            })}
-                          </tbody>
-                        </table>
-                      ) : (
-                        <div style={{ padding: "20px 14px", color: "var(--text-3)", fontStyle: "italic", fontSize: 13 }}>
-                          No matching record in uploaded file
-                        </div>
-                      )}
-                    </div>
-                  </div>
-
-                  {/* Narration */}
-                  <div style={{ marginBottom: 14 }}>
-                    <label style={{ fontSize: 12, fontWeight: 600, color: "var(--text-2)", display: "block", marginBottom: 5 }}>
-                      Narration / Remarks
-                    </label>
-                    <textarea
-                      rows={2}
-                      className="input"
-                      style={{ width: "100%", resize: "vertical", fontSize: 13 }}
-                      placeholder="Add a narration or reason for the action taken…"
-                      value={row.narration}
-                      onChange={e => updateRow(row.policyNo, { narration: e.target.value })}
-                    />
-                  </div>
-
-                  {/* Action buttons */}
-                  <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
-                    <span style={{ fontSize: 12.5, color: "var(--text-3)", fontWeight: 600 }}>Action:</span>
-                    {[
-                      { key: "accepted", label: "✓ Accept",   style: ACTION_STYLE.accepted },
-                      { key: "rejected", label: "✗ Reject",   style: ACTION_STYLE.rejected },
-                      { key: "hold",     label: "⏸ Hold",     style: ACTION_STYLE.hold     },
-                    ].map(btn => (
-                      <button
-                        key={btn.key}
-                        type="button"
-                        onClick={() => updateRow(row.policyNo, { action: row.action === btn.key ? "pending" : btn.key })}
-                        style={{
-                          padding: "7px 20px", borderRadius: 7, fontSize: 13, fontWeight: 700,
-                          cursor: "pointer", fontFamily: "inherit",
-                          border: `1.5px solid ${btn.style.border}`,
-                          background: row.action === btn.key ? btn.style.bg : "#fff",
-                          color: row.action === btn.key ? btn.style.color : "var(--text-2)",
-                          boxShadow: row.action === btn.key ? `0 0 0 3px ${btn.style.border}22` : "none",
-                          transition: "all .12s",
-                        }}
-                      >
-                        {btn.label}
-                      </button>
-                    ))}
-
-                    {row.recordType === "match" && row.action === "pending" && (
-                      <span style={{ marginLeft: 8, fontSize: 12, color: "#2d7d46", fontStyle: "italic" }}>
-                        ✓ Records match — no action required
-                      </span>
-                    )}
-                  </div>
-                </div>
-              )}
-            </div>
-          );
-        })}
-      </div>
-
-      {/* Bottom finalise bar */}
-      {filtered.length > 0 && (
+        {/* Sticky bottom bar */}
         <div style={{
-          position: "sticky", bottom: 0, background: "#fff", borderTop: "1px solid var(--border)",
-          marginTop: 24, padding: "14px 0", display: "flex", justifyContent: "space-between", alignItems: "center",
+          position: 'sticky', bottom: 0, background: '#fff',
+          borderTop: '1px solid var(--border)', marginTop: 20,
+          padding: '14px 0', display: 'flex', justifyContent: 'space-between', alignItems: 'center',
         }}>
-          <span style={{ fontSize: 13, color: "var(--text-3)" }}>
-            {counts.pending} record{counts.pending !== 1 ? "s" : ""} still pending
+          <span style={{ fontSize: 13, color: 'var(--text-3)' }}>
+            {reviewCounts.pending} record{reviewCounts.pending !== 1 ? 's' : ''} still pending
           </span>
           <button className="btn btn-primary" onClick={handleFinalize}>
             Finalise Reconciliation →
           </button>
         </div>
-      )}
+      </div>
+    )
+  }
+
+  // ════════════════════════════════════════════════════════════════════════════
+  // LIST (default)
+  // ════════════════════════════════════════════════════════════════════════════
+  return (
+    <div>
+      <PageHeader
+        icon={<DocumentIcon />}
+        title="Reconciliation"
+        subtitle="Review initiated and rejected payment records"
+      />
+
+      {/* Top filter bar */}
+      <div className="card" style={{ marginBottom: 20 }}>
+        <div className="card-body" style={{ padding: '16px 20px' }}>
+          <div style={{ display: 'flex', gap: 16, alignItems: 'flex-end', flexWrap: 'wrap' }}>
+            <div style={{ flex: '1 1 260px' }}>
+              <label style={LABEL}>Campaign Name</label>
+              <select className="field-select" style={{ marginTop: 5 }} value={topCampaign} onChange={e => setTopCampaign(e.target.value)}>
+                <option value="">All Campaigns</option>
+                {CAMPAIGNS.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
+              </select>
+            </div>
+            <div style={{ flex: '1 1 260px' }}>
+              <label style={LABEL}>Association</label>
+              <select className="field-select" style={{ marginTop: 5 }} value={topAssoc} onChange={e => setTopAssoc(e.target.value)}>
+                <option value="">All Associations</option>
+                {ASSOCIATIONS.filter(a => a.isActive).map(a => (
+                  <option key={a.id} value={a.id}>{a.name}</option>
+                ))}
+              </select>
+            </div>
+            <button
+              type="button" onClick={handleApply}
+              style={{
+                padding: '10px 32px', borderRadius: 9, border: 'none', cursor: 'pointer',
+                fontFamily: 'inherit', fontWeight: 700, fontSize: 14, color: '#fff',
+                background: 'linear-gradient(135deg, #ec4899 0%, #a855f7 100%)',
+                boxShadow: '0 2px 8px rgba(168,85,247,0.35)', flexShrink: 0,
+              }}
+              onMouseEnter={e => e.currentTarget.style.opacity = '.85'}
+              onMouseLeave={e => e.currentTarget.style.opacity = '1'}
+            >
+              Apply
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {/* Summary cards */}
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(160px,1fr))', gap: 14, marginBottom: 24 }}>
+        {[
+          { label: 'Total',     count: counts.All,       color: '#7c3aed', bg: '#f5f3ff' },
+          { label: 'Initiated', count: counts.Initiated, color: '#0369a1', bg: '#e0f2fe' },
+          { label: 'Rejected',  count: counts.Rejected,  color: '#dc2626', bg: '#fee2e2' },
+        ].map(s => (
+          <div key={s.label} style={{ background: '#fff', border: '1px solid #e8e4f0', borderRadius: 12, padding: '16px 18px' }}>
+            <div style={{ fontSize: 26, fontWeight: 800, color: s.color }}>{s.count}</div>
+            <div style={{ fontSize: 12.5, fontWeight: 600, color: '#1a1628', marginTop: 2 }}>{s.label}</div>
+          </div>
+        ))}
+      </div>
+
+      <div className="card">
+        <div className="card-body">
+
+          {/* Status tabs */}
+          <div style={{ display: 'flex', gap: 6, marginBottom: 16, flexWrap: 'wrap' }}>
+            {STATUS_TABS.map(t => (
+              <button key={t} type="button" onClick={() => { setActiveTab(t); pg.reset() }}
+                style={{
+                  padding: '6px 16px', borderRadius: 99, fontSize: 13, fontWeight: 600,
+                  cursor: 'pointer', fontFamily: 'inherit', border: 'none',
+                  background: activeTab === t ? '#a855f7' : '#f5f3ff',
+                  color:      activeTab === t ? '#fff'    : '#a855f7',
+                  transition: 'all .13s',
+                }}>
+                {t} <span style={{ fontSize: 11, opacity: .7 }}>({counts[t] ?? filtered.length})</span>
+              </button>
+            ))}
+          </div>
+
+          {/* Search + filters */}
+          <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap', alignItems: 'flex-end', marginBottom: 14 }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+              <label style={LABEL}>Search</label>
+              <input className="field-input filter-search" placeholder="Customer, proposal, product, mobile…"
+                value={search} onChange={e => { setSearch(e.target.value); pg.reset() }} style={{ width: 260 }} />
+            </div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+              <label style={LABEL}>Status</label>
+              <select className="field-select" style={{ width: 150 }} value={statusFilter}
+                onChange={e => { setStatusFilter(e.target.value); pg.reset() }}>
+                <option value="">All Status</option>
+                <option value="Initiated">Initiated</option>
+                <option value="Rejected">Rejected</option>
+              </select>
+            </div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+              <label style={LABEL}>Pay Type</label>
+              <select className="field-select" style={{ width: 140 }} value={payTypeFilter}
+                onChange={e => { setPayTypeFilter(e.target.value); pg.reset() }}>
+                <option value="">All Types</option>
+                <option value="NEFT">NEFT</option>
+                <option value="Cheque">Cheque</option>
+              </select>
+            </div>
+            {(statusFilter || payTypeFilter || search) && (
+              <button type="button" className="btn btn-ghost btn-sm" style={{ alignSelf: 'flex-end' }}
+                onClick={() => { setStatusFilter(''); setPayTypeFilter(''); setSearch(''); pg.reset() }}>
+                Clear
+              </button>
+            )}
+            <div style={{ marginLeft: 'auto', alignSelf: 'flex-end', display: 'flex', gap: 10 }}>
+              <button
+                type="button"
+                onClick={() => exportToExcel(filtered)}
+                style={{
+                  padding: '9px 18px', borderRadius: 9, border: '2px solid #0ea5e9',
+                  cursor: 'pointer', fontFamily: 'inherit', fontWeight: 700,
+                  fontSize: 13.5, color: '#0ea5e9', background: '#fff',
+                  transition: 'all .15s', display: 'flex', alignItems: 'center', gap: 6,
+                }}
+                onMouseEnter={e => { e.currentTarget.style.background = '#f0f9ff' }}
+                onMouseLeave={e => { e.currentTarget.style.background = '#fff' }}
+              >
+                ⬇ Export Excel
+              </button>
+              <button
+                type="button"
+                onClick={startReconcile}
+                style={{
+                  padding: '9px 22px', borderRadius: 9, border: '2px solid #a855f7',
+                  cursor: 'pointer', fontFamily: 'inherit', fontWeight: 700,
+                  fontSize: 13.5, color: '#a855f7', background: '#fff',
+                  transition: 'all .15s',
+                }}
+                onMouseEnter={e => { e.currentTarget.style.background = '#f5f3ff' }}
+                onMouseLeave={e => { e.currentTarget.style.background = '#fff' }}
+              >
+                Reconcile
+              </button>
+            </div>
+          </div>
+
+          {/* Table */}
+          <div className="table-wrap">
+            <table style={{ fontSize: 13 }}>
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>Customer</th>
+                  <th>Mobile</th>
+                  <th>Proposal ID</th>
+                  <th>Product</th>
+                  <th>IC Name</th>
+                  <th>Premium</th>
+                  <th>Mode</th>
+                  <th>Pay Type</th>
+                  <th>Campaign</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                {pg.slice.length === 0 ? (
+                  <tr><td colSpan={11} style={{ textAlign: 'center', padding: '32px 0', color: '#64748b' }}>No records found</td></tr>
+                ) : pg.slice.map(p => (
+                  <tr key={p.id}>
+                    <td style={{ color: 'var(--text-3)' }}>{p.id}</td>
+                    <td style={{ fontWeight: 500 }}>{p.customerName}</td>
+                    <td style={{ color: '#64748b' }}>{p.mobile}</td>
+                    <td style={{ fontFamily: 'monospace', fontSize: 12, color: '#7c3aed' }}>{p.proposalId}</td>
+                    <td style={{ maxWidth: 180, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{p.product}</td>
+                    <td style={{ color: '#64748b' }}>{p.icName}</td>
+                    <td style={{ fontWeight: 600 }}>{fmt(p.premium)}</td>
+                    <td>
+                      <span style={{ fontSize: 12, fontWeight: 600, padding: '2px 8px', borderRadius: 6, background: '#fef3c7', color: '#92400e' }}>
+                        {p.paymentMode}
+                      </span>
+                    </td>
+                    <td><span style={{ fontSize: 12, color: 'var(--text-2)' }}>{p.paymentType}</span></td>
+                    <td style={{ fontSize: 11.5, color: 'var(--text-2)', maxWidth: 140, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{p.campaignName}</td>
+                    <td><StatusPill status={p.paymentStatus} /></td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+
+          <Pagination total={pg.total} page={pg.page} perPage={pg.perPage} onPage={pg.onPage} onPerPage={pg.onPerPage} />
+
+        </div>
+      </div>
     </div>
-  );
+  )
 }

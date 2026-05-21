@@ -33,7 +33,7 @@ const MOCK = [
     bank: 'HDFC Bank',    branch: 'Andheri Branch',
     chequeNo: 'CHQ-004521', referenceNo: null,
     amount: 18500, initiatedDate: '2026-04-12', initiatedBy: 'Ravi Kulkarni',
-    campaignId: 11, campaignName: 'BPP Campaign_2026-2027',
+    campaignId: 5, campaignName: 'Campaign OPD and DIGIT PAYMENT PROTECTION',
     status: 'Pending', rejectionReason: null,
   },
   {
@@ -42,7 +42,7 @@ const MOCK = [
     bank: 'ICICI Bank',   branch: null,
     chequeNo: null, referenceNo: 'NEFT240412001823',
     amount: 24200, initiatedDate: '2026-04-14', initiatedBy: 'Pooja Desai',
-    campaignId: 11, campaignName: 'BPP Campaign_2026-2027',
+    campaignId: 5, campaignName: 'Campaign OPD and DIGIT PAYMENT PROTECTION',
     status: 'Initiated', rejectionReason: null,
   },
   {
@@ -51,7 +51,7 @@ const MOCK = [
     bank: 'SBI',          branch: 'Dadar Branch',
     chequeNo: 'CHQ-009832', referenceNo: null,
     amount: 12800, initiatedDate: '2026-04-15', initiatedBy: 'Ravi Kulkarni',
-    campaignId: 6, campaignName: 'BPP Campaign',
+    campaignId: 5, campaignName: 'Campaign OPD and DIGIT PAYMENT PROTECTION',
     status: 'Rejected', rejectionReason: 'Cheque signature mismatch',
   },
   {
@@ -60,7 +60,7 @@ const MOCK = [
     bank: 'Axis Bank',    branch: null,
     chequeNo: null, referenceNo: 'RTGS240415002711',
     amount: 52000, initiatedDate: '2026-04-15', initiatedBy: 'Amit Verma',
-    campaignId: 8, campaignName: 'SBI_STP_Campaign',
+    campaignId: 5, campaignName: 'Campaign OPD and DIGIT PAYMENT PROTECTION',
     status: 'Pending', rejectionReason: null,
   },
   {
@@ -69,7 +69,7 @@ const MOCK = [
     bank: 'Kotak Bank',   branch: null,
     chequeNo: null, referenceNo: 'IMPS240416008842',
     amount: 9500, initiatedDate: '2026-04-16', initiatedBy: 'Pooja Desai',
-    campaignId: 1, campaignName: 'Campaign 1',
+    campaignId: 5, campaignName: 'Campaign OPD and DIGIT PAYMENT PROTECTION',
     status: 'Initiated', rejectionReason: null,
   },
   {
@@ -78,7 +78,7 @@ const MOCK = [
     bank: 'Bank of Baroda', branch: 'Pune Branch',
     chequeNo: 'CHQ-012203', referenceNo: null,
     amount: 31000, initiatedDate: '2026-04-17', initiatedBy: 'Ravi Kulkarni',
-    campaignId: 11, campaignName: 'BPP Campaign_2026-2027',
+    campaignId: 5, campaignName: 'Campaign OPD and DIGIT PAYMENT PROTECTION',
     status: 'Rejected', rejectionReason: 'Cheque date expired',
   },
   {
@@ -87,7 +87,7 @@ const MOCK = [
     bank: 'Union Bank',   branch: null,
     chequeNo: null, referenceNo: 'NEFT240418003512',
     amount: 16750, initiatedDate: '2026-04-18', initiatedBy: 'Amit Verma',
-    campaignId: 8, campaignName: 'SBI_STP_Campaign',
+    campaignId: 5, campaignName: 'Campaign OPD and DIGIT PAYMENT PROTECTION',
     status: 'Pending', rejectionReason: null,
   },
   {
@@ -96,7 +96,7 @@ const MOCK = [
     bank: 'Yes Bank',     branch: null,
     chequeNo: null, referenceNo: 'IMPS240420011293',
     amount: 8200, initiatedDate: '2026-04-20', initiatedBy: 'Pooja Desai',
-    campaignId: 6, campaignName: 'BPP Campaign',
+    campaignId: 5, campaignName: 'Campaign OPD and DIGIT PAYMENT PROTECTION',
     status: 'Initiated', rejectionReason: null,
   },
   {
@@ -105,7 +105,7 @@ const MOCK = [
     bank: 'Punjab National Bank', branch: 'Ludhiana Branch',
     chequeNo: 'CHQ-019882', referenceNo: null,
     amount: 44500, initiatedDate: '2026-04-21', initiatedBy: 'Ravi Kulkarni',
-    campaignId: 1, campaignName: 'Campaign 1',
+    campaignId: 5, campaignName: 'Campaign OPD and DIGIT PAYMENT PROTECTION',
     status: 'Pending', rejectionReason: null,
   },
   {
@@ -114,7 +114,7 @@ const MOCK = [
     bank: 'HDFC Bank',    branch: null,
     chequeNo: null, referenceNo: 'RTGS240422007634',
     amount: 67000, initiatedDate: '2026-04-22', initiatedBy: 'Amit Verma',
-    campaignId: 12, campaignName: 'Standalone campaign',
+    campaignId: 5, campaignName: 'Campaign OPD and DIGIT PAYMENT PROTECTION',
     status: 'Rejected', rejectionReason: 'Insufficient funds at time of transfer',
   },
 ]
@@ -348,15 +348,37 @@ function PaymentModal({ payment, onClose, onAccept, onReject }) {
   )
 }
 
+const ASSOCIATIONS_LIST = [
+  { id: 1007, name: 'AIBRF-BANK OF BARODA RETIREES ASSOCIATION MAHARASHTRA' },
+  { id: 1008, name: 'ALL INDIA PUNJAB NATIONAL BANK PENSIONERS ASSOCIATION (REGD.)' },
+  { id: 1019, name: 'BANK OF MAHARASHTRA RETIRED EMPLOYEES ORGANISATION' },
+  { id: 1021, name: 'AIBRF-ALL INDIA UNION BANK RETIREES FEDERATION' },
+  { id: 1023, name: 'INDIAN OVERSEAS BANK' },
+  { id: 1025, name: 'KARUR VYSYA BANK' },
+  { id: 1027, name: 'BANK OF RAJASTHAN' },
+  { id: 1030, name: 'BHARATHEEYA BANK' },
+  { id: 1032, name: 'CENTRAL BANK RETIRED OFFICERS ASSOCIATION' },
+  { id: 1033, name: 'Group Oraganization' },
+  { id: 1058, name: 'UCO BANK RETIRED EMPLOYEES ASSOCIATION' },
+]
+
+const TOP_LABEL = {
+  display: 'block', fontSize: 11, fontWeight: 700, color: '#64748b',
+  textTransform: 'uppercase', letterSpacing: '.5px',
+}
+
 const STATUS_TABS = ['All', 'Pending', 'Initiated', 'Rejected']
 
 export default function UpdatePayment() {
   const [payments, setPayments] = useState(MOCK)
   const [activeTab, setActiveTab] = useState('All')
   const [search, setSearch] = useState('')
-  const [campaignFilter, setCampaignFilter] = useState('')
+  const [campaignFilter, setCampaignFilter] = useState('5')
   const [methodFilter, setMethodFilter] = useState('')
   const [selected, setSelected] = useState(null)
+  // Top-bar filters (applied on button click)
+  const [topCampaign, setTopCampaign] = useState('5')
+  const [topAssoc,    setTopAssoc]    = useState('')
 
   const filtered = payments.filter(p => {
     const q = search.toLowerCase()
@@ -376,10 +398,7 @@ export default function UpdatePayment() {
     return matchQ && matchTab && matchCampaign && matchMethod
   })
 
-  const counts = STATUS_TABS.reduce((acc, t) => {
-    acc[t] = t === 'All' ? payments.length : payments.filter(p => p.status === t).length
-    return acc
-  }, {})
+  const counts = { All: 1100, Pending: 17, Initiated: 82, Rejected: 11 }
 
   const handleAccept = (id) => {
     setPayments(prev => prev.map(p => p.id === id ? { ...p, status: 'Accepted' } : p))
@@ -394,14 +413,62 @@ export default function UpdatePayment() {
     <div>
       <PageHeader icon={<PaymentIcon />} title="Update Payment" subtitle="Review and process offline payment submissions" />
 
+      {/* Top filter bar */}
+      <div className="card" style={{ marginBottom: 20 }}>
+        <div className="card-body" style={{ padding: '16px 20px' }}>
+          <div style={{ display: 'flex', gap: 16, alignItems: 'flex-end', flexWrap: 'wrap' }}>
+            <div style={{ flex: '1 1 260px' }}>
+              <label style={TOP_LABEL}>Campaign Name</label>
+              <select
+                className="field-select"
+                style={{ marginTop: 5 }}
+                value={topCampaign}
+                onChange={e => setTopCampaign(e.target.value)}
+              >
+                <option value="">All Campaigns</option>
+                {CAMPAIGNS.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
+              </select>
+            </div>
+            <div style={{ flex: '1 1 260px' }}>
+              <label style={TOP_LABEL}>Association</label>
+              <select
+                className="field-select"
+                style={{ marginTop: 5 }}
+                value={topAssoc}
+                onChange={e => setTopAssoc(e.target.value)}
+              >
+                <option value="">All Associations</option>
+                {ASSOCIATIONS_LIST.map(a => <option key={a.id} value={a.id}>{a.name}</option>)}
+              </select>
+            </div>
+            <button
+              type="button"
+              onClick={() => setCampaignFilter(topCampaign)}
+              style={{
+                padding: '10px 32px', borderRadius: 9, border: 'none', cursor: 'pointer',
+                fontFamily: 'inherit', fontWeight: 700, fontSize: 14, color: '#fff',
+                background: 'linear-gradient(135deg, #ec4899 0%, #a855f7 100%)',
+                boxShadow: '0 2px 8px rgba(168,85,247,0.35)',
+                flexShrink: 0, alignSelf: 'flex-end',
+                transition: 'opacity .15s',
+              }}
+              onMouseEnter={e => e.currentTarget.style.opacity = '.85'}
+              onMouseLeave={e => e.currentTarget.style.opacity = '1'}
+            >
+              Apply
+            </button>
+          </div>
+        </div>
+      </div>
+
       {/* Summary cards */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(160px,1fr))', gap: 14, marginBottom: 24 }}>
         {[
-          { label: 'Total',     count: payments.length,                         color: '#7c3aed', bg: '#f5f3ff' },
-          { label: 'Pending',   count: payments.filter(p=>p.status==='Pending').length,   color: '#a05c00', bg: '#fff3e0' },
-          { label: 'Initiated', count: payments.filter(p=>p.status==='Initiated').length, color: '#0369a1', bg: '#e0f2fe' },
-          { label: 'Rejected',  count: payments.filter(p=>p.status==='Rejected').length,  color: '#dc2626', bg: '#fee2e2' },
-          { label: 'Accepted',  count: payments.filter(p=>p.status==='Accepted').length,  color: '#15803d', bg: '#dcfce7' },
+          { label: 'Total',     count: 1100, color: '#7c3aed', bg: '#f5f3ff' },
+          { label: 'Pending',   count: 17,   color: '#a05c00', bg: '#fff3e0' },
+          { label: 'Initiated', count: 82,   color: '#0369a1', bg: '#e0f2fe' },
+          { label: 'Rejected',  count: 11,   color: '#dc2626', bg: '#fee2e2' },
+          { label: 'Accepted',  count: 990,  color: '#15803d', bg: '#dcfce7' },
         ].map(s => (
           <div key={s.label} style={{ background: '#fff', border: '1px solid #e8e4f0', borderRadius: 12, padding: '16px 18px' }}>
             <div style={{ fontSize: 26, fontWeight: 800, color: s.color }}>{s.count}</div>
