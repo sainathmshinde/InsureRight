@@ -601,8 +601,7 @@ export default function BuyPolicy() {
 
   const next = () => setStep((s) => Math.min(s + 1, STEPS.length - 1));
   const back = () => {
-    if (isCustomer && step === 1)        { navigate("/policy");   return; }
-    if (preselectedCustomer && step === 1) { navigate("/customer"); return; }
+    if (step === 1) { navigate("/customer"); return; }
     setStep((s) => Math.max(s - 1, 0));
   };
 
@@ -784,7 +783,7 @@ export default function BuyPolicy() {
         <CustomerStrip
           customer={selectedCustomer}
           onChangeCustomer={() => setStep(0)}
-          canChange={!isCustomer}
+          canChange={false}
         />
       )}
 

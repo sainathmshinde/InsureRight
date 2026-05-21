@@ -117,7 +117,6 @@ export default function CustomerList() {
       <PageHeader
         icon={<CustomerIcon />}
         title={user?.role === "agent" ? "My Customers" : "Customers"}
-        subtitle={`${scopedData.length} customers`}
       >
         <Button onClick={() => navigate("/customer/create")}>
           + Add Customer

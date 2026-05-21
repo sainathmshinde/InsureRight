@@ -57,7 +57,7 @@ export default function AssociationList() {
 
   return (
     <div>
-      <PageHeader icon={<GroupIcon />} title="Associations" subtitle={`${associations.length} associations`}>
+      <PageHeader icon={<GroupIcon />} title="Associations">
         <Button onClick={() => navigate('/association/create')}>+ Add Association</Button>
       </PageHeader>
 

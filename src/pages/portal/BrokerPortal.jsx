@@ -13,21 +13,21 @@ const STATS = [
   },
   {
     label: "Total Customers",
-    value: "248",
+    value: "8,800",
     sub: "+14 this month",
     color: "#1d4ed8",
     bg: "#dbeafe",
   },
   {
-    label: "Policies Issued",
-    value: "183",
+    label: "Policy Purchased",
+    value: "5,200",
     sub: "This financial year",
     color: "#15803d",
     bg: "#dcfce7",
   },
   {
     label: "Premium Collected",
-    value: "₹24.5L",
+    value: "₹41.60L",
     sub: "April 2025",
     color: "#b45309",
     bg: "#fef3c7",
@@ -980,7 +980,7 @@ export default function BrokerPortal() {
             />
 
             <DonutChart
-              title="Payment Initiates"
+              title="Payment Initiated"
               segments={[
                 {
                   label: "RTGS",

@@ -44,7 +44,7 @@ export default function ProductList() {
 
   return (
     <div>
-      <PageHeader icon={<ProductIcon />} title="Product Catalogue" subtitle={`${PRODUCTS.length} products`}>
+      <PageHeader icon={<ProductIcon />} title="Product Catalogue" >
         <Button onClick={() => navigate('/product/create')}>+ Add Product</Button>
       </PageHeader>
 

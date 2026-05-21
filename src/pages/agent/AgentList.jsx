@@ -44,7 +44,7 @@ export default function AgentList() {
 
   return (
     <div>
-      <PageHeader icon={<AgentIcon />} title="Agents / POS" subtitle={`${MOCK.length} agents registered`}>
+      <PageHeader icon={<AgentIcon />} title="Agents / POS">
         <Button variant="secondary" onClick={() => navigate('/agent/commission')}>Commission Rules</Button>
         <Button onClick={() => navigate('/agent/create')}>+ Add Agent</Button>
       </PageHeader>

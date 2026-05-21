@@ -73,7 +73,7 @@ export default function CampaignList() {
 
   return (
     <div>
-      <PageHeader icon={<CampaignIcon />} title="Campaigns" subtitle={`${MOCK.length} campaigns registered`}>
+      <PageHeader icon={<CampaignIcon />} title="Campaigns">
         <Button onClick={() => navigate('/campaign/create')}>+ Add Campaign</Button>
       </PageHeader>
 

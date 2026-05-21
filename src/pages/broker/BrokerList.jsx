@@ -53,7 +53,7 @@ export default function BrokerList() {
 
   return (
     <div>
-      <PageHeader icon={<BrokerIcon />} title="Brokers" subtitle={`${MOCK.length} brokers registered`}>
+      <PageHeader icon={<BrokerIcon />} title="Brokers">
         <Button onClick={() => navigate('/broker/create')}>+ Add Broker</Button>
       </PageHeader>
 

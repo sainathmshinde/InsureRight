@@ -7,6 +7,22 @@ import { PolicyIcon, DownloadPolicyIcon } from '../../icons'
 import { useAuth } from '../../context/AuthContext'
 import { POLICY_TYPE_COLOR } from '../product/productData'
 
+const _PP = [
+  ['OPD Policy-2025-26','SBI General Insurance','OPD',5,'Campaign OPD and DIGIT PAYMENT PROTECTION'],
+  ['OUT-PATIENT CARE INSURANCE POLICY','Go Digit General Insurance','OPD',5,'Campaign OPD and DIGIT PAYMENT PROTECTION'],
+  ['DIGIT Payment Protection Policy','Go Digit General Insurance','Base Policy',5,'Campaign OPD and DIGIT PAYMENT PROTECTION'],
+  ['OPD Group Insurance Policy','HDFC ERGO General Insurance','OPD',5,'Campaign OPD and DIGIT PAYMENT PROTECTION'],
+  ['Group Health Insurance Policy for BPP_2026-2027','SBI General Insurance','Age Band Premium',11,'BPP Campaign_2026-2027'],
+  ['Super Top Up Policy','SBI General Insurance','Super Top Up',6,'BPP Campaign'],
+]
+const _PC = ['Ajit Sharma','Bhavana Gupta','Chandru Iyer','Deepti Patel','Ekta Verma','Farhan Khan','Gita Rao','Hema Nair','Irfan Shaikh','Jagdish Mehta','Kalyan Das','Lalita Bose','Mamta Reddy','Neeraj Patel','Omkar Joshi','Parveen Malik','Qamar Ali','Rashmi Singh','Shalini Rao','Tabassum Khan','Uma Devi','Vasantha Pillai','Waseem Ahmad','Xavier DSouza','Yashoda Nair','Zahid Shaikh']
+const _PV = [9000,10000,11000,12000,13000,14000,15000,16000,17000,18000,9500,10500,11500,12500,13500,14500,15500,16500,17500,8500,9800,12300,14800,16800,18500,11800]
+const _EXTRA_POL = Array.from({length:131},(_,i)=>{
+  const id=i+82; const [product,icName,type,campId,campName]=_PP[id%_PP.length]
+  const premium=_PV[id%_PV.length]; const m=id%2===0?'04':'05'; const dd=String((id%26)+1).padStart(2,'0')
+  return { id, agentId:id%2===0?'a2':'a1', customerId:`c${(id%80)+1}`, proposalId:`PRO-2025-${1081+i}`, customerName:_PC[id%_PC.length], mobile:`9870${String(id).padStart(6,'0')}`, product, icName, type, premium, sumInsured:'₹3L', policyNo:`POL/2025/${String(id).padStart(4,'0')}`, paymentStatus:'Paid', status:'Active', startDate:`2025-${m}-${dd}`, endDate:`2026-${m}-${dd}`, campaignId:campId, campaignName:campName, paymentMode:id%2===0?'Online':'Offline', paymentType:['UPI','Gateway','NEFT','Cheque'][id%4] }
+})
+
 const MOCK = [
   { id: 1,  agentId: 'a1', customerId: 'c1', proposalId: 'PRO-2025-1001', customerName: 'Aarav Sharma',  mobile: '98765 43210', product: 'Group Health Insurance Policy for BPP_2026-2027', icName: 'SBI General Insurance',      type: 'Age Band Premium', premium: 27777, sumInsured: '₹3L',  policyNo: 'SBI/2025/001234', paymentStatus: 'Paid',    status: 'Active',    startDate: '2025-01-15', endDate: '2026-01-14', campaignId: 11, campaignName: 'BPP Campaign_2026-2027',               paymentMode: 'Online',  paymentType: 'Gateway' },
   { id: 2,  agentId: 'a2', customerId: 'c2', proposalId: 'PRO-2025-1002', customerName: 'Priya Mehta',   mobile: '87654 32109', product: 'Group Health Insurance Policy for BPP',          icName: 'MAGMA General Insurance',    type: 'Age Band Premium', premium: 47221, sumInsured: '₹3L',  policyNo: 'MAG/2025/002456', paymentStatus: 'Paid',    status: 'Active',    startDate: '2025-02-01', endDate: '2026-01-31', campaignId: 6,  campaignName: 'BPP Campaign',                         paymentMode: 'Online',  paymentType: 'UPI'     },
@@ -101,6 +117,7 @@ const MOCK = [
   { id: 79, agentId: 'a2', customerId: 'c80', proposalId: 'PRO-2025-1079', customerName: 'Naresh Joshi',    mobile: '98712 34568', product: 'OUT-PATIENT CARE INSURANCE POLICY',              icName: 'Go Digit General Insurance',  type: 'OPD',         premium: 12300, sumInsured: '₹15K', policyNo: 'DIG/2025/079818', paymentStatus: 'Paid', status: 'Active', startDate: '2025-04-24', endDate: '2026-04-23', campaignId: 5, campaignName: 'Campaign OPD and DIGIT PAYMENT PROTECTION', paymentMode: 'Offline', paymentType: 'Cheque' },
   { id: 80, agentId: 'a1', customerId: 'c81', proposalId: 'PRO-2025-1080', customerName: 'Saroja Pillai',   mobile: '98712 34569', product: 'DIGIT Payment Protection Policy',                icName: 'Go Digit General Insurance',  type: 'Base Policy', premium: 16600, sumInsured: '₹10K', policyNo: 'DIG/2025/080919', paymentStatus: 'Paid', status: 'Active', startDate: '2025-05-04', endDate: '2026-05-03', campaignId: 5, campaignName: 'Campaign OPD and DIGIT PAYMENT PROTECTION', paymentMode: 'Offline', paymentType: 'Cheque' },
   { id: 81, agentId: 'a2', customerId: 'c82', proposalId: 'PRO-2025-1081', customerName: 'Vinayak Rao',     mobile: '98712 34570', product: 'OPD Group Insurance Policy',                     icName: 'HDFC ERGO General Insurance', type: 'OPD',         premium: 9800,  sumInsured: '₹25K', policyNo: 'HDF/2025/081020', paymentStatus: 'Paid', status: 'Active', startDate: '2025-05-13', endDate: '2026-05-12', campaignId: 5, campaignName: 'Campaign OPD and DIGIT PAYMENT PROTECTION', paymentMode: 'Offline', paymentType: 'Cheque' },
+  ..._EXTRA_POL,
 ]
 
 export { MOCK as POLICY_MOCK }
@@ -196,32 +213,9 @@ export default function PolicyList() {
       <PageHeader
         icon={<PolicyIcon />}
         title={isCustomer ? 'My Policies' : 'Policy Issuance'}
-        subtitle={isCustomer
-          ? `${scopedData.length} policies · ${scopedData.filter(p => p.status === 'Active').length} active`
-          : `${MOCK.length} proposals · ${MOCK.filter(p => p.status === 'Active').length} active policies`}
       >
         <Button onClick={() => navigate('/policy/buy')}>+ Buy Policy</Button>
       </PageHeader>
-
-      {/* Summary tiles */}
-      <div className="pl-tiles" style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 16, marginBottom: 24 }}>
-        {[
-          { label: isCustomer ? 'My Policies'    : 'Total Proposals', value: scopedData.length,                                                         icon: '📋', color: 'var(--brand)' },
-          { label: 'Active Policies',              value: scopedData.filter(p => p.status === 'Active').length,                                          icon: '✅', color: 'var(--green)' },
-          { label: 'Pending Payment',              value: scopedData.filter(p => p.paymentStatus === 'Pending').length,                                  icon: '⏳', color: 'var(--amber)' },
-          { label: isCustomer ? 'Premium Paid'   : 'Total Premium',   value: `₹${(scopedData.filter(p => p.paymentStatus === 'Paid').reduce((s, p) => s + p.premium, 0) / 1000).toFixed(1)}K`, icon: '💰', color: 'var(--blue)' },
-        ].map(tile => (
-          <div key={tile.label} style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 'var(--r-lg)', padding: '18px 20px', boxShadow: 'var(--shadow-sm)' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
-              <div style={{ fontSize: 26, width: 44, height: 44, borderRadius: 'var(--r-md)', background: tile.color + '15', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>{tile.icon}</div>
-              <div>
-                <div style={{ fontWeight: 700, fontSize: 20, color: 'var(--text)' }}>{tile.value}</div>
-                <div style={{ fontSize: 12, color: 'var(--text-3)', marginTop: 1 }}>{tile.label}</div>
-              </div>
-            </div>
-          </div>
-        ))}
-      </div>
 
       <div className="card">
         <div className="card-body">

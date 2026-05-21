@@ -1,5 +1,16 @@
 import { createContext, useContext, useState } from 'react'
 
+const _FN = ['Amit','Priya','Rahul','Sneha','Suresh','Geeta','Mohit','Divya','Ravi','Pooja','Kiran','Ajay','Nisha','Saurabh','Deepa','Vikram','Kavita','Ashok','Sunita','Manoj','Rekha','Rajesh','Neha','Arun','Meera','Vinod','Usha','Gaurav','Swati','Naveen','Asha','Sanjay','Radha','Tarun','Lata','Deepak','Poonam','Girish','Madhuri','Sunil']
+const _LN = ['Sharma','Verma','Singh','Gupta','Patel','Kumar','Mishra','Joshi','Rao','Nair','Pillai','Iyer','Reddy','Shah','Mehta','Jain','Pandey','Tiwari','Yadav','Sinha','Kulkarni','Bose','Nambiar','Agarwal','Saxena']
+const _CD = [[5,'Campaign OPD and DIGIT PAYMENT PROTECTION'],[6,'BPP Campaign'],[8,'SBI_STP_Campaign'],[11,'BPP Campaign_2026-2027'],[12,'Standalone campaign']]
+const _KYC = ['Verified','Verified','Verified','Verified','Pending','Rejected']
+const _ORG = [1003,1005,1006,1008,1012,1013,1015,1019]
+const _ASC = [1007,1008,1019,1021,1023,1025,1027,1030,1032,1033,1058]
+const _EXTRA = Array.from({length:216},(_,i)=>{
+  const id = i+33; const kyc=_KYC[id%_KYC.length]; const [cid,cn]=_CD[id%_CD.length]
+  return { id, name:`${_FN[id%_FN.length]} ${_LN[Math.floor(id/7)%_LN.length]}`, mobile:`987${String(id).padStart(7,'0')}`, email:`cust${id}@email.com`, dob:`${1975+(id%28)}-${String((id%12)+1).padStart(2,'0')}-${String((id%28)+1).padStart(2,'0')}`, gender:id%3===0?'Female':'Male', kyc, policies:kyc==='Verified'?id%3:0, agentId:id%2===0?'a2':'a1', organisationId:_ORG[id%_ORG.length], associationId:_ASC[id%_ASC.length], campaignId:cid, campaignName:cn, engaged:kyc==='Verified'&&id%5!==0 }
+})
+
 export const INITIAL_CUSTOMERS = [
   { id: 1,  name: 'Aarav Sharma',  mobile: '9876543210', email: 'aarav@gmail.com',  dob: '1990-03-15', gender: 'Male',   kyc: 'Verified',  policies: 1, agentId: 'a1', organisationId: 1003, associationId: 1007, campaignId: 11, campaignName: 'BPP Campaign_2026-2027',              engaged: true  },
   { id: 2,  name: 'Rohit Sharma',  mobile: '9812000000', email: 'rohit@gmail.com',  dob: '1990-11-20', gender: 'Male',   kyc: 'Pending',   policies: 0, agentId: 'a2', organisationId: 1005, associationId: 1033, campaignId: 8,  campaignName: 'SBI_STP_Campaign',                    engaged: false },
@@ -35,6 +46,7 @@ export const INITIAL_CUSTOMERS = [
   { id: 30, name: 'Swati Bose',      mobile: '9871234518', email: 'swati.bose@gmail.com',      dob: '1986-01-08', gender: 'Female', kyc: 'Verified', policies: 2, agentId: 'a1', organisationId: 1006, associationId: 1023, campaignId: 5, campaignName: 'Campaign OPD and DIGIT PAYMENT PROTECTION', engaged: true  },
   { id: 31, name: 'Harish Rao',      mobile: '9871234519', email: 'harish.rao@gmail.com',      dob: '1975-09-14', gender: 'Male',   kyc: 'Pending',  policies: 0, agentId: 'a2', organisationId: 1019, associationId: 1021, campaignId: 5, campaignName: 'Campaign OPD and DIGIT PAYMENT PROTECTION', engaged: false },
   { id: 32, name: 'Nandini Gupta',   mobile: '9871234520', email: 'nandini.gupta@gmail.com',   dob: '1989-03-26', gender: 'Female', kyc: 'Verified', policies: 1, agentId: 'a1', organisationId: 1013, associationId: 1058, campaignId: 5, campaignName: 'Campaign OPD and DIGIT PAYMENT PROTECTION', engaged: true  },
+  ..._EXTRA,
 ]
 
 const CustomerContext = createContext(null)

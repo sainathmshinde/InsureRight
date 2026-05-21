@@ -39,7 +39,7 @@ export default function OrganisationList() {
 
   return (
     <div>
-      <PageHeader icon={<BankIcon />} title="Organisations" subtitle={`${organisations.length} organisations`}>
+      <PageHeader icon={<BankIcon />} title="Organisations">
         <Button onClick={() => navigate('/organisation/create')}>+ Add Organisation</Button>
       </PageHeader>
 

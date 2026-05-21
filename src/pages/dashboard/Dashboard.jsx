@@ -36,20 +36,14 @@ function BrokerDashboard({ user }) {
   const hour = new Date().getHours()
   const greet = hour < 12 ? 'Good morning' : hour < 17 ? 'Good afternoon' : 'Good evening'
 
-  const totalAgents    = AGENTS.length
-  const activeAgents   = AGENTS.filter(a => a.status === 'Active').length
-  const totalCustomers = CUSTOMER_MOCK.length
-  const verifiedKyc    = CUSTOMER_MOCK.filter(c => c.kyc === 'Verified').length
-  const activePolicies = POLICY_MOCK.filter(p => p.status === 'Active').length
-  const pendingPayment = POLICY_MOCK.filter(p => p.paymentStatus === 'Pending').length
-  const totalProducts  = PRODUCT_MOCK.length
-  const activeProducts = PRODUCT_MOCK.filter(p => p.status === 'Active').length
+  const totalAgents  = AGENTS.length
+  const activeAgents = AGENTS.filter(a => a.status === 'Active').length
 
   const brokerStats = [
-    { label: 'Total Agents',    value: totalAgents,    sub: `${activeAgents} active`,            gradient: 'var(--grad-purple)', icon: '👤' },
-    { label: 'Total Customers', value: totalCustomers, sub: `${verifiedKyc} KYC verified`,       gradient: 'var(--grad-blue)',   icon: '🧑‍🤝‍🧑' },
-    { label: 'Active Policies', value: activePolicies, sub: `${pendingPayment} pending payment`, gradient: 'var(--grad-teal)',   icon: '📋' },
-    { label: 'Products Listed', value: totalProducts,  sub: `${activeProducts} active`,          gradient: 'var(--grad-coral)',  icon: '📦' },
+    { label: 'Total Agents',      value: totalAgents, sub: `${activeAgents} active`, color: '#7c3aed', icon: '👤' },
+    { label: 'Total Customers',   value: '8,800',     sub: '+14 this month',         color: '#2563eb', icon: '🧑‍🤝‍🧑' },
+    { label: 'Policy Purchased',  value: '5,200',     sub: 'This financial year',    color: '#16a34a', icon: '📋' },
+    { label: 'Premium Collected', value: '₹41.60L',   sub: 'April 2025',             color: '#d97706', icon: '₹' },
   ]
 
   return (
@@ -68,15 +62,15 @@ function BrokerDashboard({ user }) {
 
       <div style={S.statsGrid}>
         {brokerStats.map(s => (
-          <div key={s.label} style={{ ...S.statCard, background: s.gradient, border: 'none', borderLeft: 'none', boxShadow: '0 4px 18px rgba(0,0,0,0.13)' }}>
+          <div key={s.label} style={{ ...S.statCard, borderLeft: `4px solid ${s.color}`, boxShadow: '0 2px 8px rgba(0,0,0,0.07)' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
               <div>
-                <div style={{ ...S.statLabel, color: 'rgba(255,255,255,0.92)' }}>{s.label}</div>
-                <div style={{ ...S.statValue, color: '#fff' }}>{s.value}</div>
+                <div style={S.statLabel}>{s.label}</div>
+                <div style={{ ...S.statValue, color: s.color, fontSize: typeof s.value === 'string' && s.value.startsWith('₹') ? 24 : 30 }}>{s.value}</div>
               </div>
-              <div style={{ ...S.statIcon, background: 'rgba(255,255,255,0.22)', color: '#fff' }}>{s.icon}</div>
+              <div style={{ ...S.statIcon, background: s.color + '18', color: s.color }}>{s.icon}</div>
             </div>
-            <div style={{ ...S.statSub, color: 'rgba(255,255,255,0.86)' }}>{s.sub}</div>
+            <div style={S.statSub}>{s.sub}</div>
           </div>
         ))}
       </div>

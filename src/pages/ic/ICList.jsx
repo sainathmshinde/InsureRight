@@ -47,7 +47,7 @@ export default function ICList() {
 
   return (
     <div>
-      <PageHeader icon={<InsuranceCompanyIcon />} title="Insurance Companies" subtitle={`${MOCK.length} companies onboarded`}>
+      <PageHeader icon={<InsuranceCompanyIcon />} title="Insurance Companies">
         <Button onClick={() => navigate('/ic/create')}>+ Add IC</Button>
       </PageHeader>
 
