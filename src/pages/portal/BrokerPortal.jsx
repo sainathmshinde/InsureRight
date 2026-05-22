@@ -2,6 +2,7 @@
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import { useAssociations } from "../association/AssociationContext";
+import { INITIAL_CUSTOMERS } from "../../context/CustomerContext";
 
 const STATS = [
   {
@@ -305,7 +306,7 @@ const MIS_DATA = {
 // ── MIS sub-components ─────────────────────────────────────────────────────────
 function DonutChart({ title, segments, note }) {
   const total = segments.reduce((s, seg) => s + seg.value, 0);
-  const r = 34;
+  const r = 38;
   const circumference = 2 * Math.PI * r;
   let cum = 0;
   const arcs = segments.map((seg) => {
@@ -345,10 +346,10 @@ function DonutChart({ title, segments, note }) {
         >
           {title}
         </div>
-        <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 14 }}>
           <svg
-            width="110"
-            height="110"
+            width="150"
+            height="150"
             viewBox="0 0 100 100"
             style={{ flexShrink: 0 }}
           >
@@ -360,7 +361,7 @@ function DonutChart({ title, segments, note }) {
                 r={r}
                 fill="none"
                 stroke={arc.color}
-                strokeWidth="22"
+                strokeWidth="18"
                 strokeDasharray={`${arc.dash} ${circumference - arc.dash}`}
                 strokeDashoffset={arc.dashOffset}
                 style={{
@@ -392,7 +393,6 @@ function DonutChart({ title, segments, note }) {
           </svg>
           <div
             style={{
-              flex: 1,
               display: "flex",
               flexDirection: "column",
               gap: 12,
@@ -1300,96 +1300,34 @@ export default function BrokerPortal() {
           </div>
         </div>
 
-        {/* Active Campaigns */}
+        {/* Recent Customers */}
         <div className="card">
           <div className="card-body">
-            <div
-              style={{
-                display: "flex",
-                justifyContent: "space-between",
-                alignItems: "center",
-                marginBottom: 16,
-              }}
-            >
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
               <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                <div
-                  style={{
-                    width: 4,
-                    height: 20,
-                    borderRadius: 99,
-                    background: "#10b981",
-                  }}
-                />
-                <div
-                  style={{ fontWeight: 800, fontSize: 15, color: "#1e293b" }}
-                >
-                  Active Campaigns
-                </div>
+                <div style={{ width: 4, height: 20, borderRadius: 99, background: "#2563eb" }} />
+                <div style={{ fontWeight: 800, fontSize: 15, color: "#1e293b" }}>Recent Customers</div>
               </div>
-              <button
-                type="button"
-                className="btn btn-ghost"
-                style={{ fontSize: 12, padding: "4px 12px" }}
-                onClick={() => navigate("/campaign")}
-              >
+              <button type="button" className="btn btn-ghost" style={{ fontSize: 12, padding: "4px 12px" }} onClick={() => navigate("/customer")}>
                 View All →
               </button>
             </div>
-            <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-              {ACTIVE_CAMPAIGNS.map((c, i) => {
-                const accentColors = ["#fb7185", "#a855f7", "#c084fc"];
+            <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+              {INITIAL_CUSTOMERS.slice(0, 5).map((c) => {
+                const kycColor = c.kyc === "Verified" ? { bg: "#dcfce7", color: "#15803d" } : c.kyc === "Pending" ? { bg: "#fef9c3", color: "#854d0e" } : { bg: "#fee2e2", color: "#991b1b" };
+                const initials = c.name.split(" ").map((w) => w[0]).join("").slice(0, 2).toUpperCase();
                 return (
-                  <div
-                    key={c.name}
-                    style={{
-                      padding: "13px 15px",
-                      border: "1px solid #e2e8f0",
-                      borderRadius: 10,
-                      background: "#f8fafc",
-                      borderLeft: `4px solid ${accentColors[i] ?? "#a855f7"}`,
-                    }}
-                  >
-                    <div
-                      style={{
-                        fontWeight: 700,
-                        fontSize: 13.5,
-                        color: "#1e293b",
-                        marginBottom: 6,
-                      }}
-                    >
-                      {c.name}
+                  <div key={c.id} style={{ padding: "11px 14px", border: "1px solid #e2e8f0", borderRadius: 10, background: "#f8fafc", display: "flex", alignItems: "center", gap: 12 }}>
+                    <div style={{ width: 36, height: 36, borderRadius: "50%", background: "linear-gradient(135deg,#fb7185,#a855f7)", color: "#fff", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12, fontWeight: 700, flexShrink: 0 }}>
+                      {initials}
                     </div>
-                    <div
-                      style={{
-                        display: "flex",
-                        gap: 16,
-                        fontSize: 12,
-                        color: "#64748b",
-                      }}
-                    >
-                      <span style={{ fontWeight: 600 }}>
-                        Agents:{" "}
-                        <strong style={{ color: "#1e293b" }}>{c.agents}</strong>
-                      </span>
-                      <span style={{ fontWeight: 600 }}>
-                        Leads:{" "}
-                        <strong style={{ color: "#1e293b" }}>{c.leads}</strong>
-                      </span>
-                      <span
-                        style={{
-                          marginLeft: "auto",
-                          padding: "1px 9px",
-                          borderRadius: 99,
-                          fontSize: 11,
-                          fontWeight: 700,
-                          background:
-                            c.status === "Active" ? "#dcfce7" : "#f1f5f9",
-                          color: c.status === "Active" ? "#15803d" : "#64748b",
-                        }}
-                      >
-                        {c.status}
-                      </span>
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <div style={{ fontWeight: 600, fontSize: 13.5, color: "#1e293b", marginBottom: 2 }}>{c.name}</div>
+                      <div style={{ fontSize: 11.5, color: "#64748b" }}>{c.mobile} · {c.campaignName}</div>
                     </div>
+                    <span style={{ padding: "3px 10px", borderRadius: 99, fontSize: 11.5, fontWeight: 700, background: kycColor.bg, color: kycColor.color, flexShrink: 0 }}>
+                      {c.kyc}
+                    </span>
                   </div>
                 );
               })}
