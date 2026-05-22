@@ -28,8 +28,8 @@ const STATS = [
   },
   {
     label: "Premium Collected",
-    value: "₹41.60L",
-    sub: "April 2025",
+    value: "₹9,62,00,000",
+    sub: "April 2026",
     color: "#b45309",
     bg: "#fef3c7",
   },
@@ -157,19 +157,19 @@ const MIS_DATA = {
     chequePurchased: 920,
     paymentPending: 8657,
     paymentRejected: 945,
-    // Premium amounts (INR)
-    engagedPremium: 16900000,
+    // Premium amounts (INR) — avg ₹18,500 per policy
+    engagedPremium: 567802000,
     nonEngagedPremium: 0,
-    policyPurchasedPremium: 16900000,
-    policyPendingPremium: 7680000,
-    onlinePremium: 14400000,
-    offlinePremium: 2500000,
-    rtgsInitiatedAmt: 188000,
-    chequeInitiatedAmt: 93000,
-    rtgsPurchasedAmt: 1810000,
-    chequePurchasedAmt: 690000,
-    paymentPendingAmt: 6930000,
-    paymentRejectedAmt: 756000,
+    policyPurchasedPremium: 390165000,
+    policyPendingPremium: 177637000,
+    onlinePremium: 333777000,
+    offlinePremium: 56388000,
+    rtgsInitiatedAmt: 4088500,
+    chequeInitiatedAmt: 2294000,
+    rtgsPurchasedAmt: 39368000,
+    chequePurchasedAmt: 17020000,
+    paymentPendingAmt: 160154500,
+    paymentRejectedAmt: 17482500,
   },
   "BPP Campaign_2026-2027": {
     engagedCustomer: 12400,
@@ -184,18 +184,18 @@ const MIS_DATA = {
     chequePurchased: 420,
     paymentPending: 3100,
     paymentRejected: 320,
-    engagedPremium: 7040000,
+    engagedPremium: 229400000,
     nonEngagedPremium: 0,
-    policyPurchasedPremium: 7040000,
-    policyPendingPremium: 2880000,
-    onlinePremium: 5760000,
-    offlinePremium: 1280000,
-    rtgsInitiatedAmt: 83300,
-    chequeInitiatedAmt: 46500,
-    rtgsPurchasedAmt: 833000,
-    chequePurchasedAmt: 315000,
-    paymentPendingAmt: 2480000,
-    paymentRejectedAmt: 256000,
+    policyPurchasedPremium: 162800000,
+    policyPendingPremium: 66600000,
+    onlinePremium: 133200000,
+    offlinePremium: 29600000,
+    rtgsInitiatedAmt: 1813000,
+    chequeInitiatedAmt: 1147000,
+    rtgsPurchasedAmt: 18130000,
+    chequePurchasedAmt: 7770000,
+    paymentPendingAmt: 57350000,
+    paymentRejectedAmt: 5920000,
   },
   SBI_STP_Campaign: {
     engagedCustomer: 9800,
@@ -210,18 +210,18 @@ const MIS_DATA = {
     chequePurchased: 290,
     paymentPending: 2400,
     paymentRejected: 280,
-    engagedPremium: 5520000,
+    engagedPremium: 181300000,
     nonEngagedPremium: 0,
-    policyPurchasedPremium: 5520000,
-    policyPendingPremium: 2320000,
-    onlinePremium: 4640000,
-    offlinePremium: 880000,
-    rtgsInitiatedAmt: 61200,
-    chequeInitiatedAmt: 30750,
-    rtgsPurchasedAmt: 603500,
-    chequePurchasedAmt: 217500,
-    paymentPendingAmt: 1920000,
-    paymentRejectedAmt: 224000,
+    policyPurchasedPremium: 127650000,
+    policyPendingPremium: 53650000,
+    onlinePremium: 107300000,
+    offlinePremium: 20350000,
+    rtgsInitiatedAmt: 1332000,
+    chequeInitiatedAmt: 758500,
+    rtgsPurchasedAmt: 13135000,
+    chequePurchasedAmt: 5365000,
+    paymentPendingAmt: 44400000,
+    paymentRejectedAmt: 5180000,
   },
   "BPP Campaign": {
     engagedCustomer: 5200,
@@ -236,18 +236,18 @@ const MIS_DATA = {
     chequePurchased: 170,
     paymentPending: 1300,
     paymentRejected: 190,
-    engagedPremium: 2880000,
+    engagedPremium: 96200000,
     nonEngagedPremium: 0,
-    policyPurchasedPremium: 2880000,
-    policyPendingPremium: 1280000,
-    onlinePremium: 2320000,
-    offlinePremium: 560000,
-    rtgsInitiatedAmt: 32300,
-    chequeInitiatedAmt: 13500,
-    rtgsPurchasedAmt: 365500,
-    chequePurchasedAmt: 127500,
-    paymentPendingAmt: 1040000,
-    paymentRejectedAmt: 152000,
+    policyPurchasedPremium: 66600000,
+    policyPendingPremium: 29600000,
+    onlinePremium: 53650000,
+    offlinePremium: 12950000,
+    rtgsInitiatedAmt: 703000,
+    chequeInitiatedAmt: 333000,
+    rtgsPurchasedAmt: 7955000,
+    chequePurchasedAmt: 3145000,
+    paymentPendingAmt: 24050000,
+    paymentRejectedAmt: 3515000,
   },
   "Campaign OPD and DIGIT PAYMENT PROTECTION": {
     engagedCustomer: 7840,
@@ -262,18 +262,18 @@ const MIS_DATA = {
     chequePurchased: 310,
     paymentPending: 2100,
     paymentRejected: 380,
-    engagedPremium: 4160000,
+    engagedPremium: 144940000,
     nonEngagedPremium: 0,
-    policyPurchasedPremium: 4160000,
-    policyPendingPremium: 2112000,
-    onlinePremium: 3280000,
-    offlinePremium: 880000,
-    rtgsInitiatedAmt: 45900,
-    chequeInitiatedAmt: 21000,
-    rtgsPurchasedAmt: 578000,
-    chequePurchasedAmt: 232500,
-    paymentPendingAmt: 1680000,
-    paymentRejectedAmt: 304000,
+    policyPurchasedPremium: 96200000,
+    policyPendingPremium: 48840000,
+    onlinePremium: 75850000,
+    offlinePremium: 20350000,
+    rtgsInitiatedAmt: 999000,
+    chequeInitiatedAmt: 518000,
+    rtgsPurchasedAmt: 12580000,
+    chequePurchasedAmt: 5735000,
+    paymentPendingAmt: 38850000,
+    paymentRejectedAmt: 7030000,
   },
   "Campaign 1": {
     engagedCustomer: 2100,
@@ -288,18 +288,18 @@ const MIS_DATA = {
     chequePurchased: 80,
     paymentPending: 560,
     paymentRejected: 90,
-    engagedPremium: 1120000,
+    engagedPremium: 38850000,
     nonEngagedPremium: 0,
-    policyPurchasedPremium: 1120000,
-    policyPendingPremium: 560000,
-    onlinePremium: 880000,
-    offlinePremium: 240000,
-    rtgsInitiatedAmt: 6800,
-    chequeInitiatedAmt: 2250,
-    rtgsPurchasedAmt: 153000,
-    chequePurchasedAmt: 60000,
-    paymentPendingAmt: 448000,
-    paymentRejectedAmt: 72000,
+    policyPurchasedPremium: 25900000,
+    policyPendingPremium: 12950000,
+    onlinePremium: 20350000,
+    offlinePremium: 5550000,
+    rtgsInitiatedAmt: 148000,
+    chequeInitiatedAmt: 55500,
+    rtgsPurchasedAmt: 3330000,
+    chequePurchasedAmt: 1480000,
+    paymentPendingAmt: 10360000,
+    paymentRejectedAmt: 1665000,
   },
 };
 
@@ -346,7 +346,14 @@ function DonutChart({ title, segments, note }) {
         >
           {title}
         </div>
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 14 }}>
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            gap: 14,
+          }}
+        >
           <svg
             width="150"
             height="150"
@@ -904,20 +911,6 @@ export default function BrokerPortal() {
                         </div>
                       )}
                     </div>
-                    <div style={{ marginTop: 6 }}>
-                      <span
-                        style={{
-                          fontSize: 11,
-                          fontWeight: 700,
-                          color: it.color,
-                          background: `${it.color}1a`,
-                          padding: "2px 8px",
-                          borderRadius: 99,
-                        }}
-                      >
-                        {it.pct}% of base
-                      </span>
-                    </div>
                   </div>
                 ))}
               </div>
@@ -1303,29 +1296,108 @@ export default function BrokerPortal() {
         {/* Recent Customers */}
         <div className="card">
           <div className="card-body">
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+                marginBottom: 16,
+              }}
+            >
               <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                <div style={{ width: 4, height: 20, borderRadius: 99, background: "#2563eb" }} />
-                <div style={{ fontWeight: 800, fontSize: 15, color: "#1e293b" }}>Recent Customers</div>
+                <div
+                  style={{
+                    width: 4,
+                    height: 20,
+                    borderRadius: 99,
+                    background: "#2563eb",
+                  }}
+                />
+                <div
+                  style={{ fontWeight: 800, fontSize: 15, color: "#1e293b" }}
+                >
+                  Recent Customers
+                </div>
               </div>
-              <button type="button" className="btn btn-ghost" style={{ fontSize: 12, padding: "4px 12px" }} onClick={() => navigate("/customer")}>
+              <button
+                type="button"
+                className="btn btn-ghost"
+                style={{ fontSize: 12, padding: "4px 12px" }}
+                onClick={() => navigate("/customer")}
+              >
                 View All →
               </button>
             </div>
             <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
               {INITIAL_CUSTOMERS.slice(0, 5).map((c) => {
-                const kycColor = c.kyc === "Verified" ? { bg: "#dcfce7", color: "#15803d" } : c.kyc === "Pending" ? { bg: "#fef9c3", color: "#854d0e" } : { bg: "#fee2e2", color: "#991b1b" };
-                const initials = c.name.split(" ").map((w) => w[0]).join("").slice(0, 2).toUpperCase();
+                const kycColor =
+                  c.kyc === "Verified"
+                    ? { bg: "#dcfce7", color: "#15803d" }
+                    : c.kyc === "Pending"
+                      ? { bg: "#fef9c3", color: "#854d0e" }
+                      : { bg: "#fee2e2", color: "#991b1b" };
+                const initials = c.name
+                  .split(" ")
+                  .map((w) => w[0])
+                  .join("")
+                  .slice(0, 2)
+                  .toUpperCase();
                 return (
-                  <div key={c.id} style={{ padding: "11px 14px", border: "1px solid #e2e8f0", borderRadius: 10, background: "#f8fafc", display: "flex", alignItems: "center", gap: 12 }}>
-                    <div style={{ width: 36, height: 36, borderRadius: "50%", background: "linear-gradient(135deg,#fb7185,#a855f7)", color: "#fff", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12, fontWeight: 700, flexShrink: 0 }}>
+                  <div
+                    key={c.id}
+                    style={{
+                      padding: "11px 14px",
+                      border: "1px solid #e2e8f0",
+                      borderRadius: 10,
+                      background: "#f8fafc",
+                      display: "flex",
+                      alignItems: "center",
+                      gap: 12,
+                    }}
+                  >
+                    <div
+                      style={{
+                        width: 36,
+                        height: 36,
+                        borderRadius: "50%",
+                        background: "linear-gradient(135deg,#fb7185,#a855f7)",
+                        color: "#fff",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        fontSize: 12,
+                        fontWeight: 700,
+                        flexShrink: 0,
+                      }}
+                    >
                       {initials}
                     </div>
                     <div style={{ flex: 1, minWidth: 0 }}>
-                      <div style={{ fontWeight: 600, fontSize: 13.5, color: "#1e293b", marginBottom: 2 }}>{c.name}</div>
-                      <div style={{ fontSize: 11.5, color: "#64748b" }}>{c.mobile} · {c.campaignName}</div>
+                      <div
+                        style={{
+                          fontWeight: 600,
+                          fontSize: 13.5,
+                          color: "#1e293b",
+                          marginBottom: 2,
+                        }}
+                      >
+                        {c.name}
+                      </div>
+                      <div style={{ fontSize: 11.5, color: "#64748b" }}>
+                        {c.mobile} · {c.campaignName}
+                      </div>
                     </div>
-                    <span style={{ padding: "3px 10px", borderRadius: 99, fontSize: 11.5, fontWeight: 700, background: kycColor.bg, color: kycColor.color, flexShrink: 0 }}>
+                    <span
+                      style={{
+                        padding: "3px 10px",
+                        borderRadius: 99,
+                        fontSize: 11.5,
+                        fontWeight: 700,
+                        background: kycColor.bg,
+                        color: kycColor.color,
+                        flexShrink: 0,
+                      }}
+                    >
                       {c.kyc}
                     </span>
                   </div>
