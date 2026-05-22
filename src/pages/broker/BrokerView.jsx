@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { useAuth } from '../../context/AuthContext'
+import { BrokerIcon } from '../../icons'
 import { BROKER_MAP } from './brokerData'
 
 const tabs = ['Basic Info', 'KYC', 'Contact & Address', 'Bank Details', 'Agreement']
@@ -50,14 +51,14 @@ export default function BrokerView() {
       {/* Header */}
       <div className="page-header">
         <div className="page-title-row">
-          <div className="page-icon">🏢</div>
+          <div className="page-icon"><BrokerIcon /></div>
           <div>
             <div className="page-title">{isProfile ? 'My Profile' : b.brokerName}</div>
             <div className="page-subtitle">{b.companyName} · {b.licenseNumber}</div>
           </div>
         </div>
         <div style={{ display: 'flex', gap: 10 }}>
-          <button className="btn btn-secondary" onClick={() => navigate(isProfile ? '/profile/edit' : `/broker/${id}/edit`)}>✏️ Edit</button>
+          <button className="btn btn-sm" onClick={() => navigate(isProfile ? '/profile/edit' : `/broker/${id}/edit`)} style={{ color: '#6d28d9', border: '1.5px solid #7c3aed', background: '#faf5ff', fontWeight: 700 }}><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ marginRight: 5 }}><path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"/></svg>Edit</button>
           <button className="btn btn-ghost" onClick={() => navigate(isProfile ? '/dashboard' : '/broker')}>← Back</button>
         </div>
       </div>

@@ -31,6 +31,7 @@ export const AGENTS = [
     ifsc: "HDFC0001234",
     assignedBroker: "K.M. Dastur & Co.",
     reportingManager: "K.M. Dastur",
+    agentType: "sales",
     status: "Active",
   },
   {
@@ -62,6 +63,7 @@ export const AGENTS = [
     ifsc: "ICIC0002345",
     assignedBroker: "K.M. Dastur & Co.",
     reportingManager: "K.M. Dastur",
+    agentType: "calling",
     status: "Active",
   },
   {

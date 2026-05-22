@@ -9,6 +9,7 @@ import {
 } from "../../components/Field";
 import { CheckboxGroup, FormActions } from "../../components/UI";
 import { DocumentViewerModal } from "../../components/fields/DocumentViewerModal";
+import { PREMIUM_CHART } from "./productData";
 import policyWordingsPdf from "../../assets/StarHealthAssureInsurancePolicy-Policy-wording.pdf";
 import brochurePdf from "../../assets/Brochure_Star_Comprehensive_Insurance_Policy_V_15_Web_633bcfcaaf.pdf";
 
@@ -183,6 +184,16 @@ const BROCHURE_TOC = [
   },
 ];
 
+const BASE_POLICIES = [
+  { id: 1,  name: "Star Comprehensive Health",     code: "SHI-HC-001" },
+  { id: 2,  name: "HDFC ERGO Optima Secure",       code: "HER-HS-002" },
+  { id: 3,  name: "ICICI Lombard Complete Health", code: "ICL-HC-003" },
+  { id: 6,  name: "LIC Jeevan Anand",              code: "LIC-LA-006" },
+  { id: 7,  name: "HDFC Life Sanchay Plus",        code: "HDFC-LSP-007" },
+  { id: 9,  name: "Star Senior Health",            code: "SHI-SH-009" },
+  { id: 11, name: "Bajaj Allianz Health Guard",    code: "BAJ-HG-011" },
+];
+
 const COVERED_MEMBERS = [
   "Self",
   "Spouse",
@@ -194,12 +205,30 @@ const COVERED_MEMBERS = [
   "Father in Law",
 ];
 
+function chartToRows(productId) {
+  const rows = PREMIUM_CHART[productId] ?? [];
+  if (rows.length === 0) return [{ id: Date.now(), sumInsured: '', gst: '0', ageBandId: '', members: {} }];
+  return rows.map((r, i) => ({
+    id: i + 1,
+    sumInsured: String(r.sumInsured),
+    gst: '0',
+    ageBandId: r.ageBandId != null ? String(r.ageBandId) : '',
+    members: {
+      ...(r.selfOnly            != null ? { Self:      String(r.selfOnly)            } : {}),
+      ...(r.selfSpouse          != null ? { Spouse:    String(r.selfSpouse)          } : {}),
+      ...(r.selfSpouse2Children != null ? { 'Child 2': String(r.selfSpouse2Children) } : {}),
+    },
+  }));
+}
+
 export default function ProductForm({
   form,
   set,
   setFile,
   setArr,
   setPremium,
+  productId,
+  initialMembers,
   onSubmit,
   onCancel,
   submitLabel = "Save Product",
@@ -207,11 +236,13 @@ export default function ProductForm({
   const [activeToc, setActiveToc] = useState(null);
   const [activeTocDoc, setActiveTocDoc] = useState("policyWordings");
   const [viewingDoc, setViewingDoc] = useState(null);
-  const [coveredMembers, setCoveredMembers] = useState(new Set());
+  const [policyToc, setPolicyToc] = useState(POLICY_TOC);
+  const [brochureToc, setBrochureToc] = useState(BROCHURE_TOC);
+  const [editingTocId, setEditingTocId] = useState(null);
+  const [tocDraft, setTocDraft] = useState({ title: '', content: '' });
+  const [coveredMembers, setCoveredMembers] = useState(() => new Set(initialMembers ?? []));
   const [handicapFlags, setHandicapFlags] = useState({ "Child 1": false, "Child 2": false });
-  const [premiumRows, setPremiumRows] = useState([
-    { id: Date.now(), sumInsured: "", gst: "18", members: {} },
-  ]);
+  const [premiumRows, setPremiumRows] = useState(() => chartToRows(productId));
   const [docState, setDocState] = useState({
     policyWordingsFile: {
       status: "uploaded",
@@ -242,10 +273,16 @@ export default function ProductForm({
     return [m];
   });
 
+  const cumulativeLabels = selectedMembers.map((_, i) =>
+    selectedMembers.slice(0, i + 1).join('+')
+  );
+
+  const hasAgeBand = premiumRows.some(r => r.ageBandId !== '');
+
   const addPremiumRow = () =>
     setPremiumRows((prev) => [
       ...prev,
-      { id: Date.now(), sumInsured: "", gst: "18", members: {} },
+      { id: Date.now(), sumInsured: '', gst: '0', ageBandId: '', members: {} },
     ]);
 
   const removePremiumRow = (id) =>
@@ -268,6 +305,17 @@ export default function ProductForm({
 
   const cancelReplace = (field) =>
     setDocState((prev) => ({ ...prev, [field]: { ...prev[field], status: "uploaded" } }));
+
+  const startEditToc = (item) => {
+    setEditingTocId(item.id);
+    setTocDraft({ title: item.title, content: item.content });
+  };
+  const saveEditToc = (docKey) => {
+    const setter = docKey === 'policyWordings' ? setPolicyToc : setBrochureToc;
+    setter(prev => prev.map(i => i.id === editingTocId ? { ...i, ...tocDraft } : i));
+    setEditingTocId(null);
+  };
+  const cancelEditToc = () => setEditingTocId(null);
 
   const handleFileUpload = (field) => (e) => {
     const file = e.target.files?.[0];
@@ -293,6 +341,22 @@ export default function ProductForm({
       {/* ── 1. Basic Information ──────────────────── */}
       <SectionBlock icon="📦" title="Basic Information">
         <div className="form-grid">
+          <Field label="Insurance Type" required style={{ gridColumn: '1 / -1' }}>
+            <Select
+              value={form.insuranceType}
+              onChange={set("insuranceType")}
+              required
+            >
+              <option value="">Select type</option>
+              <option>Health</option>
+              <option>Motor</option>
+              <option>Life</option>
+              <option>Travel</option>
+              <option>Home</option>
+              <option>Fire</option>
+              <option>Marine</option>
+            </Select>
+          </Field>
           <Field label="Product Name" required>
             <Input
               placeholder="e.g. Star Comprehensive Health"
@@ -308,22 +372,6 @@ export default function ProductForm({
               onChange={set("productCode")}
               required
             />
-          </Field>
-          <Field label="Insurance Type" required>
-            <Select
-              value={form.insuranceType}
-              onChange={set("insuranceType")}
-              required
-            >
-              <option value="">Select type</option>
-              <option>Health</option>
-              <option>Motor</option>
-              <option>Life</option>
-              <option>Travel</option>
-              <option>Home</option>
-              <option>Fire</option>
-              <option>Marine</option>
-            </Select>
           </Field>
           <Field label="Insurance Company (IC)" required>
             <Select value={form.icName} onChange={set("icName")} required>
@@ -347,6 +395,24 @@ export default function ProductForm({
               <option>Inactive</option>
             </Select>
           </Field>
+          <Field label="Policy Type" required>
+            <Select value={form.policyType} onChange={set("policyType")} required>
+              <option>Base</option>
+              <option>Top-up</option>
+              <option>Super Top-up</option>
+              <option>Comprehensive</option>
+            </Select>
+          </Field>
+          {(form.policyType === "Top-up" || form.policyType === "Super Top-up") && (
+            <Field label="Link to Base Policy">
+              <Select value={form.basePolicyId} onChange={set("basePolicyId")}>
+                <option value="">Select base policy</option>
+                {BASE_POLICIES.map(p => (
+                  <option key={p.id} value={p.id}>{p.name} ({p.code})</option>
+                ))}
+              </Select>
+            </Field>
+          )}
         </div>
       </SectionBlock>
 
@@ -416,19 +482,20 @@ export default function ProductForm({
                 <thead>
                   <tr>
                     <th style={{ minWidth: 130 }}>Sum Insured (₹)</th>
+                    {hasAgeBand && <th style={{ minWidth: 100 }}>Age Band</th>}
                     <th style={{ minWidth: 90 }}>GST %</th>
-                    {selectedMembers.map((m) => {
+                    {selectedMembers.map((m, i) => {
                       const isHandicap = m.includes("(Handicap)");
                       return (
                         <th
                           key={m}
                           style={{
-                            minWidth: 130,
+                            minWidth: 160,
                             background: isHandicap ? "#ede9fe" : undefined,
                             color: isHandicap ? "var(--brand)" : undefined,
                           }}
                         >
-                          {isHandicap ? "♿ " : ""}{m} (₹)
+                          {isHandicap ? "♿ " : ""}{cumulativeLabels[i]} (₹)
                         </th>
                       );
                     })}
@@ -445,14 +512,23 @@ export default function ProductForm({
                           placeholder="e.g. 500000"
                           value={row.sumInsured}
                           onChange={(e) =>
-                            updatePremiumRow(
-                              row.id,
-                              "sumInsured",
-                              e.target.value,
-                            )
+                            updatePremiumRow(row.id, "sumInsured", e.target.value)
                           }
                         />
                       </td>
+                      {hasAgeBand && (
+                        <td>
+                          <Input
+                            type="number"
+                            min="1"
+                            placeholder="Band ID"
+                            value={row.ageBandId}
+                            onChange={(e) =>
+                              updatePremiumRow(row.id, "ageBandId", e.target.value)
+                            }
+                          />
+                        </td>
+                      )}
                       <td>
                         <Select
                           value={row.gst}
@@ -524,7 +600,7 @@ export default function ProductForm({
 
       {/* ── 3. Documents ─────────────────────────── */}
       <SectionBlock icon="📄" title="Documents">
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 24, alignItems: "start" }}>
+        <div className="pf-doc-grid" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 24, alignItems: "start" }}>
 
           {/* Left — file cards */}
           <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
@@ -611,40 +687,80 @@ export default function ProductForm({
 
             {/* Accordion */}
             <div style={{ maxHeight: 400, overflowY: "auto" }}>
-              {(activeTocDoc === "policyWordings" ? POLICY_TOC : BROCHURE_TOC).map((item) => (
-                <div key={item.id}>
-                  <button
-                    type="button"
-                    onClick={() => setActiveToc((prev) => prev === item.id ? null : item.id)}
-                    style={{
-                      display: "flex", alignItems: "center", justifyContent: "space-between",
-                      width: "100%", padding: "10px 16px", textAlign: "left",
-                      background: activeToc === item.id ? "var(--brand-light)" : "transparent",
-                      border: "none", borderBottom: "1px solid var(--border)", cursor: "pointer",
-                      fontFamily: "inherit", transition: "background .12s",
-                      color: activeToc === item.id ? "var(--brand)" : "var(--text)",
-                    }}
-                  >
-                    <span style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 13 }}>
-                      <span>{item.icon}</span>
-                      <span style={{ fontWeight: activeToc === item.id ? 600 : 400 }}>{item.title}</span>
-                    </span>
-                    <span style={{ fontSize: 10, color: "var(--text-3)", flexShrink: 0 }}>
-                      {activeToc === item.id ? "▲" : "▼"}
-                    </span>
-                  </button>
-                  {activeToc === item.id && (
-                    <div style={{ padding: "12px 16px 14px", background: "var(--brand-light)", borderBottom: "1px solid var(--border)", fontSize: 12.5, color: "var(--text-2)", lineHeight: 1.75 }}>
-                      {item.content}
-                    </div>
-                  )}
-                </div>
-              ))}
+              {(activeTocDoc === "policyWordings" ? policyToc : brochureToc).map((item) => {
+                const isOpen    = activeToc === item.id;
+                const isEditing = editingTocId === item.id;
+                return (
+                  <div key={item.id}>
+                    <button
+                      type="button"
+                      onClick={() => { if (!isEditing) setActiveToc(prev => prev === item.id ? null : item.id); }}
+                      style={{
+                        display: "flex", alignItems: "center", justifyContent: "space-between",
+                        width: "100%", padding: "10px 16px", textAlign: "left",
+                        background: isOpen ? "var(--brand-light)" : "transparent",
+                        border: "none", borderBottom: "1px solid var(--border)", cursor: "pointer",
+                        fontFamily: "inherit", transition: "background .12s",
+                        color: isOpen ? "var(--brand)" : "var(--text)",
+                      }}
+                    >
+                      <span style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 13 }}>
+                        <span>{item.icon}</span>
+                        <span style={{ fontWeight: isOpen ? 600 : 400 }}>{item.title}</span>
+                      </span>
+                      <span style={{ fontSize: 10, color: "var(--text-3)", flexShrink: 0 }}>
+                        {isOpen ? "▲" : "▼"}
+                      </span>
+                    </button>
+                    {isOpen && (
+                      <div style={{ padding: "12px 16px 14px", background: "var(--brand-light)", borderBottom: "1px solid var(--border)" }}>
+                        {isEditing ? (
+                          <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+                            <div>
+                              <div style={{ fontSize: 11, fontWeight: 600, color: "var(--text-3)", marginBottom: 4 }}>Title</div>
+                              <input
+                                type="text"
+                                value={tocDraft.title}
+                                onChange={e => setTocDraft(p => ({ ...p, title: e.target.value }))}
+                                style={{ width: "100%", padding: "7px 10px", fontSize: 13, border: "1.5px solid var(--border)", borderRadius: 6, fontFamily: "inherit", outline: "none", boxSizing: "border-box" }}
+                              />
+                            </div>
+                            <div>
+                              <div style={{ fontSize: 11, fontWeight: 600, color: "var(--text-3)", marginBottom: 4 }}>Content</div>
+                              <textarea
+                                value={tocDraft.content}
+                                onChange={e => setTocDraft(p => ({ ...p, content: e.target.value }))}
+                                rows={5}
+                                style={{ width: "100%", padding: "7px 10px", fontSize: 12.5, border: "1.5px solid var(--border)", borderRadius: 6, fontFamily: "inherit", outline: "none", resize: "vertical", boxSizing: "border-box", lineHeight: 1.75 }}
+                              />
+                            </div>
+                            <div style={{ display: "flex", gap: 8 }}>
+                              <button type="button" className="btn btn-ghost btn-sm" onClick={cancelEditToc}>Cancel</button>
+                              <button type="button" className="btn btn-primary btn-sm" onClick={() => saveEditToc(activeTocDoc)}>Save</button>
+                            </div>
+                          </div>
+                        ) : (
+                          <div>
+                            <div style={{ fontSize: 12.5, color: "var(--text-2)", lineHeight: 1.75, marginBottom: 10 }}>
+                              {item.content}
+                            </div>
+                            <button
+                              type="button"
+                              className="btn btn-ghost btn-sm"
+                              onClick={e => { e.stopPropagation(); startEditToc(item); }}
+                              style={{ fontSize: 12, padding: "4px 12px" }}
+                            >
+                              ✏️ Edit
+                            </button>
+                          </div>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
             </div>
 
-            <div style={{ padding: "9px 16px", background: "var(--surface-2)", borderTop: "1px solid var(--border)", fontSize: 11.5, color: "var(--text-3)", display: "flex", alignItems: "center", gap: 6 }}>
-              <span>ℹ</span> TOC is auto-extracted from the uploaded document
-            </div>
           </div>
         </div>
 
@@ -677,16 +793,6 @@ export default function ProductForm({
                 onChange={setArr("addOns")}
               />
             </div>
-          </Field>
-        </div>
-        <div className="form-grid">
-          <Field label="Policy Type">
-            <Select value={form.policyType} onChange={set("policyType")}>
-              <option>Base</option>
-              <option>Top-up</option>
-              <option>Super Top-up</option>
-              <option>Comprehensive</option>
-            </Select>
           </Field>
         </div>
       </SectionBlock>
@@ -727,7 +833,7 @@ export default function ProductForm({
               <option>Single AC Room</option>
             </Select>
           </Field>
-          <Field label="Disease Restrictions" className="col-span-2">
+          <Field label="Waiting Period For Disease" className="col-span-2">
             <Textarea
               placeholder="e.g. Pre-existing diseases covered after 36 months, Maternity after 2 years…"
               value={form.diseaseRestrictions}
@@ -738,7 +844,7 @@ export default function ProductForm({
       </SectionBlock>
 
       {/* ── 6. Terms & Conditions ────────────────── */}
-      <SectionBlock icon="📜" title="Terms & Conditions (AI-Editable)">
+      <SectionBlock >
         <div className="form-grid">
           <Field label="Eligibility Criteria" required>
             <Textarea
@@ -788,19 +894,6 @@ export default function ProductForm({
               placeholder="Any additional terms, conditions or notes…"
               value={form.notes}
               onChange={set("notes")}
-            />
-          </Field>
-        </div>
-      </SectionBlock>
-
-      {/* ── 7. IC API Mapping ──────────────────────── */}
-      <SectionBlock icon="🔌" title="IC API Mapping">
-        <div className="form-grid">
-          <Field label="IC API Product ID">
-            <Input
-              placeholder="e.g. SHI_COMP_HEALTH_V2"
-              value={form.icApiProductId}
-              onChange={set("icApiProductId")}
             />
           </Field>
         </div>

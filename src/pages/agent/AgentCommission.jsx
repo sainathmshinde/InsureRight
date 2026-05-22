@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Field, Input, Select, SectionBlock } from '../../components/Field'
+import { CommissionIcon } from '../../icons'
 
 const MOCK_RULES = [
   { id: 1, type: 'Health',  basis: 'Sales Amount', minAmount: '0',       maxAmount: '50000',  percentage: '15', timePeriod: 'Monthly' },
@@ -31,7 +32,7 @@ export default function AgentCommission() {
     <div>
       <div className="page-header">
         <div className="page-title-row">
-          <div className="page-icon">💰</div>
+          <div className="page-icon"><CommissionIcon /></div>
           <div>
             <div className="page-title">Commission Rules</div>
             <div className="page-subtitle">Define payout rules by insurance type, amount and period</div>

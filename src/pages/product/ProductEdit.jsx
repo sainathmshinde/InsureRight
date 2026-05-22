@@ -3,6 +3,7 @@ import { PageHeader } from '../../components/UI'
 import { ProductIcon } from '../../icons'
 import ProductForm from './ProductForm'
 import useProductForm from './useProductForm'
+import { PREMIUM_CHART } from './productData'
 
 const MOCK_DATA = {
   1: {
@@ -22,6 +23,7 @@ const MOCK_DATA = {
     notes: 'Renewal guaranteed without medical tests up to 65 years',
     icApiProductId: 'SHI_COMP_HEALTH_V2',
     status: 'Active',
+    coveredMembers: ['Self', 'Spouse', 'Child 1', 'Child 2', 'Mother', 'Father'],
   },
   4: {
     productName: 'Bajaj Allianz Comprehensive Motor', productCode: 'BAJ-MC-004',
@@ -40,12 +42,26 @@ const MOCK_DATA = {
     notes: 'Cashless claim at 4000+ network garages',
     icApiProductId: 'BAJ_COMP_MOTOR_V3',
     status: 'Active',
+    coveredMembers: ['Self'],
   },
+}
+
+function deriveMembers(productId) {
+  const mock = MOCK_DATA[productId]
+  if (mock?.coveredMembers) return mock.coveredMembers
+  const rows = PREMIUM_CHART[productId] ?? []
+  if (rows.length === 0) return []
+  return [
+    'Self',
+    ...(rows.some(r => r.selfSpouse != null)          ? ['Spouse']           : []),
+    ...(rows.some(r => r.selfSpouse2Children != null) ? ['Child 1', 'Child 2'] : []),
+  ]
 }
 
 export default function ProductEdit() {
   const { id } = useParams()
   const navigate = useNavigate()
+  const productId = Number(id)
   const { form, set, setFile, setArr, setPremium } = useProductForm(MOCK_DATA[id] ?? {})
 
   const handleSubmit = e => {
@@ -64,6 +80,8 @@ export default function ProductEdit() {
         <div className="card-body">
           <ProductForm
             form={form} set={set} setFile={setFile} setArr={setArr} setPremium={setPremium}
+            productId={productId}
+            initialMembers={deriveMembers(productId)}
             onSubmit={handleSubmit}
             onCancel={() => navigate('/product')}
             submitLabel="Update Product"

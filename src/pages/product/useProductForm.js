@@ -14,6 +14,7 @@ const INITIAL = {
   coverageDetails: '',
   addOns: [],
   policyType: 'Base',
+  basePolicyId: '',
   tenureOptions: [],
   waitingPeriod: '',
   roomRentLimit: '',

@@ -6,6 +6,7 @@ import { InsuranceCompanyIcon } from "../../icons";
 const INITIAL = {
   icName: "",
   code: "",
+  branch: "",
   contactPerson: "",
   email: "",
   phone: "",
@@ -64,6 +65,13 @@ export default function ICCreate() {
                     value={form.code}
                     onChange={set("code")}
                     required
+                  />
+                </Field>
+                <Field label="Branch">
+                  <Input
+                    placeholder="e.g. Mumbai"
+                    value={form.branch}
+                    onChange={set("branch")}
                   />
                 </Field>
                 <Field label="Contact Person">

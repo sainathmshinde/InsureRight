@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { Field, Input, SectionBlock } from '../../components/Field'
+import { IntegrationIcon } from '../../icons'
 
 const MOCK_DATA = {
   1: { apiMappingId: 'MAP-SHI-001', productEndpoint: '/products/list', premiumEndpoint: '/premium/calculate', policyEndpoint: '/policy/issue', webhookUrl: 'https://insureright.in/webhook/shi', timeout: '30', retryCount: '3' },
@@ -28,14 +29,14 @@ export default function ICIntegration() {
     <div>
       <div className="page-header">
         <div className="page-title-row">
-          <div className="page-icon">🔌</div>
+          <div className="page-icon"><IntegrationIcon /></div>
           <div>
             <div className="page-title">IC Integration Setup</div>
             <div className="page-subtitle">{IC_NAMES[id] ?? `IC #${id}`} — API mapping and endpoint configuration</div>
           </div>
         </div>
         <div style={{ display: 'flex', gap: 10 }}>
-          <button className="btn btn-ghost" onClick={() => navigate(`/ic/${id}/edit`)}>Edit IC</button>
+          <button className="btn btn-sm" onClick={() => navigate(`/ic/${id}/edit`)} style={{ color: '#6d28d9', border: '1.5px solid #7c3aed', background: '#faf5ff', fontWeight: 700 }}><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ marginRight: 5 }}><path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"/></svg>Edit IC</button>
           <button className="btn btn-ghost" onClick={() => navigate('/ic')}>← Back</button>
         </div>
       </div>

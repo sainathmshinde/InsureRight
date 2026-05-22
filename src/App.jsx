@@ -1,5 +1,6 @@
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider, useAuth } from "./context/AuthContext";
+import { CustomerProvider } from "./context/CustomerContext";
 import Layout from "./components/Layout";
 import ProtectedRoute from "./components/ProtectedRoute";
 import RoleGuard from "./components/RoleGuard";
@@ -36,6 +37,7 @@ import CustomerCreate  from "./pages/customer/CustomerCreate";
 import CustomerEdit    from "./pages/customer/CustomerEdit";
 import CustomerProfile from "./pages/customer/CustomerProfile";
 import Customer360     from "./pages/customer/Customer360";
+import KYCReview      from "./pages/customer/KYCReview";
 
 // Product pages
 import ProductList   from "./pages/product/ProductList";
@@ -51,8 +53,28 @@ import CampaignEdit   from "./pages/campaign/CampaignEdit";
 import PolicyList from "./pages/policy/PolicyList";
 import BuyPolicy  from "./pages/policy/BuyPolicy";
 
+// Organisation pages
+import OrganisationList from "./pages/organisation/OrganisationList";
+import OrganisationEdit from "./pages/organisation/OrganisationEdit";
+import { OrganisationProvider } from "./pages/organisation/OrganisationContext";
+
+// Association pages
+import AssociationList from "./pages/association/AssociationList";
+import AssociationEdit from "./pages/association/AssociationEdit";
+import { AssociationProvider } from "./pages/association/AssociationContext";
+
 // CRM
 import CrmPage from "./pages/crm/CrmPage";
+import Reports        from "./pages/reports/Reports";
+import Reconciliation from "./pages/reconciliation/Reconciliation";
+import UpdatePayment   from "./pages/payment/UpdatePayment";
+import ExtractPayments from "./pages/payment/ExtractPayments";
+
+// Portals
+import BrokerPortal    from "./pages/portal/BrokerPortal";
+import AgentPortal     from "./pages/portal/AgentPortal";
+import CustomerPortal  from "./pages/portal/CustomerPortal";
+import PolicyCatalogue from "./pages/portal/PolicyCatalogue";
 
 function ProfileView() {
   const { user } = useAuth();
@@ -72,6 +94,9 @@ export default function App() {
   return (
     <BrowserRouter>
       <AuthProvider>
+      <OrganisationProvider>
+      <AssociationProvider>
+      <CustomerProvider>
         <Routes>
           {/* ── Public auth routes (no sidebar/topbar) ── */}
           <Route path="/login"    element={<SignIn />} />
@@ -81,6 +106,18 @@ export default function App() {
           <Route element={<ProtectedRoute />}>
             <Route path="/" element={<Layout />}>
               <Route index element={<Navigate to="/dashboard" replace />} />
+
+              {/* ── PORTALS (role-specific home) ── */}
+              <Route element={<RoleGuard roles={['broker']} />}>
+                <Route path="broker-portal" element={<BrokerPortal />} />
+              </Route>
+              <Route element={<RoleGuard roles={['agent']} />}>
+                <Route path="agent-portal" element={<AgentPortal />} />
+              </Route>
+              <Route element={<RoleGuard roles={['customer']} />}>
+                <Route path="customer-portal" element={<CustomerPortal />} />
+                <Route path="policy-catalogue" element={<PolicyCatalogue />} />
+              </Route>
 
               {/* ── DASHBOARD (all roles) ── */}
               <Route path="dashboard" element={<Dashboard />} />
@@ -104,6 +141,7 @@ export default function App() {
                   <Route path="create" element={<CustomerCreate />} />
                   <Route path=":id/edit" element={<CustomerEdit />} />
                   <Route path=":id/360" element={<Customer360 />} />
+                  <Route path=":id/kyc" element={<KYCReview />} />
                 </Route>
                 <Route path="crm">
                   <Route index element={<CrmPage />} />
@@ -121,6 +159,18 @@ export default function App() {
                   <Route index element={<AgentList />} />
                   <Route path="create" element={<AgentCreate />} />
                   <Route path=":id/edit" element={<AgentEdit />} />
+                </Route>
+
+                <Route path="organisation">
+                  <Route index element={<OrganisationList />} />
+                  <Route path="create" element={<OrganisationEdit />} />
+                  <Route path=":id/edit" element={<OrganisationEdit />} />
+                </Route>
+
+                <Route path="association">
+                  <Route index element={<AssociationList />} />
+                  <Route path="create" element={<AssociationEdit />} />
+                  <Route path=":id/edit" element={<AssociationEdit />} />
                 </Route>
 
                 <Route path="product">
@@ -148,6 +198,11 @@ export default function App() {
                   <Route path=":id" element={<BrokerView />} />
                   <Route path=":id/edit" element={<BrokerEdit />} />
                 </Route>
+
+                <Route path="reports"         element={<Reports />} />
+                <Route path="reconciliation" element={<Reconciliation />} />
+                <Route path="update-payment"  element={<UpdatePayment />} />
+                <Route path="extract-payments" element={<ExtractPayments />} />
               </Route>
 
               <Route path="*" element={<Navigate to="/dashboard" replace />} />
@@ -157,6 +212,9 @@ export default function App() {
           {/* Catch-all → login */}
           <Route path="*" element={<Navigate to="/login" replace />} />
         </Routes>
+      </CustomerProvider>
+      </AssociationProvider>
+      </OrganisationProvider>
       </AuthProvider>
     </BrowserRouter>
   );

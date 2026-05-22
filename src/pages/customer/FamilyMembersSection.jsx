@@ -12,7 +12,7 @@ const MEMBER_TYPES = [
   { value: 'Sibling',        label: 'Sibling',          icon: '🧑' },
 ]
 export const TYPE_ICON = Object.fromEntries(MEMBER_TYPES.map(t => [t.value, t.icon]))
-const EMPTY = { type: 'Spouse', name: '', dob: '', gender: '', preExisting: '' }
+const EMPTY = { type: 'Spouse', name: '', dob: '', gender: '' }
 
 function calcAge(dob) {
   if (!dob) return null
@@ -58,11 +58,9 @@ export default function FamilyMembersSection({ members = [], onChange }) {
                   <div style={{ fontWeight: 600, fontSize: 13.5, color: 'var(--text)' }}>{m.name}</div>
                   <div style={{ fontSize: 12, color: 'var(--text-3)', marginTop: 2 }}>
                     {m.type}{m.gender ? ` · ${m.gender}` : ''}{age !== null ? ` · Age: ${age} yrs` : ''}{m.dob ? ` (${m.dob})` : ''}
-                    {m.preExisting ? <span style={{ color: '#d97706', marginLeft: 6 }}>⚠ {m.preExisting}</span> : null}
                   </div>
                 </div>
-                <span className="badge badge-purple" style={{ flexShrink: 0 }}>{m.type}</span>
-                <button type="button" className="btn btn-ghost btn-sm" onClick={() => startEdit(m)} style={{ flexShrink: 0 }}>Edit</button>
+                <button type="button" onClick={() => startEdit(m)} title="Edit" style={{ background: 'linear-gradient(135deg,#fb7185,#a855f7)', border: 'none', borderRadius: 6, cursor: 'pointer', padding: '5px 6px', color: '#fff', display: 'inline-flex', alignItems: 'center', boxShadow: '0 2px 6px rgba(168,85,247,.30)', flexShrink: 0 }}><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"/></svg></button>
                 <button type="button" className="btn btn-danger btn-sm" onClick={() => remove(m.id)} style={{ flexShrink: 0 }}>Remove</button>
               </div>
             )
@@ -103,9 +101,6 @@ export default function FamilyMembersSection({ members = [], onChange }) {
                 <option>Female</option>
                 <option>Other</option>
               </Select>
-            </Field>
-            <Field label="Pre-existing Diseases">
-              <Input placeholder="e.g. Diabetes, Hypertension (leave blank if none)" value={draft.preExisting} onChange={setD('preExisting')} />
             </Field>
           </div>
           {draft.dob && (

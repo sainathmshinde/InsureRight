@@ -7,7 +7,7 @@ import {
   UploadBox,
   SectionBlock,
 } from "../../components/Field";
-import { AgentIcon } from "../../icons";
+import { AgentIcon, EditIcon } from "../../icons";
 import { AGENT_MAP } from "./agentData";
 import { useAuth } from "../../context/AuthContext";
 
@@ -22,7 +22,25 @@ export default function AgentEdit() {
   const { user } = useAuth();
 
   const isProfile = !id;
-  const initial = isProfile ? authUserToAgent(user) : (AGENT_MAP[Number(id)] ?? {});
+
+  // For profile: load full agent record (with doc URLs) then overlay auth user fields
+  const profileAgent = isProfile
+    ? (
+        Object.values(AGENT_MAP).find(a => a.email === user?.email)
+        ?? Object.values(AGENT_MAP).find(a => a.name === user?.name)
+        ?? AGENT_MAP[2]
+      )
+    : null
+
+  const initial = isProfile
+    ? {
+        ...profileAgent,
+        name:           user?.name    || profileAgent?.name    || '',
+        mobile:         user?.phone   || profileAgent?.mobile  || '',
+        email:          user?.email   || profileAgent?.email   || '',
+        assignedBroker: user?.company || profileAgent?.assignedBroker || '',
+      }
+    : (AGENT_MAP[Number(id)] ?? {});
   const [form, setForm] = useState(initial);
   const set = (f) => (e) => setForm((p) => ({ ...p, [f]: e.target.value }));
   const setF = (f) => (e) =>
@@ -38,7 +56,7 @@ export default function AgentEdit() {
     <div>
       <div className="page-header">
         <div className="page-title-row">
-          <div className="page-icon">✏️</div>
+          <div className="page-icon"><EditIcon /></div>
           <div>
             <div className="page-title">{isProfile ? "Edit My Profile" : "Edit Agent"}</div>
             <div className="page-subtitle">
@@ -99,6 +117,13 @@ export default function AgentEdit() {
                     <option>Other</option>
                   </Select>
                 </Field>
+                <Field label="Agent Type" required>
+                  <Select value={form.agentType || ""} onChange={set("agentType")} required>
+                    <option value="">Select agent type</option>
+                    <option value="calling">Calling Agent</option>
+                    <option value="sales">Sales Agent</option>
+                  </Select>
+                </Field>
               </div>
             </SectionBlock>
 
@@ -147,11 +172,10 @@ export default function AgentEdit() {
 
             <SectionBlock icon="💼" title="Professional Details">
               <div className="form-grid">
-                <Field label="POS License Number" required>
+                <Field label="POS License Number">
                   <Input
                     value={form.posLicense || ""}
                     onChange={set("posLicense")}
-                    required
                   />
                 </Field>
                 <Field label="Qualification">
@@ -179,11 +203,10 @@ export default function AgentEdit() {
 
             <SectionBlock icon="🏦" title="Bank Details">
               <div className="form-grid">
-                <Field label="Account Number" required>
+                <Field label="Account Number">
                   <Input
                     value={form.accountNumber || ""}
                     onChange={set("accountNumber")}
-                    required
                   />
                 </Field>
                 <Field label="IFSC Code" required>
@@ -196,30 +219,7 @@ export default function AgentEdit() {
               </div>
             </SectionBlock>
 
-            <SectionBlock icon="🔗" title="Mapping">
-              <div className="form-grid">
-                <Field label="Assigned Broker">
-                  <Input value="K.M. Dastur & Co." readOnly style={{ background: 'var(--bg-2)', color: 'var(--text-2)' }} />
-                </Field>
-                <Field label="Reporting Manager">
-                  <Input
-                    value={form.reportingManager || ""}
-                    onChange={set("reportingManager")}
-                  />
-                </Field>
-                <Field label="Status">
-                  <Select
-                    value={form.status || "Active"}
-                    onChange={set("status")}
-                  >
-                    <option>Active</option>
-                    <option>Inactive</option>
-                  </Select>
-                </Field>
-              </div>
-            </SectionBlock>
-
-            <div className="actions-row">
+<div className="actions-row">
               <button
                 type="button"
                 className="btn btn-ghost"

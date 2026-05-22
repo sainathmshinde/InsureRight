@@ -1,0 +1,10 @@
+policyNo,customerName,mobile,icName,policyType,premium,sumInsured,status
+POL-2025-001,Aarav Sharma,9876543210,Star Health Insurance,Health,8500,500000,Active
+POL-2025-002,Rohit Sharma,9812000000,HDFC ERGO,Health,6500,300000,Active
+POL-2025-003,Divya Nair,9911223344,ICICI Lombard,Health,9100,750000,Active
+POL-2025-004,Vijay Patil,9011223344,Bajaj Allianz,Motor,4800,0,Active
+POL-2025-005,Suresh Kumar,9988001122,New India Assurance,Health,14000,300000,Active
+POL-2025-006,Vikram Rao,9944556677,HDFC ERGO,Health,6200,250000,Active
+POL-2025-007,Kavitha Pillai,9899112233,LIC,Life,12000,1000000,Active
+POL-2025-008,Arjun Singh,9922334455,Bajaj Allianz,Motor,5200,0,Lapsed
+POL-2025-009,Priya Mehta,9812345678,ICICI Lombard,Health,9100,500000,Active
