@@ -2,87 +2,28 @@
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../../context/AuthContext'
 import { POLICY_MOCK } from '../policy/PolicyList'
+import { PRODUCTS, PREMIUM_CHART, POLICY_TYPE_ICON } from '../product/productData'
 
 /* ─── data ─────────────────────────────────────────────── */
-const INSURANCE_TYPES = [
-  { id: 'health',     icon: '🏥', label: 'Health',       sub: 'Family & individual',    color: '#2d7d46', bg: '#e6f4ea', path: '/insurance/health',      badge: 'LIVE' },
-  { id: 'car',        icon: '🚗', label: 'Car',          sub: 'Comprehensive cover',     color: '#0a7ea4', bg: '#e0f4fb', path: '/insurance/car'           },
-  { id: 'two-wheeler',icon: '🏍️', label: 'Two-Wheeler',  sub: 'Bike & scooter plans',   color: '#7c3aed', bg: '#f5f3ff', path: '/insurance/two-wheeler'   },
-  { id: 'term-life',  icon: '🛡️', label: 'Term Life',    sub: '₹1 Cr cover from ₹490/mo',color: '#1565c0', bg: '#e8f4fd', path: '/insurance/term-life'    },
-  { id: 'investment', icon: '📈', label: 'Investment',   sub: 'Grow + protect wealth',   color: '#6d28d9', bg: '#ede9fe', path: '/insurance/investment'    },
-  { id: 'travel',     icon: '✈️', label: 'Travel',       sub: 'Domestic & international',color: '#a05c00', bg: '#fff3e0', path: '/insurance/travel'        },
-  { id: 'home',       icon: '🏠', label: 'Home',         sub: 'Structure & contents',    color: '#b91c1c', bg: '#fef2f2', path: '/insurance/home'          },
-  { id: 'business',   icon: '🏢', label: 'Business',     sub: 'SME & corporate plans',   color: '#374151', bg: '#f3f4f6', path: '/insurance/business'      },
-]
 
-const FEATURED_DEALS = [
-  {
-    id: 'health-promo',
-    tag: '🔥 Best Seller', tagBg: '#fff3e0', tagColor: '#a05c00',
-    icon: '🏥', title: 'Star Comprehensive Health',
-    subtitle: "India's #1 health insurance plan",
-    highlight: 'Save up to 40% on family floater',
-    price: '₹8,500', period: 'per year',
-    features: ['₹10 Lakh sum insured', '14,000+ hospitals', 'No room rent limit', 'Day care & AYUSH'],
-    color: '#2d7d46', bg: '#f0fdf4', border: '#bbf7d0',
-    cta: 'View Plans', path: '/insurance/health', ribbon: '40% OFF',
-  },
-  {
-    id: 'term-promo',
-    tag: '💰 Tax Saving', tagBg: '#e8f4fd', tagColor: '#1565c0',
-    icon: '🛡️', title: 'Pure Term Life Plan',
-    subtitle: 'Maximum cover at minimum cost',
-    highlight: '₹1 Crore life cover — 100% online',
-    price: '₹490', period: 'per month',
-    features: ['No medical checkup needed', 'Tax benefit u/s 80C', 'Payout within 7 days', 'Critical illness rider'],
-    color: '#1565c0', bg: '#eff6ff', border: '#bfdbfe',
-    cta: 'Get Quote', path: '/insurance/term-life', ribbon: null,
-  },
-  {
-    id: 'car-promo',
-    tag: '⚡ Instant Renew', tagBg: '#f5f3ff', tagColor: '#7c3aed',
-    icon: '🚗', title: 'Car Comprehensive Cover',
-    subtitle: 'Complete protection for your vehicle',
-    highlight: 'Renew in 2 minutes — no paperwork',
-    price: '₹2,500', period: 'per year',
-    features: ['Zero depreciation add-on', '4,000+ cashless garages', 'Roadside assistance 24×7', 'Engine protection'],
-    color: '#7c3aed', bg: '#faf5ff', border: '#ddd6fe',
-    cta: 'Renew Now', path: '/insurance/car', ribbon: null,
-  },
-  {
-    id: 'travel-promo',
-    tag: '✈️ New Launch', tagBg: '#fff3e0', tagColor: '#a05c00',
-    icon: '✈️', title: 'International Travel Cover',
-    subtitle: 'Fly worry-free anywhere in the world',
-    highlight: 'Medical emergency + trip cancellation',
-    price: '₹299', period: 'per trip',
-    features: ['Medical emergency abroad', 'Trip cancellation cover', 'Lost baggage protection', 'Passport loss cover'],
-    color: '#a05c00', bg: '#fffbf0', border: '#fde68a',
-    cta: 'Explore', path: '/insurance/travel', ribbon: null,
-  },
-  {
-    id: 'home-promo',
-    tag: '🏠 Trending', tagBg: '#fef2f2', tagColor: '#b91c1c',
-    icon: '🏠', title: 'Home & Contents Insurance',
-    subtitle: 'Protect your biggest investment',
-    highlight: 'Structure + valuables covered',
-    price: '₹1,200', period: 'per year',
-    features: ['Fire & natural disaster', 'Theft & burglary cover', 'Jewellery & electronics', 'Temporary accommodation'],
-    color: '#b91c1c', bg: '#fff5f5', border: '#fecaca',
-    cta: 'Get Quote', path: '/insurance/home', ribbon: null,
-  },
-  {
-    id: 'health-senior',
-    tag: '👴 Senior Special', tagBg: '#e6f4ea', tagColor: '#2d7d46',
-    icon: '⭐', title: 'Star Senior Red Carpet',
-    subtitle: 'Purpose-built for age 60+',
-    highlight: 'Entry up to 75 yrs · No pre-check',
-    price: '₹14,000', period: 'per year',
-    features: ['No pre-policy checkup', 'PED covered after 2 yrs', 'Day care & domiciliary', 'Co-payment waiver add-on'],
-    color: '#2d7d46', bg: '#f0fdf4', border: '#bbf7d0',
-    cta: 'Buy Now', path: '/insurance/health', ribbon: 'SENIOR',
-  },
-]
+const TYPE_COLORS = {
+  'Base Policy':        { color: '#1d4ed8', bg: '#dbeafe', border: '#93c5fd' },
+  'OPD':                { color: '#15803d', bg: '#dcfce7', border: '#86efac' },
+  'Payment Protection': { color: '#b45309', bg: '#fef3c7', border: '#fcd34d' },
+  'Age Band Premium':   { color: '#7c3aed', bg: '#f5f3ff', border: '#c4b5fd' },
+  'Super Top Up':       { color: '#dc2626', bg: '#fee2e2', border: '#fca5a5' },
+  'Top Up Policy':      { color: '#4f46e5', bg: '#eef2ff', border: '#a5b4fc' },
+}
+
+function fmtSI(v) {
+  if (v >= 100000) return `₹${(v / 100000).toFixed(0)}L`
+  if (v >= 1000)   return `₹${(v / 1000).toFixed(0)}K`
+  return `₹${v}`
+}
+
+// Health products from catalogue — skip test entries
+const TEST_IDS = new Set([6, 46, 47])
+const HEALTH_PRODUCTS = PRODUCTS.filter(p => !TEST_IDS.has(p.id))
 
 const TESTIMONIALS = [
   { name: 'Priya M.', city: 'Mumbai', rating: 5, text: 'Cashless claim settled in 48 hours. InsureRight made the whole process stress-free!', policy: 'Health Insurance' },
@@ -105,63 +46,98 @@ const PARTNERS = [
 const CARD_W = 320
 const CARD_GAP = 16
 
-function DealCard({ deal, navigate }) {
+function ProductDealCard({ product, navigate }) {
+  const tc         = TYPE_COLORS[product.policyType] ?? { color: '#64748b', bg: '#f1f5f9', border: '#cbd5e1' }
+  const icon       = POLICY_TYPE_ICON[product.policyType] ?? '📋'
+  const chartRows  = PREMIUM_CHART[product.id] ?? []
+  const uniqueSIs  = [...new Set(chartRows.map(r => r.sumInsured))]
+  const allPremiums = chartRows.flatMap(r => [r.selfOnly, r.selfSpouse, r.selfSpouse2Children].filter(Boolean))
+  const minPremium = allPremiums.length > 0 ? Math.min(...allPremiums) : null
+  const hasSelfSpouse = chartRows.some(r => r.selfSpouse != null)
+  const hasFamily     = chartRows.some(r => r.selfSpouse2Children != null)
+
   return (
     <div
-      onClick={() => navigate(deal.path)}
+      onClick={() => navigate('/policy/buy')}
       style={{
         width: CARD_W, flexShrink: 0,
-        background: deal.bg, border: `1.5px solid ${deal.border}`,
+        background: tc.bg, border: `1.5px solid ${tc.border}`,
         borderRadius: 14, overflow: 'hidden', cursor: 'pointer',
-        position: 'relative',
+        position: 'relative', display: 'flex', flexDirection: 'column',
         transition: 'transform .18s, box-shadow .18s',
       }}
-      onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-4px)'; e.currentTarget.style.boxShadow = `0 12px 32px ${deal.color}28` }}
+      onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-4px)'; e.currentTarget.style.boxShadow = `0 12px 32px ${tc.color}28` }}
       onMouseLeave={e => { e.currentTarget.style.transform = 'none'; e.currentTarget.style.boxShadow = 'none' }}
     >
-      {deal.ribbon && (
-        <div style={{ position:'absolute', top:14, right:-22, background:deal.color, color:'#fff', fontSize:10, fontWeight:800, padding:'4px 32px', transform:'rotate(35deg)', letterSpacing:.5, zIndex:1 }}>{deal.ribbon}</div>
-      )}
-      <div style={{ padding:'20px 20px 0' }}>
-        <div style={{ display:'flex', justifyContent:'space-between', alignItems:'flex-start', marginBottom:12 }}>
-          <div style={{ fontSize:34 }}>{deal.icon}</div>
-          <span style={{ padding:'3px 10px', borderRadius:99, fontSize:11, fontWeight:700, background:deal.tagBg, color:deal.tagColor }}>{deal.tag}</span>
+      {/* top accent bar */}
+      <div style={{ height: 4, background: `linear-gradient(90deg,${tc.color},${tc.color}88)`, flexShrink: 0 }} />
+
+      <div style={{ padding: '16px 18px 0', flex: 1 }}>
+        {/* icon + type badge */}
+        <div style={{ display:'flex', justifyContent:'space-between', alignItems:'flex-start', marginBottom:10 }}>
+          <div style={{ width:40, height:40, borderRadius:10, background:'#fff', border:`1.5px solid ${tc.border}`, display:'flex', alignItems:'center', justifyContent:'center', fontSize:22, flexShrink:0 }}>{icon}</div>
+          <span style={{ padding:'3px 10px', borderRadius:99, fontSize:10.5, fontWeight:700, background:'#fff', color:tc.color, border:`1px solid ${tc.border}` }}>{product.policyType}</span>
         </div>
-        <div style={{ fontSize:15, fontWeight:800, color:'#1a1628', marginBottom:2 }}>{deal.title}</div>
-        <div style={{ fontSize:12, color:'#5c5573', marginBottom:8 }}>{deal.subtitle}</div>
-        <div style={{ fontSize:11.5, fontWeight:700, color:deal.color, marginBottom:12, padding:'5px 10px', background:deal.color+'12', borderRadius:7, display:'inline-block' }}>
-          ✨ {deal.highlight}
-        </div>
-        <div style={{ display:'flex', flexDirection:'column', gap:5, marginBottom:16 }}>
-          {deal.features.map(f => (
-            <div key={f} style={{ display:'flex', alignItems:'center', gap:7, fontSize:12, color:'#3d3555' }}>
-              <span style={{ color:deal.color, fontWeight:800, fontSize:10, flexShrink:0 }}>✓</span>{f}
+
+        {/* provider */}
+        <div style={{ fontSize:11, fontWeight:700, color:tc.color, marginBottom:3, overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>{product.provider}</div>
+
+        {/* name */}
+        <div style={{ fontSize:13.5, fontWeight:800, color:'#1a1628', marginBottom:2, lineHeight:1.3 }}>{product.name}</div>
+
+        {/* code */}
+        <div style={{ fontSize:10.5, fontFamily:'monospace', color:'#94a3b8', marginBottom:12 }}>{product.code}</div>
+
+        {/* SI + premium metrics */}
+        <div style={{ display:'flex', gap:8, marginBottom:12 }}>
+          {uniqueSIs.length > 0 && (
+            <div style={{ flex:1, background:'#fff', borderRadius:8, padding:'7px 10px', border:'1px solid #e2e8f0' }}>
+              <div style={{ fontSize:9, fontWeight:700, color:'#94a3b8', textTransform:'uppercase', letterSpacing:'.5px', marginBottom:2 }}>Sum Insured</div>
+              <div style={{ fontSize:12, fontWeight:700, color:'#1e293b' }}>
+                {fmtSI(Math.min(...uniqueSIs))}{uniqueSIs.length > 1 && ` – ${fmtSI(Math.max(...uniqueSIs))}`}
+              </div>
             </div>
-          ))}
+          )}
+          {minPremium ? (
+            <div style={{ flex:1, background:'#fff', borderRadius:8, padding:'7px 10px', border:`1px solid ${tc.border}` }}>
+              <div style={{ fontSize:9, fontWeight:700, color:tc.color, textTransform:'uppercase', letterSpacing:'.5px', marginBottom:2, opacity:.8 }}>Starts From</div>
+              <div style={{ fontSize:12, fontWeight:800, color:tc.color }}>₹{minPremium.toLocaleString('en-IN')}<span style={{ fontSize:9.5, fontWeight:600 }}>/yr</span></div>
+            </div>
+          ) : (
+            <div style={{ flex:1, background:'#fff', borderRadius:8, padding:'7px 10px', border:'1px solid #e2e8f0' }}>
+              <div style={{ fontSize:9, fontWeight:700, color:'#94a3b8', textTransform:'uppercase', letterSpacing:'.5px', marginBottom:2 }}>Premium</div>
+              <div style={{ fontSize:11, fontWeight:600, color:'#94a3b8' }}>On request</div>
+            </div>
+          )}
+        </div>
+
+        {/* coverage chips */}
+        <div style={{ display:'flex', gap:5, flexWrap:'wrap', marginBottom:14 }}>
+          <span style={{ fontSize:10.5, fontWeight:600, background:'#fff', border:'1px solid #e2e8f0', borderRadius:20, padding:'2px 9px', color:'#475569' }}>👤 Self</span>
+          {hasSelfSpouse && <span style={{ fontSize:10.5, fontWeight:600, background:'#fff', border:'1px solid #e2e8f0', borderRadius:20, padding:'2px 9px', color:'#475569' }}>👫 + Spouse</span>}
+          {hasFamily     && <span style={{ fontSize:10.5, fontWeight:600, background:'#fff', border:'1px solid #e2e8f0', borderRadius:20, padding:'2px 9px', color:'#475569' }}>👨‍👩‍👧 Family</span>}
         </div>
       </div>
-      <div style={{ borderTop:`1px solid ${deal.border}`, padding:'12px 20px', display:'flex', justifyContent:'space-between', alignItems:'center' }}>
-        <div>
-          <span style={{ fontSize:20, fontWeight:900, color:deal.color }}>{deal.price}</span>
-          <span style={{ fontSize:11.5, color:'#64748b' }}> {deal.period}</span>
-        </div>
-        <button onClick={e => { e.stopPropagation(); navigate(deal.path) }}
-          style={{ padding:'8px 16px', borderRadius:9, border:'none', background:deal.color, color:'#fff', fontWeight:700, fontSize:12.5, cursor:'pointer', fontFamily:'inherit' }}>
-          {deal.cta} →
+
+      {/* footer */}
+      <div style={{ borderTop:`1px solid ${tc.border}`, padding:'11px 18px', display:'flex', justifyContent:'space-between', alignItems:'center', background:'#fff', flexShrink:0 }}>
+        <div style={{ fontSize:11.5, color:tc.color, fontWeight:700 }}>🏥 Health Insurance</div>
+        <button
+          onClick={e => { e.stopPropagation(); navigate('/policy/buy') }}
+          style={{ padding:'7px 16px', borderRadius:9, border:'none', background:tc.color, color:'#fff', fontWeight:700, fontSize:12, cursor:'pointer', fontFamily:'inherit' }}
+        >
+          Buy Now →
         </button>
       </div>
     </div>
   )
 }
 
-function DealsCarousel({ deals, navigate }) {
+function DealsCarousel({ products, navigate }) {
   const [paused, setPaused] = useState(false)
-  /* We duplicate the list so the seam is invisible */
-  const repeated = [...deals, ...deals]
-  /* Total width of one full set of cards */
-  const setWidth = deals.length * (CARD_W + CARD_GAP)
-  /* Animation duration — higher = slower scroll */
-  const duration = deals.length * 4   // ~24 s for 6 cards
+  const repeated = [...products, ...products]
+  const setWidth = products.length * (CARD_W + CARD_GAP)
+  const duration = products.length * 4
 
   return (
     <div style={{ marginBottom: 28 }}>
@@ -187,7 +163,7 @@ function DealsCarousel({ deals, navigate }) {
             Advisor-recommended plans · Best prices guaranteed
           </div>
         </div>
-        <button onClick={() => navigate('/policy-catalogue')}
+        <button onClick={() => navigate('/policy/buy')}
           style={{ fontSize:13, color:'#2d7d46', fontWeight:700, background:'none', border:'none', cursor:'pointer', fontFamily:'inherit' }}>
           See all plans →
         </button>
@@ -204,8 +180,8 @@ function DealsCarousel({ deals, navigate }) {
         <div style={{ position:'absolute', right:0, top:0, bottom:0, width:60, background:'linear-gradient(to left, var(--bg, #f5f4f9), transparent)', zIndex:2, pointerEvents:'none' }} />
 
         <div className={`deals-track${paused ? ' paused' : ''}`}>
-          {repeated.map((deal, i) => (
-            <DealCard key={`${deal.id}-${i}`} deal={deal} navigate={navigate} />
+          {repeated.map((product, i) => (
+            <ProductDealCard key={`${product.id}-${i}`} product={product} navigate={navigate} />
           ))}
         </div>
       </div>
@@ -235,146 +211,15 @@ function Stars({ n }) {
 export default function CustomerPortal() {
   const { user }   = useAuth()
   const navigate   = useNavigate()
-  const [hovered, setHovered] = useState(null)
-
-  const myPolicies  = POLICY_MOCK.filter(p => p.customerId === user?.id)
-  const activePols  = myPolicies.filter(p => p.status === 'Active')
-  const nextRenewal = [...activePols].sort((a, b) => a.endDate.localeCompare(b.endDate))[0]
-  const daysLeft    = nextRenewal ? Math.max(0, daysUntil(nextRenewal.endDate)) : null
+  const myPolicies = POLICY_MOCK.filter(p => p.customerId === user?.id)
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 0 }}>
 
       {/* ══════════════════════════════════════════════════
-          HERO
-      ══════════════════════════════════════════════════ */}
-      <div className="cp-hero" style={{ background: 'linear-gradient(135deg,#1b5e20 0%,#2e7d32 50%,#1565c0 100%)', borderRadius: 16, padding: '40px 40px 44px', position: 'relative', overflow: 'hidden', marginBottom: 24 }}>
-        {/* decorative blobs */}
-        <div style={{ position:'absolute', top:-60, right:160, width:280, height:280, borderRadius:'50%', background:'rgba(255,255,255,0.05)', pointerEvents:'none' }} />
-        <div style={{ position:'absolute', bottom:-80, right:-30, width:320, height:320, borderRadius:'50%', background:'rgba(255,255,255,0.05)', pointerEvents:'none' }} />
-
-        <div className="cp-hero-inner" style={{ display:'flex', justifyContent:'space-between', alignItems:'flex-start', gap:32, position:'relative' }}>
-          {/* left copy */}
-          <div className="cp-hero-left" style={{ flex:1, maxWidth:560 }}>
-            <div style={{ display:'inline-flex', alignItems:'center', gap:7, background:'rgba(255,255,255,0.12)', border:'1px solid rgba(255,255,255,0.2)', borderRadius:99, padding:'5px 14px', marginBottom:16 }}>
-              <span style={{ width:7, height:7, borderRadius:'50%', background:'#4ade80', display:'inline-block', boxShadow:'0 0 0 3px rgba(74,222,128,0.3)' }} />
-              <span style={{ fontSize:12, color:'#fff', fontWeight:600 }}>K.M. Dastur & Co. · IRDAI Licensed Broker CB-456/2008</span>
-            </div>
-
-            <h1 style={{ margin:'0 0 10px', fontSize:30, fontWeight:900, color:'#fff', lineHeight:1.15 }}>
-              Compare & Buy Insurance<br />
-              <span style={{ color:'#86efac' }}>Save Up to 40% on Premiums</span>
-            </h1>
-            <p style={{ margin:'0 0 24px', fontSize:14.5, color:'rgba(255,255,255,0.75)', lineHeight:1.7 }}>
-              Welcome back, <strong style={{ color:'#fff' }}>{user?.name?.split(' ')[0]}</strong>! Browse India's top insurance plans,
-              compare quotes instantly and buy in minutes — all in one place.
-            </p>
-
-            {/* CTA row */}
-            <div className="cp-cta-row" style={{ display:'flex', gap:10, flexWrap:'wrap', marginBottom:28 }}>
-              <button onClick={() => navigate('/insurance/health')}
-                style={{ padding:'11px 24px', borderRadius:9, border:'none', background:'#fff', color:'#2d7d46', fontWeight:800, fontSize:14, cursor:'pointer', fontFamily:'inherit', boxShadow:'0 4px 14px rgba(0,0,0,0.15)' }}>
-                🏥 Explore Health Plans
-              </button>
-              <button onClick={() => navigate('/policy/buy')}
-                style={{ padding:'11px 24px', borderRadius:9, border:'2px solid rgba(255,255,255,0.5)', background:'transparent', color:'#fff', fontWeight:700, fontSize:14, cursor:'pointer', fontFamily:'inherit' }}>
-                + Buy New Policy
-              </button>
-              <button onClick={() => navigate('/policy-catalogue')}
-                style={{ padding:'11px 24px', borderRadius:9, border:'2px solid rgba(255,255,255,0.3)', background:'transparent', color:'rgba(255,255,255,0.85)', fontWeight:600, fontSize:14, cursor:'pointer', fontFamily:'inherit' }}>
-                Browse All Plans
-              </button>
-            </div>
-
-            {/* Mini trust row */}
-            <div style={{ display:'flex', gap:20, flexWrap:'wrap' }}>
-              {[['50,000+','Happy Customers'],['98%','Claims Settled'],['14,000+','Network Hospitals'],['2 min','Instant Issuance']].map(([v,l]) => (
-                <div key={l} style={{ textAlign:'center' }}>
-                  <div style={{ fontSize:16, fontWeight:800, color:'#fff' }}>{v}</div>
-                  <div style={{ fontSize:11, color:'rgba(255,255,255,.88)' }}>{l}</div>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* right: my policy card */}
-          <div className="cp-hero-right" style={{ width:260, flexShrink:0 }}>
-            <div style={{ background:'rgba(255,255,255,0.1)', backdropFilter:'blur(12px)', border:'1px solid rgba(255,255,255,0.2)', borderRadius:14, padding:'18px 20px' }}>
-              <div style={{ fontSize:11, color:'#a5d6a7', fontWeight:700, textTransform:'uppercase', letterSpacing:1, marginBottom:12 }}>My Portfolio</div>
-              {[
-                { icon:'📋', label:'Active Policies', value: activePols.length },
-                { icon:'🛡️', label:'Total Coverage',  value: activePols.length ? `₹${activePols.reduce((s,p)=>{const n=parseInt(String(p.sumInsured).replace(/\D/g,''));return s+(isNaN(n)?0:n)},0)/100000}L` : '—' },
-                { icon:'🗓️', label:'Next Renewal',    value: nextRenewal ? `${daysLeft}d · ${fmtDate(nextRenewal.endDate)}` : 'No active policy' },
-                { icon:'📝', label:'Claims Filed',     value: '0 claims' },
-              ].map(item => (
-                <div key={item.label} style={{ display:'flex', alignItems:'center', gap:10, padding:'9px 0', borderBottom:'1px solid rgba(255,255,255,0.08)' }}>
-                  <span style={{ fontSize:16 }}>{item.icon}</span>
-                  <div>
-                    <div style={{ fontSize:10.5, color:'rgba(255,255,255,.82)' }}>{item.label}</div>
-                    <div style={{ fontSize:13, fontWeight:700, color:'#fff' }}>{item.value}</div>
-                  </div>
-                </div>
-              ))}
-              <button onClick={() => navigate('/policy')}
-                style={{ marginTop:14, width:'100%', padding:'9px', borderRadius:8, border:'1.5px solid rgba(255,255,255,0.3)', background:'rgba(255,255,255,0.1)', color:'#fff', fontWeight:700, fontSize:13, cursor:'pointer', fontFamily:'inherit' }}>
-                View My Policies →
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* ══════════════════════════════════════════════════
-          RENEWAL ALERT  (only if urgent)
-      ══════════════════════════════════════════════════ */}
-      {daysLeft != null && daysLeft <= 30 && (
-        <div style={{ background:'#fffbeb', border:'1.5px solid #fde68a', borderRadius:12, padding:'14px 20px', display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:24, flexWrap:'wrap', gap:10 }}>
-          <div style={{ display:'flex', alignItems:'center', gap:12 }}>
-            <span style={{ fontSize:22 }}>⚠️</span>
-            <div>
-              <div style={{ fontSize:14, fontWeight:700, color:'#92400e' }}>Policy Renewal Due in {daysLeft} Days</div>
-              <div style={{ fontSize:12.5, color:'#a05c00' }}>{nextRenewal?.product} — renew now to avoid a coverage gap</div>
-            </div>
-          </div>
-          <button type="button" className="btn btn-primary" style={{ fontSize:13, padding:'8px 20px' }} onClick={() => navigate('/policy/buy')}>
-            Renew Now →
-          </button>
-        </div>
-      )}
-
-      {/* ══════════════════════════════════════════════════
-          INSURANCE CATEGORIES
-      ══════════════════════════════════════════════════ */}
-      <div style={{ marginBottom:28 }}>
-        <div style={{ display:'flex', justifyContent:'space-between', alignItems:'flex-end', marginBottom:14 }}>
-          <div>
-            <div style={{ fontSize:18, fontWeight:800, color:'#1a1628' }}>What Would You Like to Insure?</div>
-            <div style={{ fontSize:13, color:'#64748b', marginTop:3 }}>Click any category to compare plans instantly</div>
-          </div>
-          <button onClick={() => navigate('/policy-catalogue')} style={{ fontSize:13, color:'#2d7d46', fontWeight:700, background:'none', border:'none', cursor:'pointer', fontFamily:'inherit' }}>
-            All Plans →
-          </button>
-        </div>
-        <div className="cp-cats" style={{ display:'grid', gridTemplateColumns:'repeat(8,1fr)', gap:10 }}>
-          {INSURANCE_TYPES.map(t => (
-            <div key={t.id}
-              onClick={() => navigate(t.path)}
-              onMouseEnter={() => setHovered(t.id)}
-              onMouseLeave={() => setHovered(null)}
-              style={{ background: hovered===t.id ? t.bg : '#fff', border:`1.5px solid ${hovered===t.id ? t.color : '#e8e4f0'}`, borderRadius:12, padding:'16px 10px 14px', cursor:'pointer', textAlign:'center', transition:'all .15s', transform: hovered===t.id ? 'translateY(-3px)' : 'none', boxShadow: hovered===t.id ? `0 6px 20px ${t.color}22` : 'none', position:'relative' }}>
-              {t.badge && <div style={{ position:'absolute', top:-1, right:-1, background:t.color, color:'#fff', fontSize:8.5, fontWeight:800, padding:'2px 6px', borderRadius:'0 12px 0 6px', letterSpacing:.5 }}>{t.badge}</div>}
-              <div style={{ fontSize:26, marginBottom:8 }}>{t.icon}</div>
-              <div style={{ fontSize:12, fontWeight:700, color: hovered===t.id ? t.color : '#1a1628' }}>{t.label}</div>
-              <div style={{ fontSize:10.5, color:'#64748b', marginTop:3, lineHeight:1.3 }}>{t.sub}</div>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      {/* ══════════════════════════════════════════════════
           FEATURED DEALS — CAROUSEL
       ══════════════════════════════════════════════════ */}
-      <DealsCarousel deals={FEATURED_DEALS} navigate={navigate} />
+      <DealsCarousel products={HEALTH_PRODUCTS} navigate={navigate} />
 
       {/* ══════════════════════════════════════════════════
           MY POLICIES  +  SIDEBAR

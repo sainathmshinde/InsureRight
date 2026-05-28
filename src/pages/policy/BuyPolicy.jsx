@@ -1194,75 +1194,115 @@ export default function BuyPolicy() {
               <div style={{ fontSize: 13 }}>No products are assigned to your campaigns</div>
             </div>
           ) : (
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))", gap: 14 }}>
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(300px, 1fr))", gap: 16 }}>
               {availableProducts.map(p => {
-                const inCart    = !!cart.find(x => x.id === p.id);
-                const chartRows = PREMIUM_CHART[p.id] ?? [];
-                const uniqueSIs = [...new Set(chartRows.map(r => r.sumInsured))];
-                const firstRow  = chartRows[0];
-                const covKeys   = ['selfOnly','selfSpouse','selfSpouse2Children'].filter(k => firstRow?.[k] != null);
-                const icon      = POLICY_TYPE_ICON[p.policyType] ?? "📋";
+                const inCart      = !!cart.find(x => x.id === p.id);
+                const chartRows   = PREMIUM_CHART[p.id] ?? [];
+                const uniqueSIs   = [...new Set(chartRows.map(r => r.sumInsured))];
+                const firstRow    = chartRows[0];
+                const allPremiums = chartRows.flatMap(r => [r.selfOnly, r.selfSpouse, r.selfSpouse2Children].filter(Boolean));
+                const minPremium  = allPremiums.length > 0 ? Math.min(...allPremiums) : null;
+                const covKeys     = ['selfOnly','selfSpouse','selfSpouse2Children'].filter(k => firstRow?.[k] != null);
+                const icon        = POLICY_TYPE_ICON[p.policyType] ?? "📋";
+                const fmtSI = v => v >= 100000 ? `₹${(v/100000).toFixed(0)}L` : v >= 1000 ? `₹${(v/1000).toFixed(0)}K` : `₹${v}`;
+                const TYPE_COLORS = {
+                  'Base Policy':        { color: '#1d4ed8', bg: '#dbeafe', border: '#93c5fd' },
+                  'OPD':                { color: '#15803d', bg: '#dcfce7', border: '#86efac' },
+                  'Payment Protection': { color: '#b45309', bg: '#fef3c7', border: '#fcd34d' },
+                  'Age Band Premium':   { color: '#7c3aed', bg: '#f5f3ff', border: '#c4b5fd' },
+                  'Super Top Up':       { color: '#dc2626', bg: '#fee2e2', border: '#fca5a5' },
+                  'Top Up Policy':      { color: '#4f46e5', bg: '#eef2ff', border: '#a5b4fc' },
+                };
+                const tc = TYPE_COLORS[p.policyType] ?? { color: '#64748b', bg: '#f1f5f9', border: '#cbd5e1' };
                 return (
-                  <div key={p.id} style={{
-                    borderRadius: 12, overflow: "hidden", background: "#fff",
-                    border: `1.5px solid ${inCart ? "var(--brand)" : "var(--border)"}`,
-                    boxShadow: inCart ? "0 2px 12px rgba(168,85,247,.10)" : "0 1px 4px rgba(0,0,0,.05)",
-                    transition: "border-color .15s, box-shadow .15s",
-                    cursor: "pointer",
-                  }}
-                  onClick={() => toggleCart(p)}
+                  <div key={p.id}
+                    onClick={() => toggleCart(p)}
+                    style={{
+                      borderRadius: 14, overflow: "hidden", background: "#fff",
+                      border: `2px solid ${inCart ? tc.color : "#e2e8f0"}`,
+                      boxShadow: inCart ? `0 4px 20px ${tc.color}28` : "0 1px 6px rgba(0,0,0,.06)",
+                      transition: "all .15s", cursor: "pointer",
+                      display: "flex", flexDirection: "column",
+                    }}
                   >
-                    {/* Header */}
-                    <div style={{ display: "flex", alignItems: "center", gap: 10, padding: "13px 14px", borderBottom: "1px solid var(--border)", background: "#fff" }}>
-                      <input type="checkbox" checked={inCart}
-                        onChange={() => toggleCart(p)}
-                        onClick={e => e.stopPropagation()}
-                        style={{ width: 16, height: 16, cursor: "pointer", accentColor: "var(--brand)", flexShrink: 0 }} />
-                      <div style={{ width: 36, height: 36, borderRadius: 9, flexShrink: 0, background: "var(--surface-2)", border: "1px solid var(--border)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18 }}>{icon}</div>
-                      <div style={{ flex: 1, minWidth: 0 }}>
-                        <div style={{ fontWeight: 800, fontSize: 14, color: "#7c3aed", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", letterSpacing: "-.1px" }}>{p.name}</div>
-                        <div style={{ fontSize: 12, color: "var(--text-3)", marginTop: 2, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", fontWeight: 500 }}>{p.provider}</div>
-                      </div>
-                      {inCart && <div style={{ width: 22, height: 22, borderRadius: "50%", background: "var(--brand)", color: "#fff", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 11, fontWeight: 700, flexShrink: 0 }}>✓</div>}
-                    </div>
+                    {/* Top accent bar */}
+                    <div style={{ height: 4, background: `linear-gradient(90deg,${tc.color},${tc.color}88)`, flexShrink: 0 }} />
 
-                    {/* Detail strip */}
-                    <div style={{ padding: "6px 14px", background: "var(--surface-2)", borderBottom: "1px solid var(--border)", fontSize: 11.5 }}>
-                      <div style={{ display: "flex", flexWrap: "wrap", gap: "3px 14px", color: "var(--text-2)" }}>
-                        <span><span style={{ color: "var(--text-3)" }}>Code </span><span style={{ fontFamily: "monospace", fontWeight: 600, color: "var(--text)" }}>{p.code}</span></span>
-                        <span><span style={{ color: "var(--text-3)" }}>Type </span><strong style={{ color: "var(--text)" }}>{p.policyType}</strong></span>
-                        <span style={{ color: "var(--green)", fontWeight: 600 }}>● Active</span>
-                      </div>
-                    </div>
+                    {/* Body */}
+                    <div style={{ padding: "14px 16px", flex: 1, display: "flex", flexDirection: "column", gap: 12 }}>
 
-                    {/* Key info */}
-                    <div style={{ padding: "12px 14px" }}>
-                      {uniqueSIs.length > 0 && (
-                        <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 10 }}>
-                          <span style={{ fontSize: 11.5, color: "var(--text-3)" }}>Sum Insured:</span>
-                          <span style={{ fontSize: 12.5, fontWeight: 600, color: "var(--text)" }}>
-                            ₹{Math.min(...uniqueSIs).toLocaleString("en-IN")}
-                            {uniqueSIs.length > 1 && ` – ₹${Math.max(...uniqueSIs).toLocaleString("en-IN")}`}
-                          </span>
+                      {/* Provider + type row */}
+                      <div style={{ display: "flex", alignItems: "flex-start", gap: 10 }}>
+                        <div style={{ width: 40, height: 40, borderRadius: 10, background: tc.bg, border: `1.5px solid ${tc.border}`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20, flexShrink: 0 }}>{icon}</div>
+                        <div style={{ flex: 1, minWidth: 0 }}>
+                          <div style={{ fontSize: 11, fontWeight: 700, color: tc.color, letterSpacing: ".2px", marginBottom: 4, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{p.provider}</div>
+                          <div style={{ display: "flex", alignItems: "center", gap: 6, flexWrap: "wrap" }}>
+                            <span style={{ fontSize: 10.5, fontWeight: 700, background: tc.bg, color: tc.color, border: `1px solid ${tc.border}`, borderRadius: 4, padding: "1px 7px" }}>{p.policyType}</span>
+                            <span style={{ fontSize: 10.5, fontFamily: "monospace", color: "#94a3b8" }}>{p.code}</span>
+                            <span style={{ fontSize: 10.5, fontWeight: 700, color: "#15803d" }}>● Active</span>
+                          </div>
                         </div>
-                      )}
+                        {inCart
+                          ? <div style={{ width: 24, height: 24, borderRadius: "50%", background: tc.color, color: "#fff", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12, fontWeight: 700, flexShrink: 0 }}>✓</div>
+                          : <input type="checkbox" checked={false} onChange={() => toggleCart(p)} onClick={e => e.stopPropagation()} style={{ width: 17, height: 17, cursor: "pointer", accentColor: tc.color, flexShrink: 0, marginTop: 2 }} />
+                        }
+                      </div>
+
+                      {/* Product name */}
+                      <div style={{ fontWeight: 800, fontSize: 14, color: "#1e293b", lineHeight: 1.4, letterSpacing: "-.1px" }}>{p.name}</div>
+
+                      {/* Metrics */}
+                      <div style={{ display: "flex", gap: 8 }}>
+                        {uniqueSIs.length > 0 && (
+                          <div style={{ flex: 1, background: "#f8fafc", borderRadius: 8, padding: "8px 10px", border: "1px solid #e2e8f0" }}>
+                            <div style={{ fontSize: 10, fontWeight: 700, color: "#94a3b8", textTransform: "uppercase", letterSpacing: ".5px", marginBottom: 3 }}>Sum Insured</div>
+                            <div style={{ fontSize: 13, fontWeight: 700, color: "#1e293b" }}>
+                              {fmtSI(Math.min(...uniqueSIs))}{uniqueSIs.length > 1 && ` – ${fmtSI(Math.max(...uniqueSIs))}`}
+                            </div>
+                          </div>
+                        )}
+                        {minPremium && (
+                          <div style={{ flex: 1, background: tc.bg, borderRadius: 8, padding: "8px 10px", border: `1px solid ${tc.border}` }}>
+                            <div style={{ fontSize: 10, fontWeight: 700, color: tc.color, textTransform: "uppercase", letterSpacing: ".5px", marginBottom: 3, opacity: .8 }}>Starts From</div>
+                            <div style={{ fontSize: 13, fontWeight: 800, color: tc.color }}>₹{minPremium.toLocaleString("en-IN")}<span style={{ fontSize: 10, fontWeight: 600 }}>/yr</span></div>
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Coverage chips */}
                       {covKeys.length > 0 && (
                         <div style={{ display: "flex", gap: 5, flexWrap: "wrap" }}>
-                          {covKeys.includes('selfOnly') && <span style={{ fontSize: 11, background: "var(--surface-2)", border: "1px solid var(--border)", borderRadius: 4, padding: "2px 8px", color: "var(--text-2)" }}>Self</span>}
-                          {covKeys.includes('selfSpouse') && <span style={{ fontSize: 11, background: "var(--surface-2)", border: "1px solid var(--border)", borderRadius: 4, padding: "2px 8px", color: "var(--text-2)" }}>Self + Spouse</span>}
-                          {covKeys.includes('selfSpouse2Children') && <span style={{ fontSize: 11, background: "var(--surface-2)", border: "1px solid var(--border)", borderRadius: 4, padding: "2px 8px", color: "var(--text-2)" }}>Family</span>}
+                          {covKeys.includes('selfOnly')            && <span style={{ fontSize: 11, fontWeight: 600, background: "#fff", border: "1px solid #e2e8f0", borderRadius: 20, padding: "3px 10px", color: "#475569" }}>👤 Self</span>}
+                          {covKeys.includes('selfSpouse')          && <span style={{ fontSize: 11, fontWeight: 600, background: "#fff", border: "1px solid #e2e8f0", borderRadius: 20, padding: "3px 10px", color: "#475569" }}>👫 Self + Spouse</span>}
+                          {covKeys.includes('selfSpouse2Children') && <span style={{ fontSize: 11, fontWeight: 600, background: "#fff", border: "1px solid #e2e8f0", borderRadius: 20, padding: "3px 10px", color: "#475569" }}>👨‍👩‍👧 Family</span>}
                         </div>
                       )}
                     </div>
 
                     {/* Footer */}
-                    <div style={{ padding: "9px 14px", borderTop: "1px solid var(--border)", display: "flex", justifyContent: "flex-end" }} onClick={e => e.stopPropagation()}>
+                    <div
+                      style={{ padding: "10px 16px", borderTop: "1px solid #f1f5f9", background: "#fafafa", display: "flex", justifyContent: "space-between", alignItems: "center", gap: 8 }}
+                      onClick={e => e.stopPropagation()}
+                    >
                       <button
-                        className="btn btn-sm"
-                        style={{ fontSize: 12, border: "1.5px solid #a855f7", color: "#7c3aed", background: "#faf5ff", fontWeight: 600 }}
+                        type="button"
+                        style={{ fontSize: 12, fontWeight: 600, border: `1.5px solid ${tc.border}`, color: tc.color, background: "#fff", borderRadius: 7, padding: "5px 12px", cursor: "pointer", fontFamily: "inherit" }}
                         onClick={e => { e.stopPropagation(); setViewingProduct(p); }}
                       >
                         View Details →
+                      </button>
+                      <button
+                        type="button"
+                        onClick={e => { e.stopPropagation(); toggleCart(p); }}
+                        style={{
+                          padding: "5px 16px", borderRadius: 7, cursor: "pointer",
+                          fontFamily: "inherit", fontWeight: 700, fontSize: 12, transition: "all .15s",
+                          background: inCart ? tc.color : "#fff",
+                          color: inCart ? "#fff" : tc.color,
+                          border: `1.5px solid ${tc.color}`,
+                        }}
+                      >
+                        {inCart ? "✓ Selected" : "+ Select"}
                       </button>
                     </div>
                   </div>
