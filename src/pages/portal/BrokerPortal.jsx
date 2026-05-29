@@ -38,35 +38,35 @@ const STATS = [
 const RECENT_AGENTS = [
   {
     name: "Ravi Kulkarni",
-    license: "POS-2023-001",
+    mobile: "9876543210",
     broker: "Mehta Insurance",
     customers: 28,
     status: "Active",
   },
   {
     name: "Pooja Desai",
-    license: "POS-2023-019",
+    mobile: "9812345678",
     broker: "Priya Brokers",
     customers: 19,
     status: "Active",
   },
   {
     name: "Kavita Sharma",
-    license: "POS-2023-045",
+    mobile: "9898989898",
     broker: "Shah Financial",
     customers: 34,
     status: "Active",
   },
   {
     name: "Amit Verma",
-    license: "POS-2023-067",
+    mobile: "9090909090",
     broker: "Mehta Insurance",
     customers: 22,
     status: "Active",
   },
   {
     name: "Suresh Nair",
-    license: "POS-2022-087",
+    mobile: "9800112233",
     broker: "AK Associates",
     customers: 11,
     status: "Inactive",
@@ -1232,7 +1232,7 @@ export default function BrokerPortal() {
                       {a.name}
                     </div>
                     <div style={{ fontSize: 11.5, color: "#64748b" }}>
-                      {a.license} · {a.customers} customers
+                      {a.mobile} · {a.customers} customers
                     </div>
                   </div>
                   <span
@@ -1267,7 +1267,7 @@ export default function BrokerPortal() {
                   {RECENT_AGENTS.map((a) => (
                     <tr key={a.name}>
                       <td style={{ fontWeight: 500 }}>{a.name}</td>
-                      <td style={{ color: "#64748b" }}>{a.license}</td>
+                      <td style={{ color: "#64748b" }}>{a.mobile}</td>
                       <td>{a.customers}</td>
                       <td>
                         <span

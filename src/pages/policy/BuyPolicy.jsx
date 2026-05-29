@@ -601,7 +601,7 @@ export default function BuyPolicy() {
 
   const next = () => setStep((s) => Math.min(s + 1, STEPS.length - 1));
   const back = () => {
-    if (step === 1) { navigate("/customer"); return; }
+    if (step === 1) { navigate(isCustomer ? "/customer-portal" : "/customer"); return; }
     setStep((s) => Math.max(s - 1, 0));
   };
 

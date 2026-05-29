@@ -196,7 +196,7 @@ const CUSTOMER_NAV = [
     key: "policy-catalogue",
     label: "Buy Insurance",
     icon: ProductIcon,
-    children: [{ label: "Available Plans", path: "/policy-catalogue" }],
+    children: [{ label: "Buy Insurance Policy", path: "/policy/buy" }],
   },
 ];
 

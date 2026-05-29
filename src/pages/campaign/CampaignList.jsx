@@ -7,9 +7,9 @@ import { CampaignIcon, CalendarIcon } from '../../icons'
 
 const MOCK = [
   { id: 1,  name: 'Campaign 1',                                startDate: '2024-09-20', endDate: '2025-07-29', isCampaignOpen: true,  isActive: true, documentName: null,                     templateName: null,                  sentStatus: null },
-  { id: 5,  name: 'Campaign OPD and DIGIT PAYMENT PROTECTION', startDate: '2025-01-31', endDate: '2025-03-31', isCampaignOpen: false, isActive: true, documentName: null,                     templateName: null,                  sentStatus: null },
+  { id: 5,  name: 'Campaign OPD and DIGIT PAYMENT PROTECTION', startDate: '2025-01-31', endDate: '2025-03-31', isCampaignOpen: true,  isActive: true, documentName: null,                     templateName: null,                  sentStatus: null },
   { id: 6,  name: 'BPP Campaign',                              startDate: '2025-02-19', endDate: '2025-03-24', isCampaignOpen: true,  isActive: true, documentName: 'cyber_opd_new_design.pdf', templateName: 'cyber_opd_new_design', sentStatus: null },
-  { id: 7,  name: 'Test Campaign',                              startDate: '2025-08-03', endDate: '2025-08-29', isCampaignOpen: true,  isActive: true, documentName: null,                     templateName: null,                  sentStatus: 0    },
+  { id: 7,  name: 'Test Campaign',                              startDate: '2025-08-03', endDate: '2025-08-29', isCampaignOpen: false, isActive: true, documentName: null,                     templateName: null,                  sentStatus: 0    },
   { id: 8,  name: 'SBI_STP_Campaign',                          startDate: '2025-09-18', endDate: '2026-03-10', isCampaignOpen: true,  isActive: true, documentName: null,                     templateName: null,                  sentStatus: 0    },
   { id: 11, name: 'BPP Campaign_2026-2027',                    startDate: '2026-03-16', endDate: '2026-05-31', isCampaignOpen: true,  isActive: true, documentName: null,                     templateName: null,                  sentStatus: 0    },
   { id: 12, name: 'Standalone campaign',                        startDate: '2026-02-28', endDate: '2026-04-29', isCampaignOpen: true,  isActive: true, documentName: null,                     templateName: null,                  sentStatus: 0    },

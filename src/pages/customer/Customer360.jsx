@@ -2,13 +2,14 @@ import { useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { TYPE_ICON } from './FamilyMembersSection'
 import { CustomerIcon } from '../../icons'
+import { ORGANISATIONS, ASSOCIATIONS } from './orgAssocData'
 
 function calcAge(dob) {
   if (!dob) return null
   return Math.floor((Date.now() - new Date(dob)) / (365.25 * 24 * 3600 * 1000))
 }
 
-const MOCK = {
+export const MOCK = {
   1: {
     name: 'Aarav Sharma', mobile: '9876543210', email: 'aarav@gmail.com',
     dob: '1990-03-15', gender: 'Male', city: 'Mumbai', state: 'Maharashtra', kyc: 'Verified',
@@ -201,7 +202,7 @@ const MOCK = {
 }
 
 // Documents mock — Aadhaar + PAN per customer
-const DOCS = {
+export const DOCS = {
   1:  { aadhaar: { number: '2345 6789 0123', name: 'Aarav Sharma',  dob: '15/03/1990', gender: 'Male',   address: '14, Green Valley Apts, Andheri West, Mumbai – 400058', status: 'Verified' }, pan: { number: 'AABPS1234C', name: 'AARAV SHARMA',  fatherName: 'SURESH SHARMA',   dob: '15/03/1990', status: 'Verified' } },
   2:  { aadhaar: { number: '3456 7890 1234', name: 'Rohit Sharma',  dob: '20/11/1990', gender: 'Male',   address: '45 MG Road, Pune – 411001', status: 'Pending'  }, pan: { number: 'BBRPS2345D', name: 'ROHIT SHARMA',  fatherName: 'MOHAN SHARMA',    dob: '20/11/1990', status: 'Pending'  } },
   3:  { aadhaar: { number: '4567 8901 2345', name: 'Divya Nair',    dob: '05/06/1978', gender: 'Female', address: '7/B Koramangala, Bangalore – 560034',              status: 'Verified' }, pan: { number: 'CCCDN3456E', name: 'DIVYA NAIR',    fatherName: 'KRISHNA NAIR',    dob: '05/06/1978', status: 'Verified' } },
@@ -216,9 +217,24 @@ const DOCS = {
   12: { aadhaar: { number: '3456 7890 2233', name: 'Ajay Iyer',     dob: '30/10/1983', gender: 'Male',   address: '4 T Nagar, Chennai – 600017',                    status: 'Rejected' }, pan: { number: 'KKAIP1234N', name: 'AJAY IYER',     fatherName: 'KRISHNAN IYER',   dob: '30/10/1983', status: 'Rejected' } },
 }
 
+export const PERSONAL = {
+  1:  { empId: 'BOB/MH/2024/001', organisationId: 1003, associationId: 1007, address: '14, Green Valley Apts, Andheri West, Mumbai – 400058' },
+  2:  { empId: 'BOM/MH/2024/002', organisationId: 1005, associationId: 1019, address: '45 MG Road, Pune – 411001' },
+  3:  { empId: 'CAN/KA/2024/003', organisationId: 1006, associationId: 1023, address: '7/B Koramangala, Bangalore – 560034' },
+  4:  { empId: 'BOM/MH/2024/004', organisationId: 1005, associationId: 1019, address: '23 Shivaji Nagar, Nashik – 422001' },
+  5:  { empId: 'BOI/MH/2024/005', organisationId: 1004, associationId: 1019, address: '101 Deccan Gymkhana, Pune – 411004' },
+  6:  { empId: 'PNB/UP/2024/006', organisationId: 1015, associationId: 1011, address: 'B-5 Sector 18, Noida – 201301' },
+  7:  { empId: 'ANB/TS/2024/007', organisationId: 1002, associationId: 1018, address: '56 Jubilee Hills, Hyderabad – 500033' },
+  8:  { empId: 'BOB/MH/2024/008', organisationId: 1003, associationId: 1007, address: '8 Andheri West, Mumbai – 400053' },
+  9:  { empId: 'KBK/KL/2024/009', organisationId: 1013, associationId: 1027, address: '33 Fort Kochi, Kerala – 682001' },
+  10: { empId: 'PNB/DL/2024/010', organisationId: 1015, associationId: 1011, address: 'C-9 Civil Lines, Delhi – 110054' },
+  11: { empId: 'PSB/RJ/2024/011', organisationId: 1014, associationId: 1026, address: '12 Raja Park, Jaipur – 302004' },
+  12: { empId: 'SIB/TN/2024/012', organisationId: 1016, associationId: 1024, address: '4 T Nagar, Chennai – 600017' },
+}
+
 const STATUS_COLOR = { Verified: { bg: '#dcfce7', border: '#86efac', text: '#15803d' }, Pending: { bg: '#fef3c7', border: '#fcd34d', text: '#92400e' }, Rejected: { bg: '#fee2e2', border: '#fca5a5', text: '#b91c1c' } }
 
-function DocCard({ type, data, customerName }) {
+export function DocCard({ type, data, customerName }) {
   const isAadhaar = type === 'aadhaar'
   const sc = STATUS_COLOR[data.status] ?? STATUS_COLOR.Pending
   return (
@@ -294,7 +310,7 @@ function DocCard({ type, data, customerName }) {
   )
 }
 
-const TABS = ['Family', 'Documents', 'Policies', 'Payments', 'Interactions']
+const TABS = ['Personal', 'Family', 'Documents', 'Policies', 'Payments', 'Interactions']
 
 export default function Customer360() {
   const { id } = useParams()
@@ -348,8 +364,38 @@ export default function Customer360() {
         </div>
 
         <div className="card-body">
+          {/* Personal */}
+          {tab === 0 && (() => {
+            const nameParts = c.name.split(' ')
+            const firstName = nameParts[0]
+            const lastName = nameParts.slice(1).join(' ')
+            const personal = PERSONAL[id]
+            const org = ORGANISATIONS.find(o => o.id === personal?.organisationId)
+            const assoc = ASSOCIATIONS.find(a => a.id === personal?.associationId)
+            const Row = ({ label, value }) => (
+              <div style={{ display: 'flex', padding: '10px 0', borderBottom: '1px solid var(--border)' }}>
+                <span style={{ width: 220, flexShrink: 0, fontSize: 13, color: 'var(--text-2)', fontWeight: 500 }}>{label}</span>
+                <span style={{ fontSize: 13.5, color: 'var(--text)' }}>{value || <span style={{ color: 'var(--text-3)' }}>—</span>}</span>
+              </div>
+            )
+            return (
+              <div>
+                <Row label="First Name"       value={firstName} />
+                <Row label="Last Name"        value={lastName} />
+                <Row label="EMP ID / PF No."  value={personal?.empId} />
+                <Row label="Mobile"           value={c.mobile} />
+                <Row label="Email"            value={c.email} />
+                <Row label="Date of Birth"    value={c.dob} />
+                <Row label="Gender"           value={c.gender} />
+                <Row label="Organisation"     value={org?.name} />
+                <Row label="Association"      value={assoc?.name} />
+                <Row label="Address"          value={personal?.address} />
+              </div>
+            )
+          })()}
+
           {/* Policies */}
-          {tab === 2 && (
+          {tab === 3 && (
             <div className="table-wrap">
               <table>
                 <thead>
@@ -372,7 +418,7 @@ export default function Customer360() {
           )}
 
           {/* Payments */}
-          {tab === 3 && (
+          {tab === 4 && (
             <div className="table-wrap">
               <table>
                 <thead>
@@ -394,7 +440,7 @@ export default function Customer360() {
           )}
 
           {/* Interaction history */}
-          {tab === 4 && (
+          {tab === 5 && (
             <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
               {c.interactions.map((i, idx) => (
                 <div key={idx} style={{ display: 'flex', gap: 14, padding: '14px 0', borderBottom: idx < c.interactions.length - 1 ? '1px solid var(--border)' : 'none' }}>
@@ -414,7 +460,7 @@ export default function Customer360() {
           )}
 
           {/* Documents */}
-          {tab === 1 && (() => {
+          {tab === 2 && (() => {
             const docs = DOCS[id]
             if (!docs) return <div style={{ padding: '32px 0', textAlign: 'center', color: 'var(--text-3)' }}>No documents found.</div>
             return (
@@ -461,7 +507,7 @@ export default function Customer360() {
           })()}
 
           {/* Family Members */}
-          {tab === 0 && (
+          {tab === 1 && (
             <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
               {c.familyMembers?.length > 0 ? c.familyMembers.map(m => {
                 const age = calcAge(m.dob)

@@ -329,7 +329,7 @@ export default function CrmPage() {
               <Field label="Agent">
                 <Select value={selectedAgentId} onChange={handleAgentChange}>
                   {KMD_AGENTS.map(a => (
-                    <option key={a.id} value={a.id}>{a.name} · {a.agentType === 'calling' ? 'Calling' : 'Sales'} ({a.posLicense})</option>
+                    <option key={a.id} value={a.id}>{a.name} · {a.agentType === 'calling' ? 'Calling' : 'Sales'}</option>
                   ))}
                 </Select>
               </Field>

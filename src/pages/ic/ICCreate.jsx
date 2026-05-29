@@ -107,36 +107,6 @@ export default function ICCreate() {
               </div>
             </SectionBlock>
 
-            <SectionBlock icon="🔌" title="API Credentials">
-              <div className="form-grid">
-                <Field label="API Base URL" required>
-                  <Input
-                    type="url"
-                    placeholder="https://api.example.com/v1"
-                    value={form.apiBaseUrl}
-                    onChange={set("apiBaseUrl")}
-                    required
-                  />
-                </Field>
-                <Field label="API Key" required>
-                  <Input
-                    placeholder="Enter API key"
-                    value={form.apiKey}
-                    onChange={set("apiKey")}
-                    required
-                  />
-                </Field>
-                <Field label="API Secret" required>
-                  <Input
-                    type="password"
-                    placeholder="Enter API secret"
-                    value={form.apiSecret}
-                    onChange={set("apiSecret")}
-                    required
-                  />
-                </Field>
-              </div>
-            </SectionBlock>
 
             <div className="actions-row">
               <button
