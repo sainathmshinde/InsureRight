@@ -9,7 +9,6 @@ import {
 } from "../../components/Field";
 import { CheckboxGroup, FormActions } from "../../components/UI";
 import { DocumentViewerModal } from "../../components/fields/DocumentViewerModal";
-import { PREMIUM_CHART } from "./productData";
 import policyWordingsPdf from "../../assets/StarHealthAssureInsurancePolicy-Policy-wording.pdf";
 import brochurePdf from "../../assets/Brochure_Star_Comprehensive_Insurance_Policy_V_15_Web_633bcfcaaf.pdf";
 
@@ -203,22 +202,46 @@ const COVERED_MEMBERS = [
   "Father",
   "Mother in Law",
   "Father in Law",
+  "Neighbour",
+  "Pet Dog",
+  "Pet Cat",
 ];
 
-function chartToRows(productId) {
-  const rows = PREMIUM_CHART[productId] ?? [];
-  if (rows.length === 0) return [{ id: Date.now(), sumInsured: '', gst: '0', ageBandId: '', members: {} }];
-  return rows.map((r, i) => ({
-    id: i + 1,
-    sumInsured: String(r.sumInsured),
-    gst: '0',
-    ageBandId: r.ageBandId != null ? String(r.ageBandId) : '',
-    members: {
-      ...(r.selfOnly            != null ? { Self:      String(r.selfOnly)            } : {}),
-      ...(r.selfSpouse          != null ? { Spouse:    String(r.selfSpouse)          } : {}),
-      ...(r.selfSpouse2Children != null ? { 'Child 2': String(r.selfSpouse2Children) } : {}),
-    },
-  }));
+const STANDARD_COMBINATIONS = [
+  ['Self'],
+  ['Self', 'Spouse'],
+  ['Self', 'Child 1'],
+  ['Self', 'Spouse', 'Child 1'],
+  ['Self', 'Child 1', 'Child 2'],
+  ['Self', 'Spouse', 'Child 1', 'Child 2'],
+  ['Self', 'Mother'],
+  ['Self', 'Father'],
+  ['Self', 'Mother', 'Father'],
+  ['Self', 'Spouse', 'Mother', 'Father'],
+  ['Self', 'Spouse', 'Child 1', 'Mother', 'Father'],
+  ['Self', 'Spouse', 'Child 1', 'Child 2', 'Mother', 'Father'],
+  ['Self', 'Mother in Law'],
+  ['Self', 'Father in Law'],
+  ['Self', 'Mother in Law', 'Father in Law'],
+  ['Self', 'Spouse', 'Mother in Law', 'Father in Law'],
+  ['Self', 'Spouse', 'Child 1', 'Child 2', 'Mother in Law', 'Father in Law'],
+  ['Self', 'Neighbour'],
+  ['Self', 'Spouse', 'Neighbour'],
+  ['Pet Dog'],
+  ['Pet Cat'],
+  ['Pet Dog', 'Pet Cat'],
+];
+
+function generateFamilyCombinations(selectedMembers) {
+  const baseSelected = new Set(selectedMembers.map(m => m.replace(' (Handicap)', '')));
+  const labelMap = {};
+  selectedMembers.forEach(m => { labelMap[m.replace(' (Handicap)', '')] = m; });
+  return STANDARD_COMBINATIONS
+    .filter(combo => combo.every(m => baseSelected.has(m)))
+    .map(combo => {
+      const actualMembers = combo.map(m => labelMap[m] || m);
+      return { key: actualMembers.join('+'), members: actualMembers };
+    });
 }
 
 export default function ProductForm({
@@ -242,7 +265,11 @@ export default function ProductForm({
   const [tocDraft, setTocDraft] = useState({ title: '', content: '' });
   const [coveredMembers, setCoveredMembers] = useState(() => new Set(initialMembers ?? []));
   const [handicapFlags, setHandicapFlags] = useState({ "Child 1": false, "Child 2": false });
-  const [premiumRows, setPremiumRows] = useState(() => chartToRows(productId));
+  const [siValues, setSiValues] = useState([]);
+  const [newSIInput, setNewSIInput] = useState('');
+  const [showSIInput, setShowSIInput] = useState(false);
+  const [premiumGrid, setPremiumGrid] = useState({});
+  const [savedCombinations, setSavedCombinations] = useState([]);
   const [docState, setDocState] = useState({
     policyWordingsFile: {
       status: "uploaded",
@@ -273,32 +300,38 @@ export default function ProductForm({
     return [m];
   });
 
-  const cumulativeLabels = selectedMembers.map((_, i) =>
-    selectedMembers.slice(0, i + 1).join('+')
-  );
+  const familyCombinations = generateFamilyCombinations(selectedMembers);
 
-  const hasAgeBand = premiumRows.some(r => r.ageBandId !== '');
+  const confirmSI = () => {
+    const val = newSIInput.trim();
+    if (!val) return;
+    setSiValues(prev => [...prev, { id: Date.now(), value: val }]);
+    setNewSIInput('');
+    setShowSIInput(false);
+  };
 
-  const addPremiumRow = () =>
-    setPremiumRows((prev) => [
+  const removeSI = (id) =>
+    setSiValues(prev => prev.filter(s => s.id !== id));
+
+  const updateCellPremium = (comboKey, siId, value) =>
+    setPremiumGrid(prev => ({
       ...prev,
-      { id: Date.now(), sumInsured: '', gst: '0', ageBandId: '', members: {} },
-    ]);
+      [comboKey]: { ...(prev[comboKey] ?? {}), [siId]: value },
+    }));
 
-  const removePremiumRow = (id) =>
-    setPremiumRows((prev) => prev.filter((r) => r.id !== id));
+  const saveCombination = (combo) => {
+    const filled = siValues.filter(s => premiumGrid[combo.key]?.[s.id]);
+    if (filled.length === 0) return;
+    const entry = {
+      comboKey: combo.key,
+      members: combo.members,
+      premiums: filled.map(s => ({ siId: s.id, si: s.value, premium: premiumGrid[combo.key][s.id] })),
+    };
+    setSavedCombinations(prev => [...prev.filter(c => c.comboKey !== combo.key), entry]);
+  };
 
-  const updatePremiumRow = (id, field, value) =>
-    setPremiumRows((prev) =>
-      prev.map((r) => (r.id === id ? { ...r, [field]: value } : r)),
-    );
-
-  const updateMemberPremium = (id, member, value) =>
-    setPremiumRows((prev) =>
-      prev.map((r) =>
-        r.id === id ? { ...r, members: { ...r.members, [member]: value } } : r,
-      ),
-    );
+  const removeSavedCombination = (comboKey) =>
+    setSavedCombinations(prev => prev.filter(c => c.comboKey !== comboKey));
 
   const replaceDoc = (field) =>
     setDocState((prev) => ({ ...prev, [field]: { ...prev[field], status: "replacing" } }));
@@ -472,128 +505,216 @@ export default function ProductForm({
       <SectionBlock icon="💰" title="Financial Details">
         {selectedMembers.length === 0 ? (
           <p style={{ fontSize: 13, color: "var(--text-3)", margin: 0 }}>
-            Select covered members in the Configuration section to build the
-            premium table.
+            Select covered members in the Configuration section to build the premium table.
           </p>
         ) : (
           <>
-            <div className="table-wrap">
-              <table style={{ fontSize: 13 }}>
-                <thead>
-                  <tr>
-                    <th style={{ minWidth: 130 }}>Sum Insured (₹)</th>
-                    {hasAgeBand && <th style={{ minWidth: 100 }}>Age Band</th>}
-                    <th style={{ minWidth: 90 }}>GST %</th>
-                    {selectedMembers.map((m, i) => {
-                      const isHandicap = m.includes("(Handicap)");
-                      return (
-                        <th
-                          key={m}
-                          style={{
-                            minWidth: 160,
-                            background: isHandicap ? "#ede9fe" : undefined,
-                            color: isHandicap ? "var(--brand)" : undefined,
-                          }}
-                        >
-                          {isHandicap ? "♿ " : ""}{cumulativeLabels[i]} (₹)
-                        </th>
-                      );
-                    })}
-                    <th style={{ width: 40 }}></th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {premiumRows.map((row) => (
-                    <tr key={row.id}>
-                      <td>
-                        <Input
-                          type="number"
-                          min="0"
-                          placeholder="e.g. 500000"
-                          value={row.sumInsured}
-                          onChange={(e) =>
-                            updatePremiumRow(row.id, "sumInsured", e.target.value)
-                          }
-                        />
-                      </td>
-                      {hasAgeBand && (
-                        <td>
-                          <Input
-                            type="number"
-                            min="1"
-                            placeholder="Band ID"
-                            value={row.ageBandId}
-                            onChange={(e) =>
-                              updatePremiumRow(row.id, "ageBandId", e.target.value)
-                            }
-                          />
-                        </td>
-                      )}
-                      <td>
-                        <Select
-                          value={row.gst}
-                          onChange={(e) =>
-                            updatePremiumRow(row.id, "gst", e.target.value)
-                          }
-                        >
-                          <option value="0">0%</option>
-                          <option value="5">5%</option>
-                          <option value="12">12%</option>
-                          <option value="18">18%</option>
-                        </Select>
-                      </td>
-                      {selectedMembers.map((m) => (
-                        <td key={m}>
-                          <Input
-                            type="number"
-                            min="0"
-                            placeholder="0"
-                            value={row.members[m] || ""}
-                            onChange={(e) =>
-                              updateMemberPremium(row.id, m, e.target.value)
-                            }
-                          />
-                        </td>
-                      ))}
-                      <td>
+            {/* ── Sum Insured Slabs ── */}
+            <div style={{ marginBottom: 24 }}>
+              <div style={{ fontSize: 13, fontWeight: 600, color: "var(--text-1)", marginBottom: 8 }}>
+                Sum Insured Slabs (₹)
+              </div>
+
+              {/* Confirmed SI chips */}
+              {siValues.length > 0 && (
+                <div style={{ display: "flex", flexWrap: "wrap", gap: 8, marginBottom: 10 }}>
+                  {siValues.map(s => (
+                    <div
+                      key={s.id}
+                      style={{
+                        display: "flex", alignItems: "center", gap: 6,
+                        background: "#ede9fe", color: "var(--brand)",
+                        border: "1px solid var(--brand)", borderRadius: 6,
+                        padding: "4px 10px", fontSize: 13, fontWeight: 500,
+                      }}
+                    >
+                      ₹{Number(s.value).toLocaleString("en-IN")}
+                      <button
+                        type="button"
+                        onClick={() => removeSI(s.id)}
+                        style={{ background: "none", border: "none", cursor: "pointer", fontSize: 15, color: "var(--brand)", lineHeight: 1, padding: 0 }}
+                      >
+                        ×
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {/* Inline input or Add button */}
+              {showSIInput ? (
+                <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                  <Input
+                    type="number"
+                    min="0"
+                    placeholder="e.g. 500000"
+                    value={newSIInput}
+                    onChange={e => setNewSIInput(e.target.value)}
+                    onKeyDown={e => { if (e.key === 'Enter') { e.preventDefault(); confirmSI(); } }}
+                    style={{ width: 160 }}
+                    autoFocus
+                  />
+                  <button
+                    type="button"
+                    className="btn btn-primary"
+                    style={{ fontSize: 13, padding: "5px 16px" }}
+                    onClick={confirmSI}
+                  >
+                    Add
+                  </button>
+                  <button
+                    type="button"
+                    className="btn btn-ghost"
+                    style={{ fontSize: 13, padding: "5px 12px" }}
+                    onClick={() => { setShowSIInput(false); setNewSIInput(''); }}
+                  >
+                    Cancel
+                  </button>
+                </div>
+              ) : (
+                <button
+                  type="button"
+                  className="btn btn-ghost"
+                  style={{ fontSize: 13, padding: "5px 14px" }}
+                  onClick={() => setShowSIInput(true)}
+                >
+                  + Add SI
+                </button>
+              )}
+            </div>
+
+            {/* ── Family Combination & Premium Table ── */}
+            {familyCombinations.length > 0 && siValues.length > 0 && (
+              <>
+                <div style={{ fontSize: 13, fontWeight: 600, color: "var(--text-1)", marginBottom: 8 }}>
+                  Family Combination &amp; Premium (₹)
+                </div>
+                <div className="table-wrap" style={{ marginBottom: 6 }}>
+                  <table style={{ fontSize: 13 }}>
+                    <thead>
+                      <tr>
+                        <th style={{ minWidth: 220 }}>Family Combination</th>
+                        {siValues.map(s => (
+                          <th key={s.id} style={{ minWidth: 140, textAlign: "right" }}>
+                            Premium — ₹{Number(s.value).toLocaleString("en-IN")}
+                          </th>
+                        ))}
+                        <th style={{ width: 90, textAlign: "center" }}>Action</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {familyCombinations.map(combo => {
+                        const isSaved = savedCombinations.some(c => c.comboKey === combo.key);
+                        return (
+                          <tr key={combo.key} style={isSaved ? { background: "#f0fdf4" } : undefined}>
+                            <td style={{ fontWeight: 500 }}>
+                              {combo.key}
+                              {isSaved && (
+                                <span style={{ marginLeft: 8, fontSize: 11, color: "#16a34a", background: "#dcfce7", borderRadius: 4, padding: "1px 6px" }}>
+                                  saved
+                                </span>
+                              )}
+                            </td>
+                            {siValues.map(s => (
+                              <td key={s.id}>
+                                <Input
+                                  type="number"
+                                  min="0"
+                                  placeholder="0"
+                                  value={premiumGrid[combo.key]?.[s.id] ?? ""}
+                                  onChange={e => updateCellPremium(combo.key, s.id, e.target.value)}
+                                  style={{ textAlign: "right" }}
+                                />
+                              </td>
+                            ))}
+                            <td style={{ textAlign: "center" }}>
+                              <button
+                                type="button"
+                                className="btn btn-secondary"
+                                style={{
+                                  fontSize: 12,
+                                  padding: "4px 16px",
+                                  ...(isSaved && { background: "#16a34a", color: "#fff", borderColor: "#16a34a" }),
+                                }}
+                                onClick={() => saveCombination(combo)}
+                              >
+                                {isSaved ? "✓ Saved" : "Save"}
+                              </button>
+                            </td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
+                </div>
+                <p style={{ fontSize: 12, color: "var(--text-3)", margin: "0 0 4px" }}>
+                  Enter the premium amount for each family combination per SI slab, then click Save.
+                </p>
+              </>
+            )}
+
+            {/* ── Saved Configurations ── */}
+            {savedCombinations.length > 0 && (
+              <div style={{ marginTop: 28, borderTop: "1px solid var(--border)", paddingTop: 18 }}>
+                <div style={{ fontSize: 13, fontWeight: 600, color: "var(--text-1)", marginBottom: 12 }}>
+                  Saved Configurations
+                </div>
+                <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+                  {savedCombinations.map(config => (
+                    <div
+                      key={config.comboKey}
+                      style={{
+                        border: "1px solid var(--border)",
+                        borderRadius: 8,
+                        overflow: "hidden",
+                        background: "var(--surface-1)",
+                      }}
+                    >
+                      {/* Card header */}
+                      <div style={{
+                        display: "flex", alignItems: "center", justifyContent: "space-between",
+                        padding: "9px 14px",
+                        background: "var(--surface-2)",
+                        borderBottom: "1px solid var(--border)",
+                      }}>
+                        <span style={{ fontWeight: 600, fontSize: 13, color: "var(--text-1)" }}>
+                          {config.comboKey}
+                        </span>
                         <button
                           type="button"
-                          onClick={() => removePremiumRow(row.id)}
-                          disabled={premiumRows.length === 1}
-                          style={{
-                            background: "none",
-                            border: "none",
-                            cursor:
-                              premiumRows.length === 1
-                                ? "not-allowed"
-                                : "pointer",
-                            fontSize: 18,
-                            color:
-                              premiumRows.length === 1
-                                ? "var(--border)"
-                                : "var(--text-3)",
-                            lineHeight: 1,
-                            padding: "2px 4px",
-                          }}
+                          onClick={() => removeSavedCombination(config.comboKey)}
+                          style={{ background: "none", border: "none", cursor: "pointer", fontSize: 16, color: "var(--text-3)", lineHeight: 1, padding: "2px 4px" }}
                         >
                           ×
                         </button>
-                      </td>
-                    </tr>
+                      </div>
+                      {/* SI → Premium grid */}
+                      <div style={{ display: "flex", flexWrap: "wrap" }}>
+                        {config.premiums.map((p, i) => (
+                          <div
+                            key={p.siId}
+                            style={{
+                              flex: "1 1 150px",
+                              padding: "10px 14px",
+                              borderRight: i < config.premiums.length - 1 ? "1px solid var(--border)" : "none",
+                            }}
+                          >
+                            <div style={{ fontSize: 11, color: "var(--text-3)", marginBottom: 2 }}>Sum Insured</div>
+                            <div style={{ fontSize: 13, fontWeight: 600, color: "var(--text-1)", marginBottom: 8 }}>
+                              ₹{Number(p.si).toLocaleString("en-IN")}
+                            </div>
+                            <div style={{ fontSize: 11, color: "var(--text-3)", marginBottom: 2 }}>Premium</div>
+                            <div style={{ fontSize: 14, fontWeight: 700, color: "var(--brand)" }}>
+                              ₹{Number(p.premium).toLocaleString("en-IN")}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
                   ))}
-                </tbody>
-              </table>
-            </div>
-            <div style={{ marginTop: 12 }}>
-              <button
-                type="button"
-                className="btn btn-ghost"
-                style={{ fontSize: 13, padding: "5px 14px" }}
-                onClick={addPremiumRow}
-              >
-                + Add Sum Insured
-              </button>
-            </div>
+                </div>
+              </div>
+            )}
           </>
         )}
       </SectionBlock>
