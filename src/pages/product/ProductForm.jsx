@@ -202,9 +202,6 @@ const COVERED_MEMBERS = [
   "Father",
   "Mother in Law",
   "Father in Law",
-  "Neighbour",
-  "Pet Dog",
-  "Pet Cat",
 ];
 
 const STANDARD_COMBINATIONS = [
@@ -225,11 +222,6 @@ const STANDARD_COMBINATIONS = [
   ['Self', 'Mother in Law', 'Father in Law'],
   ['Self', 'Spouse', 'Mother in Law', 'Father in Law'],
   ['Self', 'Spouse', 'Child 1', 'Child 2', 'Mother in Law', 'Father in Law'],
-  ['Self', 'Neighbour'],
-  ['Self', 'Spouse', 'Neighbour'],
-  ['Pet Dog'],
-  ['Pet Cat'],
-  ['Pet Dog', 'Pet Cat'],
 ];
 
 function generateFamilyCombinations(selectedMembers) {

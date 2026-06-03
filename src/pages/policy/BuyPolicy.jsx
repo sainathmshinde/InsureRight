@@ -957,166 +957,74 @@ export default function BuyPolicy() {
 
                     <div style={{ padding: "14px 16px", display: "flex", flexDirection: "column", gap: 16 }}>
 
-                      {/* SI × Coverage matrix */}
-                      {chartRows.length > 0 && (() => {
-                        const filteredRows = hasAB && sel.ageBandId
-                          ? chartRows.filter(r => String(r.ageBandId) === sel.ageBandId)
-                          : chartRows;
-                        const allSIs = [...new Set(filteredRows.map(r => r.sumInsured))].sort((a, b) => a - b);
-                        const covKeys = ['selfOnly', 'selfSpouse', 'selfSpouse2Children'];
-
-                        // matrix[covKey][si] = premium
-                        const matrix = {};
-                        covKeys.forEach(covKey => {
-                          filteredRows.forEach(row => {
-                            if (row[covKey] != null) {
-                              if (!matrix[covKey]) matrix[covKey] = {};
-                              matrix[covKey][row.sumInsured] = row[covKey];
-                            }
-                          });
-                        });
-                        const activeRows = covKeys.filter(k => matrix[k]);
-
-                        return (
-                          <div>
-                            {/* Age band selector (if applicable) */}
-                            {hasAB && rowBands.length > 0 && (
-                              <div style={{ marginBottom: 12 }}>
-                                <div style={{ fontSize: 11, color: "var(--text-3)", fontWeight: 600, textTransform: "uppercase", letterSpacing: ".4px", marginBottom: 5 }}>Age Band</div>
-                                <select className="field-select" value={sel.ageBandId}
-                                  onChange={e => {
-                                    const band = e.target.value;
-                                    const row  = matchRow(p.id, sel.sumInsured, band);
-                                    const cov  = sel.coverage && row?.[sel.coverage] != null ? sel.coverage : (row?.selfOnly != null ? 'selfOnly' : '');
-                                    setPsel(p.id, { ageBandId: band, coverage: cov, premium: row?.[cov] ?? null });
-                                    if (cov) ensureMembersFor(cov);
-                                  }}
-                                  style={{ fontSize: 13, padding: "6px 10px", minWidth: 130 }}>
-                                  {rowBands.map(b => <option key={b} value={b}>Band {b}</option>)}
-                                </select>
-                              </div>
-                            )}
-
-                            {/* Matrix table */}
-                            <div style={{ fontSize: 11, color: "var(--text-3)", fontWeight: 600, textTransform: "uppercase", letterSpacing: ".4px", marginBottom: 8 }}>
-                              Select Coverage &amp; Sum Insured
-                            </div>
-                            <div style={{ overflowX: "auto", borderRadius: 10, border: "1.5px solid var(--border)" }}>
-                              <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13 }}>
-                                <thead>
-                                  <tr style={{ background: "var(--surface-2)" }}>
-                                    <th style={{
-                                      textAlign: "left", padding: "10px 14px",
-                                      fontSize: 11.5, fontWeight: 700, color: "var(--text-3)",
-                                      borderBottom: "1.5px solid var(--border)",
-                                      minWidth: 170, letterSpacing: ".3px",
-                                    }}>
-                                      COVERAGE TYPE
-                                    </th>
-                                    {allSIs.map(si => (
-                                      <th key={si} style={{
-                                        textAlign: "center", padding: "10px 14px",
-                                        fontSize: 12, fontWeight: 700, color: "var(--text-1)",
-                                        borderBottom: "1.5px solid var(--border)",
-                                        borderLeft: "1px solid var(--border)",
-                                        minWidth: 120, whiteSpace: "nowrap",
-                                      }}>
-                                        ₹{si.toLocaleString("en-IN")}
-                                      </th>
-                                    ))}
-                                  </tr>
-                                </thead>
-                                <tbody>
-                                  {activeRows.map((covKey, ri) => {
-                                    const isRowSelected = sel.coverage === covKey;
-                                    return (
-                                      <tr key={covKey} style={{
-                                        borderTop: ri > 0 ? "1px solid var(--border)" : undefined,
-                                        background: isRowSelected ? "#faf5ff" : "#fff",
-                                        transition: "background .15s",
-                                      }}>
-                                        {/* Coverage label */}
-                                        <td style={{ padding: "12px 14px", borderRight: "1px solid var(--border)" }}>
-                                          <label style={{ display: "flex", alignItems: "center", gap: 9, cursor: "pointer" }}>
-                                            <input
-                                              type="radio"
-                                              name={`cov-${p.id}`}
-                                              checked={isRowSelected}
-                                              onChange={() => {
-                                                const si   = sel.sumInsured || String(allSIs[0]);
-                                                const prem = matrix[covKey]?.[Number(si)] ?? null;
-                                                setPsel(p.id, { coverage: covKey, sumInsured: si, premium: prem });
-                                                ensureMembersFor(covKey);
-                                              }}
-                                              style={{ accentColor: "var(--brand)", width: 15, height: 15, flexShrink: 0 }}
-                                            />
-                                            <span style={{
-                                              fontSize: 13.5,
-                                              fontWeight: isRowSelected ? 700 : 500,
-                                              color: isRowSelected ? "var(--brand)" : "var(--text)",
-                                            }}>
-                                              {COV_LABEL[covKey]}
-                                            </span>
-                                          </label>
-                                        </td>
-                                        {/* Premium cells */}
-                                        {allSIs.map(si => {
-                                          const premium       = matrix[covKey]?.[si];
-                                          const isCellActive  = isRowSelected && String(si) === sel.sumInsured;
-                                          return (
-                                            <td key={si}
-                                              onClick={() => {
-                                                if (premium == null) return;
-                                                setPsel(p.id, { coverage: covKey, sumInsured: String(si), premium });
-                                                ensureMembersFor(covKey);
-                                              }}
-                                              style={{
-                                                padding: "12px 14px",
-                                                textAlign: "center",
-                                                borderLeft: "1px solid var(--border)",
-                                                cursor: premium != null ? "pointer" : "default",
-                                                background: isCellActive
-                                                  ? "#ede9fe"
-                                                  : isRowSelected ? "#faf5ff" : "transparent",
-                                                transition: "background .15s",
-                                                position: "relative",
-                                              }}
-                                            >
-                                              {premium != null ? (
-                                                <span style={{
-                                                  display: "block",
-                                                  fontWeight: isCellActive ? 800 : 600,
-                                                  fontSize: isCellActive ? 15 : 13.5,
-                                                  color: isCellActive ? "var(--brand)" : "var(--text)",
-                                                  transition: "all .15s",
-                                                }}>
-                                                  ₹{premium.toLocaleString("en-IN")}
-                                                </span>
-                                              ) : (
-                                                <span style={{ color: "var(--border)", fontSize: 16 }}>—</span>
-                                              )}
-                                              {isCellActive && (
-                                                <span style={{
-                                                  position: "absolute", top: 4, right: 5,
-                                                  fontSize: 10, fontWeight: 700,
-                                                  color: "var(--brand)", background: "#ede9fe",
-                                                  borderRadius: 3, padding: "1px 4px", lineHeight: 1.4,
-                                                }}>
-                                                  ✓
-                                                </span>
-                                              )}
-                                            </td>
-                                          );
-                                        })}
-                                      </tr>
-                                    );
-                                  })}
-                                </tbody>
-                              </table>
-                            </div>
+                      {/* SI + Age Band */}
+                      {chartRows.length > 0 && (
+                        <div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
+                          <div style={{ minWidth: 160 }}>
+                            <div style={{ fontSize: 11, color: "var(--text-3)", fontWeight: 600, textTransform: "uppercase", letterSpacing: ".4px", marginBottom: 5 }}>Sum Insured</div>
+                            <select className="field-select" value={sel.sumInsured}
+                              onChange={e => {
+                                const si    = e.target.value;
+                                const bands = hasAB ? [...new Set(chartRows.filter(r => r.sumInsured === Number(si)).map(r => String(r.ageBandId)))] : [];
+                                const band  = bands[0] ?? '';
+                                const row   = matchRow(p.id, si, band);
+                                const cov   = row?.selfOnly != null ? 'selfOnly' : '';
+                                setPsel(p.id, { sumInsured: si, ageBandId: band, coverage: cov, premium: row?.[cov] ?? null });
+                                if (cov) ensureMembersFor(cov);
+                              }}
+                              style={{ fontSize: 13, padding: "6px 10px", width: "100%" }}>
+                              {uniqueSIs.map(si => <option key={si} value={String(si)}>₹{si.toLocaleString("en-IN")}</option>)}
+                            </select>
                           </div>
-                        );
-                      })()}
+                          {hasAB && rowBands.length > 0 && (
+                            <div style={{ minWidth: 130 }}>
+                              <div style={{ fontSize: 11, color: "var(--text-3)", fontWeight: 600, textTransform: "uppercase", letterSpacing: ".4px", marginBottom: 5 }}>Age Band</div>
+                              <select className="field-select" value={sel.ageBandId}
+                                onChange={e => {
+                                  const band = e.target.value;
+                                  const row  = matchRow(p.id, sel.sumInsured, band);
+                                  const cov  = sel.coverage && row?.[sel.coverage] != null ? sel.coverage : (row?.selfOnly != null ? 'selfOnly' : '');
+                                  setPsel(p.id, { ageBandId: band, coverage: cov, premium: row?.[cov] ?? null });
+                                  if (cov) ensureMembersFor(cov);
+                                }}
+                                style={{ fontSize: 13, padding: "6px 10px", width: "100%" }}>
+                                {rowBands.map(b => <option key={b} value={b}>Band {b}</option>)}
+                              </select>
+                            </div>
+                          )}
+                        </div>
+                      )}
+
+                      {/* Coverage options */}
+                      {covOpts.length > 0 && (
+                        <div>
+                          <div style={{ fontSize: 11, color: "var(--text-3)", fontWeight: 600, textTransform: "uppercase", letterSpacing: ".4px", marginBottom: 7 }}>Coverage Type</div>
+                          <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+                            {covOpts.map(opt => {
+                              const active = sel.coverage === opt.key;
+                              return (
+                                <label key={opt.key} style={{
+                                  display: "flex", alignItems: "center", gap: 10,
+                                  padding: "10px 14px", borderRadius: 9, cursor: "pointer",
+                                  background: "#fff",
+                                  border: `1.5px solid ${active ? "var(--brand)" : "var(--border)"}`,
+                                  borderLeft: `4px solid ${active ? "var(--brand)" : "var(--border)"}`,
+                                  transition: "all .15s",
+                                }}>
+                                  <input type="radio" name={`cov2-${p.id}`} checked={active}
+                                    onChange={() => {
+                                      setPsel(p.id, { coverage: opt.key, premium: opt.value });
+                                      ensureMembersFor(opt.key);
+                                    }}
+                                    style={{ accentColor: "var(--brand)", width: 15, height: 15, flexShrink: 0 }} />
+                                  <span style={{ flex: 1, fontSize: 13.5, color: "var(--text)", fontWeight: active ? 700 : 400 }}>{opt.label}</span>
+                                  <span style={{ fontWeight: 800, fontSize: 15, color: active ? "var(--brand-dark)" : "var(--text)", flexShrink: 0 }}>₹{opt.value.toLocaleString("en-IN")}</span>
+                                </label>
+                              );
+                            })}
+                          </div>
+                        </div>
+                      )}
 
                       {/* Insured Members — driven by coverage selection */}
                       {neededTypes.length > 0 && (
