@@ -64,12 +64,12 @@ export default function AgentEdit() {
           </div>
           <div>
             <div className="page-title">
-              {isProfile ? "Edit My Profile" : "Edit Agent"}
+              {isProfile ? "Edit My Profile" : "Edit Operator"}
             </div>
             <div className="page-subtitle">
               {isProfile
                 ? "Update your contact and professional details"
-                : "Update agent profile and documents"}
+                : "Update operator profile and documents"}
             </div>
           </div>
         </div>
@@ -134,15 +134,15 @@ export default function AgentEdit() {
                     <option>Other</option>
                   </Select>
                 </Field>
-                <Field label="Agent Type" required>
+                <Field label="Operator Type" required>
                   <Select
                     value={form.agentType || ""}
                     onChange={set("agentType")}
                     required
                   >
-                    <option value="">Select agent type</option>
-                    <option value="calling">Calling Agent</option>
-                    <option value="sales">Sales Agent</option>
+                    <option value="">Select operator type</option>
+                    <option value="calling">Calling Operator</option>
+                    <option value="sales">Sales Operator</option>
                   </Select>
                 </Field>
               </div>
@@ -249,7 +249,7 @@ export default function AgentEdit() {
                 Cancel
               </button>
               <button type="submit" className="btn btn-primary">
-                {isProfile ? "Save Profile" : "Update Agent"}
+            {isProfile ? "Save Profile" : "Update Operator"}
               </button>
             </div>
           </form>

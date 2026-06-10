@@ -90,14 +90,14 @@ export default function AgentList() {
 
   return (
     <div>
-      <PageHeader icon={<AgentIcon />} title="Agents">
+      <PageHeader icon={<AgentIcon />} title="Operators">
         <Button
           variant="secondary"
           onClick={() => navigate("/agent/commission")}
         >
           Commission Rules
         </Button>
-        <Button onClick={() => navigate("/agent/create")}>+ Add Agent</Button>
+        <Button onClick={() => navigate("/agent/create")}>+ Add Operator</Button>
       </PageHeader>
 
       <div className="card">
@@ -180,7 +180,7 @@ export default function AgentList() {
             empty={
               <EmptyState
                 icon="👤"
-                title="No agents found"
+                title="No operators found"
                 subtitle="Try adjusting your filters"
               />
             }

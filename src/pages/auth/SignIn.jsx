@@ -6,8 +6,8 @@ import kmdLogo from "../../assets/kmd-logo.svg";
 
 const DEMO = [
   { role: "Broker",        email: "sainath@kmdastur.com", pass: "broker@123", mobile: "9000000001" },
-  { role: "Calling Agent", email: "pooja@kmdastur.com",  pass: "agent@123",  mobile: "9000000002" },
-  { role: "Sales Agent",   email: "ravi@kmdastur.com",   pass: "sales@123",  mobile: "9000000003" },
+  { role: "Calling Operator", email: "pooja@kmdastur.com",  pass: "agent@123",  mobile: "9000000002" },
+  { role: "Sales Operator",   email: "ravi@kmdastur.com",   pass: "sales@123",  mobile: "9000000003" },
   { role: "Customer",      email: "aarav@gmail.com",     pass: "cust@123",   mobile: "9876543210" },
 ];
 

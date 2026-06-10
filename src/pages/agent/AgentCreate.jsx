@@ -57,8 +57,8 @@ export default function AgentCreate() {
             <AgentIcon />
           </div>
           <div>
-            <div className="page-title">Add Agent</div>
-            <div className="page-subtitle">Register a new agent</div>
+            <div className="page-title">Add Operator</div>
+            <div className="page-subtitle">Register a new operator</div>
           </div>
         </div>
         <button className="btn btn-ghost" onClick={() => navigate("/agent")}>
@@ -113,15 +113,15 @@ export default function AgentCreate() {
                     <option>Other</option>
                   </Select>
                 </Field>
-                <Field label="Agent Type" required>
+                <Field label="Operator Type" required>
                   <Select
                     value={form.agentType}
                     onChange={set("agentType")}
                     required
                   >
-                    <option value="">Select agent type</option>
-                    <option value="calling">Calling Agent</option>
-                    <option value="sales">Sales Agent</option>
+                    <option value="">Select operator type</option>
+                    <option value="calling">Calling Operator</option>
+                    <option value="sales">Sales Operator</option>
                   </Select>
                 </Field>
               </div>
@@ -232,7 +232,7 @@ export default function AgentCreate() {
                 Cancel
               </button>
               <button type="submit" className="btn btn-primary">
-                Create Agent
+                Create Operator
               </button>
             </div>
           </form>

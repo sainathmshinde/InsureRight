@@ -35,7 +35,7 @@ export default function AgentProfile() {
 
       <div style={{ display: 'flex', gap: 10, marginBottom: 20 }}>
         <span className="badge badge-green">Active</span>
-        <span className="badge badge-purple">Agent</span>
+        <span className="badge badge-purple">Operator</span>
       </div>
 
       <div className="card">

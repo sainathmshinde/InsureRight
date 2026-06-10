@@ -6,7 +6,7 @@ import { INITIAL_CUSTOMERS } from "../../context/CustomerContext";
 
 const STATS = [
   {
-    label: "Total Agents",
+    label: "Total Operators",
     value: "12",
     sub: "9 active",
     color: "#7c3aed",
@@ -81,7 +81,7 @@ const ACTIVE_CAMPAIGNS = [
 
 const QUICK_ACTIONS = [
   {
-    label: "Add Agent",
+    label: "Add Operator",
     path: "/agent/create",
     color: "#3b0764",
     bg: "#ede9fe",
@@ -1191,7 +1191,7 @@ export default function BrokerPortal() {
                 <div
                   style={{ fontWeight: 800, fontSize: 15, color: "#1e293b" }}
                 >
-                  Agents
+                  Operators
                 </div>
               </div>
               <button

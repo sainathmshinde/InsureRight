@@ -15,7 +15,7 @@ export default function Topbar({ onMenuClick }) {
   }, [])
 
   const initials = user?.avatar || user?.name?.split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2) || 'U'
-  const roleName = { broker: 'Broker', agent: 'Agent', customer: 'Customer' }[user?.role] || 'User'
+  const roleName = { broker: 'Broker', agent: 'Operator', customer: 'Customer' }[user?.role] || 'User'
 
   const handleLogout = () => {
     setOpen(false)

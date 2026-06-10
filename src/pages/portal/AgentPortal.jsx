@@ -61,7 +61,7 @@ export default function AgentPortal() {
 
       {/* Welcome banner */}
       <div className="ap-banner" style={{ background: 'linear-gradient(135deg,#fb7185 0%,#a855f7 100%)', borderRadius: 14, padding: '28px 32px', color: '#fff' }}>
-        <div style={{ fontSize: 13, color: 'rgba(255,255,255,0.75)', marginBottom: 6, fontWeight: 500 }}>Agent Portal</div>
+        <div style={{ fontSize: 13, color: 'rgba(255,255,255,0.75)', marginBottom: 6, fontWeight: 500 }}>Operator Portal</div>
         <div className="ap-banner-title" style={{ fontSize: 24, fontWeight: 800, marginBottom: 4 }}>Welcome back, {user?.name}</div>
         <div style={{ fontSize: 13.5, color: 'rgba(255,255,255,0.88)' }}>{user?.company}</div>
       </div>

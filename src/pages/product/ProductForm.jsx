@@ -197,8 +197,6 @@ const BASE_POLICIES = [
 const COVERED_MEMBERS = [
   "Self",
   "Spouse",
-  "Child 1",
-  "Child 2",
   "Mother",
   "Father",
   "Mother in Law",
@@ -240,9 +238,17 @@ export default function ProductForm({
   const [brochureToc, setBrochureToc] = useState(BROCHURE_TOC);
   const [editingTocId, setEditingTocId] = useState(null);
   const [tocDraft, setTocDraft] = useState({ title: '', content: '' });
-  const [coveredMembers, setCoveredMembers] = useState(() => new Set(initialMembers ?? []));
-  const [handicapFlags, setHandicapFlags] = useState({ "Child 1": false, "Child 2": false });
-  const [premiumRows, setPremiumRows] = useState(() => chartToRows(productId));
+  const [coveredMembers, setCoveredMembers] = useState(() => new Set(initialMembers?.length ? initialMembers : ["Self"]));
+  const [handicapFlags, setHandicapFlags] = useState({});
+  const [childCount, setChildCount] = useState(0);
+  const [childHandicaps, setChildHandicaps] = useState([]);
+  const [sumInsuredList, setSumInsuredList] = useState(() => {
+    const rows = PREMIUM_CHART[productId] ?? [];
+    if (rows.length === 0) return [{ id: Date.now(), value: '', gst: '0' }];
+    return rows.map((r, i) => ({ id: i + 1, value: String(r.sumInsured), gst: '0' }));
+  });
+  const [premiumMatrix, setPremiumMatrix] = useState({});
+  const [removedCombos, setRemovedCombos] = useState(new Set());
   const [docState, setDocState] = useState({
     policyWordingsFile: {
       status: "uploaded",
@@ -266,39 +272,38 @@ export default function ProductForm({
   const toggleHandicap = (child) =>
     setHandicapFlags((prev) => ({ ...prev, [child]: !prev[child] }));
 
-  const selectedMembers = COVERED_MEMBERS.flatMap((m) => {
-    if (!coveredMembers.has(m)) return [];
-    if ((m === "Child 1" || m === "Child 2") && handicapFlags[m])
-      return [`${m} (Handicap)`];
-    return [m];
-  });
+  const selectedMembers = [
+    ...COVERED_MEMBERS.flatMap((m) => {
+      if (!coveredMembers.has(m)) return [];
+      return [m];
+    }),
+    ...Array.from({ length: childCount }, (_, i) =>
+      childHandicaps[i] ? `Child ${i + 1} (Handicap)` : `Child ${i + 1}`
+    ),
+  ];
 
-  const cumulativeLabels = selectedMembers.map((_, i) =>
-    selectedMembers.slice(0, i + 1).join('+')
-  );
+  // All power-set combinations with Self always first
+  const nonSelfMembers = selectedMembers.filter(m => m !== 'Self');
+  const allCombos = (() => {
+    if (!selectedMembers.includes('Self')) return selectedMembers.map(m => m);
+    const result = [];
+    const n = nonSelfMembers.length;
+    for (let mask = 0; mask < (1 << n); mask++) {
+      const combo = ['Self'];
+      for (let i = 0; i < n; i++) {
+        if (mask & (1 << i)) combo.push(nonSelfMembers[i]);
+      }
+      result.push(combo.join('+'));
+    }
+    return result;
+  })();
+  const visibleCombos = allCombos.filter(c => !removedCombos.has(c));
 
-  const hasAgeBand = premiumRows.some(r => r.ageBandId !== '');
-
-  const addPremiumRow = () =>
-    setPremiumRows((prev) => [
+  const updateCellPremium = (label, siId, value) =>
+    setPremiumMatrix(prev => ({
       ...prev,
-      { id: Date.now(), sumInsured: '', gst: '0', ageBandId: '', members: {} },
-    ]);
-
-  const removePremiumRow = (id) =>
-    setPremiumRows((prev) => prev.filter((r) => r.id !== id));
-
-  const updatePremiumRow = (id, field, value) =>
-    setPremiumRows((prev) =>
-      prev.map((r) => (r.id === id ? { ...r, [field]: value } : r)),
-    );
-
-  const updateMemberPremium = (id, member, value) =>
-    setPremiumRows((prev) =>
-      prev.map((r) =>
-        r.id === id ? { ...r, members: { ...r.members, [member]: value } } : r,
-      ),
-    );
+      [label]: { ...(prev[label] ?? {}), [siId]: value },
+    }));
 
   const replaceDoc = (field) =>
     setDocState((prev) => ({ ...prev, [field]: { ...prev[field], status: "replacing" } }));
@@ -416,7 +421,50 @@ export default function ProductForm({
         </div>
       </SectionBlock>
 
-      {/* ── 2. Configuration ─────────────────────── */}
+      {/* ── 2. Sum Assured ───────────────────────── */}
+      <SectionBlock icon="💹" title="Sum Assured">
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+          {sumInsuredList.map((si, i) => (
+            <div key={si.id} style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+              <span style={{ fontSize: 12, color: 'var(--text-3)', minWidth: 22, textAlign: 'right' }}>#{i + 1}</span>
+              <Input
+                type="number"
+                min="0"
+                placeholder="e.g. 500000"
+                value={si.value}
+                onChange={e => setSumInsuredList(prev => prev.map(s => s.id === si.id ? { ...s, value: e.target.value } : s))}
+                style={{ maxWidth: 160 }}
+              />
+              <Select
+                value={si.gst}
+                onChange={e => setSumInsuredList(prev => prev.map(s => s.id === si.id ? { ...s, gst: e.target.value } : s))}
+                style={{ maxWidth: 110 }}
+              >
+                <option value="0">0% GST</option>
+                <option value="5">5% GST</option>
+                <option value="12">12% GST</option>
+                <option value="18">18% GST</option>
+              </Select>
+              <button
+                type="button"
+                onClick={() => setSumInsuredList(prev => prev.filter(s => s.id !== si.id))}
+                disabled={sumInsuredList.length === 1}
+                style={{ background: 'none', border: 'none', cursor: sumInsuredList.length === 1 ? 'not-allowed' : 'pointer', fontSize: 18, color: sumInsuredList.length === 1 ? 'var(--border)' : 'var(--text-3)', lineHeight: 1, padding: '2px 4px' }}
+              >×</button>
+            </div>
+          ))}
+          <div>
+            <button
+              type="button"
+              className="btn btn-ghost"
+              style={{ fontSize: 13, padding: '5px 14px', marginTop: 4 }}
+              onClick={() => setSumInsuredList(prev => [...prev, { id: Date.now(), value: '', gst: '0' }])}
+            >+ Add Sum Assured</button>
+          </div>
+        </div>
+      </SectionBlock>
+
+      {/* ── 3. Configuration ─────────────────────── */}
       <SectionBlock icon="⚙️" title="Configuration">
         <Field label="Covered Members">
           <div
@@ -428,7 +476,6 @@ export default function ProductForm({
             }}
           >
             {COVERED_MEMBERS.map((member) => {
-              const isChild = member === "Child 1" || member === "Child 2";
               const isChecked = coveredMembers.has(member);
               return (
                 <div key={member} style={{ display: "flex", alignItems: "center", gap: 8 }}>
@@ -440,160 +487,133 @@ export default function ProductForm({
                     />
                     {member}
                   </label>
-                  {isChild && isChecked && (
+                </div>
+              );
+            })}
+
+            {/* Children — dynamic counter + per-child handicap */}
+            <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                <span style={{ fontSize: 14 }}>Children</span>
+                <div style={{ display: "flex", alignItems: "center", background: "var(--surface-2)", border: "1px solid var(--border)", borderRadius: 8, overflow: "hidden" }}>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setChildCount(c => Math.max(0, c - 1));
+                      setChildHandicaps(prev => prev.slice(0, -1));
+                    }}
+                    style={{ width: 30, height: 30, border: "none", background: "transparent", fontSize: 18, cursor: "pointer", color: "var(--text-2)", lineHeight: 1 }}
+                  >−</button>
+                  <span style={{ minWidth: 28, textAlign: "center", fontSize: 14, fontWeight: 600, color: childCount > 0 ? "var(--brand)" : "var(--text-3)" }}>{childCount}</span>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setChildCount(c => c + 1);
+                      setChildHandicaps(prev => [...prev, false]);
+                    }}
+                    style={{ width: 30, height: 30, border: "none", background: "transparent", fontSize: 18, cursor: "pointer", color: "var(--text-2)", lineHeight: 1 }}
+                  >+</button>
+                </div>
+              </div>
+              {childCount > 0 && (
+                <div style={{ display: "flex", flexWrap: "wrap", gap: "6px 16px", paddingLeft: 4 }}>
+                  {Array.from({ length: childCount }, (_, i) => (
                     <label
+                      key={i}
                       style={{
                         display: "flex", alignItems: "center", gap: 4,
                         cursor: "pointer", fontSize: 12,
-                        background: handicapFlags[member] ? "#ede9fe" : "var(--surface-2)",
-                        color: handicapFlags[member] ? "var(--brand)" : "var(--text-3)",
-                        border: `1px solid ${handicapFlags[member] ? "var(--brand)" : "var(--border)"}`,
-                        borderRadius: 99, padding: "2px 9px",
-                        transition: "all .12s",
+                        background: childHandicaps[i] ? "#ede9fe" : "var(--surface-2)",
+                        color: childHandicaps[i] ? "var(--brand)" : "var(--text-3)",
+                        border: `1px solid ${childHandicaps[i] ? "var(--brand)" : "var(--border)"}`,
+                        borderRadius: 99, padding: "3px 10px", transition: "all .12s",
                       }}
                     >
                       <input
                         type="checkbox"
-                        checked={handicapFlags[member]}
-                        onChange={() => toggleHandicap(member)}
+                        checked={!!childHandicaps[i]}
+                        onChange={() => setChildHandicaps(prev => prev.map((v, j) => j === i ? !v : v))}
                         style={{ accentColor: "var(--brand)", width: 12 }}
                       />
-                      ♿ Handicap
+                      Child {i + 1} ♿ Handicap
                     </label>
-                  )}
+                  ))}
                 </div>
-              );
-            })}
+              )}
+            </div>
           </div>
         </Field>
       </SectionBlock>
 
-      {/* ── 3. Financial Details ──────────────────── */}
+      {/* ── 4. Financial Details ──────────────────── */}
       <SectionBlock icon="💰" title="Financial Details">
         {selectedMembers.length === 0 ? (
-          <p style={{ fontSize: 13, color: "var(--text-3)", margin: 0 }}>
-            Select covered members in the Configuration section to build the
-            premium table.
+          <p style={{ fontSize: 13, color: 'var(--text-3)', margin: 0 }}>
+            Select covered members in the Configuration section to build the premium table.
+          </p>
+        ) : sumInsuredList.every(s => !s.value) ? (
+          <p style={{ fontSize: 13, color: 'var(--text-3)', margin: 0 }}>
+            Add Sum Assured values in the Sum Assured section to build the premium table.
           </p>
         ) : (
           <>
-            <div className="table-wrap">
-              <table style={{ fontSize: 13 }}>
-                <thead>
-                  <tr>
-                    <th style={{ minWidth: 130 }}>Sum Insured (₹)</th>
-                    {hasAgeBand && <th style={{ minWidth: 100 }}>Age Band</th>}
-                    <th style={{ minWidth: 90 }}>GST %</th>
-                    {selectedMembers.map((m, i) => {
-                      const isHandicap = m.includes("(Handicap)");
-                      return (
-                        <th
-                          key={m}
-                          style={{
-                            minWidth: 160,
-                            background: isHandicap ? "#ede9fe" : undefined,
-                            color: isHandicap ? "var(--brand)" : undefined,
-                          }}
-                        >
-                          {isHandicap ? "♿ " : ""}{cumulativeLabels[i]} (₹)
-                        </th>
-                      );
-                    })}
-                    <th style={{ width: 40 }}></th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {premiumRows.map((row) => (
-                    <tr key={row.id}>
-                      <td>
-                        <Input
-                          type="number"
-                          min="0"
-                          placeholder="e.g. 500000"
-                          value={row.sumInsured}
-                          onChange={(e) =>
-                            updatePremiumRow(row.id, "sumInsured", e.target.value)
-                          }
-                        />
+          <div className="table-wrap" style={{ maxHeight: 450, overflowY: 'auto' }}>
+            <table style={{ fontSize: 13 }}>
+              <thead>
+                <tr>
+                  <th style={{ minWidth: 200, background: 'var(--surface-2)' }}>Family Combination</th>
+                  {sumInsuredList.map((si, i) => (
+                    <th key={si.id} style={{ minWidth: 150, textAlign: 'center' }}>
+                      <div style={{ fontWeight: 700 }}>₹{si.value ? Number(si.value).toLocaleString('en-IN') : `SI ${i + 1}`}</div>
+                      <div style={{ fontSize: 11, fontWeight: 400, color: 'var(--text-3)', marginTop: 2 }}>GST {si.gst}%</div>
+                    </th>
+                  ))}
+                  <th style={{ width: 40 }}></th>
+                </tr>
+              </thead>
+              <tbody>
+                {visibleCombos.map((label) => {
+                  const isHandicap = label.includes('(Handicap)');
+                  return (
+                    <tr key={label}>
+                      <td style={{ fontWeight: 500, background: 'var(--surface-2)', whiteSpace: 'nowrap', paddingRight: 12 }}>
+                        {isHandicap && <span style={{ marginRight: 4 }}>♿</span>}{label}
                       </td>
-                      {hasAgeBand && (
-                        <td>
-                          <Input
-                            type="number"
-                            min="1"
-                            placeholder="Band ID"
-                            value={row.ageBandId}
-                            onChange={(e) =>
-                              updatePremiumRow(row.id, "ageBandId", e.target.value)
-                            }
-                          />
-                        </td>
-                      )}
-                      <td>
-                        <Select
-                          value={row.gst}
-                          onChange={(e) =>
-                            updatePremiumRow(row.id, "gst", e.target.value)
-                          }
-                        >
-                          <option value="0">0%</option>
-                          <option value="5">5%</option>
-                          <option value="12">12%</option>
-                          <option value="18">18%</option>
-                        </Select>
-                      </td>
-                      {selectedMembers.map((m) => (
-                        <td key={m}>
+                      {sumInsuredList.map(si => (
+                        <td key={si.id}>
                           <Input
                             type="number"
                             min="0"
                             placeholder="0"
-                            value={row.members[m] || ""}
-                            onChange={(e) =>
-                              updateMemberPremium(row.id, m, e.target.value)
-                            }
+                            value={premiumMatrix[label]?.[si.id] ?? ''}
+                            onChange={e => updateCellPremium(label, si.id, e.target.value)}
                           />
                         </td>
                       ))}
-                      <td>
+                      <td style={{ textAlign: 'center' }}>
                         <button
                           type="button"
-                          onClick={() => removePremiumRow(row.id)}
-                          disabled={premiumRows.length === 1}
-                          style={{
-                            background: "none",
-                            border: "none",
-                            cursor:
-                              premiumRows.length === 1
-                                ? "not-allowed"
-                                : "pointer",
-                            fontSize: 18,
-                            color:
-                              premiumRows.length === 1
-                                ? "var(--border)"
-                                : "var(--text-3)",
-                            lineHeight: 1,
-                            padding: "2px 4px",
-                          }}
-                        >
-                          ×
-                        </button>
+                          title="Remove row"
+                          onClick={() => setRemovedCombos(prev => new Set([...prev, label]))}
+                          style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 16, color: 'var(--text-3)', lineHeight: 1, padding: '2px 6px' }}
+                        >×</button>
                       </td>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-            <div style={{ marginTop: 12 }}>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+          {removedCombos.size > 0 && (
+            <div style={{ marginTop: 10 }}>
               <button
                 type="button"
                 className="btn btn-ghost"
-                style={{ fontSize: 13, padding: "5px 14px" }}
-                onClick={addPremiumRow}
-              >
-                + Add Sum Insured
-              </button>
+                style={{ fontSize: 12, padding: '4px 12px', color: 'var(--brand)' }}
+                onClick={() => setRemovedCombos(new Set())}
+              >↺ Restore {removedCombos.size} removed row{removedCombos.size > 1 ? 's' : ''}</button>
             </div>
+          )}
           </>
         )}
       </SectionBlock>

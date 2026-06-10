@@ -30,11 +30,11 @@ const BROKER_NAV = [
   },
   {
     key: "agent",
-    label: "Agents",
+    label: "Operators",
     icon: AgentIcon,
     children: [
-      { label: "All Agents", path: "/agent" },
-      { label: "Add Agent", path: "/agent/create" },
+      { label: "All Operators", path: "/agent" },
+      { label: "Add Operator", path: "/agent/create" },
     ],
   },
   {
