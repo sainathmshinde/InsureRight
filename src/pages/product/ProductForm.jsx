@@ -9,9 +9,10 @@ import {
 } from "../../components/Field";
 import { CheckboxGroup, FormActions } from "../../components/UI";
 import { DocumentViewerModal } from "../../components/fields/DocumentViewerModal";
-import { PREMIUM_CHART } from "./productData";
 import policyWordingsPdf from "../../assets/StarHealthAssureInsurancePolicy-Policy-wording.pdf";
 import brochurePdf from "../../assets/Brochure_Star_Comprehensive_Insurance_Policy_V_15_Web_633bcfcaaf.pdf";
+
+const PREMIUM_CHART = {};
 
 const IC_LIST = [
   "Star Health Insurance",
@@ -203,20 +204,36 @@ const COVERED_MEMBERS = [
   "Father in Law",
 ];
 
-function chartToRows(productId) {
-  const rows = PREMIUM_CHART[productId] ?? [];
-  if (rows.length === 0) return [{ id: Date.now(), sumInsured: '', gst: '0', ageBandId: '', members: {} }];
-  return rows.map((r, i) => ({
-    id: i + 1,
-    sumInsured: String(r.sumInsured),
-    gst: '0',
-    ageBandId: r.ageBandId != null ? String(r.ageBandId) : '',
-    members: {
-      ...(r.selfOnly            != null ? { Self:      String(r.selfOnly)            } : {}),
-      ...(r.selfSpouse          != null ? { Spouse:    String(r.selfSpouse)          } : {}),
-      ...(r.selfSpouse2Children != null ? { 'Child 2': String(r.selfSpouse2Children) } : {}),
-    },
-  }));
+const STANDARD_COMBINATIONS = [
+  ['Self'],
+  ['Self', 'Spouse'],
+  ['Self', 'Child 1'],
+  ['Self', 'Spouse', 'Child 1'],
+  ['Self', 'Child 1', 'Child 2'],
+  ['Self', 'Spouse', 'Child 1', 'Child 2'],
+  ['Self', 'Mother'],
+  ['Self', 'Father'],
+  ['Self', 'Mother', 'Father'],
+  ['Self', 'Spouse', 'Mother', 'Father'],
+  ['Self', 'Spouse', 'Child 1', 'Mother', 'Father'],
+  ['Self', 'Spouse', 'Child 1', 'Child 2', 'Mother', 'Father'],
+  ['Self', 'Mother in Law'],
+  ['Self', 'Father in Law'],
+  ['Self', 'Mother in Law', 'Father in Law'],
+  ['Self', 'Spouse', 'Mother in Law', 'Father in Law'],
+  ['Self', 'Spouse', 'Child 1', 'Child 2', 'Mother in Law', 'Father in Law'],
+];
+
+function generateFamilyCombinations(selectedMembers) {
+  const baseSelected = new Set(selectedMembers.map(m => m.replace(' (Handicap)', '')));
+  const labelMap = {};
+  selectedMembers.forEach(m => { labelMap[m.replace(' (Handicap)', '')] = m; });
+  return STANDARD_COMBINATIONS
+    .filter(combo => combo.every(m => baseSelected.has(m)))
+    .map(combo => {
+      const actualMembers = combo.map(m => labelMap[m] || m);
+      return { key: actualMembers.join('+'), members: actualMembers };
+    });
 }
 
 export default function ProductForm({
