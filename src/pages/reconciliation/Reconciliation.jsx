@@ -716,19 +716,19 @@ export default function Reconciliation() {
               <table style={{ fontSize: 13 }}>
                 <thead style={{ position: "sticky", top: 0, zIndex: 2 }}>
                   <tr>
-                    <th style={{ position: "sticky", top: 0, background: "#fff7ed", zIndex: 3 }}>Proposal ID</th>
-                    <th style={{ position: "sticky", top: 0, background: "#fff7ed", zIndex: 3 }}>Customer</th>
+                    <th style={{ position: "sticky", top: 0, background: "#eff6ff", zIndex: 3 }}>Proposal ID</th>
+                    <th style={{ position: "sticky", top: 0, background: "#eff6ff", zIndex: 3 }}>Customer</th>
                     {payTypeFilter === "Cheque" && <>
-                      <th style={{ position: "sticky", top: 0, background: "#fff7ed", zIndex: 3 }}>Cheque No.</th>
-                      <th style={{ position: "sticky", top: 0, background: "#fff7ed", zIndex: 3 }}>Cheque Date</th>
-                      <th style={{ position: "sticky", top: 0, background: "#fff7ed", zIndex: 3 }}>Clearing Date</th>
+                      <th style={{ position: "sticky", top: 0, background: "#eff6ff", zIndex: 3 }}>Cheque No.</th>
+                      <th style={{ position: "sticky", top: 0, background: "#eff6ff", zIndex: 3 }}>Cheque Date</th>
+                      <th style={{ position: "sticky", top: 0, background: "#eff6ff", zIndex: 3 }}>Clearing Date</th>
                     </>}
                     {payTypeFilter === "NEFT" && <>
-                      <th style={{ position: "sticky", top: 0, background: "#fff7ed", zIndex: 3 }}>Transaction No.</th>
-                      <th style={{ position: "sticky", top: 0, background: "#fff7ed", zIndex: 3 }}>Transaction Date</th>
+                      <th style={{ position: "sticky", top: 0, background: "#eff6ff", zIndex: 3 }}>Transaction No.</th>
+                      <th style={{ position: "sticky", top: 0, background: "#eff6ff", zIndex: 3 }}>Transaction Date</th>
                     </>}
-                    <th style={{ position: "sticky", top: 0, background: "#fff7ed", zIndex: 3 }}>Amount</th>
-                    <th style={{ position: "sticky", top: 0, background: "#fff7ed", zIndex: 3 }}>Status</th>
+                    <th style={{ position: "sticky", top: 0, background: "#eff6ff", zIndex: 3 }}>Amount</th>
+                    <th style={{ position: "sticky", top: 0, background: "#eff6ff", zIndex: 3 }}>Status</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -736,7 +736,7 @@ export default function Reconciliation() {
                     <tr><td colSpan={payTypeFilter === "Cheque" ? 8 : payTypeFilter === "NEFT" ? 7 : 5} style={{ textAlign: "center", padding: "32px 0", color: "#64748b" }}>No unmatched system records</td></tr>
                   ) : (
                     pendingRecords.map((rec) => (
-                      <tr key={rec.id} style={{ background: "#fffbeb" }}>
+                      <tr key={rec.id} style={{ background: "#f0f7ff" }}>
                         <td style={{ fontFamily: "monospace", fontSize: 11.5, color: "#7c3aed" }}>{rec.proposalId}</td>
                         <td style={{ fontWeight: 500 }}>{rec.customerName}</td>
                         {payTypeFilter === "Cheque" && <>
