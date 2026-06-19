@@ -11,8 +11,7 @@ import { CheckboxGroup, FormActions } from "../../components/UI";
 import { DocumentViewerModal } from "../../components/fields/DocumentViewerModal";
 import policyWordingsPdf from "../../assets/StarHealthAssureInsurancePolicy-Policy-wording.pdf";
 import brochurePdf from "../../assets/Brochure_Star_Comprehensive_Insurance_Policy_V_15_Web_633bcfcaaf.pdf";
-
-const PREMIUM_CHART = {};
+import { PREMIUM_CHART } from "./productData";
 
 const IC_LIST = [
   "Star Health Insurance",
