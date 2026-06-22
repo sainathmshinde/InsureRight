@@ -32,12 +32,12 @@ export default function AssociationList() {
     { key: 'orgId', label: 'Organisation',
       render: row => {
         const org = ORGANISATIONS.find(o => o.id === row.orgId)
-        return <span style={{ fontSize: 12.5, color: 'var(--text-2)' }}>{org?.name ?? '—'}</span>
+        return <span style={{ fontSize: 13.5, color: 'var(--text-2)' }}>{org?.name ?? '—'}</span>
       }
     },
     { key: 'associationCode', label: 'Code',
       render: row => row.associationCode
-        ? <span style={{ fontFamily: 'monospace', fontSize: 12, color: 'var(--brand)' }}>{row.associationCode}</span>
+        ? <span style={{ fontFamily: 'monospace', fontSize: 13, color: 'var(--brand)' }}>{row.associationCode}</span>
         : <span style={{ color: 'var(--text-3)' }}>—</span>
     },
     { key: 'city',     label: 'City',   style: { fontSize: 13, color: 'var(--text-2)' } },
@@ -65,19 +65,19 @@ export default function AssociationList() {
         <div className="card-body">
           <div style={{ display: 'flex', gap: 14, alignItems: 'flex-end', marginBottom: 18, flexWrap: 'wrap' }}>
             <div style={{ flex: '1 1 220px' }}>
-              <label style={{ display: 'block', fontSize: 11.5, fontWeight: 700, color: '#64748b', marginBottom: 5, textTransform: 'uppercase', letterSpacing: '.4px' }}>Search</label>
+              <label style={{ display: 'block', fontSize: 13, fontWeight: 700, color: '#64748b', marginBottom: 5, textTransform: 'uppercase', letterSpacing: '.4px' }}>Search</label>
               <input className="field-input filter-search" style={{ width: '100%' }} placeholder="Search by name, code or city…"
                 value={search} onChange={e => handle(setSearch)(e.target.value)} />
             </div>
             <div style={{ flex: '0 0 200px' }}>
-              <label style={{ display: 'block', fontSize: 11.5, fontWeight: 700, color: '#64748b', marginBottom: 5, textTransform: 'uppercase', letterSpacing: '.4px' }}>Organisation</label>
+              <label style={{ display: 'block', fontSize: 13, fontWeight: 700, color: '#64748b', marginBottom: 5, textTransform: 'uppercase', letterSpacing: '.4px' }}>Organisation</label>
               <select className="field-select" style={{ width: '100%' }} value={orgFilter} onChange={e => handle(setOrgFilter)(e.target.value)}>
                 <option value="">All Organisations</option>
                 {ORGANISATIONS.map(o => <option key={o.id} value={o.id}>{o.name}</option>)}
               </select>
             </div>
             <div style={{ flex: '0 0 150px' }}>
-              <label style={{ display: 'block', fontSize: 11.5, fontWeight: 700, color: '#64748b', marginBottom: 5, textTransform: 'uppercase', letterSpacing: '.4px' }}>Status</label>
+              <label style={{ display: 'block', fontSize: 13, fontWeight: 700, color: '#64748b', marginBottom: 5, textTransform: 'uppercase', letterSpacing: '.4px' }}>Status</label>
               <select className="field-select" style={{ width: '100%' }} value={statusFilter} onChange={e => handle(setStatus)(e.target.value)}>
                 <option value="">All Status</option>
                 <option>Active</option>

@@ -538,7 +538,7 @@ export default function ProductForm({
                       key={i}
                       style={{
                         display: "flex", alignItems: "center", gap: 4,
-                        cursor: "pointer", fontSize: 12,
+                        cursor: "pointer", fontSize: 13,
                         background: childHandicaps[i] ? "#ede9fe" : "var(--surface-2)",
                         color: childHandicaps[i] ? "var(--brand)" : "var(--text-3)",
                         border: `1px solid ${childHandicaps[i] ? "var(--brand)" : "var(--border)"}`,
@@ -625,7 +625,7 @@ export default function ProductForm({
               <button
                 type="button"
                 className="btn btn-ghost"
-                style={{ fontSize: 12, padding: '4px 12px', color: 'var(--brand)' }}
+                style={{ fontSize: 13, padding: '4px 12px', color: 'var(--brand)' }}
                 onClick={() => setRemovedCombos(new Set())}
               >↺ Restore {removedCombos.size} removed row{removedCombos.size > 1 ? 's' : ''}</button>
             </div>
@@ -655,7 +655,7 @@ export default function ProductForm({
                           <div style={{ fontWeight: 600, fontSize: 13, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
                             {doc.meta.name}
                           </div>
-                          <div style={{ fontSize: 11.5, color: "var(--text-3)", marginTop: 3 }}>
+                          <div style={{ fontSize: 13, color: "var(--text-3)", marginTop: 3 }}>
                             {doc.meta.size} · {doc.meta.pages} pages · Uploaded {doc.meta.date}
                           </div>
                         </div>
@@ -664,12 +664,12 @@ export default function ProductForm({
                         <button
                           type="button"
                           className="btn btn-secondary"
-                          style={{ fontSize: 12, padding: "4px 12px" }}
+                          style={{ fontSize: 13, padding: "4px 12px" }}
                           onClick={() => setViewingDoc(field)}
                         >
                           View
                         </button>
-                        <button type="button" className="btn btn-ghost" style={{ fontSize: 12, padding: "4px 12px" }} onClick={() => replaceDoc(field)}>
+                        <button type="button" className="btn btn-ghost" style={{ fontSize: 13, padding: "4px 12px" }} onClick={() => replaceDoc(field)}>
                           Replace
                         </button>
                       </div>
@@ -677,7 +677,7 @@ export default function ProductForm({
                   ) : (
                     <div>
                       <UploadBox label={`Upload new ${label}`} hint={hint} onChange={handleFileUpload(field)} />
-                      <button type="button" className="btn btn-ghost" style={{ fontSize: 12, marginTop: 6 }} onClick={() => cancelReplace(field)}>
+                      <button type="button" className="btn btn-ghost" style={{ fontSize: 13, marginTop: 6 }} onClick={() => cancelReplace(field)}>
                         Cancel
                       </button>
                     </div>
@@ -711,7 +711,7 @@ export default function ProductForm({
                     borderBottom: activeTocDoc === key ? "2px solid var(--brand)" : "2px solid transparent",
                     color: activeTocDoc === key ? "var(--brand)" : "var(--text-3)",
                     fontWeight: activeTocDoc === key ? 600 : 400,
-                    fontSize: 12.5, fontFamily: "inherit",
+                    fontSize: 13.5, fontFamily: "inherit",
                     marginBottom: activeTocDoc === key ? -1 : 0,
                     transition: "all .12s",
                   }}
@@ -753,7 +753,7 @@ export default function ProductForm({
                         {isEditing ? (
                           <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
                             <div>
-                              <div style={{ fontSize: 11, fontWeight: 600, color: "var(--text-3)", marginBottom: 4 }}>Title</div>
+                              <div style={{ fontSize: 13, fontWeight: 600, color: "var(--text-3)", marginBottom: 4 }}>Title</div>
                               <input
                                 type="text"
                                 value={tocDraft.title}
@@ -762,12 +762,12 @@ export default function ProductForm({
                               />
                             </div>
                             <div>
-                              <div style={{ fontSize: 11, fontWeight: 600, color: "var(--text-3)", marginBottom: 4 }}>Content</div>
+                              <div style={{ fontSize: 13, fontWeight: 600, color: "var(--text-3)", marginBottom: 4 }}>Content</div>
                               <textarea
                                 value={tocDraft.content}
                                 onChange={e => setTocDraft(p => ({ ...p, content: e.target.value }))}
                                 rows={5}
-                                style={{ width: "100%", padding: "7px 10px", fontSize: 12.5, border: "1.5px solid var(--border)", borderRadius: 6, fontFamily: "inherit", outline: "none", resize: "vertical", boxSizing: "border-box", lineHeight: 1.75 }}
+                                style={{ width: "100%", padding: "7px 10px", fontSize: 13.5, border: "1.5px solid var(--border)", borderRadius: 6, fontFamily: "inherit", outline: "none", resize: "vertical", boxSizing: "border-box", lineHeight: 1.75 }}
                               />
                             </div>
                             <div style={{ display: "flex", gap: 8 }}>
@@ -777,14 +777,14 @@ export default function ProductForm({
                           </div>
                         ) : (
                           <div>
-                            <div style={{ fontSize: 12.5, color: "var(--text-2)", lineHeight: 1.75, marginBottom: 10 }}>
+                            <div style={{ fontSize: 13.5, color: "var(--text-2)", lineHeight: 1.75, marginBottom: 10 }}>
                               {item.content}
                             </div>
                             <button
                               type="button"
                               className="btn btn-ghost btn-sm"
                               onClick={e => { e.stopPropagation(); startEditToc(item); }}
-                              style={{ fontSize: 12, padding: "4px 12px" }}
+                              style={{ fontSize: 13, padding: "4px 12px" }}
                             >
                               ✏️ Edit
                             </button>

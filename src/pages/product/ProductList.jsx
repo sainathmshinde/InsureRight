@@ -51,12 +51,12 @@ export default function ProductList() {
           {/* Filters */}
           <div style={{ display: 'flex', gap: 14, alignItems: 'flex-end', marginBottom: 20, flexWrap: 'wrap' }}>
             <div style={{ flex: '1 1 220px' }}>
-              <label style={{ display: 'block', fontSize: 11.5, fontWeight: 700, color: '#64748b', marginBottom: 5, textTransform: 'uppercase', letterSpacing: '.4px' }}>Search</label>
+              <label style={{ display: 'block', fontSize: 13, fontWeight: 700, color: '#64748b', marginBottom: 5, textTransform: 'uppercase', letterSpacing: '.4px' }}>Search</label>
               <input className="field-input filter-search" style={{ width: '100%' }} placeholder="Search by name, code or provider…"
                 value={search} onChange={e => handle(setSearch)(e.target.value)} />
             </div>
             <div style={{ flex: '0 0 200px' }}>
-              <label style={{ display: 'block', fontSize: 11.5, fontWeight: 700, color: '#64748b', marginBottom: 5, textTransform: 'uppercase', letterSpacing: '.4px' }}>Policy Type</label>
+              <label style={{ display: 'block', fontSize: 13, fontWeight: 700, color: '#64748b', marginBottom: 5, textTransform: 'uppercase', letterSpacing: '.4px' }}>Policy Type</label>
               <select className="field-select" style={{ width: '100%' }} value={typeFilter} onChange={e => handle(setType)(e.target.value)}>
                 <option value="">All Types</option>
                 {uniqueTypes.map(t => <option key={t}>{t}</option>)}
@@ -102,7 +102,7 @@ export default function ProductList() {
                       <div style={{ display: 'flex', alignItems: 'flex-start', gap: 10 }}>
                         <div style={{ width: 40, height: 40, borderRadius: 10, background: tc.bg, border: `1.5px solid ${tc.border}`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 20, flexShrink: 0 }}>{icon}</div>
                         <div style={{ flex: 1, minWidth: 0 }}>
-                          <div style={{ fontSize: 11, fontWeight: 700, color: tc.color, letterSpacing: '.2px', marginBottom: 4, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{p.provider}</div>
+                          <div style={{ fontSize: 13, fontWeight: 700, color: tc.color, letterSpacing: '.2px', marginBottom: 4, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{p.provider}</div>
                           <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap' }}>
                             <span style={{ fontSize: 10.5, fontWeight: 700, background: tc.bg, color: tc.color, border: `1px solid ${tc.border}`, borderRadius: 4, padding: '1px 7px' }}>{p.policyType}</span>
                             <span style={{ fontSize: 10.5, fontFamily: 'monospace', color: '#94a3b8' }}>{p.code}</span>
@@ -118,7 +118,7 @@ export default function ProductList() {
                       <div style={{ display: 'flex', gap: 8 }}>
                         {uniqueSIs.length > 0 && (
                           <div style={{ flex: 1, background: '#f8fafc', borderRadius: 8, padding: '8px 10px', border: '1px solid #e2e8f0' }}>
-                            <div style={{ fontSize: 10, fontWeight: 700, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '.5px', marginBottom: 3 }}>Sum Insured</div>
+                            <div style={{ fontSize: 12, fontWeight: 700, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '.5px', marginBottom: 3 }}>Sum Insured</div>
                             <div style={{ fontSize: 13, fontWeight: 700, color: '#1e293b' }}>
                               {fmtSI(Math.min(...uniqueSIs))}{uniqueSIs.length > 1 && ` – ${fmtSI(Math.max(...uniqueSIs))}`}
                             </div>
@@ -126,12 +126,12 @@ export default function ProductList() {
                         )}
                         {minPremium ? (
                           <div style={{ flex: 1, background: tc.bg, borderRadius: 8, padding: '8px 10px', border: `1px solid ${tc.border}` }}>
-                            <div style={{ fontSize: 10, fontWeight: 700, color: tc.color, textTransform: 'uppercase', letterSpacing: '.5px', marginBottom: 3, opacity: .8 }}>Starts From</div>
+                            <div style={{ fontSize: 12, fontWeight: 700, color: tc.color, textTransform: 'uppercase', letterSpacing: '.5px', marginBottom: 3, opacity: .8 }}>Starts From</div>
                             <div style={{ fontSize: 13, fontWeight: 800, color: tc.color }}>₹{minPremium.toLocaleString('en-IN')}<span style={{ fontSize: 10, fontWeight: 600 }}>/yr</span></div>
                           </div>
                         ) : (
                           <div style={{ flex: 1, background: '#f8fafc', borderRadius: 8, padding: '8px 10px', border: '1px solid #e2e8f0' }}>
-                            <div style={{ fontSize: 10, fontWeight: 700, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '.5px', marginBottom: 3 }}>Premium</div>
+                            <div style={{ fontSize: 12, fontWeight: 700, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '.5px', marginBottom: 3 }}>Premium</div>
                             <div style={{ fontSize: 12, fontWeight: 600, color: '#94a3b8' }}>On request</div>
                           </div>
                         )}
@@ -140,9 +140,9 @@ export default function ProductList() {
                       {/* Coverage chips */}
                       {covKeys.length > 0 && (
                         <div style={{ display: 'flex', gap: 5, flexWrap: 'wrap' }}>
-                          {covKeys.includes('selfOnly')            && <span style={{ fontSize: 11, fontWeight: 600, background: '#fff', border: '1px solid #e2e8f0', borderRadius: 20, padding: '3px 10px', color: '#475569' }}>👤 Self</span>}
-                          {covKeys.includes('selfSpouse')          && <span style={{ fontSize: 11, fontWeight: 600, background: '#fff', border: '1px solid #e2e8f0', borderRadius: 20, padding: '3px 10px', color: '#475569' }}>👫 Self + Spouse</span>}
-                          {covKeys.includes('selfSpouse2Children') && <span style={{ fontSize: 11, fontWeight: 600, background: '#fff', border: '1px solid #e2e8f0', borderRadius: 20, padding: '3px 10px', color: '#475569' }}>👨‍👩‍👧 Family</span>}
+                          {covKeys.includes('selfOnly')            && <span style={{ fontSize: 13, fontWeight: 600, background: '#fff', border: '1px solid #e2e8f0', borderRadius: 20, padding: '3px 10px', color: '#475569' }}>👤 Self</span>}
+                          {covKeys.includes('selfSpouse')          && <span style={{ fontSize: 13, fontWeight: 600, background: '#fff', border: '1px solid #e2e8f0', borderRadius: 20, padding: '3px 10px', color: '#475569' }}>👫 Self + Spouse</span>}
+                          {covKeys.includes('selfSpouse2Children') && <span style={{ fontSize: 13, fontWeight: 600, background: '#fff', border: '1px solid #e2e8f0', borderRadius: 20, padding: '3px 10px', color: '#475569' }}>👨‍👩‍👧 Family</span>}
                         </div>
                       )}
                     </div>
@@ -154,7 +154,7 @@ export default function ProductList() {
                         onClick={() => navigate(`/product/${p.id}/edit`)}
                         style={{
                           padding: '6px 18px', borderRadius: 7, border: `1.5px solid ${tc.color}`,
-                          background: '#fff', color: tc.color, fontWeight: 700, fontSize: 12.5,
+                          background: '#fff', color: tc.color, fontWeight: 700, fontSize: 13.5,
                           cursor: 'pointer', fontFamily: 'inherit', transition: 'all .15s',
                           display: 'inline-flex', alignItems: 'center', gap: 6,
                         }}

@@ -834,14 +834,14 @@ export default function CampaignCreate() {
                         <div
                           style={{
                             fontWeight: 700,
-                            fontSize: 12.5,
+                            fontSize: 13.5,
                             color: "var(--text)",
                             lineHeight: 1.3,
                           }}
                         >
                           {p.name}
                         </div>
-                        <div style={{ fontSize: 11, color: "var(--text-3)" }}>
+                        <div style={{ fontSize: 13, color: "var(--text-3)" }}>
                           {p.provider}
                         </div>
                       </div>
@@ -992,7 +992,7 @@ export default function CampaignCreate() {
                                   border: "1px solid var(--brand-mid)",
                                   borderRadius: 20,
                                   padding: "3px 10px 3px 12px",
-                                  fontSize: 12.5,
+                                  fontSize: 13.5,
                                   fontWeight: 500,
                                 }}
                               >
@@ -1054,14 +1054,14 @@ export default function CampaignCreate() {
                             }}
                           />
                           <span
-                            style={{ fontSize: 11, color: "var(--text-3)" }}
+                            style={{ fontSize: 13, color: "var(--text-3)" }}
                           >
                             {form.selectedAssociations.length > 0
                               ? `${form.selectedAssociations.length} selected`
                               : ""}
                           </span>
                           <span
-                            style={{ color: "var(--text-3)", fontSize: 12 }}
+                            style={{ color: "var(--text-3)", fontSize: 13 }}
                           >
                             {assocOpen ? "▲" : "▼"}
                           </span>
@@ -1391,7 +1391,7 @@ export default function CampaignCreate() {
                         color: "#0369a1",
                         borderRadius: 6,
                         padding: "2px 9px",
-                        fontSize: 12,
+                        fontSize: 13,
                       }}
                     >
                       📞 Calling Agents
@@ -1477,12 +1477,12 @@ export default function CampaignCreate() {
                           fontSize: 13,
                         }}
                       />
-                      <span style={{ fontSize: 11, color: "var(--text-3)" }}>
+                      <span style={{ fontSize: 13, color: "var(--text-3)" }}>
                         {assignedCalling.size > 0
                           ? `${assignedCalling.size} selected`
                           : ""}
                       </span>
-                      <span style={{ color: "var(--text-3)", fontSize: 12 }}>
+                      <span style={{ color: "var(--text-3)", fontSize: 13 }}>
                         {callingOpen ? "▲" : "▼"}
                       </span>
                     </div>
@@ -1548,7 +1548,7 @@ export default function CampaignCreate() {
                                   </div>
                                   <div
                                     style={{
-                                      fontSize: 11.5,
+                                      fontSize: 13,
                                       color: "var(--text-3)",
                                     }}
                                   >
@@ -1583,7 +1583,7 @@ export default function CampaignCreate() {
                         color: "var(--brand)",
                         borderRadius: 6,
                         padding: "2px 9px",
-                        fontSize: 12,
+                        fontSize: 13,
                       }}
                     >
                       💼 Sales Agents
@@ -1669,12 +1669,12 @@ export default function CampaignCreate() {
                           fontSize: 13,
                         }}
                       />
-                      <span style={{ fontSize: 11, color: "var(--text-3)" }}>
+                      <span style={{ fontSize: 13, color: "var(--text-3)" }}>
                         {assignedSales.size > 0
                           ? `${assignedSales.size} selected`
                           : ""}
                       </span>
-                      <span style={{ color: "var(--text-3)", fontSize: 12 }}>
+                      <span style={{ color: "var(--text-3)", fontSize: 13 }}>
                         {salesOpen ? "▲" : "▼"}
                       </span>
                     </div>
@@ -1740,7 +1740,7 @@ export default function CampaignCreate() {
                                   </div>
                                   <div
                                     style={{
-                                      fontSize: 11.5,
+                                      fontSize: 13,
                                       color: "var(--text-3)",
                                     }}
                                   >

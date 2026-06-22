@@ -30,7 +30,7 @@ const REJECT_REASONS = [
 
 const LABEL = {
   display: "block",
-  fontSize: 11,
+  fontSize: 13,
   fontWeight: 700,
   color: "#64748b",
   textTransform: "uppercase",
@@ -107,7 +107,7 @@ function StatusPill({ status }) {
       style={{
         padding: "3px 12px",
         borderRadius: 99,
-        fontSize: 12,
+        fontSize: 13,
         fontWeight: 700,
         background: m.bg,
         color: m.color,
@@ -466,7 +466,7 @@ export default function Reconciliation() {
                   </div>
                   <div
                     style={{
-                      fontSize: 12,
+                      fontSize: 13,
                       color: "var(--text-3)",
                       marginTop: 4,
                     }}
@@ -595,7 +595,7 @@ export default function Reconciliation() {
                   </div>
                   <div
                     style={{
-                      fontSize: 12,
+                      fontSize: 13,
                       fontWeight: 600,
                       color: "#1a1628",
                       marginTop: 4,
@@ -697,7 +697,7 @@ export default function Reconciliation() {
                 marginLeft: 8,
                 padding: "2px 8px",
                 borderRadius: 99,
-                fontSize: 12,
+                fontSize: 13,
                 fontWeight: 800,
                 background: reviewTab === t.key ? t.color : "#e2e8f0",
                 color: reviewTab === t.key ? "#fff" : "#64748b",
@@ -737,7 +737,7 @@ export default function Reconciliation() {
                   ) : (
                     pendingRecords.map((rec) => (
                       <tr key={rec.id} style={{ background: "#f0f7ff" }}>
-                        <td style={{ fontFamily: "monospace", fontSize: 11.5, color: "#7c3aed" }}>{rec.proposalId}</td>
+                        <td style={{ fontFamily: "monospace", fontSize: 13, color: "#7c3aed" }}>{rec.proposalId}</td>
                         <td style={{ fontWeight: 500 }}>{rec.customerName}</td>
                         {payTypeFilter === "Cheque" && <>
                           <td style={{ fontFamily: "monospace", fontWeight: 600 }}>{rec.chequeNumber ?? "—"}</td>
@@ -811,14 +811,14 @@ export default function Reconciliation() {
                     <th rowSpan={2} style={{ verticalAlign: "bottom", minWidth: 230, position: "sticky", top: 0, background: "#fff", zIndex: 3 }}>Action</th>
                   </tr>
                   <tr>
-                    <th style={{ position: "sticky", top: 36, background: "#eff6ff", color: "#1e40af", fontSize: 11.5, zIndex: 3 }}>Cheque No.</th>
-                    <th style={{ position: "sticky", top: 36, background: "#eff6ff", color: "#1e40af", fontSize: 11.5, zIndex: 3 }}>Cheque Date</th>
-                    <th style={{ position: "sticky", top: 36, background: "#eff6ff", color: "#1e40af", fontSize: 11.5, zIndex: 3 }}>Clearing Date</th>
-                    <th style={{ position: "sticky", top: 36, background: "#eff6ff", color: "#1e40af", fontSize: 11.5, zIndex: 3 }}>Amount</th>
-                    <th style={{ position: "sticky", top: 36, background: "#fefce8", color: "#92400e", fontSize: 11.5, zIndex: 3 }}>Cheque No.</th>
-                    <th style={{ position: "sticky", top: 36, background: "#fefce8", color: "#92400e", fontSize: 11.5, zIndex: 3 }}>Cheque Date</th>
-                    <th style={{ position: "sticky", top: 36, background: "#fefce8", color: "#92400e", fontSize: 11.5, zIndex: 3 }}>Clearing Date</th>
-                    <th style={{ position: "sticky", top: 36, background: "#fefce8", color: "#92400e", fontSize: 11.5, zIndex: 3 }}>Amount</th>
+                    <th style={{ position: "sticky", top: 36, background: "#eff6ff", color: "#1e40af", fontSize: 13, zIndex: 3 }}>Cheque No.</th>
+                    <th style={{ position: "sticky", top: 36, background: "#eff6ff", color: "#1e40af", fontSize: 13, zIndex: 3 }}>Cheque Date</th>
+                    <th style={{ position: "sticky", top: 36, background: "#eff6ff", color: "#1e40af", fontSize: 13, zIndex: 3 }}>Clearing Date</th>
+                    <th style={{ position: "sticky", top: 36, background: "#eff6ff", color: "#1e40af", fontSize: 13, zIndex: 3 }}>Amount</th>
+                    <th style={{ position: "sticky", top: 36, background: "#fefce8", color: "#92400e", fontSize: 13, zIndex: 3 }}>Cheque No.</th>
+                    <th style={{ position: "sticky", top: 36, background: "#fefce8", color: "#92400e", fontSize: 13, zIndex: 3 }}>Cheque Date</th>
+                    <th style={{ position: "sticky", top: 36, background: "#fefce8", color: "#92400e", fontSize: 13, zIndex: 3 }}>Clearing Date</th>
+                    <th style={{ position: "sticky", top: 36, background: "#fefce8", color: "#92400e", fontSize: 13, zIndex: 3 }}>Amount</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -838,7 +838,7 @@ export default function Reconciliation() {
                           background: action === "accept" ? "#f0fdf4" : action === "reject" ? "#fff5f5" : "#fff",
                           borderLeft: `3px solid ${action === "accept" ? "#16a34a" : action === "reject" ? "#dc2626" : "transparent"}`,
                         }}>
-                          <td style={{ fontFamily: "monospace", fontSize: 11.5, color: "#7c3aed" }}>{rec.proposalId}</td>
+                          <td style={{ fontFamily: "monospace", fontSize: 13, color: "#7c3aed" }}>{rec.proposalId}</td>
                           <td style={{ fontWeight: 500 }}>{rec.customerName}</td>
                           <td style={{ background: "#f0f7ff", fontFamily: "monospace", fontWeight: 600 }}>{rec.chequeNumber}</td>
                           <td style={{ background: "#f0f7ff", whiteSpace: "nowrap" }}>{rec.chequeDate}</td>
@@ -872,13 +872,13 @@ export default function Reconciliation() {
                                     style={{ fontSize: 11, color: "#64748b", background: "none", border: "1px solid #e2e8f0", borderRadius: 5, padding: "2px 7px", cursor: "pointer" }}>Undo</button>
                                 </div>
                                 {!reason && (
-                                  <select className="field-select" style={{ fontSize: 12, padding: "4px 8px" }} value={reason}
+                                  <select className="field-select" style={{ fontSize: 13, padding: "4px 8px" }} value={reason}
                                     onChange={(e) => setReason(rec.id, e.target.value)}>
                                     <option value="">Select reason…</option>
                                     {REJECT_REASONS.map((r) => (<option key={r}>{r}</option>))}
                                   </select>
                                 )}
-                                {reason && <span style={{ fontSize: 11.5, color: "#64748b" }}>{reason}</span>}
+                                {reason && <span style={{ fontSize: 13, color: "#64748b" }}>{reason}</span>}
                               </div>
                             )}
                             {!action && (
@@ -907,12 +907,12 @@ export default function Reconciliation() {
                     <th rowSpan={2} style={{ verticalAlign: "bottom", minWidth: 230, position: "sticky", top: 0, background: "#fff", zIndex: 3 }}>Action</th>
                   </tr>
                   <tr>
-                    <th style={{ position: "sticky", top: 36, background: "#eff6ff", color: "#1e40af", fontSize: 11.5, zIndex: 3 }}>Transaction No.</th>
-                    <th style={{ position: "sticky", top: 36, background: "#eff6ff", color: "#1e40af", fontSize: 11.5, zIndex: 3 }}>Transaction Date</th>
-                    <th style={{ position: "sticky", top: 36, background: "#eff6ff", color: "#1e40af", fontSize: 11.5, zIndex: 3 }}>Amount</th>
-                    <th style={{ position: "sticky", top: 36, background: "#fefce8", color: "#92400e", fontSize: 11.5, zIndex: 3 }}>Transaction No.</th>
-                    <th style={{ position: "sticky", top: 36, background: "#fefce8", color: "#92400e", fontSize: 11.5, zIndex: 3 }}>Transaction Date</th>
-                    <th style={{ position: "sticky", top: 36, background: "#fefce8", color: "#92400e", fontSize: 11.5, zIndex: 3 }}>Amount</th>
+                    <th style={{ position: "sticky", top: 36, background: "#eff6ff", color: "#1e40af", fontSize: 13, zIndex: 3 }}>Transaction No.</th>
+                    <th style={{ position: "sticky", top: 36, background: "#eff6ff", color: "#1e40af", fontSize: 13, zIndex: 3 }}>Transaction Date</th>
+                    <th style={{ position: "sticky", top: 36, background: "#eff6ff", color: "#1e40af", fontSize: 13, zIndex: 3 }}>Amount</th>
+                    <th style={{ position: "sticky", top: 36, background: "#fefce8", color: "#92400e", fontSize: 13, zIndex: 3 }}>Transaction No.</th>
+                    <th style={{ position: "sticky", top: 36, background: "#fefce8", color: "#92400e", fontSize: 13, zIndex: 3 }}>Transaction Date</th>
+                    <th style={{ position: "sticky", top: 36, background: "#fefce8", color: "#92400e", fontSize: 13, zIndex: 3 }}>Amount</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -931,7 +931,7 @@ export default function Reconciliation() {
                           background: action === "accept" ? "#f0fdf4" : action === "reject" ? "#fff5f5" : "#fff",
                           borderLeft: `3px solid ${action === "accept" ? "#16a34a" : action === "reject" ? "#dc2626" : "transparent"}`,
                         }}>
-                          <td style={{ fontFamily: "monospace", fontSize: 11.5, color: "#7c3aed" }}>{rec.proposalId}</td>
+                          <td style={{ fontFamily: "monospace", fontSize: 13, color: "#7c3aed" }}>{rec.proposalId}</td>
                           <td style={{ fontWeight: 500 }}>{rec.customerName}</td>
                           {/* System record cells — blue tint */}
                           <td style={{ background: "#f0f7ff", fontFamily: "monospace", fontWeight: 600, color: "#0369a1" }}>{rec.transactionId}</td>
@@ -964,13 +964,13 @@ export default function Reconciliation() {
                                     style={{ fontSize: 11, color: "#64748b", background: "none", border: "1px solid #e2e8f0", borderRadius: 5, padding: "2px 7px", cursor: "pointer" }}>Undo</button>
                                 </div>
                                 {!reason && (
-                                  <select className="field-select" style={{ fontSize: 12, padding: "4px 8px" }} value={reason}
+                                  <select className="field-select" style={{ fontSize: 13, padding: "4px 8px" }} value={reason}
                                     onChange={(e) => setReason(rec.id, e.target.value)}>
                                     <option value="">Select reason…</option>
                                     {REJECT_REASONS.map((r) => (<option key={r}>{r}</option>))}
                                   </select>
                                 )}
-                                {reason && <span style={{ fontSize: 11.5, color: "#64748b" }}>{reason}</span>}
+                                {reason && <span style={{ fontSize: 13, color: "#64748b" }}>{reason}</span>}
                               </div>
                             )}
                             {!action && (
@@ -1061,7 +1061,7 @@ export default function Reconciliation() {
                                     <button type="button" onClick={() => setManualMatches((prev) => { const n = { ...prev }; delete n[up.proposalId]; return n; })}
                                       style={{ fontSize: 11, color: "#64748b", background: "none", border: "1px solid #e2e8f0", borderRadius: 5, padding: "2px 7px", cursor: "pointer" }}>Undo</button>
                                   </div>
-                                  {mm.reason && <span style={{ fontSize: 11.5, color: "#64748b" }}>{mm.reason}</span>}
+                                  {mm.reason && <span style={{ fontSize: 13, color: "#64748b" }}>{mm.reason}</span>}
                                 </div>
                               )}
                               {!mm && !isExpanded && (
@@ -1086,7 +1086,7 @@ export default function Reconciliation() {
                                 <div style={{ padding: "14px 16px" }}>
                                   {/* Pending record selector */}
                                   <div style={{ marginBottom: 12 }}>
-                                    <label style={{ fontSize: 12, fontWeight: 700, color: "#64748b", textTransform: "uppercase", letterSpacing: ".5px" }}>Select a pending record to compare:</label>
+                                    <label style={{ fontSize: 13, fontWeight: 700, color: "#64748b", textTransform: "uppercase", letterSpacing: ".5px" }}>Select a pending record to compare:</label>
                                     <select className="field-select" style={{ marginTop: 6, maxWidth: 400 }} value={selectedPending ?? ""} onChange={(e) => setSelectedPending(e.target.value ? Number(e.target.value) : null)}>
                                       <option value="">— Choose pending record —</option>
                                       {availablePending.map((p) => (
@@ -1180,7 +1180,7 @@ export default function Reconciliation() {
                                           </button>
                                           {/* Reject reason inline — shown after Reject is clicked */}
                                           {manualMatches[up.proposalId]?.action === "reject" && manualMatches[up.proposalId]?.reason === "" && (
-                                            <select className="field-select" style={{ fontSize: 12, padding: "4px 8px", maxWidth: 220 }} value=""
+                                            <select className="field-select" style={{ fontSize: 13, padding: "4px 8px", maxWidth: 220 }} value=""
                                               onChange={(e) => {
                                                 setManualMatches((prev) => ({ ...prev, [up.proposalId]: { ...prev[up.proposalId], reason: e.target.value } }));
                                                 setExpandedUnmatched(null); setSelectedPending(null);
@@ -1211,8 +1211,8 @@ export default function Reconciliation() {
                                 <td style={{ whiteSpace: "nowrap", color: "#1e40af", fontSize: 11.5 }}>{matchedPendingRec.neftDate ?? "—"}</td>
                               </>}
                               <td style={{ fontWeight: 600, color: "#1e40af", fontSize: 11.5 }}>{fmt(matchedPendingRec.premium)}</td>
-                              <td style={{ fontSize: 11.5, color: "#1e40af" }}>Pending (System)</td>
-                              <td style={{ fontSize: 11.5, color: "#64748b" }}>Matched ↑</td>
+                              <td style={{ fontSize: 13, color: "#1e40af" }}>Pending (System)</td>
+                              <td style={{ fontSize: 13, color: "#64748b" }}>Matched ↑</td>
                             </tr>
                           ),
                         ];
@@ -1412,7 +1412,7 @@ export default function Reconciliation() {
             </div>
             <div
               style={{
-                fontSize: 12,
+                fontSize: 13,
                 fontWeight: 700,
                 color: "#64748b",
                 marginTop: 6,
@@ -1577,13 +1577,13 @@ export default function Reconciliation() {
                     pg.slice.map((p) => (
                       <tr key={p.id}>
                         <td style={{ color: "var(--text-3)" }}>{p.id}</td>
-                        <td style={{ fontFamily: "monospace", fontSize: 12, color: "#7c3aed" }}>{p.paymentDetailId ?? "—"}</td>
+                        <td style={{ fontFamily: "monospace", fontSize: 13, color: "#7c3aed" }}>{p.paymentDetailId ?? "—"}</td>
                         <td style={{ fontFamily: "monospace", fontWeight: 600 }}>{p.chequeNumber ?? "—"}</td>
                         <td style={{ fontWeight: 600 }}>{fmt(p.premium)}</td>
                         <td>{p.bankName ?? "—"}</td>
                         <td style={{ whiteSpace: "nowrap" }}>{p.chequeDate ?? "—"}</td>
                         <td style={{ maxWidth: 160, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{p.inFavourOf ?? "—"}</td>
-                        <td style={{ fontSize: 11.5, color: "#7c3aed", maxWidth: 140, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                        <td style={{ fontSize: 13, color: "#7c3aed", maxWidth: 140, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
                           {p.chequePhotoDocumentName ?? "—"}
                         </td>
                         <td style={{ maxWidth: 160, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{p.chequeDepositLocation ?? "—"}</td>
@@ -1626,16 +1626,16 @@ export default function Reconciliation() {
                   ) : (
                     pg.slice.map((p) => (
                       <tr key={p.id}>
-                        <td style={{ fontFamily: "monospace", fontSize: 12, color: "#7c3aed" }}>{p.paymentDetailId ?? "—"}</td>
+                        <td style={{ fontFamily: "monospace", fontSize: 13, color: "#7c3aed" }}>{p.paymentDetailId ?? "—"}</td>
                         <td>{p.bankName ?? "—"}</td>
                         <td>{p.branchName ?? "—"}</td>
                         <td style={{ fontFamily: "monospace", fontSize: 12 }}>{p.accountNumber ?? "—"}</td>
                         <td style={{ fontWeight: 500 }}>{p.accountName ?? "—"}</td>
                         <td style={{ fontFamily: "monospace", fontSize: 12 }}>{p.ifscCode ?? "—"}</td>
-                        <td style={{ fontFamily: "monospace", fontSize: 12, color: "#0369a1" }}>{p.transactionId ?? "—"}</td>
+                        <td style={{ fontFamily: "monospace", fontSize: 13, color: "#0369a1" }}>{p.transactionId ?? "—"}</td>
                         <td style={{ fontWeight: 600 }}>{fmt(p.premium)}</td>
                         <td style={{ whiteSpace: "nowrap" }}>{p.neftDate ?? "—"}</td>
-                        <td style={{ fontSize: 11.5, color: "#7c3aed", maxWidth: 160, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                        <td style={{ fontSize: 13, color: "#7c3aed", maxWidth: 160, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
                           {p.neftReceiptDocumentName ?? "—"}
                         </td>
                         <td style={{ color: "var(--text-3)" }}>{p.userId ?? "—"}</td>
@@ -1676,19 +1676,19 @@ export default function Reconciliation() {
                         <td style={{ color: "var(--text-3)" }}>{p.id}</td>
                         <td style={{ fontWeight: 500 }}>{p.customerName}</td>
                         <td style={{ color: "#64748b" }}>{p.mobile}</td>
-                        <td style={{ fontFamily: "monospace", fontSize: 12, color: "#7c3aed" }}>{p.proposalId}</td>
+                        <td style={{ fontFamily: "monospace", fontSize: 13, color: "#7c3aed" }}>{p.proposalId}</td>
                         <td style={{ maxWidth: 180, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{p.product}</td>
                         <td style={{ color: "#64748b" }}>{p.icName}</td>
                         <td style={{ fontWeight: 600 }}>{fmt(p.premium)}</td>
                         <td>
-                          <span style={{ fontSize: 12, fontWeight: 600, padding: "2px 8px", borderRadius: 6, background: "#fef3c7", color: "#92400e" }}>
+                          <span style={{ fontSize: 13, fontWeight: 600, padding: "2px 8px", borderRadius: 6, background: "#fef3c7", color: "#92400e" }}>
                             {p.paymentMode}
                           </span>
                         </td>
                         <td>
-                          <span style={{ fontSize: 12, color: "var(--text-2)" }}>{p.paymentType}</span>
+                          <span style={{ fontSize: 13, color: "var(--text-2)" }}>{p.paymentType}</span>
                         </td>
-                        <td style={{ fontSize: 11.5, color: "var(--text-2)", maxWidth: 140, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                        <td style={{ fontSize: 13, color: "var(--text-2)", maxWidth: 140, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
                           {p.campaignName}
                         </td>
                         <td><StatusPill status={p.paymentStatus} /></td>

@@ -233,7 +233,7 @@ function StatusPill({ status, onClick }) {
       style={{
         padding: "3px 12px",
         borderRadius: 99,
-        fontSize: 12,
+        fontSize: 13,
         fontWeight: 700,
         background: m.bg,
         color: m.color,
@@ -259,7 +259,7 @@ function DetailRow({ label, value }) {
     <div style={{ display: "flex", flexDirection: "column", gap: 2 }}>
       <div
         style={{
-          fontSize: 11,
+          fontSize: 13,
           color: "#64748b",
           fontWeight: 600,
           textTransform: "uppercase",
@@ -338,7 +338,7 @@ function PaymentModal({ payment, onClose, onAccept, onReject }) {
           <div>
             <div
               style={{
-                fontSize: 11,
+                fontSize: 13,
                 color: "#64748b",
                 fontWeight: 600,
                 letterSpacing: ".5px",
@@ -402,7 +402,7 @@ function PaymentModal({ payment, onClose, onAccept, onReject }) {
             <div>
               <div
                 style={{
-                  fontSize: 11,
+                  fontSize: 13,
                   color: "#7c3aed",
                   fontWeight: 600,
                   letterSpacing: ".4px",
@@ -440,7 +440,7 @@ function PaymentModal({ payment, onClose, onAccept, onReject }) {
               >
                 <span>{m.icon}</span> {payment.method}
               </div>
-              <div style={{ fontSize: 12, color: "#64748b", marginTop: 6 }}>
+              <div style={{ fontSize: 13, color: "#64748b", marginTop: 6 }}>
                 Offline Payment
               </div>
             </div>
@@ -486,7 +486,7 @@ function PaymentModal({ payment, onClose, onAccept, onReject }) {
             >
               <div
                 style={{
-                  fontSize: 12,
+                  fontSize: 13,
                   fontWeight: 700,
                   color: "#dc2626",
                   marginBottom: 4,
@@ -591,7 +591,7 @@ function PaymentModal({ payment, onClose, onAccept, onReject }) {
               <div style={{ marginBottom: 12 }}>
                 <label
                   style={{
-                    fontSize: 12,
+                    fontSize: 13,
                     fontWeight: 600,
                     color: "#64748b",
                     display: "block",
@@ -615,7 +615,7 @@ function PaymentModal({ payment, onClose, onAccept, onReject }) {
               <div style={{ marginBottom: 16 }}>
                 <label
                   style={{
-                    fontSize: 12,
+                    fontSize: 13,
                     fontWeight: 600,
                     color: "#64748b",
                     display: "block",
@@ -751,7 +751,7 @@ const ASSOCIATIONS_LIST = [
 
 const TOP_LABEL = {
   display: "block",
-  fontSize: 11,
+  fontSize: 13,
   fontWeight: 700,
   color: "#64748b",
   textTransform: "uppercase",
@@ -959,7 +959,7 @@ export default function UpdatePayment() {
             </div>
             <div
               style={{
-                fontSize: 12,
+                fontSize: 13,
                 fontWeight: 700,
                 color: "#64748b",
                 marginTop: 6,
@@ -989,7 +989,7 @@ export default function UpdatePayment() {
               <label
                 style={{
                   display: "block",
-                  fontSize: 11.5,
+                  fontSize: 13,
                   fontWeight: 700,
                   color: "#64748b",
                   marginBottom: 5,
@@ -1011,7 +1011,7 @@ export default function UpdatePayment() {
               <label
                 style={{
                   display: "block",
-                  fontSize: 11.5,
+                  fontSize: 13,
                   fontWeight: 700,
                   color: "#64748b",
                   marginBottom: 5,
@@ -1036,7 +1036,7 @@ export default function UpdatePayment() {
               <label
                 style={{
                   display: "block",
-                  fontSize: 11.5,
+                  fontSize: 13,
                   fontWeight: 700,
                   color: "#64748b",
                   marginBottom: 5,
@@ -1065,7 +1065,7 @@ export default function UpdatePayment() {
                 <button
                   type="button"
                   className="btn btn-ghost"
-                  style={{ fontSize: 12, padding: "5px 12px", flexShrink: 0 }}
+                  style={{ fontSize: 13, padding: "5px 12px", flexShrink: 0 }}
                   onClick={() => {
                     setMethodFilter("");
                     setCampaignFilter("");
@@ -1130,7 +1130,7 @@ export default function UpdatePayment() {
                         <td
                           style={{
                             fontFamily: "monospace",
-                            fontSize: 12,
+                            fontSize: 13,
                             color: "#7c3aed",
                           }}
                         >
@@ -1141,7 +1141,7 @@ export default function UpdatePayment() {
                           style={{
                             color: "#64748b",
                             fontFamily: "monospace",
-                            fontSize: 12,
+                            fontSize: 13,
                           }}
                         >
                           {p.policyNo}
@@ -1156,7 +1156,7 @@ export default function UpdatePayment() {
                               color: mm.color,
                               borderRadius: 6,
                               padding: "2px 9px",
-                              fontSize: 12,
+                              fontSize: 13,
                               fontWeight: 600,
                             }}
                           >
@@ -1168,7 +1168,7 @@ export default function UpdatePayment() {
                         <td
                           style={{
                             fontFamily: "monospace",
-                            fontSize: 11.5,
+                            fontSize: 13,
                             color: "#64748b",
                           }}
                         >

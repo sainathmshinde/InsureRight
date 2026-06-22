@@ -353,8 +353,8 @@ export default function CampaignEdit() {
                             {sel && <span style={{ color: m.color, fontSize: 14, fontWeight: 800, lineHeight: 1 }}>✓</span>}
                           </div>
                         </div>
-                        <div style={{ fontWeight: 700, fontSize: 12.5, color: "var(--text)", lineHeight: 1.3 }}>{p.name}</div>
-                        <div style={{ fontSize: 11, color: "var(--text-3)" }}>{p.provider}</div>
+                        <div style={{ fontWeight: 700, fontSize: 13.5, color: "var(--text)", lineHeight: 1.3 }}>{p.name}</div>
+                        <div style={{ fontSize: 13, color: "var(--text-3)" }}>{p.provider}</div>
                       </div>
                     );
                   })}
@@ -443,7 +443,7 @@ export default function CampaignEdit() {
                           {form.selectedAssociations.map((aid) => {
                             const assoc = ASSOCIATIONS.find((a) => a.id === aid);
                             return (
-                              <span key={aid} style={{ display: "inline-flex", alignItems: "center", gap: 5, background: "var(--brand-light)", color: "var(--brand)", border: "1px solid var(--brand-mid)", borderRadius: 20, padding: "3px 10px 3px 12px", fontSize: 12.5, fontWeight: 500 }}>
+                              <span key={aid} style={{ display: "inline-flex", alignItems: "center", gap: 5, background: "var(--brand-light)", color: "var(--brand)", border: "1px solid var(--brand-mid)", borderRadius: 20, padding: "3px 10px 3px 12px", fontSize: 13.5, fontWeight: 500 }}>
                                 {assoc?.name ?? aid}
                                 <button type="button" onClick={() => toggleAssoc(aid)} style={{ background: "none", border: "none", cursor: "pointer", color: "var(--brand)", fontSize: 14, lineHeight: 1, padding: 0 }}>×</button>
                               </span>
@@ -464,8 +464,8 @@ export default function CampaignEdit() {
                             onFocus={() => setAssocOpen(true)}
                             style={{ flex: 1, border: "none", outline: "none", background: "transparent", fontSize: 13, fontFamily: "inherit" }}
                           />
-                          <span style={{ fontSize: 11, color: "var(--text-3)" }}>{form.selectedAssociations.length > 0 ? `${form.selectedAssociations.length} selected` : ""}</span>
-                          <span style={{ color: "var(--text-3)", fontSize: 12 }}>{assocOpen ? "▲" : "▼"}</span>
+                          <span style={{ fontSize: 13, color: "var(--text-3)" }}>{form.selectedAssociations.length > 0 ? `${form.selectedAssociations.length} selected` : ""}</span>
+                          <span style={{ color: "var(--text-3)", fontSize: 13 }}>{assocOpen ? "▲" : "▼"}</span>
                         </div>
                         {assocOpen && (
                           <>
@@ -605,8 +605,8 @@ export default function CampaignEdit() {
                   <div style={{ position: "relative" }}>
                     <div style={{ display: "flex", alignItems: "center", gap: 8, border: "1px solid var(--border)", borderRadius: "var(--r-md)", padding: "8px 12px", background: "var(--surface)", cursor: "text" }} onClick={() => setCallingOpen(true)}>
                       <input type="text" placeholder="Search calling agents…" value={callingSearch} onChange={(e) => { setCallingSearch(e.target.value); setCallingOpen(true); }} onFocus={() => setCallingOpen(true)} style={{ flex: 1, border: "none", outline: "none", background: "transparent", fontSize: 13 }} />
-                      <span style={{ fontSize: 11, color: "var(--text-3)" }}>{assignedCalling.size > 0 ? `${assignedCalling.size} selected` : ""}</span>
-                      <span style={{ color: "var(--text-3)", fontSize: 12 }}>{callingOpen ? "▲" : "▼"}</span>
+                      <span style={{ fontSize: 13, color: "var(--text-3)" }}>{assignedCalling.size > 0 ? `${assignedCalling.size} selected` : ""}</span>
+                      <span style={{ color: "var(--text-3)", fontSize: 13 }}>{callingOpen ? "▲" : "▼"}</span>
                     </div>
                     {callingOpen && (
                       <>
@@ -620,7 +620,7 @@ export default function CampaignEdit() {
                                 <input type="checkbox" checked={assignedCalling.has(a.id)} onChange={() => toggleCalling(a.id)} />
                                 <div>
                                   <div style={{ fontWeight: 500 }}>{a.name}</div>
-                                  <div style={{ fontSize: 11.5, color: "var(--text-3)" }}>{a.broker} · {a.posLicense}</div>
+                                  <div style={{ fontSize: 13, color: "var(--text-3)" }}>{a.broker} · {a.posLicense}</div>
                                 </div>
                               </label>
                             ))
@@ -649,8 +649,8 @@ export default function CampaignEdit() {
                   <div style={{ position: "relative" }}>
                     <div style={{ display: "flex", alignItems: "center", gap: 8, border: "1px solid var(--border)", borderRadius: "var(--r-md)", padding: "8px 12px", background: "var(--surface)", cursor: "text" }} onClick={() => setSalesOpen(true)}>
                       <input type="text" placeholder="Search sales agents…" value={salesSearch} onChange={(e) => { setSalesSearch(e.target.value); setSalesOpen(true); }} onFocus={() => setSalesOpen(true)} style={{ flex: 1, border: "none", outline: "none", background: "transparent", fontSize: 13 }} />
-                      <span style={{ fontSize: 11, color: "var(--text-3)" }}>{assignedSales.size > 0 ? `${assignedSales.size} selected` : ""}</span>
-                      <span style={{ color: "var(--text-3)", fontSize: 12 }}>{salesOpen ? "▲" : "▼"}</span>
+                      <span style={{ fontSize: 13, color: "var(--text-3)" }}>{assignedSales.size > 0 ? `${assignedSales.size} selected` : ""}</span>
+                      <span style={{ color: "var(--text-3)", fontSize: 13 }}>{salesOpen ? "▲" : "▼"}</span>
                     </div>
                     {salesOpen && (
                       <>
@@ -664,7 +664,7 @@ export default function CampaignEdit() {
                                 <input type="checkbox" checked={assignedSales.has(a.id)} onChange={() => toggleSales(a.id)} />
                                 <div>
                                   <div style={{ fontWeight: 500 }}>{a.name}</div>
-                                  <div style={{ fontSize: 11.5, color: "var(--text-3)" }}>{a.broker} · {a.posLicense}</div>
+                                  <div style={{ fontSize: 13, color: "var(--text-3)" }}>{a.broker} · {a.posLicense}</div>
                                 </div>
                               </label>
                             ))

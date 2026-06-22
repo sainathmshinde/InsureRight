@@ -245,7 +245,7 @@ export function DocCard({ type, data, customerName }) {
           <span style={{ fontSize: 26 }}>{isAadhaar ? '🪪' : '💳'}</span>
           <div>
             <div style={{ color: '#fff', fontWeight: 700, fontSize: 15, letterSpacing: 0.3 }}>{isAadhaar ? 'Aadhaar Card' : 'PAN Card'}</div>
-            <div style={{ color: 'rgba(255,255,255,.75)', fontSize: 11.5 }}>{isAadhaar ? 'Unique Identification Authority of India' : 'Income Tax Department, Govt. of India'}</div>
+            <div style={{ color: 'rgba(255,255,255,.75)', fontSize: 13 }}>{isAadhaar ? 'Unique Identification Authority of India' : 'Income Tax Department, Govt. of India'}</div>
           </div>
         </div>
         <span style={{ fontSize: 12, fontWeight: 600, padding: '4px 10px', borderRadius: 99, background: sc.bg, color: sc.text, border: `1px solid ${sc.border}` }}>{data.status}</span>
@@ -404,7 +404,7 @@ export default function Customer360() {
                 <tbody>
                   {c.policies.map(p => (
                     <tr key={p.id}>
-                      <td style={{ fontFamily: 'monospace', fontSize: 12.5 }}>{p.id}</td>
+                      <td style={{ fontFamily: 'monospace', fontSize: 13.5 }}>{p.id}</td>
                       <td><span className={`badge ${p.type === 'Health' ? 'badge-green' : 'badge-blue'}`}>{p.type}</span></td>
                       <td>{p.ic}</td>
                       <td style={{ fontWeight: 500 }}>₹{p.premium.toLocaleString('en-IN')}</td>
@@ -430,7 +430,7 @@ export default function Customer360() {
                       <td>{p.date}</td>
                       <td style={{ fontWeight: 500 }}>₹{p.amount.toLocaleString('en-IN')}</td>
                       <td><span className="badge badge-blue">{p.mode}</span></td>
-                      <td style={{ fontFamily: 'monospace', fontSize: 12.5 }}>{p.txnId}</td>
+                      <td style={{ fontFamily: 'monospace', fontSize: 13.5 }}>{p.txnId}</td>
                       <td><span className={`badge ${p.status === 'Success' ? 'badge-green' : 'badge-red'}`}>{p.status}</span></td>
                     </tr>
                   ))}

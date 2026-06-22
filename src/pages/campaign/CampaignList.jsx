@@ -48,7 +48,7 @@ export default function CampaignList() {
     { key: 'name', label: 'Campaign Name', style: { fontWeight: 500, minWidth: 220 } },
     { key: 'period', label: 'Period',
       render: row => (
-        <div style={{ display: 'flex', alignItems: 'center', gap: 5, fontSize: 12.5, color: 'var(--text-2)', whiteSpace: 'nowrap' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 5, fontSize: 13.5, color: 'var(--text-2)', whiteSpace: 'nowrap' }}>
           <CalendarIcon size={13} color="var(--text-3)" />
           {row.startDate} → {row.endDate}
         </div>
@@ -81,12 +81,12 @@ export default function CampaignList() {
         <div className="card-body">
           <div style={{ display: 'flex', gap: 14, alignItems: 'flex-end', marginBottom: 18, flexWrap: 'wrap' }}>
             <div style={{ flex: '1 1 220px' }}>
-              <label style={{ display: 'block', fontSize: 11.5, fontWeight: 700, color: '#64748b', marginBottom: 5, textTransform: 'uppercase', letterSpacing: '.4px' }}>Campaign Name</label>
+              <label style={{ display: 'block', fontSize: 13, fontWeight: 700, color: '#64748b', marginBottom: 5, textTransform: 'uppercase', letterSpacing: '.4px' }}>Campaign Name</label>
               <input className="field-input filter-search" style={{ width: '100%' }} placeholder="Search by campaign name…"
                 value={search} onChange={e => handle(setSearch)(e.target.value)} />
             </div>
             <div style={{ flex: '0 0 160px' }}>
-              <label style={{ display: 'block', fontSize: 11.5, fontWeight: 700, color: '#64748b', marginBottom: 5, textTransform: 'uppercase', letterSpacing: '.4px' }}>Status</label>
+              <label style={{ display: 'block', fontSize: 13, fontWeight: 700, color: '#64748b', marginBottom: 5, textTransform: 'uppercase', letterSpacing: '.4px' }}>Status</label>
               <select className="field-select" style={{ width: '100%' }} value={statusFilter} onChange={e => handle(setStatus)(e.target.value)}>
                 <option value="">All Status</option>
                 <option>Active</option>
@@ -97,7 +97,7 @@ export default function CampaignList() {
               </select>
             </div>
             <div style={{ flex: '0 0 150px' }}>
-              <label style={{ display: 'block', fontSize: 11.5, fontWeight: 700, color: '#64748b', marginBottom: 5, textTransform: 'uppercase', letterSpacing: '.4px' }}>Visibility</label>
+              <label style={{ display: 'block', fontSize: 13, fontWeight: 700, color: '#64748b', marginBottom: 5, textTransform: 'uppercase', letterSpacing: '.4px' }}>Visibility</label>
               <select className="field-select" style={{ width: '100%' }} value={openFilter} onChange={e => handle(setOpen)(e.target.value)}>
                 <option value="">Open / Closed</option>
                 <option value="true">Open</option>

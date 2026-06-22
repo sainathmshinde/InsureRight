@@ -303,7 +303,7 @@ export default function CustomerEdit() {
                   <span style={{ fontSize: 18 }}>✅</span>
                   <div>
                     <div style={{ fontWeight: 600, fontSize: 13.5, color: '#166534' }}>Documents Resubmitted</div>
-                    <div style={{ fontSize: 12.5, color: '#15803d', marginTop: 2 }}>KYC is pending re-verification by the broker.</div>
+                    <div style={{ fontSize: 13.5, color: '#15803d', marginTop: 2 }}>KYC is pending re-verification by the broker.</div>
                   </div>
                 </div>
               ) : liveKyc === 'Verified' ? (
@@ -311,7 +311,7 @@ export default function CustomerEdit() {
                   <span style={{ fontSize: 18 }}>✅</span>
                   <div>
                     <div style={{ fontWeight: 600, fontSize: 13.5, color: '#166534' }}>KYC Verified</div>
-                    <div style={{ fontSize: 12.5, color: '#15803d', marginTop: 2 }}>Documents approved. Re-upload to update.</div>
+                    <div style={{ fontSize: 13.5, color: '#15803d', marginTop: 2 }}>Documents approved. Re-upload to update.</div>
                   </div>
                 </div>
               ) : liveKyc === 'Rejected' ? (
@@ -319,7 +319,7 @@ export default function CustomerEdit() {
                   <span style={{ fontSize: 18 }}>❌</span>
                   <div>
                     <div style={{ fontWeight: 600, fontSize: 13.5, color: '#991b1b' }}>KYC Rejected</div>
-                    <div style={{ fontSize: 12.5, color: '#b91c1c', marginTop: 2 }}>
+                    <div style={{ fontSize: 13.5, color: '#b91c1c', marginTop: 2 }}>
                       Your documents were rejected. Please re-upload valid Aadhaar and PAN documents below and submit for re-verification.
                     </div>
                   </div>
@@ -329,7 +329,7 @@ export default function CustomerEdit() {
                   <span style={{ fontSize: 18 }}>⏳</span>
                   <div>
                     <div style={{ fontWeight: 600, fontSize: 13.5, color: '#92400e' }}>KYC Pending Review</div>
-                    <div style={{ fontSize: 12.5, color: '#b45309', marginTop: 2 }}>Documents submitted and awaiting verification.</div>
+                    <div style={{ fontSize: 13.5, color: '#b45309', marginTop: 2 }}>Documents submitted and awaiting verification.</div>
                   </div>
                 </div>
               )}

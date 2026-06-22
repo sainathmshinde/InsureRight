@@ -279,7 +279,7 @@ function CustomerStrip({ customer, onChangeCustomer, canChange = true }) {
         <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
           <span style={{ fontWeight: 700, fontSize: 14.5, color: "#1e293b" }}>{customer.name}</span>
           <span style={{
-            fontSize: 11, fontWeight: 700, padding: "2px 8px", borderRadius: 20,
+            fontSize: 13, fontWeight: 700, padding: "2px 8px", borderRadius: 20,
             background: customer.kyc === "Verified" ? "#dcfce7" : customer.kyc === "Pending" ? "#fef3c7" : "#fee2e2",
             color: kycColor,
             border: `1px solid ${kycColor}55`,
@@ -287,7 +287,7 @@ function CustomerStrip({ customer, onChangeCustomer, canChange = true }) {
             {customer.kyc === "Verified" ? "✓" : "●"} {customer.kyc}
           </span>
         </div>
-        <div className="bp-cust-detail" style={{ fontSize: 12, color: "#64748b", marginTop: 3, display: "flex", gap: 10, flexWrap: "wrap" }}>
+        <div className="bp-cust-detail" style={{ fontSize: 13, color: "#64748b", marginTop: 3, display: "flex", gap: 10, flexWrap: "wrap" }}>
           <span>📱 {customer.mobile}</span>
           <span className="bp-cust-email">✉ {customer.email}</span>
         </div>
@@ -318,7 +318,7 @@ function CustomerStrip({ customer, onChangeCustomer, canChange = true }) {
 
 // ── KYC Warning ────────────────────────────────────────────────────────────
 const PAY_LABEL = {
-  fontSize: 11, fontWeight: 600, color: 'var(--text-3)',
+  fontSize: 13, fontWeight: 600, color: 'var(--text-3)',
   textTransform: 'uppercase', letterSpacing: '0.05em', display: 'block',
 };
 
@@ -805,7 +805,7 @@ export default function BuyPolicy() {
                 autoFocus
               />
             </div>
-            <span style={{ fontSize: 12.5, color: "var(--text-3)", whiteSpace: "nowrap", background: "var(--surface-2)", border: "1px solid var(--border)", borderRadius: 20, padding: "4px 12px" }}>
+            <span style={{ fontSize: 13.5, color: "var(--text-3)", whiteSpace: "nowrap", background: "var(--surface-2)", border: "1px solid var(--border)", borderRadius: 20, padding: "4px 12px" }}>
               {filteredCustomers.length} customers
             </span>
             {!isSalesAgent && (
@@ -855,17 +855,17 @@ export default function BuyPolicy() {
                             {c.name}
                           </div>
                           {isSelected && (
-                            <div style={{ width: 20, height: 20, borderRadius: "50%", background: "var(--brand)", color: "#fff", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 11, fontWeight: 700, flexShrink: 0 }}>✓</div>
+                            <div style={{ width: 20, height: 20, borderRadius: "50%", background: "var(--brand)", color: "#fff", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, fontWeight: 700, flexShrink: 0 }}>✓</div>
                           )}
                         </div>
                         <div style={{ display: "flex", alignItems: "center", gap: 5, marginBottom: 6 }}>
-                          <span style={{ fontSize: 11, color: "var(--text-3)", fontWeight: 500 }}>KYC:</span>
+                          <span style={{ fontSize: 13, color: "var(--text-3)", fontWeight: 500 }}>KYC:</span>
                           <StatusBadge status={c.kyc} />
                         </div>
                         <div style={{ display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap" }}>
-                          <span style={{ fontSize: 12, color: "var(--text-2)", whiteSpace: "nowrap" }}>📱 {c.mobile}</span>
-                          <span style={{ fontSize: 11, color: "var(--text-3)" }}>·</span>
-                          <span style={{ fontSize: 12, color: "var(--blue)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", minWidth: 0 }}>✉ {c.email}</span>
+                          <span style={{ fontSize: 13, color: "var(--text-2)", whiteSpace: "nowrap" }}>📱 {c.mobile}</span>
+                          <span style={{ fontSize: 13, color: "var(--text-3)" }}>·</span>
+                          <span style={{ fontSize: 13, color: "var(--blue)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", minWidth: 0 }}>✉ {c.email}</span>
                         </div>
                       </div>
                     </div>
@@ -951,7 +951,7 @@ export default function BuyPolicy() {
                       <div style={{ width: 34, height: 34, borderRadius: 8, background: "#fff", border: "1px solid var(--border)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 17, flexShrink: 0 }}>{icon}</div>
                       <div style={{ flex: 1, minWidth: 0 }}>
                         <div style={{ fontWeight: 800, fontSize: 13.5, color: "#7c3aed", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{p.name}</div>
-                        <div style={{ fontSize: 11.5, color: "var(--text-3)" }}>{p.provider} · <span style={{ fontFamily: "monospace" }}>{p.code}</span></div>
+                        <div style={{ fontSize: 13, color: "var(--text-3)" }}>{p.provider} · <span style={{ fontFamily: "monospace" }}>{p.code}</span></div>
                       </div>
                     </div>
 
@@ -961,7 +961,7 @@ export default function BuyPolicy() {
                       {chartRows.length > 0 && (
                         <div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
                           <div style={{ minWidth: 160 }}>
-                            <div style={{ fontSize: 11, color: "var(--text-3)", fontWeight: 600, textTransform: "uppercase", letterSpacing: ".4px", marginBottom: 5 }}>Sum Insured</div>
+                            <div style={{ fontSize: 13, color: "var(--text-3)", fontWeight: 600, textTransform: "uppercase", letterSpacing: ".4px", marginBottom: 5 }}>Sum Insured</div>
                             <select className="field-select" value={sel.sumInsured}
                               onChange={e => {
                                 const si    = e.target.value;
@@ -978,7 +978,7 @@ export default function BuyPolicy() {
                           </div>
                           {hasAB && rowBands.length > 0 && (
                             <div style={{ minWidth: 130 }}>
-                              <div style={{ fontSize: 11, color: "var(--text-3)", fontWeight: 600, textTransform: "uppercase", letterSpacing: ".4px", marginBottom: 5 }}>Age Band</div>
+                              <div style={{ fontSize: 13, color: "var(--text-3)", fontWeight: 600, textTransform: "uppercase", letterSpacing: ".4px", marginBottom: 5 }}>Age Band</div>
                               <select className="field-select" value={sel.ageBandId}
                                 onChange={e => {
                                   const band = e.target.value;
@@ -998,7 +998,7 @@ export default function BuyPolicy() {
                       {/* Coverage options */}
                       {covOpts.length > 0 && (
                         <div>
-                          <div style={{ fontSize: 11, color: "var(--text-3)", fontWeight: 600, textTransform: "uppercase", letterSpacing: ".4px", marginBottom: 7 }}>Coverage Type</div>
+                          <div style={{ fontSize: 13, color: "var(--text-3)", fontWeight: 600, textTransform: "uppercase", letterSpacing: ".4px", marginBottom: 7 }}>Coverage Type</div>
                           <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
                             {covOpts.map(opt => {
                               const active = sel.coverage === opt.key;
@@ -1029,7 +1029,7 @@ export default function BuyPolicy() {
                       {/* Insured Members — driven by coverage selection */}
                       {neededTypes.length > 0 && (
                         <div style={{ background: "var(--surface-2)", borderRadius: 10, padding: "12px 14px" }}>
-                          <div style={{ fontSize: 11, color: "var(--text-3)", fontWeight: 600, textTransform: "uppercase", letterSpacing: ".5px", marginBottom: 10 }}>
+                          <div style={{ fontSize: 13, color: "var(--text-3)", fontWeight: 600, textTransform: "uppercase", letterSpacing: ".5px", marginBottom: 10 }}>
                             Insured Members
                           </div>
                           <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
@@ -1052,7 +1052,7 @@ export default function BuyPolicy() {
                                   <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
                                     <span style={{ fontSize: 17 }}>{slot?.icon}</span>
                                     <div>
-                                      <div style={{ fontSize: 12.5, fontWeight: 700, color: "var(--text)", lineHeight: 1.2 }}>{slot?.label}</div>
+                                      <div style={{ fontSize: 13.5, fontWeight: 700, color: "var(--text)", lineHeight: 1.2 }}>{slot?.label}</div>
                                       {isSelf && <div style={{ fontSize: 10.5, color: "var(--text-3)", fontWeight: 600 }}>Primary</div>}
                                       {age !== null && <div style={{ fontSize: 10.5, color: "var(--text-3)" }}>{age} yrs</div>}
                                     </div>
@@ -1063,7 +1063,7 @@ export default function BuyPolicy() {
                                     value={m?.name ?? ""}
                                     onChange={e => updateMember(type, "name", e.target.value)}
                                     disabled={isSelf}
-                                    style={{ fontSize: 12.5, padding: "6px 9px", width: "100%", borderColor: missingName ? "#f59e0b" : undefined }}
+                                    style={{ fontSize: 13.5, padding: "6px 9px", width: "100%", borderColor: missingName ? "#f59e0b" : undefined }}
                                   />
                                   <input
                                     type="date"
@@ -1071,15 +1071,15 @@ export default function BuyPolicy() {
                                     value={m?.dob ?? ""}
                                     onChange={e => updateMember(type, "dob", e.target.value)}
                                     disabled={isSelf}
-                                    style={{ fontSize: 12.5, padding: "6px 9px", width: "100%", borderColor: missingDob ? "#f59e0b" : undefined }}
+                                    style={{ fontSize: 13.5, padding: "6px 9px", width: "100%", borderColor: missingDob ? "#f59e0b" : undefined }}
                                   />
                                   {isSelf ? (
                                     <input className="field-input" value={m?.gender ?? ""} disabled
-                                      style={{ fontSize: 12.5, padding: "6px 9px", width: "100%", background: "#f3f4f6", color: "var(--text-2)" }} />
+                                      style={{ fontSize: 13.5, padding: "6px 9px", width: "100%", background: "#f3f4f6", color: "var(--text-2)" }} />
                                   ) : (
                                     <select className="field-select" value={m?.gender ?? ""}
                                       onChange={e => updateMember(type, "gender", e.target.value)}
-                                      style={{ fontSize: 12.5, padding: "6px 9px", width: "100%" }}>
+                                      style={{ fontSize: 13.5, padding: "6px 9px", width: "100%" }}>
                                       <option value="">Gender</option>
                                       <option>Male</option>
                                       <option>Female</option>
@@ -1091,7 +1091,7 @@ export default function BuyPolicy() {
                             })}
                           </div>
                           {hasMissingMembers && (
-                            <div style={{ display: "flex", alignItems: "center", gap: 6, marginTop: 8, fontSize: 12, color: "#92400e", fontWeight: 500, background: "#fffbeb", border: "1px solid #f59e0b", borderRadius: 6, padding: "6px 10px" }}>
+                            <div style={{ display: "flex", alignItems: "center", gap: 6, marginTop: 8, fontSize: 13, color: "#92400e", fontWeight: 500, background: "#fffbeb", border: "1px solid #f59e0b", borderRadius: 6, padding: "6px 10px" }}>
                               ⚠ Please fill in the highlighted member details before continuing
                             </div>
                           )}
@@ -1102,7 +1102,7 @@ export default function BuyPolicy() {
                     {/* Premium footer */}
                     {sel.premium != null && (
                       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "10px 16px", background: "var(--surface-2)", borderTop: "1px solid var(--border)" }}>
-                        <span style={{ fontSize: 12, color: "var(--text-3)", fontWeight: 500 }}>Annual Premium</span>
+                        <span style={{ fontSize: 13, color: "var(--text-3)", fontWeight: 500 }}>Annual Premium</span>
                         <span style={{ fontSize: 16, fontWeight: 800, color: "var(--brand)" }}>₹{sel.premium.toLocaleString("en-IN")}</span>
                       </div>
                     )}
@@ -1131,14 +1131,14 @@ export default function BuyPolicy() {
               }}>
                 {hasPremium ? (
                   <div style={{ flex: 1, minWidth: 0 }}>
-                    <div style={{ fontSize: 11.5, color: "rgba(255,255,255,.94)", fontWeight: 600, marginBottom: 2, textTransform: "uppercase", letterSpacing: ".4px" }}>
+                    <div style={{ fontSize: 13, color: "rgba(255,255,255,.94)", fontWeight: 600, marginBottom: 2, textTransform: "uppercase", letterSpacing: ".4px" }}>
                       {cart.length} product{cart.length > 1 ? "s" : ""} · Total Premium
                     </div>
                     <div style={{ display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap" }}>
                       <span style={{ fontSize: 24, fontWeight: 800, color: "#fff" }}>
                         ₹{cart.reduce((s, x) => s + (psel(x.id).premium ?? 0), 0).toLocaleString("en-IN")}
                       </span>
-                      <span style={{ fontSize: 11.5, color: "rgba(255,255,255,.94)" }}>
+                      <span style={{ fontSize: 13, color: "rgba(255,255,255,.94)" }}>
                         {cart.map(x => `${x.name.split(" ")[0]}: ₹${(psel(x.id).premium ?? 0).toLocaleString("en-IN")}`).join("  +  ")}
                       </span>
                     </div>
@@ -1235,7 +1235,7 @@ export default function BuyPolicy() {
                       <div style={{ display: "flex", alignItems: "flex-start", gap: 10 }}>
                         <div style={{ width: 40, height: 40, borderRadius: 10, background: tc.bg, border: `1.5px solid ${tc.border}`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20, flexShrink: 0 }}>{icon}</div>
                         <div style={{ flex: 1, minWidth: 0 }}>
-                          <div style={{ fontSize: 11, fontWeight: 700, color: tc.color, letterSpacing: ".2px", marginBottom: 4, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{p.provider}</div>
+                          <div style={{ fontSize: 13, fontWeight: 700, color: tc.color, letterSpacing: ".2px", marginBottom: 4, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{p.provider}</div>
                           <div style={{ display: "flex", alignItems: "center", gap: 6, flexWrap: "wrap" }}>
                             <span style={{ fontSize: 10.5, fontWeight: 700, background: tc.bg, color: tc.color, border: `1px solid ${tc.border}`, borderRadius: 4, padding: "1px 7px" }}>{p.policyType}</span>
                             <span style={{ fontSize: 10.5, fontFamily: "monospace", color: "#94a3b8" }}>{p.code}</span>
@@ -1243,7 +1243,7 @@ export default function BuyPolicy() {
                           </div>
                         </div>
                         {inCart
-                          ? <div style={{ width: 24, height: 24, borderRadius: "50%", background: tc.color, color: "#fff", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12, fontWeight: 700, flexShrink: 0 }}>✓</div>
+                          ? <div style={{ width: 24, height: 24, borderRadius: "50%", background: tc.color, color: "#fff", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, fontWeight: 700, flexShrink: 0 }}>✓</div>
                           : <input type="checkbox" checked={false} onChange={() => toggleCart(p)} onClick={e => e.stopPropagation()} style={{ width: 17, height: 17, cursor: "pointer", accentColor: tc.color, flexShrink: 0, marginTop: 2 }} />
                         }
                       </div>
@@ -1272,9 +1272,9 @@ export default function BuyPolicy() {
                       {/* Coverage chips */}
                       {covKeys.length > 0 && (
                         <div style={{ display: "flex", gap: 5, flexWrap: "wrap" }}>
-                          {covKeys.includes('selfOnly')            && <span style={{ fontSize: 11, fontWeight: 600, background: "#fff", border: "1px solid #e2e8f0", borderRadius: 20, padding: "3px 10px", color: "#475569" }}>👤 Self</span>}
-                          {covKeys.includes('selfSpouse')          && <span style={{ fontSize: 11, fontWeight: 600, background: "#fff", border: "1px solid #e2e8f0", borderRadius: 20, padding: "3px 10px", color: "#475569" }}>👫 Self + Spouse</span>}
-                          {covKeys.includes('selfSpouse2Children') && <span style={{ fontSize: 11, fontWeight: 600, background: "#fff", border: "1px solid #e2e8f0", borderRadius: 20, padding: "3px 10px", color: "#475569" }}>👨‍👩‍👧 Family</span>}
+                          {covKeys.includes('selfOnly')            && <span style={{ fontSize: 13, fontWeight: 600, background: "#fff", border: "1px solid #e2e8f0", borderRadius: 20, padding: "3px 10px", color: "#475569" }}>👤 Self</span>}
+                          {covKeys.includes('selfSpouse')          && <span style={{ fontSize: 13, fontWeight: 600, background: "#fff", border: "1px solid #e2e8f0", borderRadius: 20, padding: "3px 10px", color: "#475569" }}>👫 Self + Spouse</span>}
+                          {covKeys.includes('selfSpouse2Children') && <span style={{ fontSize: 13, fontWeight: 600, background: "#fff", border: "1px solid #e2e8f0", borderRadius: 20, padding: "3px 10px", color: "#475569" }}>👨‍👩‍👧 Family</span>}
                         </div>
                       )}
                     </div>
@@ -1286,7 +1286,7 @@ export default function BuyPolicy() {
                     >
                       <button
                         type="button"
-                        style={{ fontSize: 12, fontWeight: 600, border: `1.5px solid ${tc.border}`, color: tc.color, background: "#fff", borderRadius: 7, padding: "5px 12px", cursor: "pointer", fontFamily: "inherit" }}
+                        style={{ fontSize: 13, fontWeight: 600, border: `1.5px solid ${tc.border}`, color: tc.color, background: "#fff", borderRadius: 7, padding: "5px 12px", cursor: "pointer", fontFamily: "inherit" }}
                         onClick={e => { e.stopPropagation(); setViewingProduct(p); }}
                       >
                         View Details →
@@ -1296,7 +1296,7 @@ export default function BuyPolicy() {
                         onClick={e => { e.stopPropagation(); toggleCart(p); }}
                         style={{
                           padding: "5px 16px", borderRadius: 7, cursor: "pointer",
-                          fontFamily: "inherit", fontWeight: 700, fontSize: 12, transition: "all .15s",
+                          fontFamily: "inherit", fontWeight: 700, fontSize: 13, transition: "all .15s",
                           background: inCart ? tc.color : "#fff",
                           color: inCart ? "#fff" : tc.color,
                           border: `1.5px solid ${tc.color}`,
@@ -1353,7 +1353,7 @@ export default function BuyPolicy() {
         const inCart    = !!cart.find(x => x.id === p.id);
 
         const sectionHead = (text) => (
-          <div style={{ fontSize: 11, fontWeight: 700, color: "#a855f7", textTransform: "uppercase", letterSpacing: ".6px", marginBottom: 10, display: "flex", alignItems: "center", gap: 6 }}>
+          <div style={{ fontSize: 13, fontWeight: 700, color: "#a855f7", textTransform: "uppercase", letterSpacing: ".6px", marginBottom: 10, display: "flex", alignItems: "center", gap: 6 }}>
             <div style={{ flex: 1, height: 1, background: "var(--border)" }} />
             <span>{text}</span>
             <div style={{ flex: 1, height: 1, background: "var(--border)" }} />
@@ -1375,7 +1375,7 @@ export default function BuyPolicy() {
                   <div style={{ width: 48, height: 48, borderRadius: 13, background: "rgba(255,255,255,.18)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 24, flexShrink: 0 }}>{icon}</div>
                   <div style={{ flex: 1, minWidth: 0 }}>
                     <div style={{ fontWeight: 800, fontSize: 16, lineHeight: 1.3, marginBottom: 3 }}>{p.name}</div>
-                    <div style={{ fontSize: 12.5, color: "rgba(255,255,255,.94)", marginBottom: details ? 8 : 0 }}>{p.provider} &nbsp;·&nbsp; <span style={{ fontFamily: "monospace", background: "rgba(255,255,255,.15)", borderRadius: 4, padding: "1px 6px" }}>{p.code}</span></div>
+                    <div style={{ fontSize: 13.5, color: "rgba(255,255,255,.94)", marginBottom: details ? 8 : 0 }}>{p.provider} &nbsp;·&nbsp; <span style={{ fontFamily: "monospace", background: "rgba(255,255,255,.15)", borderRadius: 4, padding: "1px 6px" }}>{p.code}</span></div>
                     {details?.tagline && (
                       <div style={{ fontSize: 13, fontStyle: "italic", opacity: .92, lineHeight: 1.5 }}>"{details.tagline}"</div>
                     )}
@@ -1445,17 +1445,17 @@ export default function BuyPolicy() {
                   <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
                     {details.covered?.length > 0 && (
                       <div style={{ background: "#f0fdf4", border: "1px solid #bbf7d0", borderRadius: 10, padding: "12px 14px" }}>
-                        <div style={{ fontSize: 11, fontWeight: 700, color: "#15803d", textTransform: "uppercase", letterSpacing: ".5px", marginBottom: 8 }}>✅ What's Covered</div>
+                        <div style={{ fontSize: 13, fontWeight: 700, color: "#15803d", textTransform: "uppercase", letterSpacing: ".5px", marginBottom: 8 }}>✅ What's Covered</div>
                         {details.covered.map((c, i) => (
-                          <div key={i} style={{ fontSize: 12.5, color: "#166534", lineHeight: 1.6, paddingLeft: 8, borderLeft: "2px solid #86efac", marginBottom: 4 }}>{c}</div>
+                          <div key={i} style={{ fontSize: 13.5, color: "#166534", lineHeight: 1.6, paddingLeft: 8, borderLeft: "2px solid #86efac", marginBottom: 4 }}>{c}</div>
                         ))}
                       </div>
                     )}
                     {details.notCovered?.length > 0 && (
                       <div style={{ background: "#fff7ed", border: "1px solid #fed7aa", borderRadius: 10, padding: "12px 14px" }}>
-                        <div style={{ fontSize: 11, fontWeight: 700, color: "#c2410c", textTransform: "uppercase", letterSpacing: ".5px", marginBottom: 8 }}>⚠ Not Covered</div>
+                        <div style={{ fontSize: 13, fontWeight: 700, color: "#c2410c", textTransform: "uppercase", letterSpacing: ".5px", marginBottom: 8 }}>⚠ Not Covered</div>
                         {details.notCovered.map((c, i) => (
-                          <div key={i} style={{ fontSize: 12.5, color: "#9a3412", lineHeight: 1.6, paddingLeft: 8, borderLeft: "2px solid #fdba74", marginBottom: 4 }}>{c}</div>
+                          <div key={i} style={{ fontSize: 13.5, color: "#9a3412", lineHeight: 1.6, paddingLeft: 8, borderLeft: "2px solid #fdba74", marginBottom: 4 }}>{c}</div>
                         ))}
                       </div>
                     )}
@@ -1466,7 +1466,7 @@ export default function BuyPolicy() {
                   <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
                     {[["Code", p.code], ["Policy Type", p.policyType], ["Provider", p.provider], ["Status", "Active"]].map(([k, v]) => (
                       <div key={k} style={{ background: "var(--surface-2)", borderRadius: 8, padding: "10px 14px" }}>
-                        <div style={{ fontSize: 11, color: "var(--text-3)", fontWeight: 600, textTransform: "uppercase", letterSpacing: ".4px", marginBottom: 3 }}>{k}</div>
+                        <div style={{ fontSize: 13, color: "var(--text-3)", fontWeight: 600, textTransform: "uppercase", letterSpacing: ".4px", marginBottom: 3 }}>{k}</div>
                         <div style={{ fontSize: 13, fontWeight: 600, color: "var(--text)", fontFamily: k === "Code" ? "monospace" : "inherit" }}>{v}</div>
                       </div>
                     ))}
@@ -1478,7 +1478,7 @@ export default function BuyPolicy() {
                   <div>
                     {sectionHead("Premium Chart (Annual, incl. GST)")}
                     <div style={{ overflowX: "auto", borderRadius: 8, border: "1px solid var(--border)" }}>
-                      <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 12.5 }}>
+                      <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13.5 }}>
                         <thead>
                           <tr style={{ background: "var(--surface-2)", borderBottom: "1.5px solid var(--border)" }}>
                             <th style={{ padding: "8px 12px", textAlign: "left", fontWeight: 600, color: "var(--text-3)", whiteSpace: "nowrap" }}>Sum Insured</th>
@@ -1506,7 +1506,7 @@ export default function BuyPolicy() {
 
                 {/* Declaration */}
                 {p.disclaimer && (
-                  <div style={{ background: "#fffbeb", border: "1px solid #f59e0b", borderRadius: 8, padding: "12px 14px", fontSize: 12, color: "#78350f", lineHeight: 1.7 }}>
+                  <div style={{ background: "#fffbeb", border: "1px solid #f59e0b", borderRadius: 8, padding: "12px 14px", fontSize: 13, color: "#78350f", lineHeight: 1.7 }}>
                     <div style={{ fontWeight: 700, marginBottom: 4 }}>⚠ Declaration</div>
                     {p.disclaimer}
                   </div>
@@ -1546,7 +1546,7 @@ export default function BuyPolicy() {
 
           {/* Selected Plans Summary */}
           <div style={{ background: "#fff", borderRadius: 12, padding: "14px 18px", border: "1.5px solid #e5e7eb", borderLeft: "4px solid var(--brand)" }}>
-            <div style={{ fontSize: 11, fontWeight: 700, color: "#6b7280", textTransform: "uppercase", letterSpacing: ".5px", marginBottom: 10 }}>
+            <div style={{ fontSize: 13, fontWeight: 700, color: "#6b7280", textTransform: "uppercase", letterSpacing: ".5px", marginBottom: 10 }}>
               Selected Plans
             </div>
             {cart.map((p, i) => (
@@ -1555,7 +1555,7 @@ export default function BuyPolicy() {
                   <span style={{ fontSize: 16, flexShrink: 0 }}>{POLICY_TYPE_ICON[p.policyType] ?? "📋"}</span>
                   <div style={{ minWidth: 0 }}>
                     <div style={{ fontWeight: 700, color: "#7c3aed", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{p.name}</div>
-                    <div style={{ fontSize: 11, color: "var(--text-3)" }}>
+                    <div style={{ fontSize: 13, color: "var(--text-3)" }}>
                       {p.sumInsured ? `₹${Number(p.sumInsured).toLocaleString("en-IN")} SI` : ""}
                       {p.coverage ? ` · ${COV_LABEL[p.coverage] ?? p.coverage}` : ""}
                     </div>
@@ -1567,7 +1567,7 @@ export default function BuyPolicy() {
               </div>
             ))}
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", paddingTop: 10, marginTop: 2, borderTop: "1.5px solid #e5e7eb" }}>
-              <span style={{ fontSize: 12, fontWeight: 600, color: "#6b7280" }}>Total Premium</span>
+              <span style={{ fontSize: 13, fontWeight: 600, color: "#6b7280" }}>Total Premium</span>
               <span style={{ fontSize: 18, fontWeight: 800, color: "#111827" }}>
                 ₹{cart.reduce((s, x) => s + (x.premium ?? 0), 0).toLocaleString("en-IN")}
               </span>
@@ -1578,7 +1578,7 @@ export default function BuyPolicy() {
           <div className="card">
             <div className="card-header">
               <span style={{ fontWeight: 700, fontSize: 14 }}>👨‍👩‍👧 Covered Members</span>
-              <span style={{ fontSize: 12, color: "var(--text-3)", marginLeft: 8 }}>{members.length} member{members.length > 1 ? "s" : ""} covered under this policy</span>
+              <span style={{ fontSize: 13, color: "var(--text-3)", marginLeft: 8 }}>{members.length} member{members.length > 1 ? "s" : ""} covered under this policy</span>
             </div>
             <div className="card-body" style={{ padding: "12px 16px" }}>
               <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
@@ -1599,12 +1599,12 @@ export default function BuyPolicy() {
                           <span style={{ fontWeight: 700, fontSize: 13, color: "#111827" }}>{slot?.label}</span>
                           {isSelf && <span style={{ fontSize: 10.5, color: "#fff", fontWeight: 700, background: "linear-gradient(135deg,#fb7185,#a855f7)", borderRadius: 4, padding: "1px 7px" }}>Primary</span>}
                         </div>
-                        <div style={{ fontSize: 12, color: "var(--text-3)", marginTop: 2 }}>
+                        <div style={{ fontSize: 13, color: "var(--text-3)", marginTop: 2 }}>
                           {m.name || "—"}{age != null ? ` · ${age} yrs` : ""}{m.gender ? ` · ${m.gender}` : ""}
                         </div>
                       </div>
                       {m.dob && (
-                        <div style={{ fontSize: 11.5, color: "var(--text-3)", flexShrink: 0 }}>
+                        <div style={{ fontSize: 13, color: "var(--text-3)", flexShrink: 0 }}>
                           {new Date(m.dob).toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" })}
                         </div>
                       )}
@@ -1620,7 +1620,7 @@ export default function BuyPolicy() {
             <div className="card-header" style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
               <div>
                 <span style={{ fontWeight: 700, fontSize: 14 }}>📝 Nominee Details</span>
-                <span style={{ fontSize: 12, color: "var(--text-3)", marginLeft: 8 }}>Total share must equal 100%</span>
+                <span style={{ fontSize: 13, color: "var(--text-3)", marginLeft: 8 }}>Total share must equal 100%</span>
               </div>
               {nominees.length < 4 && (
                 <button type="button" className="btn btn-secondary btn-sm" onClick={addNominee}>
@@ -1632,7 +1632,7 @@ export default function BuyPolicy() {
               {/* Column headers */}
               <div style={{ display: "grid", gridTemplateColumns: "1fr 140px 80px 90px 36px", gap: 8, marginBottom: 6, padding: "0 2px" }}>
                 {["Full Name", "Relation", "Age", "Share %", ""].map(h => (
-                  <div key={h} style={{ fontSize: 11, fontWeight: 600, color: "var(--text-3)", textTransform: "uppercase", letterSpacing: ".4px" }}>{h}</div>
+                  <div key={h} style={{ fontSize: 13, fontWeight: 600, color: "var(--text-3)", textTransform: "uppercase", letterSpacing: ".4px" }}>{h}</div>
                 ))}
               </div>
 
@@ -1648,7 +1648,7 @@ export default function BuyPolicy() {
                       <input className="field-input" placeholder="Full name" value={n.name}
                         onChange={e => updateNominee(n.id, "name", e.target.value)}
                         style={{
-                          fontSize: 12.5, padding: "6px 9px", width: "100%",
+                          fontSize: 13.5, padding: "6px 9px", width: "100%",
                           transition: "border-color .4s, box-shadow .4s",
                           ...(nomineeAutoFilled[n.id] && n.name ? {
                             borderColor: "#16a34a",
@@ -1665,7 +1665,7 @@ export default function BuyPolicy() {
                     </div>
                     <select className="field-select" value={n.relation}
                       onChange={e => updateNomineeRelation(n.id, e.target.value)}
-                      style={{ fontSize: 12.5, padding: "6px 9px" }}>
+                      style={{ fontSize: 13.5, padding: "6px 9px" }}>
                       <option value="">Relation</option>
                       {["Spouse", "Son", "Daughter", "Father", "Mother", "Brother", "Sister", "Other"].map(r => (
                         <option key={r}>{r}</option>
@@ -1675,7 +1675,7 @@ export default function BuyPolicy() {
                       <input type="number" className="field-input" placeholder="Age" value={n.age} min="1" max="100"
                         onChange={e => updateNominee(n.id, "age", e.target.value)}
                         style={{
-                          fontSize: 12.5, padding: "6px 9px", width: "100%",
+                          fontSize: 13.5, padding: "6px 9px", width: "100%",
                           transition: "border-color .4s, box-shadow .4s",
                           ...(nomineeAutoFilled[n.id] && n.age ? {
                             borderColor: "#16a34a",
@@ -1689,8 +1689,8 @@ export default function BuyPolicy() {
                     <div style={{ position: "relative" }}>
                       <input type="number" className="field-input" placeholder="%" value={n.share} min="1" max="100"
                         onChange={e => updateNominee(n.id, "share", e.target.value)}
-                        style={{ fontSize: 12.5, padding: "6px 28px 6px 9px" }} />
-                      <span style={{ position: "absolute", right: 8, top: "50%", transform: "translateY(-50%)", fontSize: 12, color: "var(--text-3)", pointerEvents: "none" }}>%</span>
+                        style={{ fontSize: 13.5, padding: "6px 28px 6px 9px" }} />
+                      <span style={{ position: "absolute", right: 8, top: "50%", transform: "translateY(-50%)", fontSize: 13, color: "var(--text-3)", pointerEvents: "none" }}>%</span>
                     </div>
                     <button type="button" onClick={() => removeNominee(n.id)} disabled={nominees.length === 1}
                       style={{ width: 32, height: 32, borderRadius: 6, border: "1.5px solid var(--border)", background: nominees.length === 1 ? "var(--surface-2)" : "#fff0f0", color: nominees.length === 1 ? "var(--text-3)" : "var(--red)", cursor: nominees.length === 1 ? "not-allowed" : "pointer", fontSize: 18, display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "inherit", transition: "all .12s" }}>
@@ -1703,7 +1703,7 @@ export default function BuyPolicy() {
               {/* Share % progress bar */}
               <div style={{ marginTop: 14 }}>
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 5 }}>
-                  <span style={{ fontSize: 12, color: "var(--text-3)", fontWeight: 500 }}>Total Share Allocated</span>
+                  <span style={{ fontSize: 13, color: "var(--text-3)", fontWeight: 500 }}>Total Share Allocated</span>
                   <span style={{ fontSize: 13, fontWeight: 700, color: nomineesTotal === 100 ? "var(--green)" : nomineesTotal > 100 ? "var(--red)" : "#d97706" }}>
                     {nomineesTotal}%&nbsp;
                     {nomineesTotal === 100 ? "✓ Complete" : nomineesTotal > 100 ? `— ${nomineesTotal - 100}% over` : `— ${100 - nomineesTotal}% remaining`}
@@ -1797,7 +1797,7 @@ export default function BuyPolicy() {
               <span style={{ fontSize: 20 }}>⏳</span>
               <div>
                 <div style={{ fontWeight: 700, fontSize: 13.5, color: '#92400e' }}>Resuming Pending Payment</div>
-                <div style={{ fontSize: 12.5, color: '#78350f', marginTop: 2 }}>
+                <div style={{ fontSize: 13.5, color: '#78350f', marginTop: 2 }}>
                   Proposal <span style={{ fontFamily: 'monospace', fontWeight: 700 }}>{resumePolicy.proposalId}</span>
                   {' · '}{resumePolicy.customerName}{' · '}₹{resumePolicy.premium.toLocaleString()}
                 </div>
@@ -1823,7 +1823,7 @@ export default function BuyPolicy() {
                         <span style={{ fontSize: 18, flexShrink: 0, marginTop: 1 }}>{POLICY_TYPE_ICON[p.policyType] ?? "📋"}</span>
                         <div style={{ minWidth: 0 }}>
                           <div style={{ fontWeight: 700, fontSize: 13, lineHeight: 1.3, color: "#7c3aed" }}>{p.name}</div>
-                          <div style={{ fontSize: 11.5, color: "var(--text-3)", marginTop: 2 }}>{p.provider} · <span style={{ fontFamily: "monospace" }}>{p.code}</span></div>
+                          <div style={{ fontSize: 13, color: "var(--text-3)", marginTop: 2 }}>{p.provider} · <span style={{ fontFamily: "monospace" }}>{p.code}</span></div>
                         </div>
                       </div>
                       <span style={{ fontWeight: 700, fontSize: 14, color: "var(--text)", flexShrink: 0 }}>
@@ -1832,17 +1832,17 @@ export default function BuyPolicy() {
                     </div>
                     <div style={{ display: "flex", gap: 8, marginTop: 6, flexWrap: "wrap" }}>
                       {p.sumInsured && (
-                        <span style={{ fontSize: 11, background: "#f3f4f6", border: "1px solid #e5e7eb", borderRadius: 5, padding: "2px 7px", color: "#374151", fontWeight: 500 }}>
+                        <span style={{ fontSize: 13, background: "#f3f4f6", border: "1px solid #e5e7eb", borderRadius: 5, padding: "2px 7px", color: "#374151", fontWeight: 500 }}>
                           SI: ₹{Number(p.sumInsured).toLocaleString("en-IN")}
                         </span>
                       )}
                       {p.coverage && (
-                        <span style={{ fontSize: 11, background: "#f3f4f6", border: "1px solid #e5e7eb", borderRadius: 5, padding: "2px 7px", color: "#374151", fontWeight: 500 }}>
+                        <span style={{ fontSize: 13, background: "#f3f4f6", border: "1px solid #e5e7eb", borderRadius: 5, padding: "2px 7px", color: "#374151", fontWeight: 500 }}>
                           {COV_LABEL[p.coverage] ?? p.coverage}
                         </span>
                       )}
                       {p.ageBandId && (
-                        <span style={{ fontSize: 11, background: "#f3f4f6", border: "1px solid #e5e7eb", borderRadius: 5, padding: "2px 7px", color: "#374151", fontWeight: 500 }}>
+                        <span style={{ fontSize: 13, background: "#f3f4f6", border: "1px solid #e5e7eb", borderRadius: 5, padding: "2px 7px", color: "#374151", fontWeight: 500 }}>
                           Band {p.ageBandId}
                         </span>
                       )}
@@ -1861,10 +1861,10 @@ export default function BuyPolicy() {
                     border: "1px solid var(--border)",
                   }}>
                     <span style={{ fontSize: 13 }}>👥</span>
-                    <span style={{ fontSize: 11, fontWeight: 700, color: "var(--brand)", textTransform: "uppercase", letterSpacing: ".6px" }}>
+                    <span style={{ fontSize: 13, fontWeight: 700, color: "var(--brand)", textTransform: "uppercase", letterSpacing: ".6px" }}>
                       Insured Members
                     </span>
-                    <span style={{ marginLeft: "auto", fontSize: 11, fontWeight: 700, color: "var(--brand)", background: "var(--brand-light)", borderRadius: 10, padding: "1px 8px" }}>
+                    <span style={{ marginLeft: "auto", fontSize: 13, fontWeight: 700, color: "var(--brand)", background: "var(--brand-light)", borderRadius: 10, padding: "1px 8px" }}>
                       {members.length}
                     </span>
                   </div>
@@ -1880,7 +1880,7 @@ export default function BuyPolicy() {
                           width: 28, height: 28, borderRadius: "50%", flexShrink: 0,
                           background: "#1e293b", color: "#fff",
                           display: "flex", alignItems: "center", justifyContent: "center",
-                          fontSize: 11, fontWeight: 800,
+                          fontSize: 13, fontWeight: 800,
                         }}>
                           {(m.name || m.type).charAt(0).toUpperCase()}
                         </div>
@@ -1889,7 +1889,7 @@ export default function BuyPolicy() {
                             {m.name || <span style={{ color: "var(--text-3)", fontStyle: "italic", fontWeight: 400 }}>Name not entered</span>}
                           </div>
                           {m.dob && (
-                            <div style={{ fontSize: 11.5, color: "var(--text-3)", marginTop: 1 }}>DOB: {m.dob}</div>
+                            <div style={{ fontSize: 13, color: "var(--text-3)", marginTop: 1 }}>DOB: {m.dob}</div>
                           )}
                         </div>
                         <div style={{ textAlign: "right", flexShrink: 0 }}>
@@ -1897,7 +1897,7 @@ export default function BuyPolicy() {
                             {m.type}
                           </div>
                           {m.gender && (
-                            <div style={{ fontSize: 11, color: "var(--text-3)", marginTop: 1 }}>{m.gender}</div>
+                            <div style={{ fontSize: 13, color: "var(--text-3)", marginTop: 1 }}>{m.gender}</div>
                           )}
                         </div>
                       </div>
@@ -1916,10 +1916,10 @@ export default function BuyPolicy() {
                     border: "1px solid var(--border)",
                   }}>
                     <span style={{ fontSize: 13 }}>📋</span>
-                    <span style={{ fontSize: 11, fontWeight: 700, color: "var(--brand)", textTransform: "uppercase", letterSpacing: ".6px" }}>
+                    <span style={{ fontSize: 13, fontWeight: 700, color: "var(--brand)", textTransform: "uppercase", letterSpacing: ".6px" }}>
                       Nominees
                     </span>
-                    <span style={{ marginLeft: "auto", fontSize: 11, fontWeight: 700, color: "var(--brand)", background: "var(--brand-light)", borderRadius: 10, padding: "1px 8px" }}>
+                    <span style={{ marginLeft: "auto", fontSize: 13, fontWeight: 700, color: "var(--brand)", background: "var(--brand-light)", borderRadius: 10, padding: "1px 8px" }}>
                       {nominees.length}
                     </span>
                   </div>
@@ -1937,7 +1937,7 @@ export default function BuyPolicy() {
                           color: n.name ? "#fff" : "var(--text-3)",
                           border: n.name ? "none" : "1px solid #e5e7eb",
                           display: "flex", alignItems: "center", justifyContent: "center",
-                          fontSize: 11, fontWeight: 800,
+                          fontSize: 13, fontWeight: 800,
                         }}>
                           {n.name ? n.name.charAt(0).toUpperCase() : "?"}
                         </div>
@@ -1945,13 +1945,13 @@ export default function BuyPolicy() {
                           <div style={{ fontWeight: 600, fontSize: 13, color: "#111827", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
                             {n.name || <span style={{ color: "var(--text-3)", fontStyle: "italic", fontWeight: 400 }}>Name not entered</span>}
                           </div>
-                          <div style={{ fontSize: 11.5, color: "var(--text-3)", marginTop: 1 }}>
+                          <div style={{ fontSize: 13, color: "var(--text-3)", marginTop: 1 }}>
                             {[n.relation, n.age ? `${n.age} yrs` : null].filter(Boolean).join(" · ") || "—"}
                           </div>
                         </div>
                         <div style={{ textAlign: "right", flexShrink: 0 }}>
                           <div style={{ fontSize: 14, fontWeight: 700, color: "#111827" }}>{n.share || "0"}%</div>
-                          <div style={{ fontSize: 11, color: "var(--text-3)" }}>share</div>
+                          <div style={{ fontSize: 13, color: "var(--text-3)" }}>share</div>
                         </div>
                       </div>
                     ))}
@@ -1978,7 +1978,7 @@ export default function BuyPolicy() {
               {cart.length > 1 && cart.map(p => (
                 <div key={p.id} style={{
                   display: "flex", justifyContent: "space-between",
-                  padding: "5px 0", fontSize: 12.5, color: "var(--text-2)",
+                  padding: "5px 0", fontSize: 13.5, color: "var(--text-2)",
                 }}>
                   <span style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", maxWidth: "60%" }}>{p.name}</span>
                   <span>{p.premium != null ? `₹${p.premium.toLocaleString("en-IN")}` : "—"}</span>
@@ -2105,7 +2105,7 @@ export default function BuyPolicy() {
                           </Field>
                         </div>
                         <div style={{ marginTop: 4, marginBottom: 16 }}>
-                          <div style={{ fontSize: 11, fontWeight: 600, color: "var(--text-3)", textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: 6 }}>In Favour Of</div>
+                          <div style={{ fontSize: 13, fontWeight: 600, color: "var(--text-3)", textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: 6 }}>In Favour Of</div>
                           <div style={{ fontWeight: 700, fontSize: 14.5, color: "var(--text)" }}>KMD Insurance Brokers Pvt. Ltd.</div>
                         </div>
                         <div className="form-grid">
@@ -2118,7 +2118,7 @@ export default function BuyPolicy() {
                               onChange={e => setChequePhoto(e.target.files[0])}
                               style={{ fontSize: 13, color: "var(--text-2)", paddingTop: 6 }}
                             />
-                            {chequePhoto && <div style={{ fontSize: 11.5, color: "var(--success)", marginTop: 4 }}>✓ {chequePhoto.name}</div>}
+                            {chequePhoto && <div style={{ fontSize: 13, color: "var(--success)", marginTop: 4 }}>✓ {chequePhoto.name}</div>}
                           </Field>
                         </div>
                         <label style={{ display: "flex", alignItems: "flex-start", gap: 10, cursor: "pointer", marginTop: 8 }}>
@@ -2149,7 +2149,7 @@ export default function BuyPolicy() {
                             ["IFSC Code",       "KKBK0000957"],
                           ].map(([k, v]) => (
                             <div key={k}>
-                              <div style={{ fontSize: 11, color: "var(--text-3)", marginBottom: 2 }}>{k}</div>
+                              <div style={{ fontSize: 13, color: "var(--text-3)", marginBottom: 2 }}>{k}</div>
                               <div style={{ fontWeight: 700, fontSize: 13.5 }}>{v}</div>
                             </div>
                           ))}
@@ -2187,7 +2187,7 @@ export default function BuyPolicy() {
                               onChange={e => setNeftPhoto(e.target.files[0])}
                               style={{ fontSize: 13, color: "var(--text-2)", paddingTop: 6 }}
                             />
-                            {neftPhoto && <div style={{ fontSize: 11.5, color: "var(--success)", marginTop: 4 }}>✓ {neftPhoto.name}</div>}
+                            {neftPhoto && <div style={{ fontSize: 13, color: "var(--success)", marginTop: 4 }}>✓ {neftPhoto.name}</div>}
                           </Field>
                         </div>
                         <label style={{ display: "flex", alignItems: "flex-start", gap: 10, cursor: "pointer", marginTop: 16 }}>

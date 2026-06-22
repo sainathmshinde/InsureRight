@@ -587,10 +587,10 @@ function CoverageScore({ score }) {
         <div style={{ fontSize: 28, fontWeight: 800, color, lineHeight: 1 }}>
           {score}
         </div>
-        <div style={{ fontSize: 12.5, fontWeight: 600, color, marginTop: 3 }}>
+        <div style={{ fontSize: 13.5, fontWeight: 600, color, marginTop: 3 }}>
           {label}
         </div>
-        <div style={{ fontSize: 11.5, color: "#64748b", marginTop: 2 }}>
+        <div style={{ fontSize: 13, color: "#64748b", marginTop: 2 }}>
           Coverage Score
         </div>
       </div>
@@ -669,7 +669,7 @@ function CustomerDashboard({ user }) {
         <div>
           <div
             style={{
-              fontSize: 11.5,
+              fontSize: 13,
               color: "#6ee7b7",
               fontWeight: 700,
               textTransform: "uppercase",
@@ -753,7 +753,7 @@ function CustomerDashboard({ user }) {
             {nextRenewal ? fmtDate(nextRenewal.endDate) : "No active policy"}
           </div>
           {nextRenewal && (
-            <div style={{ fontSize: 12, color: "#a7f3d0", marginTop: 4 }}>
+            <div style={{ fontSize: 13, color: "#a7f3d0", marginTop: 4 }}>
               in {Math.max(0, daysUntil(nextRenewal.endDate))} days
             </div>
           )}
@@ -830,7 +830,7 @@ function CustomerDashboard({ user }) {
           <span
             style={{
               marginLeft: 8,
-              fontSize: 11,
+              fontSize: 13,
               fontWeight: 600,
               color: "#64748b",
               textTransform: "uppercase",
@@ -895,7 +895,7 @@ function CustomerDashboard({ user }) {
                 </div>
                 <div
                   style={{
-                    fontSize: 12.5,
+                    fontSize: 13.5,
                     color: "rgba(255,255,255,0.75)",
                     marginBottom: 14,
                   }}
@@ -917,7 +917,7 @@ function CustomerDashboard({ user }) {
                         display: "flex",
                         alignItems: "center",
                         gap: 7,
-                        fontSize: 12,
+                        fontSize: 13,
                         color: "rgba(255,255,255,0.85)",
                       }}
                     >
@@ -1014,7 +1014,7 @@ function CustomerDashboard({ user }) {
                 No policies yet
               </div>
               <div
-                style={{ fontSize: 12.5, color: "#64748b", marginBottom: 16 }}
+                style={{ fontSize: 13.5, color: "#64748b", marginBottom: 16 }}
               >
                 Buy your first policy to get covered
               </div>
@@ -1069,7 +1069,7 @@ function CustomerDashboard({ user }) {
                       >
                         {p.product}
                       </div>
-                      <div style={{ fontSize: 11.5, color: "#64748b" }}>
+                      <div style={{ fontSize: 13, color: "#64748b" }}>
                         {p.icName} · {p.policyNo ?? p.id}
                       </div>
                     </div>
@@ -1120,7 +1120,7 @@ function CustomerDashboard({ user }) {
                         </div>
                         <div
                           style={{
-                            fontSize: 12.5,
+                            fontSize: 13.5,
                             fontWeight: 600,
                             color: "#1a1628",
                           }}
@@ -1143,7 +1143,7 @@ function CustomerDashboard({ user }) {
                     >
                       <span
                         style={{
-                          fontSize: 12,
+                          fontSize: 13,
                           color: "#92400e",
                           fontWeight: 600,
                         }}
@@ -1159,7 +1159,7 @@ function CustomerDashboard({ user }) {
                           background: "#d97706",
                           color: "#fff",
                           fontWeight: 700,
-                          fontSize: 12,
+                          fontSize: 13,
                           cursor: "pointer",
                           fontFamily: "inherit",
                         }}
@@ -1223,7 +1223,7 @@ function CustomerDashboard({ user }) {
                       display: "flex",
                       alignItems: "center",
                       justifyContent: "center",
-                      fontSize: 11,
+                      fontSize: 13,
                       fontWeight: 700,
                       flexShrink: 0,
                     }}
@@ -1244,7 +1244,7 @@ function CustomerDashboard({ user }) {
                     <button
                       onClick={() => navigate("/policy-catalogue")}
                       style={{
-                        fontSize: 11,
+                        fontSize: 13,
                         color: color,
                         fontWeight: 700,
                         background: "none",
@@ -1293,7 +1293,7 @@ function CustomerDashboard({ user }) {
                   >
                     {q.icon}
                   </span>
-                  <span style={{ ...S.quickLabel, fontSize: 12 }}>
+                  <span style={{ ...S.quickLabel, fontSize: 14 }}>
                     {q.label}
                   </span>
                 </button>
@@ -1351,7 +1351,7 @@ function CustomerDashboard({ user }) {
                     display: "flex",
                     alignItems: "center",
                     gap: 7,
-                    fontSize: 12.5,
+                    fontSize: 13.5,
                   }}
                 >
                   <span
@@ -1383,7 +1383,7 @@ function CustomerDashboard({ user }) {
                 border: "1.5px solid #e8e4f0",
                 background: "#faf9fc",
                 color: "#1a1628",
-                fontSize: 12.5,
+                fontSize: 13.5,
                 fontWeight: 600,
                 cursor: "pointer",
                 fontFamily: "inherit",
@@ -1418,7 +1418,7 @@ function CustomerDashboard({ user }) {
             <div style={{ fontSize: 14, fontWeight: 700, color: "#1a1628" }}>
               How to File a Claim
             </div>
-            <div style={{ fontSize: 12.5, color: "#64748b", marginTop: 2 }}>
+            <div style={{ fontSize: 13.5, color: "#64748b", marginTop: 2 }}>
               24×7 claim support · Call 1800-XXX-XXXX
             </div>
           </div>
@@ -1430,7 +1430,7 @@ function CustomerDashboard({ user }) {
               border: "1.5px solid #e8e4f0",
               background: "#faf9fc",
               color: "#1a1628",
-              fontSize: 12.5,
+              fontSize: 13.5,
               fontWeight: 600,
               cursor: "pointer",
               fontFamily: "inherit",
@@ -1474,7 +1474,7 @@ function CustomerDashboard({ user }) {
                   Step {step.step}
                 </div>
                 <div
-                  style={{ fontSize: 12.5, fontWeight: 600, color: "#1a1628" }}
+                  style={{ fontSize: 13.5, fontWeight: 600, color: "#1a1628" }}
                 >
                   {step.label}
                 </div>
@@ -1507,7 +1507,7 @@ const S = {
     color: "rgba(255,255,255,0.92)",
     marginBottom: 2,
   },
-  irdaiTxt: { fontSize: 11.5, color: "rgba(255,255,255,0.88)" },
+  irdaiTxt: { fontSize: 13, color: "rgba(255,255,255,0.88)" },
   todayBox: {
     background: "rgba(255,255,255,0.18)",
     border: "1px solid rgba(255,255,255,0.30)",
@@ -1517,12 +1517,12 @@ const S = {
     flexShrink: 0,
   },
   todayLbl: {
-    fontSize: 10,
+    fontSize: 13,
     color: "rgba(255,255,255,0.88)",
     textTransform: "uppercase",
     letterSpacing: ".8px",
   },
-  todayDate: { fontSize: 13, fontWeight: 600, color: "#fff", marginTop: 3 },
+  todayDate: { fontSize: 14, fontWeight: 600, color: "#fff", marginTop: 3 },
   statsGrid: { display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 14 },
   statCard: {
     background: "#fff",
@@ -1532,7 +1532,7 @@ const S = {
     borderLeft: "4px solid transparent",
   },
   statLabel: {
-    fontSize: 11.5,
+    fontSize: 13,
     color: "var(--text-2)",
     fontWeight: 500,
     marginBottom: 5,
@@ -1541,7 +1541,7 @@ const S = {
   },
   statValue: { fontSize: 30, fontWeight: 800, lineHeight: 1, color: "#111827" },
   statSub: {
-    fontSize: 11.5,
+    fontSize: 13,
     marginTop: 8,
     fontWeight: 500,
     color: "var(--text-3)",
@@ -1564,7 +1564,7 @@ const S = {
     border: "1px solid #e5e7eb",
   },
   cardTitle: {
-    fontSize: 13.5,
+    fontSize: 15,
     fontWeight: 700,
     color: "#111827",
     marginBottom: 14,
@@ -1597,7 +1597,7 @@ const S = {
     fontSize: 14,
     flexShrink: 0,
   },
-  quickLabel: { fontSize: 13, fontWeight: 500, color: "#111827" },
+  quickLabel: { fontSize: 14, fontWeight: 500, color: "#111827" },
   actRow: {
     display: "flex",
     alignItems: "flex-start",
@@ -1606,8 +1606,8 @@ const S = {
     borderBottom: "1px solid #f3f4f6",
   },
   actIcon: { fontSize: 18, lineHeight: 1, flexShrink: 0, marginTop: 1 },
-  actText: { fontSize: 13, color: "#111827", fontWeight: 500 },
-  actTime: { fontSize: 11.5, color: "var(--text-3)", marginTop: 2 },
+  actText: { fontSize: 14, color: "#111827", fontWeight: 500 },
+  actTime: { fontSize: 13, color: "var(--text-3)", marginTop: 2 },
   initCircle: {
     width: 34,
     height: 34,
@@ -1615,14 +1615,14 @@ const S = {
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
-    fontSize: 12,
+    fontSize: 13,
     fontWeight: 700,
     flexShrink: 0,
   },
   badge: {
     padding: "3px 9px",
     borderRadius: 99,
-    fontSize: 11.5,
+    fontSize: 13,
     fontWeight: 600,
     flexShrink: 0,
   },
@@ -1630,7 +1630,7 @@ const S = {
     background: "none",
     border: "none",
     color: "#7c3aed",
-    fontSize: 12.5,
+    fontSize: 13.5,
     cursor: "pointer",
     fontFamily: "inherit",
     fontWeight: 600,

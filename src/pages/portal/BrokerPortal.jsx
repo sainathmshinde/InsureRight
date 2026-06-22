@@ -447,7 +447,7 @@ function DonutChart({ title, segments, note }) {
                     />
                     <div
                       style={{
-                        fontSize: 11,
+                        fontSize: 13,
                         color: "#64748b",
                         fontWeight: 600,
                         letterSpacing: ".1px",
@@ -502,7 +502,7 @@ function DonutChart({ title, segments, note }) {
                     <div
                       style={{
                         paddingLeft: 15,
-                        fontSize: 11.5,
+                        fontSize: 13,
                         fontWeight: 700,
                         color: "#475569",
                         marginTop: 2,
@@ -519,7 +519,7 @@ function DonutChart({ title, segments, note }) {
         {note && (
           <div
             style={{
-              fontSize: 11,
+              fontSize: 13,
               color: "#64748b",
               marginTop: 10,
               textAlign: "center",
@@ -681,7 +681,7 @@ export default function BrokerPortal() {
                 background: "linear-gradient(180deg,#fb7185,#a855f7)",
               }}
             />
-            <div style={{ fontWeight: 800, fontSize: 17, color: "#1e293b" }}>
+            <div style={{ fontWeight: 800, fontSize: 22, color: "#1e293b" }}>
               Campaign MIS
             </div>
           </div>
@@ -700,7 +700,8 @@ export default function BrokerPortal() {
               <label
                 style={{
                   display: "block",
-                  fontSize: 11.5,
+                  fontFamily: '"Plus Jakarta Sans", sans-serif',
+                  fontSize: 13,
                   fontWeight: 700,
                   color: "#64748b",
                   marginBottom: 5,
@@ -726,7 +727,8 @@ export default function BrokerPortal() {
               <label
                 style={{
                   display: "block",
-                  fontSize: 11.5,
+                  fontFamily: '"Plus Jakarta Sans", sans-serif',
+                  fontSize: 13,
                   fontWeight: 700,
                   color: "#64748b",
                   marginBottom: 5,
@@ -787,8 +789,8 @@ export default function BrokerPortal() {
                         (mis.nonEngagedCustomer / totalCustomers) * 100,
                       )
                     : 0,
-                color: "#f59e0b",
-                bg: "#fffbeb",
+                color: "#6d6d6b",
+                // bg: "#fffbeb",
                 border: "#fde68a",
                 onClick: goToNonEngaged,
               },
@@ -801,7 +803,7 @@ export default function BrokerPortal() {
                     : 0,
                 amount: mis.policyPendingPremium,
                 color: "#f97316",
-                bg: "#fff7ed",
+                // bg: "#fff7ed",
                 border: "#fed7aa",
                 onClick: goToPolicyPending,
               },
@@ -814,7 +816,7 @@ export default function BrokerPortal() {
                     : 0,
                 amount: mis.paymentPendingAmt,
                 color: "#ef4444",
-                bg: "#fef2f2",
+                // bg: "#fef2f2",
                 border: "#fecaca",
                 onClick: goToPaymentPending,
               },
@@ -829,7 +831,7 @@ export default function BrokerPortal() {
                     : 0,
                 amount: mis.paymentRejectedAmt,
                 color: "#dc2626",
-                bg: "#fef2f2",
+                // bg: "#fef2f2",
                 border: "#fca5a5",
                 onClick: goToPaymentRejected,
               },
@@ -848,8 +850,8 @@ export default function BrokerPortal() {
                     key={it.label}
                     onClick={it.onClick}
                     style={{
-                      background: it.bg,
-                      border: `1.5px solid ${it.border}`,
+                      background: "#fff",
+                      border: `1.5px solid ${it.color}`,
                       borderRadius: 12,
                       padding: "14px 16px",
                       borderLeft: `4px solid ${it.color}`,
@@ -871,7 +873,7 @@ export default function BrokerPortal() {
                   >
                     <div
                       style={{
-                        fontSize: 11,
+                        fontSize: 13,
                         fontWeight: 700,
                         color: "#64748b",
                         textTransform: "uppercase",
@@ -892,7 +894,7 @@ export default function BrokerPortal() {
                         style={{
                           fontSize: 24,
                           fontWeight: 800,
-                          color: it.color,
+                          color: "#6b7280",
                           lineHeight: 1,
                         }}
                       >
@@ -903,7 +905,7 @@ export default function BrokerPortal() {
                           style={{
                             fontSize: 24,
                             fontWeight: 800,
-                            color: it.color,
+                            color: "#6b7280",
                             lineHeight: 1,
                           }}
                         >
@@ -919,7 +921,7 @@ export default function BrokerPortal() {
 
           <div
             style={{
-              fontSize: 12.5,
+              fontSize: 15,
               fontWeight: 600,
               color: "#64748b",
               marginBottom: 20,
@@ -1080,7 +1082,7 @@ export default function BrokerPortal() {
           >
             <div
               style={{
-                fontSize: 11,
+                fontSize: 13,
                 fontWeight: 700,
                 color: "#64748b",
                 textTransform: "uppercase",
@@ -1100,7 +1102,7 @@ export default function BrokerPortal() {
             >
               {s.value}
             </div>
-            <div style={{ fontSize: 12, color: "#64748b", marginTop: 6 }}>
+            <div style={{ fontSize: 13, color: "#64748b", marginTop: 6 }}>
               {s.sub}
             </div>
           </div>
@@ -1197,7 +1199,7 @@ export default function BrokerPortal() {
               <button
                 type="button"
                 className="btn btn-ghost"
-                style={{ fontSize: 12, padding: "4px 12px" }}
+                style={{ fontSize: 13, padding: "4px 12px" }}
                 onClick={() => navigate("/agent")}
               >
                 View All →
@@ -1231,7 +1233,7 @@ export default function BrokerPortal() {
                     >
                       {a.name}
                     </div>
-                    <div style={{ fontSize: 11.5, color: "#64748b" }}>
+                    <div style={{ fontSize: 13, color: "#64748b" }}>
                       {a.mobile} · {a.customers} customers
                     </div>
                   </div>
@@ -1239,7 +1241,7 @@ export default function BrokerPortal() {
                     style={{
                       padding: "3px 10px",
                       borderRadius: 99,
-                      fontSize: 11.5,
+                      fontSize: 13,
                       fontWeight: 700,
                       background: a.status === "Active" ? "#dcfce7" : "#f1f5f9",
                       color: a.status === "Active" ? "#15803d" : "#64748b",
@@ -1274,7 +1276,7 @@ export default function BrokerPortal() {
                           style={{
                             padding: "2px 9px",
                             borderRadius: 99,
-                            fontSize: 11.5,
+                            fontSize: 13,
                             fontWeight: 600,
                             background:
                               a.status === "Active" ? "#dcfce7" : "#f1f5f9",
@@ -1322,7 +1324,7 @@ export default function BrokerPortal() {
               <button
                 type="button"
                 className="btn btn-ghost"
-                style={{ fontSize: 12, padding: "4px 12px" }}
+                style={{ fontSize: 13, padding: "4px 12px" }}
                 onClick={() => navigate("/customer")}
               >
                 View All →
@@ -1365,7 +1367,7 @@ export default function BrokerPortal() {
                         display: "flex",
                         alignItems: "center",
                         justifyContent: "center",
-                        fontSize: 12,
+                        fontSize: 13,
                         fontWeight: 700,
                         flexShrink: 0,
                       }}
@@ -1383,7 +1385,7 @@ export default function BrokerPortal() {
                       >
                         {c.name}
                       </div>
-                      <div style={{ fontSize: 11.5, color: "#64748b" }}>
+                      <div style={{ fontSize: 13, color: "#64748b" }}>
                         {c.mobile} · {c.campaignName}
                       </div>
                     </div>
@@ -1391,7 +1393,7 @@ export default function BrokerPortal() {
                       style={{
                         padding: "3px 10px",
                         borderRadius: 99,
-                        fontSize: 11.5,
+                        fontSize: 13,
                         fontWeight: 700,
                         background: kycColor.bg,
                         color: kycColor.color,

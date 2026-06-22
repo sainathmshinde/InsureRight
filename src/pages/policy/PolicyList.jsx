@@ -126,7 +126,7 @@ const CAMPAIGN_OPTIONS = [...new Map(MOCK.map(p => [p.campaignId, p.campaignName
   .map(([id, name]) => ({ id, name }))
 
 const filterLabel = {
-  fontSize: 11,
+  fontSize: 13,
   fontWeight: 600,
   color: 'var(--text-3)',
   textTransform: 'uppercase',
@@ -164,13 +164,13 @@ export default function PolicyList() {
 
   const columns = [
     { key: 'proposalId',    label: 'Proposal ID',
-      style: { fontFamily: 'monospace', fontSize: 12.5, color: 'var(--brand)', fontWeight: 600 } },
+      style: { fontFamily: 'monospace', fontSize: 13.5, color: 'var(--brand)', fontWeight: 600 } },
     ...(!isCustomer ? [{
       key: 'customerName', label: 'Customer',
       render: row => (
         <div>
           <div style={{ fontWeight: 500 }}>{row.customerName}</div>
-          <div style={{ fontSize: 12, color: 'var(--text-3)' }}>{row.mobile}</div>
+          <div style={{ fontSize: 13, color: 'var(--text-3)' }}>{row.mobile}</div>
         </div>
       ),
     }] : []),
@@ -183,11 +183,11 @@ export default function PolicyList() {
     { key: 'paymentStatus', label: 'Payment',     render: row => <StatusBadge status={row.paymentStatus} /> },
     { key: 'paymentMode',   label: 'Mode',
       render: row => row.paymentMode
-        ? <span style={{ fontSize: 12, color: 'var(--text-2)' }}>{row.paymentMode}</span>
+        ? <span style={{ fontSize: 13, color: 'var(--text-2)' }}>{row.paymentMode}</span>
         : <span style={{ color: 'var(--text-3)' }}>—</span> },
     { key: 'paymentType',   label: 'Pay Type',
       render: row => row.paymentType
-        ? <span style={{ fontSize: 12, color: 'var(--text-2)' }}>{row.paymentType}</span>
+        ? <span style={{ fontSize: 13, color: 'var(--text-2)' }}>{row.paymentType}</span>
         : <span style={{ color: 'var(--text-3)' }}>—</span> },
     { key: 'policyNo',      label: 'Policy No.',
       style: { fontFamily: 'monospace', fontSize: 12 },
@@ -294,11 +294,11 @@ export default function PolicyList() {
                     <div style={{ padding: '14px 16px', borderBottom: '1px solid var(--border)', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 10 }}>
                       <div style={{ flex: 1, minWidth: 0 }}>
                         <div style={{ fontWeight: 700, fontSize: 14, color: 'var(--text)', marginBottom: 3, lineHeight: 1.3 }}>{row.product}</div>
-                        <div style={{ fontSize: 12, color: 'var(--text-3)' }}>{row.icName}</div>
+                        <div style={{ fontSize: 13, color: 'var(--text-3)' }}>{row.icName}</div>
                       </div>
                       <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 5, flexShrink: 0 }}>
                         <StatusBadge status={row.status} />
-                        <span style={{ fontSize: 11, fontWeight: 600, padding: '2px 8px', borderRadius: 99, background: typeBg, color: typeColor }}>{row.type}</span>
+                        <span style={{ fontSize: 13, fontWeight: 600, padding: '2px 8px', borderRadius: 99, background: typeBg, color: typeColor }}>{row.type}</span>
                       </div>
                     </div>
 
@@ -318,18 +318,18 @@ export default function PolicyList() {
                       </div>
                       <div>
                         <div style={{ fontSize: 10.5, color: 'var(--text-3)', marginBottom: 2 }}>Valid Until</div>
-                        <div style={{ fontWeight: 500, fontSize: 12.5 }}>{row.endDate || '—'}</div>
+                        <div style={{ fontWeight: 500, fontSize: 13.5 }}>{row.endDate || '—'}</div>
                       </div>
                       {row.paymentMode && (
                         <div>
                           <div style={{ fontSize: 10.5, color: 'var(--text-3)', marginBottom: 2 }}>Mode</div>
-                          <div style={{ fontWeight: 500, fontSize: 12.5 }}>{row.paymentMode}</div>
+                          <div style={{ fontWeight: 500, fontSize: 13.5 }}>{row.paymentMode}</div>
                         </div>
                       )}
                       {row.paymentType && (
                         <div>
                           <div style={{ fontSize: 10.5, color: 'var(--text-3)', marginBottom: 2 }}>Pay Type</div>
-                          <div style={{ fontWeight: 500, fontSize: 12.5 }}>{row.paymentType}</div>
+                          <div style={{ fontWeight: 500, fontSize: 13.5 }}>{row.paymentType}</div>
                         </div>
                       )}
                       {!isCustomer && (
@@ -341,12 +341,12 @@ export default function PolicyList() {
                       {row.policyNo && (
                         <div style={{ gridColumn: 'span 2' }}>
                           <div style={{ fontSize: 10.5, color: 'var(--text-3)', marginBottom: 2 }}>Policy No.</div>
-                          <div style={{ fontFamily: 'monospace', fontSize: 12.5, fontWeight: 600, color: 'var(--brand)' }}>{row.policyNo}</div>
+                          <div style={{ fontFamily: 'monospace', fontSize: 13.5, fontWeight: 600, color: 'var(--brand)' }}>{row.policyNo}</div>
                         </div>
                       )}
                       <div style={{ gridColumn: 'span 2' }}>
                         <div style={{ fontSize: 10.5, color: 'var(--text-3)', marginBottom: 2 }}>Proposal ID</div>
-                        <div style={{ fontFamily: 'monospace', fontSize: 12, color: 'var(--text-2)' }}>{row.proposalId}</div>
+                        <div style={{ fontFamily: 'monospace', fontSize: 13, color: 'var(--text-2)' }}>{row.proposalId}</div>
                       </div>
                     </div>
 

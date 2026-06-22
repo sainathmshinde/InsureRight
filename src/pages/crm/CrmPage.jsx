@@ -21,7 +21,7 @@ function SectionTitle({ children }) {
 }
 
 function Badge({ bg, color, children }) {
-  return <span style={{ padding: '2px 10px', borderRadius: 12, fontSize: 12, fontWeight: 500, background: bg, color }}>{children}</span>
+  return <span style={{ padding: '2px 10px', borderRadius: 12, fontSize: 13, fontWeight: 500, background: bg, color }}>{children}</span>
 }
 
 export default function CrmPage() {
@@ -120,8 +120,8 @@ export default function CrmPage() {
             <div style={{ padding: '12px 14px', borderBottom: '1px solid var(--border)', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 8 }}>
               <div>
                 <div style={{ fontWeight: 700, fontSize: 14, color: 'var(--text)' }}>{lead.name}</div>
-                <div style={{ fontSize: 12.5, color: 'var(--text-3)', marginTop: 2 }}>📱 {lead.mobile}</div>
-                {showCampaign && <div style={{ fontSize: 11.5, color: 'var(--text-3)', marginTop: 2 }}>📢 {campaignName(lead.campaignId)}</div>}
+                <div style={{ fontSize: 13.5, color: 'var(--text-3)', marginTop: 2 }}>📱 {lead.mobile}</div>
+                {showCampaign && <div style={{ fontSize: 13, color: 'var(--text-3)', marginTop: 2 }}>📢 {campaignName(lead.campaignId)}</div>}
               </div>
               <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 5, flexShrink: 0 }}>
                 <Badge bg={enrollBg(lead.enrollmentStatus)} color={enrollClr(lead.enrollmentStatus)}>{lead.enrollmentStatus}</Badge>
@@ -133,12 +133,12 @@ export default function CrmPage() {
               <div style={{ display: 'flex', gap: 20, flexWrap: 'wrap' }}>
                 <div>
                   <div style={{ fontSize: 10.5, color: 'var(--text-3)' }}>Enrollment Date</div>
-                  <div style={{ fontSize: 12.5, fontWeight: 600 }}>{lead.enrollmentDate || '—'}</div>
+                  <div style={{ fontSize: 13.5, fontWeight: 600 }}>{lead.enrollmentDate || '—'}</div>
                 </div>
                 {showAssignedTo && (
                   <div>
                     <div style={{ fontSize: 10.5, color: 'var(--text-3)' }}>Sales Operator</div>
-                    <div style={{ fontSize: 12.5, fontWeight: 600 }}>{KMD_AGENTS.find(a => a.id === lead.salesAssignedTo)?.name ?? '—'}</div>
+                    <div style={{ fontSize: 13.5, fontWeight: 600 }}>{KMD_AGENTS.find(a => a.id === lead.salesAssignedTo)?.name ?? '—'}</div>
                   </div>
                 )}
               </div>
@@ -178,7 +178,7 @@ export default function CrmPage() {
                 <td><Badge bg={enrollBg(lead.enrollmentStatus)} color={enrollClr(lead.enrollmentStatus)}>{lead.enrollmentStatus}</Badge></td>
                 <td>{lead.enrollmentDate || '—'}</td>
                 <td><Badge bg={purchBg(lead.purchaseStatus)} color={purchClr(lead.purchaseStatus)}>{lead.purchaseStatus}</Badge></td>
-                {showAssignedTo && <td style={{ fontSize: 12, color: 'var(--text-3)' }}>{KMD_AGENTS.find(a => a.id === lead.salesAssignedTo)?.name ?? '—'}</td>}
+                {showAssignedTo && <td style={{ fontSize: 13, color: 'var(--text-3)' }}>{KMD_AGENTS.find(a => a.id === lead.salesAssignedTo)?.name ?? '—'}</td>}
                 <td>
                   {showClaim ? (
                     <button type="button" className="btn btn-primary btn-sm" style={{ fontSize: 12 }} onClick={() => claimLead(lead.id)}>Claim</button>
@@ -226,7 +226,7 @@ export default function CrmPage() {
                 <div style={{ width: 40, height: 40, borderRadius: 10, background: '#0a7ea4', color: '#fff', fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 15 }}>CA</div>
                 <div>
                   <div style={{ fontWeight: 700, fontSize: 14 }}>{user?.name}</div>
-                  <div style={{ fontSize: 12, color: '#0a7ea4', fontWeight: 500 }}>Calling Operator · {myAgentRecord?.posLicense}</div>
+                  <div style={{ fontSize: 13, color: '#0a7ea4', fontWeight: 500 }}>Calling Operator · {myAgentRecord?.posLicense}</div>
                 </div>
               </div>
               <div className="form-grid">
@@ -287,7 +287,7 @@ export default function CrmPage() {
               <div style={{ width: 40, height: 40, borderRadius: 10, background: '#2d7d46', color: '#fff', fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 15 }}>SA</div>
               <div>
                 <div style={{ fontWeight: 700, fontSize: 14 }}>{user?.name}</div>
-                <div style={{ fontSize: 12, color: '#2d7d46', fontWeight: 500 }}>Sales Operator · {myAgentRecord?.posLicense}</div>
+                <div style={{ fontSize: 13, color: '#2d7d46', fontWeight: 500 }}>Sales Operator · {myAgentRecord?.posLicense}</div>
               </div>
             </div>
 
@@ -365,7 +365,7 @@ export default function CrmPage() {
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '18px 24px', borderBottom: '1px solid var(--border)', flexShrink: 0 }}>
               <div>
                 <div style={{ fontWeight: 700, fontSize: 15 }}>{draft.name}</div>
-                <div style={{ fontSize: 12, color: 'var(--text-3)', marginTop: 2 }}>
+                <div style={{ fontSize: 13, color: 'var(--text-3)', marginTop: 2 }}>
                   📱 {draft.mobile} · 📢 {campaignName(draft.campaignId)}
                 </div>
               </div>
@@ -411,7 +411,7 @@ export default function CrmPage() {
                     </button>
                   </div>
                   {draft.salesAssignedTo && (
-                    <div style={{ fontSize: 12, color: '#2d7d46', marginTop: 8 }}>
+                    <div style={{ fontSize: 13, color: '#2d7d46', marginTop: 8 }}>
                       Currently assigned to: <strong>{KMD_AGENTS.find(a => a.id === draft.salesAssignedTo)?.name ?? '—'}</strong>
                     </div>
                   )}
