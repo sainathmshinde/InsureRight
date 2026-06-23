@@ -69,6 +69,7 @@ import Reports        from "./pages/reports/Reports";
 import Reconciliation from "./pages/reconciliation/Reconciliation";
 import UpdatePayment   from "./pages/payment/UpdatePayment";
 import ExtractPayments from "./pages/payment/ExtractPayments";
+import AcceptCheque    from "./pages/payment/AcceptCheque";
 
 // Portals
 import BrokerPortal    from "./pages/portal/BrokerPortal";
@@ -202,6 +203,7 @@ export default function App() {
                 <Route path="reports"         element={<Reports />} />
                 <Route path="reconciliation" element={<Reconciliation />} />
                 <Route path="update-payment"  element={<UpdatePayment />} />
+                <Route path="accept-cheque"    element={<AcceptCheque />} />
                 <Route path="extract-payments" element={<ExtractPayments />} />
               </Route>
 

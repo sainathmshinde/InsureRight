@@ -125,6 +125,142 @@ function fmt(v) {
   return v ? `₹${Number(v).toLocaleString("en-IN")}` : "—";
 }
 
+function TxnDetailRow({ label, value, mismatch }) {
+  return (
+    <div style={{ display: "flex", flexDirection: "column", gap: 2 }}>
+      <div style={{ fontSize: 11, color: "#64748b", fontWeight: 600, textTransform: "uppercase", letterSpacing: ".4px" }}>{label}</div>
+      <div style={{ fontSize: 13.5, color: mismatch ? "#dc2626" : "#1a1628", fontWeight: mismatch ? 700 : 500 }}>
+        {value || "—"}{mismatch && <span style={{ marginLeft: 4 }}>⚠</span>}
+      </div>
+    </div>
+  );
+}
+
+function TransactionDetailModal({ system: rec, uploaded: up, onClose }) {
+  const [showChequeImage, setShowChequeImage] = useState(false);
+  const isCheque = rec.paymentType === "Cheque";
+  const methodMeta = isCheque
+    ? { color: "#7c3aed", bg: "#f5f3ff", icon: "🏦" }
+    : { color: "#0369a1", bg: "#e0f2fe", icon: "⚡" };
+
+  return (
+    <>
+      <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,.45)", zIndex: 1000, backdropFilter: "blur(2px)" }} onClick={onClose} />
+      <div style={{ position: "fixed", top: "50%", left: "50%", transform: "translate(-50%,-50%)", zIndex: 1001, background: "#fff", borderRadius: 18, boxShadow: "0 24px 60px rgba(0,0,0,.22)", width: "92%", maxWidth: 640, maxHeight: "90vh", overflowY: "auto" }}>
+        {/* Header */}
+        <div style={{ padding: "22px 26px 18px", borderBottom: "1.5px solid #f0edf8", display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 12 }}>
+          <div>
+            <div style={{ fontSize: 11, color: "#64748b", fontWeight: 600, letterSpacing: ".5px", textTransform: "uppercase", marginBottom: 4 }}>Transaction Details</div>
+            <div style={{ fontSize: 18, fontWeight: 800, color: "#1a1628" }}>{rec.proposalId}</div>
+            <div style={{ fontSize: 13, color: "#64748b", marginTop: 2 }}>{rec.customerName} · {rec.product}</div>
+          </div>
+          <div style={{ display: "flex", alignItems: "center", gap: 10, flexShrink: 0 }}>
+            <button onClick={onClose} style={{ width: 30, height: 30, borderRadius: 8, border: "1.5px solid #e8e4f0", background: "#faf9fc", cursor: "pointer", fontSize: 16, display: "flex", alignItems: "center", justifyContent: "center", color: "#64748b", lineHeight: 1 }}>×</button>
+          </div>
+        </div>
+
+        <div style={{ padding: "20px 26px" }}>
+          {/* Amount banner */}
+          <div style={{ background: "linear-gradient(135deg,#f5f3ff,#ede9fe)", borderRadius: 12, padding: "16px 20px", display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 20 }}>
+            <div>
+              <div style={{ fontSize: 11, color: "#7c3aed", fontWeight: 600, letterSpacing: ".4px", textTransform: "uppercase" }}>Premium Amount</div>
+              <div style={{ fontSize: 28, fontWeight: 900, color: "#a855f7", marginTop: 2 }}>{fmt(rec.premium)}</div>
+            </div>
+            <div style={{ textAlign: "right" }}>
+              <div style={{ display: "inline-flex", alignItems: "center", gap: 6, background: methodMeta.bg, color: methodMeta.color, border: "1.5px solid", borderColor: methodMeta.bg, borderRadius: 10, padding: "6px 14px", fontSize: 13, fontWeight: 700 }}>
+                <span>{methodMeta.icon}</span> {rec.paymentType}
+              </div>
+              <div style={{ fontSize: 12, color: "#64748b", marginTop: 6 }}>Offline Payment</div>
+            </div>
+          </div>
+
+          {/* System details grid */}
+          <div style={{ fontSize: 12, fontWeight: 700, color: "#1d4ed8", textTransform: "uppercase", letterSpacing: ".5px", marginBottom: 10 }}>System Record</div>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "14px 24px", marginBottom: 20 }}>
+            <TxnDetailRow label="Customer Name" value={rec.customerName} />
+            <TxnDetailRow label="Proposal ID" value={rec.proposalId} />
+            <TxnDetailRow label="Product" value={rec.product} />
+            <TxnDetailRow label="Campaign" value={rec.campaignName} />
+            <TxnDetailRow label="IC Name" value={rec.icName} />
+            <TxnDetailRow label="Bank" value={rec.bankName} />
+            {isCheque && <>
+              <TxnDetailRow label="Cheque Number" value={rec.chequeNumber} />
+              <TxnDetailRow label="Cheque Date" value={rec.chequeDate} />
+              <TxnDetailRow label="Clearing Date" value={rec.clearingDate} />
+              <TxnDetailRow label="In Favour Of" value={rec.inFavourOf} />
+              <TxnDetailRow label="Deposit Location" value={rec.chequeDepositLocation} />
+              <TxnDetailRow label="IFSC Code" value={rec.ifscCode} />
+              <TxnDetailRow label="MICR Code" value={rec.micrCode} />
+            </>}
+            {!isCheque && <>
+              <TxnDetailRow label="Transaction ID" value={rec.transactionId} />
+              <TxnDetailRow label="NEFT Date" value={rec.neftDate} />
+              <TxnDetailRow label="Account Number" value={rec.accountNumber} />
+              <TxnDetailRow label="Account Name" value={rec.accountName} />
+              <TxnDetailRow label="Branch" value={rec.branchName} />
+              <TxnDetailRow label="IFSC Code" value={rec.ifscCode} />
+            </>}
+          </div>
+
+          {/* Divider */}
+          <div style={{ borderTop: "2px dashed #e2e8f0", margin: "8px 0 20px" }} />
+
+          {/* Uploaded record */}
+          <div style={{ fontSize: 12, fontWeight: 700, color: "#a16207", textTransform: "uppercase", letterSpacing: ".5px", marginBottom: 10 }}>Uploaded Record (IC Data)</div>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "14px 24px", marginBottom: 20, background: "#fefce8", borderRadius: 10, padding: "14px 16px" }}>
+            <TxnDetailRow label="Premium Amount" value={fmt(up.premium)} mismatch={up.premium !== rec.premium} />
+            <TxnDetailRow label="IC Status" value={up.uploadedStatus} />
+            {isCheque && <>
+              <TxnDetailRow label="Cheque Number" value={up.chequeNumber} mismatch={up.chequeNumber !== rec.chequeNumber} />
+              <TxnDetailRow label="Cheque Date" value={up.chequeDate} mismatch={up.chequeDate !== rec.chequeDate} />
+              <TxnDetailRow label="Clearing Date" value={up.clearingDate} mismatch={up.clearingDate !== rec.clearingDate} />
+            </>}
+            {!isCheque && <>
+              <TxnDetailRow label="Transaction ID" value={up.transactionId} mismatch={up.transactionId !== rec.transactionId} />
+              <TxnDetailRow label="NEFT Date" value={up.neftDate} mismatch={up.neftDate !== rec.neftDate} />
+            </>}
+          </div>
+
+          {/* View Uploaded Cheque button */}
+          {isCheque && (
+            <div>
+              <button type="button" onClick={() => setShowChequeImage(!showChequeImage)}
+                style={{ padding: "10px 22px", borderRadius: 10, border: "2px solid #7c3aed", background: "#fff", color: "#7c3aed", fontWeight: 700, fontSize: 13.5, cursor: "pointer", fontFamily: "inherit", display: "flex", alignItems: "center", gap: 8, transition: "all .15s" }}
+                onMouseEnter={(e) => { e.currentTarget.style.background = "#f5f3ff"; }}
+                onMouseLeave={(e) => { e.currentTarget.style.background = "#fff"; }}>
+                🏦 {showChequeImage ? "Hide" : "View"} Uploaded Cheque
+              </button>
+              {showChequeImage && (
+                <div style={{ marginTop: 14, border: "1.5px solid #e2e8f0", borderRadius: 12, overflow: "hidden", background: "#f8fafc", padding: 20, textAlign: "center" }}>
+                  <div style={{ fontSize: 12, color: "#64748b", fontWeight: 600, marginBottom: 10, textTransform: "uppercase", letterSpacing: ".4px" }}>
+                    {rec.chequePhotoDocumentName}
+                  </div>
+                  <div style={{ background: "#fff", border: "1px dashed #cbd5e1", borderRadius: 8, padding: "40px 20px", color: "#94a3b8", fontSize: 14 }}>
+                    Cheque image preview for {rec.chequePhotoDocumentName}
+                    <div style={{ marginTop: 8, fontSize: 12, color: "#7c3aed", fontFamily: "monospace" }}>{rec.chequePhotoDocumentUrl}</div>
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* View NEFT Receipt */}
+          {!isCheque && (
+            <div>
+              <button type="button"
+                style={{ padding: "10px 22px", borderRadius: 10, border: "2px solid #0369a1", background: "#fff", color: "#0369a1", fontWeight: 700, fontSize: 13.5, cursor: "pointer", fontFamily: "inherit", display: "flex", alignItems: "center", gap: 8 }}
+                onMouseEnter={(e) => { e.currentTarget.style.background = "#e0f2fe"; }}
+                onMouseLeave={(e) => { e.currentTarget.style.background = "#fff"; }}>
+                ⚡ View NEFT Receipt
+              </button>
+            </div>
+          )}
+        </div>
+      </div>
+    </>
+  );
+}
+
 function exportToExcel(rows) {
   const headers = [
     "ID",
@@ -286,6 +422,7 @@ export default function Reconciliation() {
   const [expandedUnmatched, setExpandedUnmatched] = useState(null);
   const [selectedPending, setSelectedPending] = useState(null);
   const [manualMatches, setManualMatches] = useState({});
+  const [viewTransaction, setViewTransaction] = useState(null); // { system, uploaded }
   const [countAdj, setCountAdj] = useState({
     acceptedInitiated: 0,
     acceptedRejected: 0,
@@ -381,16 +518,21 @@ export default function Reconciliation() {
     rejected: Object.values(rowActions).filter((a) => a === "reject").length,
   };
 
-  // Classify records into tabs by matching proposalId
+  // Classify records into tabs by proposalId + amount match
   const uploadedMap = {};
   uploadedRows.forEach((u) => { uploadedMap[u.proposalId] = u; });
   const systemIds = new Set(reconcileBase.map((r) => r.proposalId));
 
   const matchedRecords = reconcileBase
-    .filter((r) => uploadedMap[r.proposalId])
+    .filter((r) => uploadedMap[r.proposalId] && uploadedMap[r.proposalId].premium === r.premium)
     .map((r) => ({ system: r, uploaded: uploadedMap[r.proposalId] }));
-  const pendingRecords = reconcileBase.filter((r) => !uploadedMap[r.proposalId]);
-  const unmatchedUploaded = uploadedRows.filter((u) => !systemIds.has(u.proposalId));
+  const amountMismatchIds = new Set(
+    reconcileBase
+      .filter((r) => uploadedMap[r.proposalId] && uploadedMap[r.proposalId].premium !== r.premium)
+      .map((r) => r.proposalId),
+  );
+  const pendingRecords = reconcileBase.filter((r) => !uploadedMap[r.proposalId] || amountMismatchIds.has(r.proposalId));
+  const unmatchedUploaded = uploadedRows.filter((u) => !systemIds.has(u.proposalId) || amountMismatchIds.has(u.proposalId));
 
   // ════════════════════════════════════════════════════════════════════════════
   // UPLOAD STEP
@@ -825,74 +967,34 @@ export default function Reconciliation() {
                   {matchedRecords.length === 0 ? (
                     <tr><td colSpan={11} style={{ textAlign: "center", padding: "32px 0", color: "#64748b" }}>No matched records</td></tr>
                   ) : (
-                    matchedRecords.map(({ system: rec, uploaded: up }) => {
-                      const action = rowActions[rec.id];
-                      const reason = rowReasons[rec.id] ?? "";
-                      const chequeNumDiff = up.chequeNumber !== rec.chequeNumber;
-                      const chequeDateDiff = up.chequeDate !== rec.chequeDate;
-                      const clearingDateDiff = up.clearingDate !== rec.clearingDate;
-                      const premDiff = up.premium !== rec.premium;
-
-                      return (
-                        <tr key={rec.id} style={{
-                          background: action === "accept" ? "#f0fdf4" : action === "reject" ? "#fff5f5" : "#fff",
-                          borderLeft: `3px solid ${action === "accept" ? "#16a34a" : action === "reject" ? "#dc2626" : "transparent"}`,
-                        }}>
-                          <td style={{ fontFamily: "monospace", fontSize: 13, color: "#7c3aed" }}>{rec.proposalId}</td>
+                    matchedRecords.map(({ system: rec, uploaded: up }) => (
+                        <tr key={rec.id} style={{ background: "#fff" }}>
+                          <td style={{ fontFamily: "monospace", fontSize: 11.5, color: "#7c3aed" }}>{rec.proposalId}</td>
                           <td style={{ fontWeight: 500 }}>{rec.customerName}</td>
                           <td style={{ background: "#f0f7ff", fontFamily: "monospace", fontWeight: 600 }}>{rec.chequeNumber}</td>
                           <td style={{ background: "#f0f7ff", whiteSpace: "nowrap" }}>{rec.chequeDate}</td>
                           <td style={{ background: "#f0f7ff", whiteSpace: "nowrap" }}>{rec.clearingDate}</td>
                           <td style={{ background: "#f0f7ff", fontWeight: 600 }}>{fmt(rec.premium)}</td>
-                          <td style={{ background: "#fffef0", fontFamily: "monospace", fontWeight: 600, color: chequeNumDiff ? "#dc2626" : "inherit" }}>
-                            {up.chequeNumber}{chequeNumDiff && <span title="Mismatch" style={{ marginLeft: 4 }}>⚠</span>}
+                          <td style={{ background: "#fffef0", fontFamily: "monospace", fontWeight: 600, color: up.chequeNumber !== rec.chequeNumber ? "#dc2626" : "inherit" }}>
+                            {up.chequeNumber}{up.chequeNumber !== rec.chequeNumber && <span title="Mismatch" style={{ marginLeft: 4 }}>⚠</span>}
                           </td>
-                          <td style={{ background: "#fffef0", whiteSpace: "nowrap", color: chequeDateDiff ? "#dc2626" : "inherit" }}>
-                            {up.chequeDate}{chequeDateDiff && <span title="Mismatch" style={{ marginLeft: 4 }}>⚠</span>}
+                          <td style={{ background: "#fffef0", whiteSpace: "nowrap", color: up.chequeDate !== rec.chequeDate ? "#dc2626" : "inherit" }}>
+                            {up.chequeDate}{up.chequeDate !== rec.chequeDate && <span title="Mismatch" style={{ marginLeft: 4 }}>⚠</span>}
                           </td>
-                          <td style={{ background: "#fffef0", whiteSpace: "nowrap", color: clearingDateDiff ? "#dc2626" : "inherit" }}>
-                            {up.clearingDate}{clearingDateDiff && <span title="Mismatch" style={{ marginLeft: 4 }}>⚠</span>}
+                          <td style={{ background: "#fffef0", whiteSpace: "nowrap", color: up.clearingDate !== rec.clearingDate ? "#dc2626" : "inherit" }}>
+                            {up.clearingDate}{up.clearingDate !== rec.clearingDate && <span title="Mismatch" style={{ marginLeft: 4 }}>⚠</span>}
                           </td>
-                          <td style={{ background: "#fffef0", fontWeight: 600, color: premDiff ? "#dc2626" : "inherit" }}>
-                            {fmt(up.premium)}{premDiff && <span title="Mismatch" style={{ marginLeft: 4 }}>⚠</span>}
+                          <td style={{ background: "#fffef0", fontWeight: 600, color: up.premium !== rec.premium ? "#dc2626" : "inherit" }}>
+                            {fmt(up.premium)}{up.premium !== rec.premium && <span title="Mismatch" style={{ marginLeft: 4 }}>⚠</span>}
                           </td>
                           <td>
-                            {action === "accept" && (
-                              <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                                <span style={{ fontSize: 12.5, fontWeight: 700, color: "#15803d" }}>✓ Accepted → Paid</span>
-                                <button type="button" onClick={() => setAction(rec.id, null)}
-                                  style={{ fontSize: 11, color: "#64748b", background: "none", border: "1px solid #e2e8f0", borderRadius: 5, padding: "2px 7px", cursor: "pointer" }}>Undo</button>
-                              </div>
-                            )}
-                            {action === "reject" && (
-                              <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
-                                <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                                  <span style={{ fontSize: 12.5, fontWeight: 700, color: "#dc2626" }}>✕ Rejected</span>
-                                  <button type="button" onClick={() => setAction(rec.id, null)}
-                                    style={{ fontSize: 11, color: "#64748b", background: "none", border: "1px solid #e2e8f0", borderRadius: 5, padding: "2px 7px", cursor: "pointer" }}>Undo</button>
-                                </div>
-                                {!reason && (
-                                  <select className="field-select" style={{ fontSize: 13, padding: "4px 8px" }} value={reason}
-                                    onChange={(e) => setReason(rec.id, e.target.value)}>
-                                    <option value="">Select reason…</option>
-                                    {REJECT_REASONS.map((r) => (<option key={r}>{r}</option>))}
-                                  </select>
-                                )}
-                                {reason && <span style={{ fontSize: 13, color: "#64748b" }}>{reason}</span>}
-                              </div>
-                            )}
-                            {!action && (
-                              <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
-                                <button type="button" onClick={() => setAction(rec.id, "accept")}
-                                  style={{ padding: "5px 14px", borderRadius: 7, border: "none", background: "#16a34a", color: "#fff", fontWeight: 700, fontSize: 12.5, cursor: "pointer", fontFamily: "inherit" }}>✓ Accept</button>
-                                <button type="button" onClick={() => setAction(rec.id, "reject")}
-                                  style={{ padding: "5px 14px", borderRadius: 7, border: "1.5px solid #dc2626", background: "#fff", color: "#dc2626", fontWeight: 700, fontSize: 12.5, cursor: "pointer", fontFamily: "inherit" }}>✕ Reject</button>
-                              </div>
-                            )}
+                            <button type="button" onClick={() => setViewTransaction({ system: rec, uploaded: up })}
+                              style={{ padding: "5px 14px", borderRadius: 7, border: "1.5px solid #7c3aed", background: "#fff", color: "#7c3aed", fontWeight: 700, fontSize: 12.5, cursor: "pointer", fontFamily: "inherit", whiteSpace: "nowrap" }}>
+                              View Transaction
+                            </button>
                           </td>
                         </tr>
-                      );
-                    })
+                      ))
                   )}
                 </tbody>
               </table>
@@ -904,7 +1006,7 @@ export default function Reconciliation() {
                     <th rowSpan={2} style={{ verticalAlign: "bottom", position: "sticky", top: 0, background: "#fff", zIndex: 3 }}>Customer</th>
                     <th colSpan={3} style={{ textAlign: "center", position: "sticky", top: 0, background: "#eff6ff", color: "#1d4ed8", borderBottom: "2px solid #93c5fd", zIndex: 3 }}>System Record</th>
                     <th colSpan={3} style={{ textAlign: "center", position: "sticky", top: 0, background: "#fefce8", color: "#a16207", borderBottom: "2px solid #fde047", zIndex: 3 }}>Uploaded Record</th>
-                    <th rowSpan={2} style={{ verticalAlign: "bottom", minWidth: 230, position: "sticky", top: 0, background: "#fff", zIndex: 3 }}>Action</th>
+                    <th rowSpan={2} style={{ verticalAlign: "bottom", minWidth: 160, position: "sticky", top: 0, background: "#fff", zIndex: 3 }}>Action</th>
                   </tr>
                   <tr>
                     <th style={{ position: "sticky", top: 36, background: "#eff6ff", color: "#1e40af", fontSize: 13, zIndex: 3 }}>Transaction No.</th>
@@ -919,72 +1021,30 @@ export default function Reconciliation() {
                   {matchedRecords.length === 0 ? (
                     <tr><td colSpan={9} style={{ textAlign: "center", padding: "32px 0", color: "#64748b" }}>No matched records</td></tr>
                   ) : (
-                    matchedRecords.map(({ system: rec, uploaded: up }) => {
-                      const action = rowActions[rec.id];
-                      const reason = rowReasons[rec.id] ?? "";
-                      const txnDiff = up.transactionId !== rec.transactionId;
-                      const dateDiff = up.neftDate !== rec.neftDate;
-                      const premDiff = up.premium !== rec.premium;
-
-                      return (
-                        <tr key={rec.id} style={{
-                          background: action === "accept" ? "#f0fdf4" : action === "reject" ? "#fff5f5" : "#fff",
-                          borderLeft: `3px solid ${action === "accept" ? "#16a34a" : action === "reject" ? "#dc2626" : "transparent"}`,
-                        }}>
-                          <td style={{ fontFamily: "monospace", fontSize: 13, color: "#7c3aed" }}>{rec.proposalId}</td>
+                    matchedRecords.map(({ system: rec, uploaded: up }) => (
+                        <tr key={rec.id} style={{ background: "#fff" }}>
+                          <td style={{ fontFamily: "monospace", fontSize: 11.5, color: "#7c3aed" }}>{rec.proposalId}</td>
                           <td style={{ fontWeight: 500 }}>{rec.customerName}</td>
-                          {/* System record cells — blue tint */}
                           <td style={{ background: "#f0f7ff", fontFamily: "monospace", fontWeight: 600, color: "#0369a1" }}>{rec.transactionId}</td>
                           <td style={{ background: "#f0f7ff", whiteSpace: "nowrap" }}>{rec.neftDate}</td>
                           <td style={{ background: "#f0f7ff", fontWeight: 600 }}>{fmt(rec.premium)}</td>
-                          {/* Uploaded record cells — yellow tint, red text on mismatch */}
-                          <td style={{ background: "#fffef0", fontFamily: "monospace", fontWeight: 600, color: txnDiff ? "#dc2626" : "#0369a1" }}>
-                            {up.transactionId ?? "—"}{txnDiff && <span title="Mismatch" style={{ marginLeft: 4 }}>⚠</span>}
+                          <td style={{ background: "#fffef0", fontFamily: "monospace", fontWeight: 600, color: up.transactionId !== rec.transactionId ? "#dc2626" : "#0369a1" }}>
+                            {up.transactionId ?? "—"}{up.transactionId !== rec.transactionId && <span title="Mismatch" style={{ marginLeft: 4 }}>⚠</span>}
                           </td>
-                          <td style={{ background: "#fffef0", whiteSpace: "nowrap", color: dateDiff ? "#dc2626" : "inherit" }}>
-                            {up.neftDate ?? "—"}{dateDiff && <span title="Mismatch" style={{ marginLeft: 4 }}>⚠</span>}
+                          <td style={{ background: "#fffef0", whiteSpace: "nowrap", color: up.neftDate !== rec.neftDate ? "#dc2626" : "inherit" }}>
+                            {up.neftDate ?? "—"}{up.neftDate !== rec.neftDate && <span title="Mismatch" style={{ marginLeft: 4 }}>⚠</span>}
                           </td>
-                          <td style={{ background: "#fffef0", fontWeight: 600, color: premDiff ? "#dc2626" : "inherit" }}>
-                            {fmt(up.premium)}{premDiff && <span title="Mismatch" style={{ marginLeft: 4 }}>⚠</span>}
+                          <td style={{ background: "#fffef0", fontWeight: 600, color: up.premium !== rec.premium ? "#dc2626" : "inherit" }}>
+                            {fmt(up.premium)}{up.premium !== rec.premium && <span title="Mismatch" style={{ marginLeft: 4 }}>⚠</span>}
                           </td>
-                          {/* Action column */}
                           <td>
-                            {action === "accept" && (
-                              <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                                <span style={{ fontSize: 12.5, fontWeight: 700, color: "#15803d" }}>✓ Accepted → Paid</span>
-                                <button type="button" onClick={() => setAction(rec.id, null)}
-                                  style={{ fontSize: 11, color: "#64748b", background: "none", border: "1px solid #e2e8f0", borderRadius: 5, padding: "2px 7px", cursor: "pointer" }}>Undo</button>
-                              </div>
-                            )}
-                            {action === "reject" && (
-                              <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
-                                <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                                  <span style={{ fontSize: 12.5, fontWeight: 700, color: "#dc2626" }}>✕ Rejected</span>
-                                  <button type="button" onClick={() => setAction(rec.id, null)}
-                                    style={{ fontSize: 11, color: "#64748b", background: "none", border: "1px solid #e2e8f0", borderRadius: 5, padding: "2px 7px", cursor: "pointer" }}>Undo</button>
-                                </div>
-                                {!reason && (
-                                  <select className="field-select" style={{ fontSize: 13, padding: "4px 8px" }} value={reason}
-                                    onChange={(e) => setReason(rec.id, e.target.value)}>
-                                    <option value="">Select reason…</option>
-                                    {REJECT_REASONS.map((r) => (<option key={r}>{r}</option>))}
-                                  </select>
-                                )}
-                                {reason && <span style={{ fontSize: 13, color: "#64748b" }}>{reason}</span>}
-                              </div>
-                            )}
-                            {!action && (
-                              <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
-                                <button type="button" onClick={() => setAction(rec.id, "accept")}
-                                  style={{ padding: "5px 14px", borderRadius: 7, border: "none", background: "#16a34a", color: "#fff", fontWeight: 700, fontSize: 12.5, cursor: "pointer", fontFamily: "inherit" }}>✓ Accept</button>
-                                <button type="button" onClick={() => setAction(rec.id, "reject")}
-                                  style={{ padding: "5px 14px", borderRadius: 7, border: "1.5px solid #dc2626", background: "#fff", color: "#dc2626", fontWeight: 700, fontSize: 12.5, cursor: "pointer", fontFamily: "inherit" }}>✕ Reject</button>
-                              </div>
-                            )}
+                            <button type="button" onClick={() => setViewTransaction({ system: rec, uploaded: up })}
+                              style={{ padding: "5px 14px", borderRadius: 7, border: "1.5px solid #7c3aed", background: "#fff", color: "#7c3aed", fontWeight: 700, fontSize: 12.5, cursor: "pointer", fontFamily: "inherit", whiteSpace: "nowrap" }}>
+                              View Transaction
+                            </button>
                           </td>
                         </tr>
-                      );
-                    })
+                      ))
                   )}
                 </tbody>
               </table>
@@ -1079,116 +1139,160 @@ export default function Reconciliation() {
                             </td>
                           </tr>,
 
-                          /* ── Expanded: pending record selector + comparison ── */
+                          /* ── Expanded: clickable pending cards + comparison ── */
                           isExpanded && (
                             <tr key={`${up.proposalId}-expand`}>
                               <td colSpan={colCount} style={{ padding: 0, background: "#f8fafc", borderTop: "2px dashed #a78bfa" }}>
                                 <div style={{ padding: "14px 16px" }}>
-                                  {/* Pending record selector */}
-                                  <div style={{ marginBottom: 12 }}>
-                                    <label style={{ fontSize: 13, fontWeight: 700, color: "#64748b", textTransform: "uppercase", letterSpacing: ".5px" }}>Select a pending record to compare:</label>
-                                    <select className="field-select" style={{ marginTop: 6, maxWidth: 400 }} value={selectedPending ?? ""} onChange={(e) => setSelectedPending(e.target.value ? Number(e.target.value) : null)}>
-                                      <option value="">— Choose pending record —</option>
-                                      {availablePending.map((p) => (
-                                        <option key={p.id} value={p.id}>
-                                          {p.proposalId} — {p.customerName} — {fmt(p.premium)}
-                                        </option>
-                                      ))}
-                                    </select>
-                                  </div>
 
-                                  {/* Comparison table */}
+                                  {/* Step 1: Pick a pending record */}
+                                  {!selectedPending && (
+                                    <div>
+                                      <div style={{ fontSize: 12, fontWeight: 700, color: "#64748b", textTransform: "uppercase", letterSpacing: ".5px", marginBottom: 10 }}>
+                                        Select a pending record to compare
+                                      </div>
+                                      {availablePending.length === 0 ? (
+                                        <div style={{ padding: "16px 0", textAlign: "center", color: "#64748b", fontSize: 13 }}>No pending records available</div>
+                                      ) : (
+                                        <div style={{ display: "flex", flexDirection: "column", gap: 6, maxHeight: 240, overflowY: "auto" }}>
+                                          {availablePending.map((p) => (
+                                            <div
+                                              key={p.id}
+                                              onClick={() => setSelectedPending(p.id)}
+                                              style={{
+                                                display: "flex", alignItems: "center", gap: 16,
+                                                padding: "10px 14px", borderRadius: 8,
+                                                border: "1.5px solid #dbeafe", background: "#f0f7ff",
+                                                cursor: "pointer", transition: "all .12s",
+                                              }}
+                                              onMouseEnter={(e) => { e.currentTarget.style.borderColor = "#7c3aed"; e.currentTarget.style.background = "#f5f3ff"; }}
+                                              onMouseLeave={(e) => { e.currentTarget.style.borderColor = "#dbeafe"; e.currentTarget.style.background = "#f0f7ff"; }}
+                                            >
+                                              <div style={{ flex: "0 0 auto" }}>
+                                                <div style={{ fontSize: 11, fontWeight: 700, color: "#1d4ed8", fontFamily: "monospace" }}>{p.proposalId}</div>
+                                              </div>
+                                              <div style={{ flex: 1, fontSize: 13, fontWeight: 500, color: "#1e293b" }}>{p.customerName}</div>
+                                              {isCheque && <>
+                                                <div style={{ fontSize: 12, color: "#64748b" }}>
+                                                  <span style={{ fontWeight: 600, fontFamily: "monospace" }}>{p.chequeNumber ?? "—"}</span>
+                                                  <span style={{ margin: "0 6px", color: "#cbd5e1" }}>|</span>
+                                                  {p.chequeDate ?? "—"}
+                                                </div>
+                                              </>}
+                                              {isNeft && <>
+                                                <div style={{ fontSize: 12, color: "#64748b" }}>
+                                                  <span style={{ fontWeight: 600, fontFamily: "monospace", color: "#0369a1" }}>{p.transactionId ?? "—"}</span>
+                                                  <span style={{ margin: "0 6px", color: "#cbd5e1" }}>|</span>
+                                                  {p.neftDate ?? "—"}
+                                                </div>
+                                              </>}
+                                              <div style={{ fontWeight: 700, fontSize: 13, color: "#1e293b", whiteSpace: "nowrap" }}>{fmt(p.premium)}</div>
+                                              <div style={{ fontSize: 18, color: "#a78bfa", flexShrink: 0 }}>→</div>
+                                            </div>
+                                          ))}
+                                        </div>
+                                      )}
+                                    </div>
+                                  )}
+
+                                  {/* Step 2: Comparison after selection */}
                                   {selectedPending && (() => {
                                     const pr = pendingRecords.find((p) => p.id === selectedPending);
                                     if (!pr) return null;
                                     return (
-                                      <div style={{ border: "1px solid var(--border)", borderRadius: 10, overflow: "hidden" }}>
-                                        <table style={{ fontSize: 13, marginBottom: 0 }}>
-                                          <thead>
-                                            <tr>
-                                              <th style={{ background: "#f1f5f9", width: 100 }}>Source</th>
-                                              {isCheque && <>
-                                                <th style={{ background: "#f1f5f9" }}>Cheque No.</th>
-                                                <th style={{ background: "#f1f5f9" }}>Cheque Date</th>
-                                                <th style={{ background: "#f1f5f9" }}>Clearing Date</th>
-                                              </>}
-                                              {isNeft && <>
-                                                <th style={{ background: "#f1f5f9" }}>Transaction No.</th>
-                                                <th style={{ background: "#f1f5f9" }}>Transaction Date</th>
-                                              </>}
-                                              <th style={{ background: "#f1f5f9" }}>Amount</th>
-                                            </tr>
-                                          </thead>
-                                          <tbody>
-                                            {/* Pending (system) row */}
-                                            <tr style={{ background: "#eff6ff" }}>
-                                              <td style={{ fontWeight: 700, color: "#1d4ed8", fontSize: 12 }}>System</td>
-                                              {isCheque && <>
-                                                <td style={{ fontFamily: "monospace", fontWeight: 600 }}>{pr.chequeNumber ?? "—"}</td>
-                                                <td style={{ whiteSpace: "nowrap" }}>{pr.chequeDate ?? "—"}</td>
-                                                <td style={{ whiteSpace: "nowrap" }}>{pr.clearingDate ?? "—"}</td>
-                                              </>}
-                                              {isNeft && <>
-                                                <td style={{ fontFamily: "monospace", fontWeight: 600, color: "#0369a1" }}>{pr.transactionId ?? "—"}</td>
-                                                <td style={{ whiteSpace: "nowrap" }}>{pr.neftDate ?? "—"}</td>
-                                              </>}
-                                              <td style={{ fontWeight: 600 }}>{fmt(pr.premium)}</td>
-                                            </tr>
-                                            {/* Uploaded row */}
-                                            <tr style={{ background: "#fefce8" }}>
-                                              <td style={{ fontWeight: 700, color: "#a16207", fontSize: 12 }}>Uploaded</td>
-                                              {isCheque && <>
-                                                <td style={{ fontFamily: "monospace", fontWeight: 600, color: up.chequeNumber !== (pr.chequeNumber ?? "") ? "#dc2626" : "inherit" }}>
-                                                  {up.chequeNumber ?? "—"}{up.chequeNumber !== (pr.chequeNumber ?? "") && <span style={{ marginLeft: 4 }}>⚠</span>}
+                                      <div>
+                                        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 10 }}>
+                                          <span style={{ fontSize: 12, fontWeight: 700, color: "#64748b", textTransform: "uppercase", letterSpacing: ".5px" }}>Comparison</span>
+                                          <button type="button" onClick={() => setSelectedPending(null)}
+                                            style={{ fontSize: 12, color: "#7c3aed", background: "none", border: "none", cursor: "pointer", fontWeight: 600, fontFamily: "inherit" }}>
+                                            ← Pick different record
+                                          </button>
+                                        </div>
+                                        <div style={{ border: "1px solid var(--border)", borderRadius: 10, overflow: "hidden" }}>
+                                          <table style={{ fontSize: 13, marginBottom: 0 }}>
+                                            <thead>
+                                              <tr>
+                                                <th style={{ background: "#f1f5f9", width: 100 }}>Source</th>
+                                                {isCheque && <>
+                                                  <th style={{ background: "#f1f5f9" }}>Cheque No.</th>
+                                                  <th style={{ background: "#f1f5f9" }}>Cheque Date</th>
+                                                  <th style={{ background: "#f1f5f9" }}>Clearing Date</th>
+                                                </>}
+                                                {isNeft && <>
+                                                  <th style={{ background: "#f1f5f9" }}>Transaction No.</th>
+                                                  <th style={{ background: "#f1f5f9" }}>Transaction Date</th>
+                                                </>}
+                                                <th style={{ background: "#f1f5f9" }}>Amount</th>
+                                              </tr>
+                                            </thead>
+                                            <tbody>
+                                              <tr style={{ background: "#eff6ff" }}>
+                                                <td style={{ fontWeight: 700, color: "#1d4ed8", fontSize: 12 }}>System</td>
+                                                {isCheque && <>
+                                                  <td style={{ fontFamily: "monospace", fontWeight: 600 }}>{pr.chequeNumber ?? "—"}</td>
+                                                  <td style={{ whiteSpace: "nowrap" }}>{pr.chequeDate ?? "—"}</td>
+                                                  <td style={{ whiteSpace: "nowrap" }}>{pr.clearingDate ?? "—"}</td>
+                                                </>}
+                                                {isNeft && <>
+                                                  <td style={{ fontFamily: "monospace", fontWeight: 600, color: "#0369a1" }}>{pr.transactionId ?? "—"}</td>
+                                                  <td style={{ whiteSpace: "nowrap" }}>{pr.neftDate ?? "—"}</td>
+                                                </>}
+                                                <td style={{ fontWeight: 600 }}>{fmt(pr.premium)}</td>
+                                              </tr>
+                                              <tr style={{ background: "#fefce8" }}>
+                                                <td style={{ fontWeight: 700, color: "#a16207", fontSize: 12 }}>Uploaded</td>
+                                                {isCheque && <>
+                                                  <td style={{ fontFamily: "monospace", fontWeight: 600, color: up.chequeNumber !== (pr.chequeNumber ?? "") ? "#dc2626" : "inherit" }}>
+                                                    {up.chequeNumber ?? "—"}{up.chequeNumber !== (pr.chequeNumber ?? "") && <span style={{ marginLeft: 4 }}>⚠</span>}
+                                                  </td>
+                                                  <td style={{ whiteSpace: "nowrap", color: up.chequeDate !== (pr.chequeDate ?? "") ? "#dc2626" : "inherit" }}>
+                                                    {up.chequeDate ?? "—"}{up.chequeDate !== (pr.chequeDate ?? "") && <span style={{ marginLeft: 4 }}>⚠</span>}
+                                                  </td>
+                                                  <td style={{ whiteSpace: "nowrap", color: up.clearingDate !== (pr.clearingDate ?? "") ? "#dc2626" : "inherit" }}>
+                                                    {up.clearingDate ?? "—"}{up.clearingDate !== (pr.clearingDate ?? "") && <span style={{ marginLeft: 4 }}>⚠</span>}
+                                                  </td>
+                                                </>}
+                                                {isNeft && <>
+                                                  <td style={{ fontFamily: "monospace", fontWeight: 600, color: up.transactionId !== (pr.transactionId ?? "") ? "#dc2626" : "#0369a1" }}>
+                                                    {up.transactionId ?? "—"}{up.transactionId !== (pr.transactionId ?? "") && <span style={{ marginLeft: 4 }}>⚠</span>}
+                                                  </td>
+                                                  <td style={{ whiteSpace: "nowrap", color: up.neftDate !== (pr.neftDate ?? "") ? "#dc2626" : "inherit" }}>
+                                                    {up.neftDate ?? "—"}{up.neftDate !== (pr.neftDate ?? "") && <span style={{ marginLeft: 4 }}>⚠</span>}
+                                                  </td>
+                                                </>}
+                                                <td style={{ fontWeight: 600, color: up.premium !== pr.premium ? "#dc2626" : "inherit" }}>
+                                                  {fmt(up.premium)}{up.premium !== pr.premium && <span style={{ marginLeft: 4 }}>⚠</span>}
                                                 </td>
-                                                <td style={{ whiteSpace: "nowrap", color: up.chequeDate !== (pr.chequeDate ?? "") ? "#dc2626" : "inherit" }}>
-                                                  {up.chequeDate ?? "—"}{up.chequeDate !== (pr.chequeDate ?? "") && <span style={{ marginLeft: 4 }}>⚠</span>}
-                                                </td>
-                                                <td style={{ whiteSpace: "nowrap", color: up.clearingDate !== (pr.clearingDate ?? "") ? "#dc2626" : "inherit" }}>
-                                                  {up.clearingDate ?? "—"}{up.clearingDate !== (pr.clearingDate ?? "") && <span style={{ marginLeft: 4 }}>⚠</span>}
-                                                </td>
-                                              </>}
-                                              {isNeft && <>
-                                                <td style={{ fontFamily: "monospace", fontWeight: 600, color: up.transactionId !== (pr.transactionId ?? "") ? "#dc2626" : "#0369a1" }}>
-                                                  {up.transactionId ?? "—"}{up.transactionId !== (pr.transactionId ?? "") && <span style={{ marginLeft: 4 }}>⚠</span>}
-                                                </td>
-                                                <td style={{ whiteSpace: "nowrap", color: up.neftDate !== (pr.neftDate ?? "") ? "#dc2626" : "inherit" }}>
-                                                  {up.neftDate ?? "—"}{up.neftDate !== (pr.neftDate ?? "") && <span style={{ marginLeft: 4 }}>⚠</span>}
-                                                </td>
-                                              </>}
-                                              <td style={{ fontWeight: 600, color: up.premium !== pr.premium ? "#dc2626" : "inherit" }}>
-                                                {fmt(up.premium)}{up.premium !== pr.premium && <span style={{ marginLeft: 4 }}>⚠</span>}
-                                              </td>
-                                            </tr>
-                                          </tbody>
-                                        </table>
+                                              </tr>
+                                            </tbody>
+                                          </table>
 
-                                        {/* Accept / Reject buttons */}
-                                        <div style={{ display: "flex", gap: 10, alignItems: "center", padding: "12px 16px", borderTop: "1px solid var(--border)", background: "#fff" }}>
-                                          <button type="button" onClick={() => {
-                                            setManualMatches((prev) => ({ ...prev, [up.proposalId]: { pendingId: selectedPending, action: "accept" } }));
-                                            setExpandedUnmatched(null); setSelectedPending(null);
-                                          }}
-                                            style={{ padding: "6px 18px", borderRadius: 7, border: "none", background: "#16a34a", color: "#fff", fontWeight: 700, fontSize: 13, cursor: "pointer", fontFamily: "inherit" }}>
-                                            ✓ Accept
-                                          </button>
-                                          <button type="button" onClick={() => {
-                                            setManualMatches((prev) => ({ ...prev, [up.proposalId]: { pendingId: selectedPending, action: "reject", reason: "" } }));
-                                          }}
-                                            style={{ padding: "6px 18px", borderRadius: 7, border: "1.5px solid #dc2626", background: "#fff", color: "#dc2626", fontWeight: 700, fontSize: 13, cursor: "pointer", fontFamily: "inherit" }}>
-                                            ✕ Reject
-                                          </button>
-                                          {/* Reject reason inline — shown after Reject is clicked */}
-                                          {manualMatches[up.proposalId]?.action === "reject" && manualMatches[up.proposalId]?.reason === "" && (
-                                            <select className="field-select" style={{ fontSize: 13, padding: "4px 8px", maxWidth: 220 }} value=""
-                                              onChange={(e) => {
-                                                setManualMatches((prev) => ({ ...prev, [up.proposalId]: { ...prev[up.proposalId], reason: e.target.value } }));
-                                                setExpandedUnmatched(null); setSelectedPending(null);
-                                              }}>
-                                              <option value="">Select reason…</option>
-                                              {REJECT_REASONS.map((r) => (<option key={r}>{r}</option>))}
-                                            </select>
-                                          )}
+                                          {/* Accept / Reject buttons */}
+                                          <div style={{ display: "flex", gap: 10, alignItems: "center", padding: "12px 16px", borderTop: "1px solid var(--border)", background: "#fff" }}>
+                                            <button type="button" onClick={() => {
+                                              setManualMatches((prev) => ({ ...prev, [up.proposalId]: { pendingId: selectedPending, action: "accept" } }));
+                                              setExpandedUnmatched(null); setSelectedPending(null);
+                                            }}
+                                              style={{ padding: "6px 18px", borderRadius: 7, border: "none", background: "#16a34a", color: "#fff", fontWeight: 700, fontSize: 13, cursor: "pointer", fontFamily: "inherit" }}>
+                                              ✓ Accept
+                                            </button>
+                                            <button type="button" onClick={() => {
+                                              setManualMatches((prev) => ({ ...prev, [up.proposalId]: { pendingId: selectedPending, action: "reject", reason: "" } }));
+                                            }}
+                                              style={{ padding: "6px 18px", borderRadius: 7, border: "1.5px solid #dc2626", background: "#fff", color: "#dc2626", fontWeight: 700, fontSize: 13, cursor: "pointer", fontFamily: "inherit" }}>
+                                              ✕ Reject
+                                            </button>
+                                            {manualMatches[up.proposalId]?.action === "reject" && manualMatches[up.proposalId]?.reason === "" && (
+                                              <select className="field-select" style={{ fontSize: 12, padding: "4px 8px", maxWidth: 220 }} value=""
+                                                onChange={(e) => {
+                                                  setManualMatches((prev) => ({ ...prev, [up.proposalId]: { ...prev[up.proposalId], reason: e.target.value } }));
+                                                  setExpandedUnmatched(null); setSelectedPending(null);
+                                                }}>
+                                                <option value="">Select reason…</option>
+                                                {REJECT_REASONS.map((r) => (<option key={r}>{r}</option>))}
+                                              </select>
+                                            )}
+                                          </div>
                                         </div>
                                       </div>
                                     );
@@ -1225,6 +1329,15 @@ export default function Reconciliation() {
           </div>
           );
         })()}
+
+        {/* Transaction detail modal */}
+        {viewTransaction && (
+          <TransactionDetailModal
+            system={viewTransaction.system}
+            uploaded={viewTransaction.uploaded}
+            onClose={() => setViewTransaction(null)}
+          />
+        )}
 
         {/* Sticky bottom bar */}
         <div
