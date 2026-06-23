@@ -30,11 +30,11 @@ const BROKER_NAV = [
   },
   {
     key: "agent",
-    label: "Agents",
+    label: "Operators",
     icon: AgentIcon,
     children: [
-      { label: "All Agents", path: "/agent" },
-      { label: "Add Agent", path: "/agent/create" },
+      { label: "All Operators", path: "/agent" },
+      { label: "Add Operator", path: "/agent/create" },
     ],
   },
   {
@@ -196,7 +196,7 @@ const CUSTOMER_NAV = [
     key: "policy-catalogue",
     label: "Buy Insurance",
     icon: ProductIcon,
-    children: [{ label: "Available Plans", path: "/policy-catalogue" }],
+    children: [{ label: "Buy Insurance Policy", path: "/policy/buy" }],
   },
 ];
 
@@ -457,7 +457,7 @@ export default function Sidebar({ mobileOpen = false, onMobileClose }) {
           >
             <LogoutIcon size={17} color="#dc2626" />
             {!collapsed && (
-              <span style={{ marginLeft: 9, fontSize: 13, fontWeight: 500 }}>
+              <span style={{ marginLeft: 9, fontSize: 14, fontWeight: 500 }}>
                 Sign Out
               </span>
             )}
@@ -625,7 +625,7 @@ const S = {
     gap: 9,
     padding: "9px 10px",
     borderRadius: 8,
-    fontSize: 13.5,
+    fontSize: 15,
     fontWeight: 500,
     color: "#1a1628",
     background: "none",
@@ -659,7 +659,7 @@ const S = {
     width: 22,
     height: 22,
   },
-  label: { flex: 1, fontSize: 13.5 },
+  label: { flex: 1, fontSize: 15 },
   chevron: {
     fontSize: 17,
     display: "inline-block",
@@ -689,7 +689,7 @@ const S = {
     gap: 8,
     padding: "7px 10px",
     borderRadius: 6,
-    fontSize: 13,
+    fontSize: 14,
     color: "#5c5573",
     textDecoration: "none",
     transition: "background .12s,color .12s",
@@ -720,7 +720,7 @@ const S = {
     alignItems: "center",
     gap: 7,
     padding: "10px 14px 9px",
-    fontSize: 11.5,
+    fontSize: 13,
     fontWeight: 700,
     color: "#7c3aed",
     textTransform: "uppercase",
@@ -732,7 +732,7 @@ const S = {
     display: "flex",
     alignItems: "center",
     padding: "10px 16px",
-    fontSize: 13.5,
+    fontSize: 15,
     color: "#1a1628",
     textDecoration: "none",
     transition: "background .1s,color .1s",

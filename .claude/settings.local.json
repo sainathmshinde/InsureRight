@@ -4,7 +4,13 @@
       "Bash(npm run *)",
       "Bash(npx vite *)",
       "WebFetch(domain:hrms.syborgtech.in)",
-      "WebFetch(domain:syborgtech.in)"
+      "WebFetch(domain:syborgtech.in)",
+      "Bash(npm install *)",
+      "Bash(kill %1)",
+      "Bash(wait)",
+      "Bash(command -v nvm)",
+      "Bash(nvm --version)",
+      "Bash(command -v brew)"
     ]
   }
 }

@@ -61,7 +61,7 @@ export default function AgentPortal() {
 
       {/* Welcome banner */}
       <div className="ap-banner" style={{ background: 'linear-gradient(135deg,#fb7185 0%,#a855f7 100%)', borderRadius: 14, padding: '28px 32px', color: '#fff' }}>
-        <div style={{ fontSize: 13, color: 'rgba(255,255,255,0.75)', marginBottom: 6, fontWeight: 500 }}>Agent Portal</div>
+        <div style={{ fontSize: 13, color: 'rgba(255,255,255,0.75)', marginBottom: 6, fontWeight: 500 }}>Operator Portal</div>
         <div className="ap-banner-title" style={{ fontSize: 24, fontWeight: 800, marginBottom: 4 }}>Welcome back, {user?.name}</div>
         <div style={{ fontSize: 13.5, color: 'rgba(255,255,255,0.88)' }}>{user?.company}</div>
       </div>
@@ -71,8 +71,8 @@ export default function AgentPortal() {
         {STATS.map(s => (
           <div key={s.label} style={{ background: '#fff', border: '1px solid #e8e4f0', borderRadius: 12, padding: '20px 22px' }}>
             <div style={{ fontSize: 28, fontWeight: 800, color: s.color }}>{s.value}</div>
-            <div style={{ fontSize: 13.5, fontWeight: 600, color: '#1a1628', marginTop: 4 }}>{s.label}</div>
-            <div style={{ fontSize: 12, color: '#64748b', marginTop: 2 }}>{s.sub}</div>
+            <div style={{ fontSize: 14.5, fontWeight: 600, color: '#1a1628', marginTop: 4 }}>{s.label}</div>
+            <div style={{ fontSize: 13, color: '#64748b', marginTop: 2 }}>{s.sub}</div>
           </div>
         ))}
       </div>
@@ -100,7 +100,7 @@ export default function AgentPortal() {
           <div className="card-body">
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 14 }}>
               <div style={{ fontWeight: 700, fontSize: 15 }}>{custLabel}</div>
-              <button type="button" className="btn btn-ghost" style={{ fontSize: 12, padding: '4px 12px' }} onClick={() => navigate('/customer')}>View All</button>
+              <button type="button" className="btn btn-ghost" style={{ fontSize: 13, padding: '4px 12px' }} onClick={() => navigate('/customer')}>View All</button>
             </div>
 
             {/* Mobile cards */}
@@ -113,9 +113,9 @@ export default function AgentPortal() {
                       {c.status}
                     </span>
                   </div>
-                  <div style={{ fontSize: 12, color: '#64748b' }}>{c.policy}</div>
+                  <div style={{ fontSize: 13, color: '#64748b' }}>{c.policy}</div>
                   {c.renewal !== '—' && (
-                    <div style={{ fontSize: 11.5, color: '#64748b', marginTop: 2 }}>Renewal: {c.renewal}</div>
+                    <div style={{ fontSize: 13, color: '#64748b', marginTop: 2 }}>Renewal: {c.renewal}</div>
                   )}
                 </div>
               ))}
@@ -123,7 +123,7 @@ export default function AgentPortal() {
 
             {/* Desktop table */}
             <div className="ap-cust-table table-wrap">
-              <table style={{ fontSize: 13 }}>
+              <table style={{ fontSize: 14 }}>
                 <thead>
                   <tr><th>Name</th><th>Policy</th><th>Renewal</th><th>Status</th></tr>
                 </thead>
@@ -154,7 +154,7 @@ export default function AgentPortal() {
               {MY_CAMPAIGNS.map(c => (
                 <div key={c.name} style={{ padding: '12px 14px', border: '1px solid #e8e4f0', borderRadius: 10, background: '#faf9fc' }}>
                   <div style={{ fontWeight: 600, fontSize: 13.5, marginBottom: 6 }}>{c.name}</div>
-                  <div style={{ display: 'flex', gap: 16, fontSize: 12, flexWrap: 'wrap' }}>
+                  <div style={{ display: 'flex', gap: 16, fontSize: 13, flexWrap: 'wrap' }}>
                     <span style={{ color: '#64748b' }}>{c.type}</span>
                     <span style={{ color: '#0a7ea4', fontWeight: 500 }}>{c.leads} Leads</span>
                     <span style={{ color: '#2d7d46', fontWeight: 500 }}>{c.purchased} Purchased</span>
@@ -162,7 +162,7 @@ export default function AgentPortal() {
                 </div>
               ))}
             </div>
-            <button type="button" className="btn btn-ghost" style={{ fontSize: 12, padding: '6px 14px', marginTop: 12 }} onClick={() => navigate('/crm')}>Open CRM →</button>
+            <button type="button" className="btn btn-ghost" style={{ fontSize: 13, padding: '6px 14px', marginTop: 12 }} onClick={() => navigate('/crm')}>Open CRM →</button>
           </div>
         </div>
 

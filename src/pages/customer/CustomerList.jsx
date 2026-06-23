@@ -55,7 +55,7 @@ export default function CustomerList() {
     { key: 'dob',      label: 'DOB' },
     { key: 'campaign', label: 'Campaign',
       render: row => row.campaignName
-        ? <span style={{ fontSize: 11.5, color: 'var(--text-2)' }}>{row.campaignName}</span>
+        ? <span style={{ fontSize: 13, color: 'var(--text-2)' }}>{row.campaignName}</span>
         : <span style={{ color: 'var(--text-3)' }}>—</span>
     },
     { key: 'engaged', label: 'Engaged',
@@ -67,7 +67,7 @@ export default function CustomerList() {
       render: row => {
         const assoc = ASSOCIATIONS.find(a => a.id === row.associationId)
         return assoc
-          ? <span style={{ fontSize: 11.5, color: 'var(--text-2)' }}>{assoc.name}</span>
+          ? <span style={{ fontSize: 13, color: 'var(--text-2)' }}>{assoc.name}</span>
           : <span style={{ color: 'var(--text-3)' }}>—</span>
       }
     },

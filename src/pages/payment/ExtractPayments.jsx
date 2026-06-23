@@ -112,7 +112,7 @@ export default function ExtractPayments() {
           <div style={{ display: 'flex', flexDirection: 'column', gap: 18, marginBottom: 28 }}>
 
             <div>
-              <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: '#64748b', marginBottom: 6, textTransform: 'uppercase', letterSpacing: '.4px' }}>
+              <label style={{ display: 'block', fontSize: 13, fontWeight: 600, color: '#64748b', marginBottom: 6, textTransform: 'uppercase', letterSpacing: '.4px' }}>
                 Campaign
               </label>
               <select
@@ -127,7 +127,7 @@ export default function ExtractPayments() {
             </div>
 
             <div>
-              <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: '#64748b', marginBottom: 6, textTransform: 'uppercase', letterSpacing: '.4px' }}>
+              <label style={{ display: 'block', fontSize: 13, fontWeight: 600, color: '#64748b', marginBottom: 6, textTransform: 'uppercase', letterSpacing: '.4px' }}>
                 Payment Type
               </label>
               <select
@@ -142,7 +142,7 @@ export default function ExtractPayments() {
             </div>
 
             <div>
-              <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: '#64748b', marginBottom: 6, textTransform: 'uppercase', letterSpacing: '.4px' }}>
+              <label style={{ display: 'block', fontSize: 13, fontWeight: 600, color: '#64748b', marginBottom: 6, textTransform: 'uppercase', letterSpacing: '.4px' }}>
                 Payment Status
               </label>
               <select
@@ -182,7 +182,7 @@ export default function ExtractPayments() {
                 <span style={{ fontSize: 18 }}>⬇</span>
                 Download Excel
                 {preview.length > 0 && (
-                  <span style={{ fontSize: 12, fontWeight: 400, opacity: .85 }}>
+                  <span style={{ fontSize: 13, fontWeight: 400, opacity: .85 }}>
                     ({preview.length} record{preview.length !== 1 ? 's' : ''})
                   </span>
                 )}

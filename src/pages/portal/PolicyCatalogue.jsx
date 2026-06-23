@@ -76,7 +76,7 @@ export default function PolicyCatalogue() {
 
       {/* Header */}
       <div style={{ background: 'linear-gradient(135deg,#fb7185 0%,#a855f7 100%)', borderRadius: 14, padding: '28px 32px', color: '#fff' }}>
-        <div style={{ fontSize: 12, color: '#ddd6fe', marginBottom: 6, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '.6px' }}>
+        <div style={{ fontSize: 13, color: '#ddd6fe', marginBottom: 6, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '.6px' }}>
           KMD Insurance — Product Catalogue
         </div>
         <div style={{ fontSize: 24, fontWeight: 800, marginBottom: 6 }}>Choose Your Plan</div>
@@ -91,7 +91,7 @@ export default function PolicyCatalogue() {
           ].map(({ label, value }) => (
             <div key={label} style={{ textAlign: 'center' }}>
               <div style={{ fontSize: 22, fontWeight: 800 }}>{value}</div>
-              <div style={{ fontSize: 11, color: '#c4b5fd' }}>{label}</div>
+              <div style={{ fontSize: 13, color: '#c4b5fd' }}>{label}</div>
             </div>
           ))}
         </div>
@@ -121,7 +121,7 @@ export default function PolicyCatalogue() {
                 type="button"
                 onClick={() => setTypeFilter(t)}
                 style={{
-                  padding: '7px 14px', borderRadius: 8, fontSize: 12.5, fontWeight: 600,
+                  padding: '7px 14px', borderRadius: 8, fontSize: 13.5, fontWeight: 600,
                   cursor: 'pointer', fontFamily: 'inherit',
                   border: `1.5px solid ${active ? m.border : 'var(--border)'}`,
                   background: active ? m.bg : '#fff',
@@ -134,7 +134,7 @@ export default function PolicyCatalogue() {
             )
           })}
         </div>
-        <span style={{ fontSize: 12.5, color: 'var(--text-3)', whiteSpace: 'nowrap' }}>
+        <span style={{ fontSize: 13.5, color: 'var(--text-3)', whiteSpace: 'nowrap' }}>
           {visible.length} plan{visible.length !== 1 ? 's' : ''}
         </span>
       </div>
@@ -171,12 +171,12 @@ export default function PolicyCatalogue() {
                 }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                     <span style={{ fontSize: 20 }}>{icon}</span>
-                    <span style={{ fontSize: 11, fontWeight: 700, color: m.color, textTransform: 'uppercase', letterSpacing: '.5px' }}>
+                    <span style={{ fontSize: 13, fontWeight: 700, color: m.color, textTransform: 'uppercase', letterSpacing: '.5px' }}>
                       {p.policyType}
                     </span>
                   </div>
                   <span style={{
-                    fontFamily: 'monospace', fontSize: 11, fontWeight: 600,
+                    fontFamily: 'monospace', fontSize: 13, fontWeight: 600,
                     color: m.color, background: '#fff',
                     border: `1px solid ${m.border}`, borderRadius: 5,
                     padding: '2px 7px',
@@ -188,7 +188,7 @@ export default function PolicyCatalogue() {
                   {/* Name & provider */}
                   <div>
                     <div style={{ fontWeight: 700, fontSize: 14, color: 'var(--text)', lineHeight: 1.3, marginBottom: 4 }}>{p.name}</div>
-                    <div style={{ fontSize: 12, color: 'var(--text-3)' }}>{p.provider}</div>
+                    <div style={{ fontSize: 13, color: 'var(--text-3)' }}>{p.provider}</div>
                   </div>
 
                   {/* Premium & SI tiles */}
@@ -198,7 +198,7 @@ export default function PolicyCatalogue() {
                       {chart ? (
                         <div style={{ fontSize: 16, fontWeight: 800, color: m.color }}>
                           ₹{chart.minPremium.toLocaleString('en-IN')}
-                          <span style={{ fontSize: 11, fontWeight: 400, color: 'var(--text-3)' }}>/yr</span>
+                          <span style={{ fontSize: 13, fontWeight: 400, color: 'var(--text-3)' }}>/yr</span>
                         </div>
                       ) : (
                         <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-3)' }}>On request</div>
@@ -219,7 +219,7 @@ export default function PolicyCatalogue() {
                   {/* Highlights */}
                   <ul style={{ margin: 0, padding: 0, listStyle: 'none', display: 'flex', flexDirection: 'column', gap: 5 }}>
                     {hiArr.slice(0, 4).map(h => (
-                      <li key={h} style={{ display: 'flex', alignItems: 'flex-start', gap: 7, fontSize: 12.5, color: 'var(--text-2)' }}>
+                      <li key={h} style={{ display: 'flex', alignItems: 'flex-start', gap: 7, fontSize: 13.5, color: 'var(--text-2)' }}>
                         <span style={{ color: m.color, fontWeight: 700, flexShrink: 0 }}>✓</span>
                         {h}
                       </li>

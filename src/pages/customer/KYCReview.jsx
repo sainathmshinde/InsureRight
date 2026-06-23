@@ -155,7 +155,7 @@ export default function KYCReview() {
         <span style={{ fontSize: 18 }}>⏳</span>
         <div>
           <div style={{ fontWeight: 600, fontSize: 14, color: '#92400e' }}>KYC Pending Review</div>
-          <div style={{ fontSize: 12.5, color: '#b45309', marginTop: 2 }}>
+          <div style={{ fontSize: 13.5, color: '#b45309', marginTop: 2 }}>
             Review the documents below and approve or reject the KYC for {cust.name}.
           </div>
         </div>
@@ -306,7 +306,7 @@ const S = {
     display: 'flex', flexDirection: 'column', gap: 2,
     padding: '10px 0', borderBottom: '1px solid #f0edf8',
   },
-  infoLabel: { fontSize: 11.5, color: 'var(--text-3)', fontWeight: 500, textTransform: 'uppercase', letterSpacing: '0.04em' },
+  infoLabel: { fontSize: 13, color: 'var(--text-3)', fontWeight: 500, textTransform: 'uppercase', letterSpacing: '0.04em' },
   infoValue: { fontSize: 14, color: 'var(--text-1)', fontWeight: 500 },
   actionRow: {
     display: 'flex', alignItems: 'center', gap: 16, flexWrap: 'wrap',

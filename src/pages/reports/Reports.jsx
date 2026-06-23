@@ -88,7 +88,7 @@ function ConvBar({ pct }) {
       <div style={{ flex: 1, height: 6, background: "#e8e4f0", borderRadius: 99 }}>
         <div style={{ width: `${pct}%`, height: "100%", background: color, borderRadius: 99, transition: "width .3s" }} />
       </div>
-      <span style={{ fontSize: 12, fontWeight: 700, color, minWidth: 32 }}>{pct}%</span>
+      <span style={{ fontSize: 13, fontWeight: 700, color, minWidth: 32 }}>{pct}%</span>
     </div>
   );
 }
@@ -150,7 +150,7 @@ export default function Reports() {
               ].map(k => (
                 <div key={k.label} style={{ background: k.bg, borderRadius: 10, padding: "16px 18px" }}>
                   <div style={{ fontSize: 26, fontWeight: 800, color: k.color }}>{k.value}</div>
-                  <div style={{ fontSize: 12.5, color: "#1a1628", marginTop: 4, fontWeight: 500 }}>{k.label}</div>
+                  <div style={{ fontSize: 13, fontFamily: '"Plus Jakarta Sans", sans-serif', color: "#1a1628", marginTop: 4, fontWeight: 500 }}>{k.label}</div>
                 </div>
               ))}
             </div>
@@ -161,7 +161,7 @@ export default function Reports() {
                 <div key={a.id} style={{ padding: "12px 14px", border: "1px solid #e8e4f0", borderRadius: 10, background: "#faf9fc" }}>
                   <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
                     <span style={{ fontWeight: 600, fontSize: 14 }}>{a.name}</span>
-                    <span style={{ fontSize: 12, color: "var(--text-3)" }}>{a.campaigns} campaign{a.campaigns !== 1 ? "s" : ""}</span>
+                    <span style={{ fontSize: 13, color: "var(--text-3)" }}>{a.campaigns} campaign{a.campaigns !== 1 ? "s" : ""}</span>
                   </div>
                   <ConvBar pct={a.convRate} />
                   <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 8, marginTop: 10, fontSize: 12 }}>
@@ -225,7 +225,7 @@ export default function Reports() {
               ].map(k => (
                 <div key={k.label} style={{ background: k.bg, borderRadius: 10, padding: "16px 18px" }}>
                   <div style={{ fontSize: 22, fontWeight: 800, color: k.color }}>{k.value}</div>
-                  <div style={{ fontSize: 12.5, color: "#1a1628", marginTop: 4, fontWeight: 500 }}>{k.label}</div>
+                  <div style={{ fontSize: 13, fontFamily: '"Plus Jakarta Sans", sans-serif', color: "#1a1628", marginTop: 4, fontWeight: 500 }}>{k.label}</div>
                 </div>
               ))}
             </div>
@@ -236,7 +236,7 @@ export default function Reports() {
                 <div key={a.id} style={{ padding: "12px 14px", border: "1px solid #e8e4f0", borderRadius: 10, background: "#faf9fc" }}>
                   <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 10 }}>
                     <span style={{ fontWeight: 600, fontSize: 14 }}>{a.name}</span>
-                    <span style={{ fontSize: 12, color: "var(--text-3)" }}>{a.campaigns} campaign{a.campaigns !== 1 ? "s" : ""}</span>
+                    <span style={{ fontSize: 13, color: "var(--text-3)" }}>{a.campaigns} campaign{a.campaigns !== 1 ? "s" : ""}</span>
                   </div>
                   <div style={{ display: "grid", gridTemplateColumns: "repeat(2,1fr)", gap: 8, fontSize: 12 }}>
                     <div><div style={{ color: "var(--text-3)", marginBottom: 2 }}>Customers</div><div style={{ fontWeight: 700 }}>{a.customers}</div></div>
@@ -300,7 +300,7 @@ export default function Reports() {
               ].map(k => (
                 <div key={k.label} style={{ background: k.bg, borderRadius: 10, padding: "16px 18px" }}>
                   <div style={{ fontSize: 22, fontWeight: 800, color: k.color }}>{k.value}</div>
-                  <div style={{ fontSize: 12.5, color: "#1a1628", marginTop: 4, fontWeight: 500 }}>{k.label}</div>
+                  <div style={{ fontSize: 13, fontFamily: '"Plus Jakarta Sans", sans-serif', color: "#1a1628", marginTop: 4, fontWeight: 500 }}>{k.label}</div>
                 </div>
               ))}
             </div>
@@ -313,10 +313,10 @@ export default function Reports() {
                   <div key={c.id} style={{ padding: "12px 14px", border: "1px solid #e8e4f0", borderRadius: 10, background: "#faf9fc" }}>
                     <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 8, marginBottom: 6 }}>
                       <span style={{ fontWeight: 600, fontSize: 13.5 }}>{c.name}</span>
-                      <span style={{ padding: "2px 9px", borderRadius: 99, fontSize: 11.5, fontWeight: 600, flexShrink: 0, ...(STATUS_STYLE[c.status] ?? {}) }}>{c.status}</span>
+                      <span style={{ padding: "2px 9px", borderRadius: 99, fontSize: 13, fontWeight: 600, flexShrink: 0, ...(STATUS_STYLE[c.status] ?? {}) }}>{c.status}</span>
                     </div>
                     <div style={{ marginBottom: 8 }}>
-                      <span style={{ padding: "2px 9px", borderRadius: 99, fontSize: 11.5, fontWeight: 600, ...(TYPE_STYLE[c.type] ?? {}) }}>{c.type}</span>
+                      <span style={{ padding: "2px 9px", borderRadius: 99, fontSize: 13, fontWeight: 600, ...(TYPE_STYLE[c.type] ?? {}) }}>{c.type}</span>
                     </div>
                     <ConvBar pct={convPct} />
                     <div style={{ display: "grid", gridTemplateColumns: "repeat(2,1fr)", gap: 8, marginTop: 10, fontSize: 12 }}>
@@ -356,12 +356,12 @@ export default function Reports() {
                         <td style={{ color: "var(--text-3)" }}>{i + 1}</td>
                         <td style={{ fontWeight: 600, maxWidth: 180 }}>{c.name}</td>
                         <td>
-                          <span style={{ padding: "2px 9px", borderRadius: 99, fontSize: 11.5, fontWeight: 600, ...(TYPE_STYLE[c.type] ?? {}) }}>
+                          <span style={{ padding: "2px 9px", borderRadius: 99, fontSize: 13, fontWeight: 600, ...(TYPE_STYLE[c.type] ?? {}) }}>
                             {c.type}
                           </span>
                         </td>
                         <td>
-                          <span style={{ padding: "2px 9px", borderRadius: 99, fontSize: 11.5, fontWeight: 600, ...(STATUS_STYLE[c.status] ?? {}) }}>
+                          <span style={{ padding: "2px 9px", borderRadius: 99, fontSize: 13, fontWeight: 600, ...(STATUS_STYLE[c.status] ?? {}) }}>
                             {c.status}
                           </span>
                         </td>

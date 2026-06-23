@@ -405,7 +405,7 @@ const S = {
 
 const SF = {
   grid:       { display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '14px 20px' },
-  lbl:        { display: 'block', fontSize: 12.5, fontWeight: 500, color: '#5c5573', marginBottom: 6, textTransform: 'uppercase', letterSpacing: '.3px' },
+  lbl:        { display: 'block', fontFamily: '"Plus Jakarta Sans", sans-serif', fontSize: 13, fontWeight: 500, color: '#5c5573', marginBottom: 6, textTransform: 'uppercase', letterSpacing: '.3px' },
   inp:        { width: '100%', padding: '9px 13px', border: '1.5px solid #e2ddf0', borderRadius: 7, fontSize: 13.5, outline: 'none', fontFamily: 'inherit', color: '#1a1628', background: '#faf9fc', boxSizing: 'border-box' },
   err:        { fontSize: 11.5, color: '#ef4444', marginTop: 4 },
   uploadBox:  { display: 'flex', alignItems: 'center', padding: '13px 16px', border: '1.5px dashed', borderRadius: 8, marginTop: 0, transition: 'all .12s' },
@@ -414,6 +414,6 @@ const SF = {
   reviewTitle:{ padding: '10px 16px', background: '#f5f3ff', fontSize: 13, fontWeight: 700, color: '#7c3aed', borderBottom: '1px solid #ede9fe' },
   reviewGrid: { display: 'grid', gridTemplateColumns: '1fr 1fr', padding: '8px 0' },
   reviewRow:  { padding: '7px 16px', display: 'flex', flexDirection: 'column', gap: 2 },
-  reviewKey:  { fontSize: 11, color: '#64748b', textTransform: 'uppercase', letterSpacing: '.3px' },
+  reviewKey:  { fontSize: 13, color: '#64748b', textTransform: 'uppercase', letterSpacing: '.3px' },
   reviewVal:  { fontSize: 13, fontWeight: 500, color: '#1a1628' },
 }

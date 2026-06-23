@@ -4,7 +4,7 @@ export function Stepper({ steps, current }) {
       {/* ── Mobile: progress bar + step label ── */}
       <div className="stepper-mobile">
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
-          <span style={{ fontSize: 12.5, color: 'var(--text-3)' }}>
+          <span style={{ fontSize: 13.5, color: 'var(--text-3)' }}>
             Step {current + 1} of {steps.length}
           </span>
           <span style={{ fontSize: 13.5, fontWeight: 700, color: 'var(--brand)' }}>
@@ -61,7 +61,7 @@ export function Stepper({ steps, current }) {
                   {done ? '✓' : i + 1}
                 </div>
                 <div style={{
-                  fontSize: 11, marginTop: 6, fontWeight: active ? 600 : 400,
+                  fontSize: 13, marginTop: 6, fontWeight: active ? 600 : 400,
                   color: active ? 'var(--brand)' : done ? 'var(--text-2)' : 'var(--text-3)',
                   textAlign: 'center', whiteSpace: 'nowrap',
                 }}>

@@ -14,7 +14,7 @@ export function SummaryCard({ icon, label, value, color = 'var(--brand)' }) {
       </div>
       <div>
         <div style={{ fontSize: 22, fontWeight: 700, color: 'var(--text)', lineHeight: 1.2 }}>{value}</div>
-        <div style={{ fontSize: 12.5, color: 'var(--text-3)', marginTop: 2 }}>{label}</div>
+        <div style={{ fontSize: 14, color: 'var(--text-3)', marginTop: 2 }}>{label}</div>
       </div>
     </div>
   )
@@ -26,10 +26,10 @@ export function InfoRow({ label, value, badge }) {
       display: 'flex', justifyContent: 'space-between', alignItems: 'center',
       padding: '9px 0', borderBottom: '1px solid var(--border)',
     }}>
-      <span style={{ fontSize: 13, color: 'var(--text-2)', fontWeight: 500 }}>{label}</span>
+      <span style={{ fontSize: 14, color: 'var(--text-2)', fontWeight: 500 }}>{label}</span>
       {badge
         ? badge
-        : <span style={{ fontSize: 13.5, color: 'var(--text)', fontWeight: 500 }}>{value ?? '—'}</span>
+        : <span style={{ fontSize: 14.5, color: 'var(--text)', fontWeight: 500 }}>{value ?? '—'}</span>
       }
     </div>
   )

@@ -6,8 +6,8 @@ import kmdLogo from "../../assets/kmd-logo.svg";
 
 const DEMO = [
   { role: "Broker",        email: "sainath@kmdastur.com", pass: "broker@123", mobile: "9000000001" },
-  { role: "Calling Agent", email: "pooja@kmdastur.com",  pass: "agent@123",  mobile: "9000000002" },
-  { role: "Sales Agent",   email: "ravi@kmdastur.com",   pass: "sales@123",  mobile: "9000000003" },
+  { role: "Calling Operator", email: "pooja@kmdastur.com",  pass: "agent@123",  mobile: "9000000002" },
+  { role: "Sales Operator",   email: "ravi@kmdastur.com",   pass: "sales@123",  mobile: "9000000003" },
   { role: "Customer",      email: "aarav@gmail.com",     pass: "cust@123",   mobile: "9876543210" },
 ];
 
@@ -186,7 +186,7 @@ function SignUpView({ onBack }) {
         <div>
           <label style={S.lbl}>Enter OTP</label>
           <OtpInput value={otp} onChange={v => { setOtp(v); setOtpError(""); }} />
-          <div style={{ fontSize: 11.5, color: "#64748b", marginTop: 8 }}>
+          <div style={{ fontSize: 13, color: "#64748b", marginTop: 8 }}>
             OTP sent to +91-{mobile}
           </div>
 
@@ -381,7 +381,7 @@ export default function SignIn() {
           <img src={kmdLogo} alt="KMD" style={S.logoImg} />
           <div>
             <div style={S.brandName}>K.M. Dastur & Co.</div>
-            <div style={{ fontSize: 11, color: "#a855f7", fontWeight: 600, marginTop: 2 }}>Insurance Brokers · IRDAI Registered</div>
+            <div style={{ fontSize: 13, color: "#a855f7", fontWeight: 600, marginTop: 2 }}>Insurance Brokers · IRDAI Registered</div>
           </div>
         </div>
 
@@ -445,12 +445,12 @@ export default function SignIn() {
                     <div>
                       <label style={S.lbl}>Enter OTP</label>
                       <OtpInput value={otp} onChange={v => { setOtp(v); setError(""); }} />
-                      <div style={{ fontSize: 11.5, color: "#64748b", marginTop: 8 }}>
+                      <div style={{ fontSize: 13, color: "#64748b", marginTop: 8 }}>
                         OTP sent to +91-{mobile} ·{" "}
                         <button
                           type="button"
                           onClick={() => { setOtpSent(false); setOtp(""); setError(""); }}
-                          style={{ background: "none", border: "none", color: "#7c3aed", cursor: "pointer", fontSize: 11.5, padding: 0, fontFamily: "inherit" }}
+                          style={{ background: "none", border: "none", color: "#7c3aed", cursor: "pointer", fontSize: 13, padding: 0, fontFamily: "inherit" }}
                         >
                           Change number
                         </button>
@@ -572,7 +572,7 @@ const S = {
   brand: { display: "flex", alignItems: "center", gap: 13, marginBottom: 28, paddingBottom: 22, borderBottom: "1.5px solid #f3e8ff" },
   logoImg: { width: 46, height: 46, flexShrink: 0, borderRadius: "50%", boxShadow: "0 2px 10px rgba(168,85,247,0.20)" },
   brandName: { fontSize: 15, fontWeight: 700, color: "#1a1628" },
-  brandSub:  { fontSize: 11, color: "#64748b", marginTop: 2 },
+  brandSub:  { fontSize: 13, color: "#64748b", marginTop: 2 },
   title: { fontSize: 26, fontWeight: 800, color: "#1a1628", margin: "0 0 6px" },
   sub:   { fontSize: 13, color: "#64748b", margin: "0 0 18px" },
   toggle: {
@@ -587,7 +587,7 @@ const S = {
     background: "#fef2f2", border: "1px solid #fecaca", color: "#dc2626",
     padding: "10px 14px", borderRadius: 8, fontSize: 13, marginBottom: 4,
   },
-  lbl: { display: "block", fontSize: 12.5, fontWeight: 600, color: "#4a4566", marginBottom: 6, letterSpacing: ".1px" },
+  lbl: { display: "block", fontFamily: '"Plus Jakarta Sans", sans-serif', fontSize: 13, fontWeight: 600, color: "#4a4566", marginBottom: 6, letterSpacing: ".1px" },
   inp: {
     width: "100%", padding: "11px 14px", border: "1.5px solid #e8e4f3",
     borderRadius: 10, fontSize: 14, outline: "none", fontFamily: "inherit",
@@ -611,11 +611,11 @@ const S = {
     boxShadow: "0 4px 14px rgba(168,85,247,0.35)",
   },
   demoBox: { padding: "13px 15px", background: "#f5f3ff", border: "1px solid #ede9fe", borderRadius: 10 },
-  demoHead: { fontSize: 11, fontWeight: 700, color: "#7c3aed", textTransform: "uppercase", letterSpacing: ".6px", marginBottom: 8 },
+  demoHead: { fontSize: 13, fontWeight: 700, color: "#7c3aed", textTransform: "uppercase", letterSpacing: ".6px", marginBottom: 8 },
   demoBtns: { display: "flex", gap: 8, flexWrap: "wrap" },
   demoBtn: {
     padding: "5px 14px", background: "#ede9fe", color: "#7c3aed",
-    border: "1px solid #c4b5fd", borderRadius: 6, fontSize: 12.5,
+    border: "1px solid #c4b5fd", borderRadius: 6, fontSize: 13.5,
     cursor: "pointer", fontFamily: "inherit", fontWeight: 500,
   },
   regLink: { fontSize: 13, color: "#5c5573", marginTop: 18, textAlign: "center" },
@@ -629,7 +629,7 @@ const S = {
   shield: { width: 50, height: 50, flexShrink: 0, borderRadius: "50%", opacity: 0.85 },
   panelTitle:   { fontSize: 18, fontWeight: 800, margin: 0, color: "#4c1d6e", lineHeight: 1.2 },
   panelSection: { fontSize: 10.5, fontWeight: 800, textTransform: "uppercase", letterSpacing: "1px", color: "#a855f7", marginBottom: 4 },
-  panelText:    { fontSize: 12.5, color: "#6b4e8a", lineHeight: 1.7, margin: 0, fontWeight: 500 },
+  panelText:    { fontSize: 13.5, color: "#6b4e8a", lineHeight: 1.7, margin: 0, fontWeight: 500 },
   infoCard: {
     background: "rgba(255,255,255,0.65)",
     borderRadius: 10, padding: "11px 14px",

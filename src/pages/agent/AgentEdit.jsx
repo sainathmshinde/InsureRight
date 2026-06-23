@@ -13,7 +13,12 @@ import { useAuth } from "../../context/AuthContext";
 
 function authUserToAgent(u) {
   if (!u) return {};
-  return { name: u.name, mobile: u.phone || '', email: u.email, assignedBroker: u.company || '' };
+  return {
+    name: u.name,
+    mobile: u.phone || "",
+    email: u.email,
+    assignedBroker: u.company || "",
+  };
 }
 
 export default function AgentEdit() {
@@ -25,20 +30,18 @@ export default function AgentEdit() {
 
   // For profile: load full agent record (with doc URLs) then overlay auth user fields
   const profileAgent = isProfile
-    ? (
-        Object.values(AGENT_MAP).find(a => a.email === user?.email)
-        ?? Object.values(AGENT_MAP).find(a => a.name === user?.name)
-        ?? AGENT_MAP[2]
-      )
-    : null
+    ? (Object.values(AGENT_MAP).find((a) => a.email === user?.email) ??
+      Object.values(AGENT_MAP).find((a) => a.name === user?.name) ??
+      AGENT_MAP[2])
+    : null;
 
   const initial = isProfile
     ? {
         ...profileAgent,
-        name:           user?.name    || profileAgent?.name    || '',
-        mobile:         user?.phone   || profileAgent?.mobile  || '',
-        email:          user?.email   || profileAgent?.email   || '',
-        assignedBroker: user?.company || profileAgent?.assignedBroker || '',
+        name: user?.name || profileAgent?.name || "",
+        mobile: user?.phone || profileAgent?.mobile || "",
+        email: user?.email || profileAgent?.email || "",
+        assignedBroker: user?.company || profileAgent?.assignedBroker || "",
       }
     : (AGENT_MAP[Number(id)] ?? {});
   const [form, setForm] = useState(initial);
@@ -56,19 +59,33 @@ export default function AgentEdit() {
     <div>
       <div className="page-header">
         <div className="page-title-row">
-          <div className="page-icon"><EditIcon /></div>
+          <div className="page-icon">
+            <EditIcon />
+          </div>
           <div>
-            <div className="page-title">{isProfile ? "Edit My Profile" : "Edit Agent"}</div>
+            <div className="page-title">
+              {isProfile ? "Edit My Profile" : "Edit Operator"}
+            </div>
             <div className="page-subtitle">
-              {isProfile ? "Update your contact and professional details" : "Update agent profile and documents"}
+              {isProfile
+                ? "Update your contact and professional details"
+                : "Update operator profile and documents"}
             </div>
           </div>
         </div>
         <div style={{ display: "flex", gap: 10 }}>
           {isProfile && (
-            <button className="btn btn-ghost" onClick={() => navigate("/profile")}>← Profile</button>
+            <button
+              className="btn btn-ghost"
+              onClick={() => navigate("/profile")}
+            >
+              ← Profile
+            </button>
           )}
-          <button className="btn btn-ghost" onClick={() => navigate(isProfile ? "/dashboard" : "/agent")}>
+          <button
+            className="btn btn-ghost"
+            onClick={() => navigate(isProfile ? "/dashboard" : "/agent")}
+          >
             {isProfile ? "← Dashboard" : "← Back"}
           </button>
         </div>
@@ -117,17 +134,21 @@ export default function AgentEdit() {
                     <option>Other</option>
                   </Select>
                 </Field>
-                <Field label="Agent Type" required>
-                  <Select value={form.agentType || ""} onChange={set("agentType")} required>
-                    <option value="">Select agent type</option>
-                    <option value="calling">Calling Agent</option>
-                    <option value="sales">Sales Agent</option>
+                <Field label="Operator Type" required>
+                  <Select
+                    value={form.agentType || ""}
+                    onChange={set("agentType")}
+                    required
+                  >
+                    <option value="">Select operator type</option>
+                    <option value="calling">Calling Operator</option>
+                    <option value="sales">Sales Operator</option>
                   </Select>
                 </Field>
               </div>
             </SectionBlock>
 
-            <SectionBlock icon="🪪" title="KYC Documents">
+            {/* <SectionBlock icon="🪪" title="KYC Documents">
               <div className="form-grid">
                 <Field label="PAN Number" required>
                   <Input
@@ -217,9 +238,9 @@ export default function AgentEdit() {
                   />
                 </Field>
               </div>
-            </SectionBlock>
+            </SectionBlock> */}
 
-<div className="actions-row">
+            <div className="actions-row">
               <button
                 type="button"
                 className="btn btn-ghost"
@@ -228,7 +249,7 @@ export default function AgentEdit() {
                 Cancel
               </button>
               <button type="submit" className="btn btn-primary">
-                {isProfile ? "Save Profile" : "Update Agent"}
+            {isProfile ? "Save Profile" : "Update Operator"}
               </button>
             </div>
           </form>

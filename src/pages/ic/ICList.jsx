@@ -40,7 +40,7 @@ export default function ICList() {
       render: row => (
         <div style={{ display: 'flex', gap: 6 }}>
           <button type="button" onClick={() => navigate(`/ic/${row.id}/edit`)} title="Edit" style={{ background: 'linear-gradient(135deg,#fb7185,#a855f7)', border: 'none', borderRadius: 6, cursor: 'pointer', padding: '5px 6px', color: '#fff', display: 'inline-flex', alignItems: 'center', boxShadow: '0 2px 6px rgba(168,85,247,.30)' }}><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"/></svg></button>
-          <Button variant="ghost"     size="sm" onClick={() => navigate(`/ic/${row.id}/integration`)}>Integration</Button>
+
         </div>
       )},
   ]
