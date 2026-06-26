@@ -44,7 +44,6 @@ export default function CampaignList() {
   const handle = setter => v => { setter(v); pg.reset() }
 
   const columns = [
-    { key: 'id',   label: '#', style: { color: 'var(--text-3)', fontFamily: 'monospace' } },
     { key: 'name', label: 'Campaign Name', style: { fontWeight: 500, minWidth: 220 } },
     { key: 'period', label: 'Period',
       render: row => (
@@ -114,6 +113,7 @@ export default function CampaignList() {
           <Table
             columns={columns}
             rows={pg.slice}
+            stickyHeader
             empty={<EmptyState icon="📢" title="No campaigns found" subtitle="Try adjusting your filters" />}
           />
 

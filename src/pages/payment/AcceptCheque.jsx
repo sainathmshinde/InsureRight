@@ -1180,7 +1180,7 @@ export default function AcceptCheque() {
     <div>
       <PageHeader
         icon={<ChequeIcon />}
-        title="Accept Cheque"
+        title="Receive Cheque"
         subtitle="Review cheques customers have submitted offline, verify the details, and accept or reject each one"
       />
 
@@ -1240,20 +1240,19 @@ export default function AcceptCheque() {
           </div>
 
           {/* Table */}
-          <div className="table-wrap">
-            <table style={{ fontSize: 13 }}>
+          <div className="table-wrap" style={{ maxHeight: 500, overflowY: "auto" }}>
+            <table style={{ fontSize: 13, borderCollapse: "separate", borderSpacing: 0 }}>
               <thead>
                 <tr>
-                  <th>Submission ID</th>
-                  <th>Customer</th>
-                  <th>Mobile No.</th>
-                  <th>Policy No.</th>
-                  <th>Cheque No.</th>
-                  <th>Bank</th>
-                  <th>Amount</th>
-                  <th>Submitted Date</th>
-                  <th>Payment Status</th>
-                  <th>Action</th>
+                  <th style={{ position: "sticky", top: 0, zIndex: 2, background: "var(--card-bg, #fff)", borderBottom: "2px solid var(--border)" }}>Submission ID</th>
+                  <th style={{ position: "sticky", top: 0, zIndex: 2, background: "var(--card-bg, #fff)", borderBottom: "2px solid var(--border)" }}>Customer</th>
+                  <th style={{ position: "sticky", top: 0, zIndex: 2, background: "var(--card-bg, #fff)", borderBottom: "2px solid var(--border)" }}>Mobile No.</th>
+                  <th style={{ position: "sticky", top: 0, zIndex: 2, background: "var(--card-bg, #fff)", borderBottom: "2px solid var(--border)" }}>Cheque No.</th>
+                  <th style={{ position: "sticky", top: 0, zIndex: 2, background: "var(--card-bg, #fff)", borderBottom: "2px solid var(--border)" }}>Bank</th>
+                  <th style={{ position: "sticky", top: 0, zIndex: 2, background: "var(--card-bg, #fff)", borderBottom: "2px solid var(--border)" }}>Amount</th>
+                  <th style={{ position: "sticky", top: 0, zIndex: 2, background: "var(--card-bg, #fff)", borderBottom: "2px solid var(--border)" }}>Submitted Date</th>
+                  <th style={{ position: "sticky", top: 0, zIndex: 2, background: "var(--card-bg, #fff)", borderBottom: "2px solid var(--border)" }}>Payment Status</th>
+                  <th style={{ position: "sticky", top: 0, zIndex: 2, background: "var(--card-bg, #fff)", borderBottom: "2px solid var(--border)" }}>Action</th>
                 </tr>
               </thead>
               <tbody>
@@ -1285,15 +1284,6 @@ export default function AcceptCheque() {
                       <td style={{ fontWeight: 500 }}>{c.customerName}</td>
                       <td style={{ color: "#64748b", fontSize: 12 }}>
                         {c.mobileNo}
-                      </td>
-                      <td
-                        style={{
-                          color: "#64748b",
-                          fontFamily: "monospace",
-                          fontSize: 12,
-                        }}
-                      >
-                        {c.policyNo || "—"}
                       </td>
                       <td
                         style={{

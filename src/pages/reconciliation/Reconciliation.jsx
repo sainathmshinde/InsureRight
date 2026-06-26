@@ -136,13 +136,10 @@ function TxnDetailRow({ label, value, mismatch }) {
 function computeMatchSummary(up, pr, isCheque) {
   const compareFields = isCheque
     ? [
-        { key: "customerName", label: "Customer Name" },
         { key: "chequeNumber", label: "Cheque Number" },
         { key: "chequeDate", label: "Cheque Date" },
-        { key: "clearingDate", label: "Clearing Date" },
       ]
     : [
-        { key: "customerName", label: "Customer Name" },
         { key: "transactionId", label: "Transaction ID" },
         { key: "neftDate", label: "NEFT Date" },
       ];
@@ -209,12 +206,10 @@ function PendingPickerModal({
             <table style={{ fontSize: 12.5, marginBottom: 0 }}>
               <thead>
                 <tr>
-                  <th style={{ background: "#fefce8", color: "#a16207" }}>Proposal ID</th>
-                  <th style={{ background: "#fefce8", color: "#a16207" }}>Customer Name</th>
+                  <th style={{ background: "#fefce8", color: "#a16207" }}>Order Id</th>
                   {isCheque && <>
                     <th style={{ background: "#fefce8", color: "#a16207" }}>Cheque No.</th>
                     <th style={{ background: "#fefce8", color: "#a16207" }}>Cheque Date</th>
-                    <th style={{ background: "#fefce8", color: "#a16207" }}>Clearing Date</th>
                   </>}
                   {isNeft && <>
                     <th style={{ background: "#fefce8", color: "#a16207" }}>Transaction No.</th>
@@ -226,11 +221,9 @@ function PendingPickerModal({
               <tbody>
                 <tr style={{ background: "#fffef0" }}>
                   <td style={{ ...refCellStyle, fontFamily: "monospace", fontWeight: 700 }}>{up.proposalId}</td>
-                  <td style={{ ...refCellStyle, fontWeight: 600 }}>{up.customerName}</td>
                   {isCheque && <>
                     <td style={{ ...refCellStyle, fontFamily: "monospace", fontWeight: 600 }}>{up.chequeNumber ?? "—"}</td>
                     <td style={refCellStyle}>{up.chequeDate ?? "—"}</td>
-                    <td style={refCellStyle}>{up.clearingDate ?? "—"}</td>
                   </>}
                   {isNeft && <>
                     <td style={{ ...refCellStyle, fontFamily: "monospace", fontWeight: 600 }}>{up.transactionId ?? "—"}</td>
@@ -280,12 +273,11 @@ function PendingPickerModal({
                 <table style={{ fontSize: 13, marginBottom: 0 }}>
                   <thead style={{ position: "sticky", top: 0, zIndex: 1 }}>
                     <tr>
-                      <th style={{ position: "sticky", top: 0, background: "#eff6ff", color: "#1d4ed8" }}>Proposal ID</th>
+                      <th style={{ position: "sticky", top: 0, background: "#eff6ff", color: "#1d4ed8" }}>Order Id</th>
                       <th style={{ position: "sticky", top: 0, background: "#eff6ff", color: "#1d4ed8" }}>Customer Name</th>
                       {isCheque && <>
                         <th style={{ position: "sticky", top: 0, background: "#eff6ff", color: "#1d4ed8" }}>Cheque No.</th>
                         <th style={{ position: "sticky", top: 0, background: "#eff6ff", color: "#1d4ed8" }}>Cheque Date</th>
-                        <th style={{ position: "sticky", top: 0, background: "#eff6ff", color: "#1d4ed8" }}>Clearing Date</th>
                       </>}
                       {isNeft && <>
                         <th style={{ position: "sticky", top: 0, background: "#eff6ff", color: "#1d4ed8" }}>Transaction No.</th>
@@ -313,7 +305,6 @@ function PendingPickerModal({
                           {isCheque && <>
                             <td style={{ fontFamily: "monospace", fontWeight: 600, color: chequeMatch ? "#15803d" : "inherit" }}>{p.chequeNumber ?? "—"}{chequeMatch && <span style={{ marginLeft: 4 }} title="Cheque number matches uploaded record">✓</span>}</td>
                             <td style={{ whiteSpace: "nowrap" }}>{p.chequeDate ?? "—"}</td>
-                            <td style={{ whiteSpace: "nowrap" }}>{p.clearingDate ?? "—"}</td>
                           </>}
                           {isNeft && <>
                             <td style={{ fontFamily: "monospace", fontWeight: 600, color: txnMatch ? "#15803d" : "#0369a1" }}>{p.transactionId ?? "—"}{txnMatch && <span style={{ marginLeft: 4 }} title="Transaction number matches uploaded record">✓</span>}</td>
@@ -375,7 +366,6 @@ function MatchComparisonModal({
                 {isCheque && <>
                   <TxnDetailRow label="Cheque Number" value={pr.chequeNumber} />
                   <TxnDetailRow label="Cheque Date" value={pr.chequeDate} />
-                  <TxnDetailRow label="Clearing Date" value={pr.clearingDate} />
                 </>}
                 {isNeft && <>
                   <TxnDetailRow label="Transaction ID" value={pr.transactionId} />
@@ -387,11 +377,9 @@ function MatchComparisonModal({
             <div style={{ background: "#fefce8", borderRadius: 10, padding: "14px 16px" }}>
               <div style={{ fontSize: 12, fontWeight: 700, color: "#a16207", textTransform: "uppercase", letterSpacing: ".5px", marginBottom: 10 }}>Uploaded (IC Data)</div>
               <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-                <TxnDetailRow label="Customer Name" value={up.customerName} mismatch={up.customerName !== pr.customerName} />
                 {isCheque && <>
                   <TxnDetailRow label="Cheque Number" value={up.chequeNumber} mismatch={(up.chequeNumber ?? "") !== (pr.chequeNumber ?? "")} />
                   <TxnDetailRow label="Cheque Date" value={up.chequeDate} mismatch={(up.chequeDate ?? "") !== (pr.chequeDate ?? "")} />
-                  <TxnDetailRow label="Clearing Date" value={up.clearingDate} mismatch={(up.clearingDate ?? "") !== (pr.clearingDate ?? "")} />
                 </>}
                 {isNeft && <>
                   <TxnDetailRow label="Transaction ID" value={up.transactionId} mismatch={(up.transactionId ?? "") !== (pr.transactionId ?? "")} />
@@ -477,7 +465,7 @@ function TransactionDetailModal({ system: rec, uploaded: up, onClose }) {
           <div style={{ fontSize: 12, fontWeight: 700, color: "#1d4ed8", textTransform: "uppercase", letterSpacing: ".5px", marginBottom: 10 }}>System Record</div>
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "14px 24px", marginBottom: 20 }}>
             <TxnDetailRow label="Customer Name" value={rec.customerName} />
-            <TxnDetailRow label="Proposal ID" value={rec.proposalId} />
+            <TxnDetailRow label="Order Id" value={rec.proposalId} />
             <TxnDetailRow label="Product" value={rec.product} />
             <TxnDetailRow label="Campaign" value={rec.campaignName} />
             <TxnDetailRow label="IC Name" value={rec.icName} />
@@ -485,7 +473,6 @@ function TransactionDetailModal({ system: rec, uploaded: up, onClose }) {
             {isCheque && <>
               <TxnDetailRow label="Cheque Number" value={rec.chequeNumber} />
               <TxnDetailRow label="Cheque Date" value={rec.chequeDate} />
-              <TxnDetailRow label="Clearing Date" value={rec.clearingDate} />
               <TxnDetailRow label="In Favour Of" value={rec.inFavourOf} />
               <TxnDetailRow label="Deposit Location" value={rec.chequeDepositLocation} />
               <TxnDetailRow label="IFSC Code" value={rec.ifscCode} />
@@ -512,7 +499,6 @@ function TransactionDetailModal({ system: rec, uploaded: up, onClose }) {
             {isCheque && <>
               <TxnDetailRow label="Cheque Number" value={up.chequeNumber} mismatch={up.chequeNumber !== rec.chequeNumber} />
               <TxnDetailRow label="Cheque Date" value={up.chequeDate} mismatch={up.chequeDate !== rec.chequeDate} />
-              <TxnDetailRow label="Clearing Date" value={up.clearingDate} mismatch={up.clearingDate !== rec.clearingDate} />
             </>}
             {!isCheque && <>
               <TxnDetailRow label="Transaction ID" value={up.transactionId} mismatch={up.transactionId !== rec.transactionId} />
@@ -563,7 +549,7 @@ function TransactionDetailModal({ system: rec, uploaded: up, onClose }) {
 function exportToExcel(rows) {
   const headers = [
     "ID",
-    "Proposal ID",
+    "Order Id",
     "Customer Name",
     "Mobile",
     "Product",
@@ -1161,12 +1147,11 @@ export default function Reconciliation() {
               <table style={{ fontSize: 13 }}>
                 <thead style={{ position: "sticky", top: 0, zIndex: 2 }}>
                   <tr>
-                    <th style={{ position: "sticky", top: 0, background: "#eff6ff", zIndex: 3 }}>Proposal ID</th>
+                    <th style={{ position: "sticky", top: 0, background: "#eff6ff", zIndex: 3 }}>Order Id</th>
                     <th style={{ position: "sticky", top: 0, background: "#eff6ff", zIndex: 3 }}>Customer</th>
                     {payTypeFilter === "Cheque" && <>
                       <th style={{ position: "sticky", top: 0, background: "#eff6ff", zIndex: 3 }}>Cheque No.</th>
                       <th style={{ position: "sticky", top: 0, background: "#eff6ff", zIndex: 3 }}>Cheque Date</th>
-                      <th style={{ position: "sticky", top: 0, background: "#eff6ff", zIndex: 3 }}>Clearing Date</th>
                     </>}
                     {payTypeFilter === "NEFT" && <>
                       <th style={{ position: "sticky", top: 0, background: "#eff6ff", zIndex: 3 }}>Transaction No.</th>
@@ -1178,7 +1163,7 @@ export default function Reconciliation() {
                 </thead>
                 <tbody>
                   {pendingRecords.length === 0 ? (
-                    <tr><td colSpan={payTypeFilter === "Cheque" ? 8 : payTypeFilter === "NEFT" ? 7 : 5} style={{ textAlign: "center", padding: "32px 0", color: "#64748b" }}>No unmatched system records</td></tr>
+                    <tr><td colSpan={payTypeFilter === "Cheque" ? 6 : payTypeFilter === "NEFT" ? 6 : 4} style={{ textAlign: "center", padding: "32px 0", color: "#64748b" }}>No unmatched system records</td></tr>
                   ) : (
                     pendingRecords.map((rec) => (
                       <tr key={rec.id} style={{ background: "#f0f7ff" }}>
@@ -1187,7 +1172,6 @@ export default function Reconciliation() {
                         {payTypeFilter === "Cheque" && <>
                           <td style={{ fontFamily: "monospace", fontWeight: 600 }}>{rec.chequeNumber ?? "—"}</td>
                           <td style={{ whiteSpace: "nowrap" }}>{rec.chequeDate ?? "—"}</td>
-                          <td style={{ whiteSpace: "nowrap" }}>{rec.clearingDate ?? "—"}</td>
                         </>}
                         {payTypeFilter === "NEFT" && <>
                           <td style={{ fontFamily: "monospace", fontWeight: 600, color: "#0369a1" }}>{rec.transactionId ?? "—"}</td>
@@ -1249,26 +1233,24 @@ export default function Reconciliation() {
               <table style={{ fontSize: 13 }}>
                 <thead style={{ position: "sticky", top: 0, zIndex: 2 }}>
                   <tr>
-                    <th rowSpan={2} style={{ verticalAlign: "bottom", position: "sticky", top: 0, background: "#fff", zIndex: 3 }}>Proposal ID</th>
+                    <th rowSpan={2} style={{ verticalAlign: "bottom", position: "sticky", top: 0, background: "#fff", zIndex: 3 }}>Order Id</th>
                     <th rowSpan={2} style={{ verticalAlign: "bottom", position: "sticky", top: 0, background: "#fff", zIndex: 3 }}>Customer</th>
-                    <th colSpan={4} style={{ textAlign: "center", position: "sticky", top: 0, background: "#eff6ff", color: "#1d4ed8", borderBottom: "2px solid #93c5fd", zIndex: 3 }}>System Record</th>
-                    <th colSpan={4} style={{ textAlign: "center", position: "sticky", top: 0, background: "#fefce8", color: "#a16207", borderBottom: "2px solid #fde047", zIndex: 3 }}>Uploaded Record</th>
+                    <th colSpan={3} style={{ textAlign: "center", position: "sticky", top: 0, background: "#eff6ff", color: "#1d4ed8", borderBottom: "2px solid #93c5fd", zIndex: 3 }}>System Record</th>
+                    <th colSpan={3} style={{ textAlign: "center", position: "sticky", top: 0, background: "#fefce8", color: "#a16207", borderBottom: "2px solid #fde047", zIndex: 3 }}>Uploaded Record</th>
                     <th rowSpan={2} style={{ verticalAlign: "bottom", minWidth: 230, position: "sticky", top: 0, background: "#fff", zIndex: 3 }}>Action</th>
                   </tr>
                   <tr>
                     <th style={{ position: "sticky", top: 36, background: "#eff6ff", color: "#1e40af", fontSize: 13, zIndex: 3 }}>Cheque No.</th>
                     <th style={{ position: "sticky", top: 36, background: "#eff6ff", color: "#1e40af", fontSize: 13, zIndex: 3 }}>Cheque Date</th>
-                    <th style={{ position: "sticky", top: 36, background: "#eff6ff", color: "#1e40af", fontSize: 13, zIndex: 3 }}>Clearing Date</th>
                     <th style={{ position: "sticky", top: 36, background: "#eff6ff", color: "#1e40af", fontSize: 13, zIndex: 3 }}>Amount</th>
                     <th style={{ position: "sticky", top: 36, background: "#fefce8", color: "#92400e", fontSize: 13, zIndex: 3 }}>Cheque No.</th>
                     <th style={{ position: "sticky", top: 36, background: "#fefce8", color: "#92400e", fontSize: 13, zIndex: 3 }}>Cheque Date</th>
-                    <th style={{ position: "sticky", top: 36, background: "#fefce8", color: "#92400e", fontSize: 13, zIndex: 3 }}>Clearing Date</th>
                     <th style={{ position: "sticky", top: 36, background: "#fefce8", color: "#92400e", fontSize: 13, zIndex: 3 }}>Amount</th>
                   </tr>
                 </thead>
                 <tbody>
                   {matchedRecords.length === 0 ? (
-                    <tr><td colSpan={11} style={{ textAlign: "center", padding: "32px 0", color: "#64748b" }}>No matched records</td></tr>
+                    <tr><td colSpan={9} style={{ textAlign: "center", padding: "32px 0", color: "#64748b" }}>No matched records</td></tr>
                   ) : (
                     matchedRecords.map(({ system: rec, uploaded: up }) => (
                         <tr key={rec.id} style={{ background: "#fff" }}>
@@ -1276,16 +1258,12 @@ export default function Reconciliation() {
                           <td style={{ fontWeight: 500 }}>{rec.customerName}</td>
                           <td style={{ background: "#f0f7ff", fontFamily: "monospace", fontWeight: 600 }}>{rec.chequeNumber}</td>
                           <td style={{ background: "#f0f7ff", whiteSpace: "nowrap" }}>{rec.chequeDate}</td>
-                          <td style={{ background: "#f0f7ff", whiteSpace: "nowrap" }}>{rec.clearingDate}</td>
                           <td style={{ background: "#f0f7ff", fontWeight: 600 }}>{fmt(rec.premium)}</td>
                           <td style={{ background: "#fffef0", fontFamily: "monospace", fontWeight: 600, color: up.chequeNumber !== rec.chequeNumber ? "#dc2626" : "inherit" }}>
                             {up.chequeNumber}{up.chequeNumber !== rec.chequeNumber && <span title="Mismatch" style={{ marginLeft: 4 }}>⚠</span>}
                           </td>
                           <td style={{ background: "#fffef0", whiteSpace: "nowrap", color: up.chequeDate !== rec.chequeDate ? "#dc2626" : "inherit" }}>
                             {up.chequeDate}{up.chequeDate !== rec.chequeDate && <span title="Mismatch" style={{ marginLeft: 4 }}>⚠</span>}
-                          </td>
-                          <td style={{ background: "#fffef0", whiteSpace: "nowrap", color: up.clearingDate !== rec.clearingDate ? "#dc2626" : "inherit" }}>
-                            {up.clearingDate}{up.clearingDate !== rec.clearingDate && <span title="Mismatch" style={{ marginLeft: 4 }}>⚠</span>}
                           </td>
                           <td style={{ background: "#fffef0", fontWeight: 600, color: up.premium !== rec.premium ? "#dc2626" : "inherit" }}>
                             {fmt(up.premium)}{up.premium !== rec.premium && <span title="Mismatch" style={{ marginLeft: 4 }}>⚠</span>}
@@ -1305,7 +1283,7 @@ export default function Reconciliation() {
               <table style={{ fontSize: 13 }}>
                 <thead style={{ position: "sticky", top: 0, zIndex: 2 }}>
                   <tr>
-                    <th rowSpan={2} style={{ verticalAlign: "bottom", position: "sticky", top: 0, background: "#fff", zIndex: 3 }}>Proposal ID</th>
+                    <th rowSpan={2} style={{ verticalAlign: "bottom", position: "sticky", top: 0, background: "#fff", zIndex: 3 }}>Order Id</th>
                     <th rowSpan={2} style={{ verticalAlign: "bottom", position: "sticky", top: 0, background: "#fff", zIndex: 3 }}>Customer</th>
                     <th colSpan={3} style={{ textAlign: "center", position: "sticky", top: 0, background: "#eff6ff", color: "#1d4ed8", borderBottom: "2px solid #93c5fd", zIndex: 3 }}>System Record</th>
                     <th colSpan={3} style={{ textAlign: "center", position: "sticky", top: 0, background: "#fefce8", color: "#a16207", borderBottom: "2px solid #fde047", zIndex: 3 }}>Uploaded Record</th>
@@ -1361,7 +1339,7 @@ export default function Reconciliation() {
         {reviewTab === "unmatched" && (() => {
           const isCheque = payTypeFilter === "Cheque";
           const isNeft = payTypeFilter === "NEFT";
-          const colCount = isCheque ? 6 : isNeft ? 5 : 3;
+          const colCount = isCheque ? 5 : isNeft ? 5 : 3;
           const alreadyMatchedPendingIds = new Set(Object.values(manualMatches).map((m) => m.pendingId));
           const availablePending = pendingRecords.filter((p) => !alreadyMatchedPendingIds.has(p.id));
           const activeUnmatchedRow = expandedUnmatched
@@ -1388,7 +1366,6 @@ export default function Reconciliation() {
                       {isCheque && <>
                         <th style={{ position: "sticky", top: 0, background: "#fef2f2", zIndex: 3 }}>Cheque No.</th>
                         <th style={{ position: "sticky", top: 0, background: "#fef2f2", zIndex: 3 }}>Cheque Date</th>
-                        <th style={{ position: "sticky", top: 0, background: "#fef2f2", zIndex: 3 }}>Clearing Date</th>
                       </>}
                       {isNeft && <>
                         <th style={{ position: "sticky", top: 0, background: "#fef2f2", zIndex: 3 }}>Transaction No.</th>
@@ -1414,7 +1391,6 @@ export default function Reconciliation() {
                             {isCheque && <>
                               <td style={{ fontFamily: "monospace", fontWeight: 600 }}>{up.chequeNumber ?? "—"}</td>
                               <td style={{ whiteSpace: "nowrap" }}>{up.chequeDate ?? "—"}</td>
-                              <td style={{ whiteSpace: "nowrap" }}>{up.clearingDate ?? "—"}</td>
                             </>}
                             {isNeft && <>
                               <td style={{ fontFamily: "monospace", fontWeight: 600, color: "#0369a1" }}>{up.transactionId ?? "—"}</td>
@@ -1461,7 +1437,6 @@ export default function Reconciliation() {
                               {isCheque && <>
                                 <td style={{ fontFamily: "monospace", fontWeight: 600, color: "#1e40af", fontSize: 11.5 }}>{matchedPendingRec.chequeNumber ?? "—"}</td>
                                 <td style={{ whiteSpace: "nowrap", color: "#1e40af", fontSize: 11.5 }}>{matchedPendingRec.chequeDate ?? "—"}</td>
-                                <td style={{ whiteSpace: "nowrap", color: "#1e40af", fontSize: 11.5 }}>{matchedPendingRec.clearingDate ?? "—"}</td>
                               </>}
                               {isNeft && <>
                                 <td style={{ fontFamily: "monospace", fontWeight: 600, color: "#1e40af", fontSize: 11.5 }}>{matchedPendingRec.transactionId ?? "—"}</td>
@@ -1851,39 +1826,36 @@ export default function Reconciliation() {
           </div>
 
           {/* Table */}
-          <div className="table-wrap">
+          <div className="table-wrap" style={{ maxHeight: 500, overflowY: "auto" }}>
             {payTypeFilter === "Cheque" ? (
-              <table style={{ fontSize: 13 }}>
-                <thead>
+              <table style={{ fontSize: 13, borderCollapse: "separate", borderSpacing: 0 }}>
+                <thead style={{ position: "sticky", top: 0, zIndex: 3 }}>
                   <tr>
                     <th colSpan={3} style={{ textAlign: "center", background: "#fff", color: "#1a1628" }}>Customer</th>
-                    <th colSpan={10} style={{ textAlign: "center", background: "#f0f7ff", color: "#1d4ed8" }}>Cheque / Bank Details</th>
-                    <th rowSpan={2} style={{ verticalAlign: "bottom" }}>Amount</th>
-                    <th rowSpan={2} style={{ verticalAlign: "bottom" }}>Status</th>
-                    <th colSpan={2} style={{ textAlign: "center", background: "#f8fafc", color: "#64748b" }}>Meta</th>
+                    <th colSpan={8} style={{ textAlign: "center", background: "#f0f7ff", color: "#1d4ed8" }}>Cheque / Bank Details</th>
+                    <th rowSpan={2} style={{ verticalAlign: "bottom", background: "#fff" }}>Amount</th>
+                    <th rowSpan={2} style={{ verticalAlign: "bottom", background: "#fff" }}>Status</th>
+                    <th style={{ textAlign: "center", background: "#f8fafc", color: "#64748b" }}>Meta</th>
                   </tr>
                   <tr>
-                    <th>Proposal ID</th>
-                    <th>Customer Name</th>
-                    <th>Mobile</th>
-                    <th style={{ background: "#f0f7ff" }}>Payment Detail ID</th>
+                    <th style={{ background: "#fff" }}>Order Id</th>
+                    <th style={{ background: "#fff" }}>Customer Name</th>
+                    <th style={{ background: "#fff" }}>Mobile</th>
                     <th style={{ background: "#f0f7ff" }}>Cheque No.</th>
                     <th style={{ background: "#f0f7ff" }}>Bank Name</th>
                     <th style={{ background: "#f0f7ff" }}>Cheque Date</th>
-                    <th style={{ background: "#f0f7ff" }}>Clearing Date</th>
                     <th style={{ background: "#f0f7ff" }}>In Favour Of</th>
                     <th style={{ background: "#f0f7ff" }}>Deposit Location</th>
                     <th style={{ background: "#f0f7ff" }}>IFSC Code</th>
                     <th style={{ background: "#f0f7ff" }}>MICR Code</th>
                     <th style={{ background: "#f0f7ff" }}>Photo Doc</th>
-                    <th style={{ background: "#f8fafc" }}>User ID</th>
-                    <th style={{ background: "#f8fafc" }}>Campaign ID</th>
+                    <th style={{ background: "#f8fafc" }}>Campaign</th>
                   </tr>
                 </thead>
                 <tbody>
                   {pg.slice.length === 0 ? (
                     <tr>
-                      <td colSpan={17} style={{ textAlign: "center", padding: "32px 0", color: "#64748b" }}>
+                      <td colSpan={14} style={{ textAlign: "center", padding: "32px 0", color: "#64748b" }}>
                         No records found
                       </td>
                     </tr>
@@ -1893,11 +1865,9 @@ export default function Reconciliation() {
                         <td style={{ fontFamily: "monospace", fontSize: 13, color: "#7c3aed" }}>{p.proposalId}</td>
                         <td style={{ fontWeight: 500 }}>{p.customerName}</td>
                         <td style={{ color: "#64748b" }}>{p.mobile}</td>
-                        <td style={{ fontFamily: "monospace", fontSize: 13, color: "#7c3aed" }}>{p.paymentDetailId ?? "—"}</td>
                         <td style={{ fontFamily: "monospace", fontWeight: 600 }}>{p.chequeNumber ?? "—"}</td>
                         <td>{p.bankName ?? "—"}</td>
                         <td style={{ whiteSpace: "nowrap" }}>{p.chequeDate ?? "—"}</td>
-                        <td style={{ whiteSpace: "nowrap" }}>{p.clearingDate ?? "—"}</td>
                         <td style={{ maxWidth: 160, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{p.inFavourOf ?? "—"}</td>
                         <td style={{ maxWidth: 160, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{p.chequeDepositLocation ?? "—"}</td>
                         <td style={{ fontFamily: "monospace", fontSize: 12 }}>{p.ifscCode ?? "—"}</td>
@@ -1907,28 +1877,26 @@ export default function Reconciliation() {
                         </td>
                         <td style={{ fontWeight: 600 }}>{fmt(p.premium)}</td>
                         <td><StatusPill status={p.paymentStatus} /></td>
-                        <td style={{ color: "var(--text-3)" }}>{p.userId ?? "—"}</td>
-                        <td style={{ color: "var(--text-3)" }}>{p.campaignId ?? "—"}</td>
+                        <td style={{ color: "var(--text-3)" }}>{p.campaignName ?? "—"}</td>
                       </tr>
                     ))
                   )}
                 </tbody>
               </table>
             ) : payTypeFilter === "NEFT" ? (
-              <table style={{ fontSize: 13 }}>
-                <thead>
+              <table style={{ fontSize: 13, borderCollapse: "separate", borderSpacing: 0 }}>
+                <thead style={{ position: "sticky", top: 0, zIndex: 3 }}>
                   <tr>
                     <th colSpan={3} style={{ textAlign: "center", background: "#fff", color: "#1a1628" }}>Customer</th>
-                    <th colSpan={9} style={{ textAlign: "center", background: "#f0f7ff", color: "#1d4ed8" }}>NEFT / Bank Details</th>
-                    <th rowSpan={2} style={{ verticalAlign: "bottom" }}>Amount</th>
-                    <th rowSpan={2} style={{ verticalAlign: "bottom" }}>Status</th>
-                    <th colSpan={2} style={{ textAlign: "center", background: "#f8fafc", color: "#64748b" }}>Meta</th>
+                    <th colSpan={8} style={{ textAlign: "center", background: "#f0f7ff", color: "#1d4ed8" }}>NEFT / Bank Details</th>
+                    <th rowSpan={2} style={{ verticalAlign: "bottom", background: "#fff" }}>Amount</th>
+                    <th rowSpan={2} style={{ verticalAlign: "bottom", background: "#fff" }}>Status</th>
+                    <th style={{ textAlign: "center", background: "#f8fafc", color: "#64748b" }}>Meta</th>
                   </tr>
                   <tr>
-                    <th>Proposal ID</th>
-                    <th>Customer Name</th>
-                    <th>Mobile</th>
-                    <th style={{ background: "#f0f7ff" }}>Payment Detail ID</th>
+                    <th style={{ background: "#fff" }}>Order Id</th>
+                    <th style={{ background: "#fff" }}>Customer Name</th>
+                    <th style={{ background: "#fff" }}>Mobile</th>
                     <th style={{ background: "#f0f7ff" }}>Bank Name</th>
                     <th style={{ background: "#f0f7ff" }}>Branch Name</th>
                     <th style={{ background: "#f0f7ff" }}>Account Number</th>
@@ -1937,14 +1905,13 @@ export default function Reconciliation() {
                     <th style={{ background: "#f0f7ff" }}>Transaction ID</th>
                     <th style={{ background: "#f0f7ff" }}>NEFT Date</th>
                     <th style={{ background: "#f0f7ff" }}>Receipt Doc</th>
-                    <th style={{ background: "#f8fafc" }}>User ID</th>
-                    <th style={{ background: "#f8fafc" }}>Campaign ID</th>
+                    <th style={{ background: "#f8fafc" }}>Campaign</th>
                   </tr>
                 </thead>
                 <tbody>
                   {pg.slice.length === 0 ? (
                     <tr>
-                      <td colSpan={16} style={{ textAlign: "center", padding: "32px 0", color: "#64748b" }}>
+                      <td colSpan={14} style={{ textAlign: "center", padding: "32px 0", color: "#64748b" }}>
                         No records found
                       </td>
                     </tr>
@@ -1954,7 +1921,6 @@ export default function Reconciliation() {
                         <td style={{ fontFamily: "monospace", fontSize: 13, color: "#7c3aed" }}>{p.proposalId}</td>
                         <td style={{ fontWeight: 500 }}>{p.customerName}</td>
                         <td style={{ color: "#64748b" }}>{p.mobile}</td>
-                        <td style={{ fontFamily: "monospace", fontSize: 13, color: "#7c3aed" }}>{p.paymentDetailId ?? "—"}</td>
                         <td>{p.bankName ?? "—"}</td>
                         <td>{p.branchName ?? "—"}</td>
                         <td style={{ fontFamily: "monospace", fontSize: 12 }}>{p.accountNumber ?? "—"}</td>
@@ -1967,28 +1933,27 @@ export default function Reconciliation() {
                         </td>
                         <td style={{ fontWeight: 600 }}>{fmt(p.premium)}</td>
                         <td><StatusPill status={p.paymentStatus} /></td>
-                        <td style={{ color: "var(--text-3)" }}>{p.userId ?? "—"}</td>
-                        <td style={{ color: "var(--text-3)" }}>{p.campaignId ?? "—"}</td>
+                        <td style={{ color: "var(--text-3)" }}>{p.campaignName ?? "—"}</td>
                       </tr>
                     ))
                   )}
                 </tbody>
               </table>
             ) : (
-              <table style={{ fontSize: 13 }}>
-                <thead>
+              <table style={{ fontSize: 13, borderCollapse: "separate", borderSpacing: 0 }}>
+                <thead style={{ position: "sticky", top: 0, zIndex: 3 }}>
                   <tr>
-                    <th>#</th>
-                    <th>Customer</th>
-                    <th>Mobile</th>
-                    <th>Proposal ID</th>
-                    <th>Product</th>
-                    <th>IC Name</th>
-                    <th>Premium</th>
-                    <th>Mode</th>
-                    <th>Pay Type</th>
-                    <th>Campaign</th>
-                    <th>Status</th>
+                    <th style={{ background: "var(--card-bg, #fff)" }}>#</th>
+                    <th style={{ background: "var(--card-bg, #fff)" }}>Customer</th>
+                    <th style={{ background: "var(--card-bg, #fff)" }}>Mobile</th>
+                    <th style={{ background: "var(--card-bg, #fff)" }}>Order Id</th>
+                    <th style={{ background: "var(--card-bg, #fff)" }}>Product</th>
+                    <th style={{ background: "var(--card-bg, #fff)" }}>IC Name</th>
+                    <th style={{ background: "var(--card-bg, #fff)" }}>Premium</th>
+                    <th style={{ background: "var(--card-bg, #fff)" }}>Mode</th>
+                    <th style={{ background: "var(--card-bg, #fff)" }}>Pay Type</th>
+                    <th style={{ background: "var(--card-bg, #fff)" }}>Campaign</th>
+                    <th style={{ background: "var(--card-bg, #fff)" }}>Status</th>
                   </tr>
                 </thead>
                 <tbody>

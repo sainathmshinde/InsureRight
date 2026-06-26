@@ -27,7 +27,6 @@ export default function AssociationList() {
   const handle = setter => v => { setter(v); pg.reset() }
 
   const columns = [
-    { key: 'id',   label: 'ID',   style: { fontFamily: 'monospace', color: 'var(--text-3)', fontSize: 12 } },
     { key: 'name', label: 'Association Name', style: { fontWeight: 500, minWidth: 220 } },
     { key: 'orgId', label: 'Organisation',
       render: row => {
@@ -94,6 +93,7 @@ export default function AssociationList() {
           <Table
             columns={columns}
             rows={pg.slice}
+            stickyHeader
             empty={<EmptyState icon="🤝" title="No associations found" subtitle="Try adjusting your filters" />}
           />
 

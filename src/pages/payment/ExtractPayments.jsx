@@ -40,11 +40,11 @@ function applyFilters(records, campaign, paymentType, paymentStatus) {
 
 function buildCSV(records) {
   const headers = [
-    'Payment ID', 'Customer Name', 'Policy No', 'Product',
+    'Payment ID', 'Customer Name', 'Product',
     'Campaign', 'Payment Method', 'Amount (INR)', 'Date', 'Status', 'Reference / Cheque No',
   ]
   const rows = records.map(r => [
-    r.id, r.customer, r.policy, r.product,
+    r.id, r.customer, r.product,
     r.campaignName, r.method, r.amount, r.date, r.status, r.reference,
   ])
   return [headers, ...rows]

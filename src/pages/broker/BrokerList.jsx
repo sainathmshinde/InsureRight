@@ -91,6 +91,7 @@ export default function BrokerList() {
           <Table
             columns={columns}
             rows={pg.slice}
+            stickyHeader
             empty={<EmptyState icon="🏢" title="No brokers found" subtitle="Try adjusting your filters" />}
           />
 

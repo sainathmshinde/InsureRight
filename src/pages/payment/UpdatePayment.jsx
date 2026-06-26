@@ -1071,18 +1071,17 @@ export default function UpdatePayment() {
           </div>
 
           {/* Table */}
-          <div className="table-wrap">
-            <table style={{ fontSize: 13 }}>
+          <div className="table-wrap" style={{ maxHeight: 500, overflowY: "auto" }}>
+            <table style={{ fontSize: 13, borderCollapse: "separate", borderSpacing: 0 }}>
               <thead>
                 <tr>
-                  <th>Payment ID</th>
-                  <th>Customer</th>
-                  <th>Policy No.</th>
-                  <th>Method</th>
-                  <th>Amount</th>
-                  <th>Date</th>
-                  <th>Reference</th>
-                  <th>
+                  <th style={{ position: "sticky", top: 0, zIndex: 2, background: "var(--card-bg, #fff)", borderBottom: "2px solid var(--border)" }}>Payment ID</th>
+                  <th style={{ position: "sticky", top: 0, zIndex: 2, background: "var(--card-bg, #fff)", borderBottom: "2px solid var(--border)" }}>Customer</th>
+                  <th style={{ position: "sticky", top: 0, zIndex: 2, background: "var(--card-bg, #fff)", borderBottom: "2px solid var(--border)" }}>Method</th>
+                  <th style={{ position: "sticky", top: 0, zIndex: 2, background: "var(--card-bg, #fff)", borderBottom: "2px solid var(--border)" }}>Amount</th>
+                  <th style={{ position: "sticky", top: 0, zIndex: 2, background: "var(--card-bg, #fff)", borderBottom: "2px solid var(--border)" }}>Date</th>
+                  <th style={{ position: "sticky", top: 0, zIndex: 2, background: "var(--card-bg, #fff)", borderBottom: "2px solid var(--border)" }}>Reference</th>
+                  <th style={{ position: "sticky", top: 0, zIndex: 2, background: "var(--card-bg, #fff)", borderBottom: "2px solid var(--border)" }}>
                     Payment Status
                     <div
                       style={{
@@ -1130,15 +1129,6 @@ export default function UpdatePayment() {
                           {p.id}
                         </td>
                         <td style={{ fontWeight: 500 }}>{p.customerName}</td>
-                        <td
-                          style={{
-                            color: "#64748b",
-                            fontFamily: "monospace",
-                            fontSize: 13,
-                          }}
-                        >
-                          {p.policyNo || "—"}
-                        </td>
                         <td>
                           <span
                             style={{

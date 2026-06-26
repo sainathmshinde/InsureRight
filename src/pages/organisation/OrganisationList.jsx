@@ -20,7 +20,6 @@ export default function OrganisationList() {
   const handle = setter => v => { setter(v); pg.reset() }
 
   const columns = [
-    { key: 'id',          label: 'ID',          style: { fontFamily: 'monospace', color: 'var(--text-3)', fontSize: 12.5 } },
     { key: 'name',        label: 'Name',        style: { fontWeight: 500 } },
     { key: 'description', label: 'Description', style: { color: 'var(--text-2)', fontSize: 13 } },
     { key: 'isActive',    label: 'Status',
@@ -69,6 +68,7 @@ export default function OrganisationList() {
           <Table
             columns={columns}
             rows={pg.slice}
+            stickyHeader
             empty={<EmptyState icon="🏦" title="No organisations found" subtitle="Try adjusting your filters" />}
           />
 

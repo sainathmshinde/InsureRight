@@ -177,6 +177,7 @@ export default function AgentList() {
           <Table
             columns={columns}
             rows={pg.slice}
+            stickyHeader
             empty={
               <EmptyState
                 icon="👤"

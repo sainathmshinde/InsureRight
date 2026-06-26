@@ -194,6 +194,7 @@ export default function CustomerList() {
           <Table
             columns={columns}
             rows={pg.slice}
+            stickyHeader
             empty={
               <EmptyState
                 icon="👤"

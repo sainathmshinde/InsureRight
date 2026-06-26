@@ -29,7 +29,6 @@ export default function ICList() {
   const handle = setter => v => { setter(v); pg.reset() }
 
   const columns = [
-    { key: 'id',      label: '#',              style: { color: 'var(--text-3)' } },
     { key: 'name',    label: 'IC Name',        style: { fontWeight: 500 } },
     { key: 'code',    label: 'Code',           render: row => <span className="badge badge-purple">{row.code}</span> },
     { key: 'branch',  label: 'Branch' },
@@ -77,6 +76,7 @@ export default function ICList() {
           <Table
             columns={columns}
             rows={pg.slice}
+            stickyHeader
             empty={<EmptyState icon="🏦" title="No insurance companies found" />}
           />
 
