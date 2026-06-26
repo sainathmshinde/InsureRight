@@ -6,6 +6,11 @@ const STATUS_MAP = {
   Health: 'blue',     Motor: 'amber',     Life: 'purple',
   Individual: 'blue', Corporate: 'purple', Family: 'green', Group: 'amber',
   Base: 'blue',       'Top-up': 'purple',
+  'Pending payment': 'amber',
+  'Payment Initiated in offline mode': 'blue',
+  'Cheque received': 'purple',
+  'Payment Failed': 'red',
+  'Payment received (completed)': 'green',
 }
 
 export function Badge({ variant = 'purple', children }) {

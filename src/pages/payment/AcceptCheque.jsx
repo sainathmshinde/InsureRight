@@ -3,6 +3,7 @@ import { PageHeader } from "../../components/UI";
 import Pagination from "../../components/Pagination";
 import usePagination from "../../components/usePagination";
 import { ChequeIcon } from "../../icons";
+import { PAYMENT_STATUS_SHORT_LABEL } from "../../constants/paymentStatus";
 
 const CAMPAIGNS = [
   { id: 1, name: "Campaign 1" },
@@ -19,7 +20,7 @@ const MOCK_CHEQUES = [
     id: "CHQ-2026-001",
     customerName: "Aarav Sharma",
     mobileNo: "9876543210",
-    policyNo: "POL-2026-1001",
+    policyNo: null,
     product: "Star Comprehensive Health",
     bank: "HDFC Bank",
     branch: "Andheri Branch",
@@ -30,14 +31,14 @@ const MOCK_CHEQUES = [
     initiatedBy: "Ravi Kulkarni",
     campaignId: 5,
     campaignName: "Campaign OPD and DIGIT PAYMENT PROTECTION",
-    status: "Initiated",
+    status: "Pending payment",
     chequePhotoUrl: "doc-viewer?type=cheque&name=Aarav Sharma&bank=HDFC Bank&account=1234567890123&ifsc=HDFC0001234",
   },
   {
     id: "CHQ-2026-002",
     customerName: "Priya Mehta",
     mobileNo: "9823456789",
-    policyNo: "POL-2026-1012",
+    policyNo: null,
     product: "HDFC ERGO Optima Secure",
     bank: "ICICI Bank",
     branch: "Bandra Branch",
@@ -48,14 +49,14 @@ const MOCK_CHEQUES = [
     initiatedBy: "Pooja Desai",
     campaignId: 5,
     campaignName: "Campaign OPD and DIGIT PAYMENT PROTECTION",
-    status: "Initiated",
+    status: "Pending payment",
     chequePhotoUrl: "doc-viewer?type=cheque&name=Priya Mehta&bank=ICICI Bank&account=9876543210456&ifsc=ICIC0005678",
   },
   {
     id: "CHQ-2026-003",
     customerName: "Rohan Verma",
     mobileNo: "9812345678",
-    policyNo: "POL-2026-1003",
+    policyNo: null,
     product: "Bajaj Allianz Health Guard",
     bank: "SBI",
     branch: "Dadar Branch",
@@ -66,14 +67,14 @@ const MOCK_CHEQUES = [
     initiatedBy: "Ravi Kulkarni",
     campaignId: 5,
     campaignName: "Campaign OPD and DIGIT PAYMENT PROTECTION",
-    status: "Initiated",
+    status: "Pending payment",
     chequePhotoUrl: "doc-viewer?type=cheque&name=Rohan Verma&bank=SBI&account=3456789012345&ifsc=SBIN0003456",
   },
   {
     id: "CHQ-2026-004",
     customerName: "Sneha Iyer",
     mobileNo: "9801234567",
-    policyNo: "POL-2026-1004",
+    policyNo: null,
     product: "Star Comprehensive Health",
     bank: "Axis Bank",
     branch: "Powai Branch",
@@ -84,14 +85,14 @@ const MOCK_CHEQUES = [
     initiatedBy: "Amit Verma",
     campaignId: 5,
     campaignName: "Campaign OPD and DIGIT PAYMENT PROTECTION",
-    status: "Initiated",
+    status: "Pending payment",
     chequePhotoUrl: "doc-viewer?type=cheque&name=Sneha Iyer&bank=Axis Bank&account=5678901234567&ifsc=UTIB0007890",
   },
   {
     id: "CHQ-2026-005",
     customerName: "Kavita Pillai",
     mobileNo: "9790123456",
-    policyNo: "POL-2026-1006",
+    policyNo: null,
     product: "HDFC ERGO Optima Secure",
     bank: "Bank of Baroda",
     branch: "Pune Branch",
@@ -102,14 +103,14 @@ const MOCK_CHEQUES = [
     initiatedBy: "Ravi Kulkarni",
     campaignId: 5,
     campaignName: "Campaign OPD and DIGIT PAYMENT PROTECTION",
-    status: "Initiated",
+    status: "Pending payment",
     chequePhotoUrl: "doc-viewer?type=cheque&name=Kavita Pillai&bank=Bank of Baroda&account=6789012345678&ifsc=BARB0PUNE01",
   },
   {
     id: "CHQ-2026-006",
     customerName: "Arjun Singh",
     mobileNo: "9712345678",
-    policyNo: "POL-2026-1009",
+    policyNo: null,
     product: "HDFC ERGO Optima Secure",
     bank: "Punjab National Bank",
     branch: "Ludhiana Branch",
@@ -120,14 +121,14 @@ const MOCK_CHEQUES = [
     initiatedBy: "Ravi Kulkarni",
     campaignId: 5,
     campaignName: "Campaign OPD and DIGIT PAYMENT PROTECTION",
-    status: "Initiated",
+    status: "Pending payment",
     chequePhotoUrl: "doc-viewer?type=cheque&name=Arjun Singh&bank=Punjab National Bank&account=7890123456789&ifsc=PUNB0123400",
   },
   {
     id: "CHQ-2026-007",
     customerName: "Meera Joshi",
     mobileNo: "9698765432",
-    policyNo: "POL-2026-1010",
+    policyNo: null,
     product: "Star Comprehensive Health",
     bank: "Union Bank",
     branch: "Thane Branch",
@@ -138,14 +139,14 @@ const MOCK_CHEQUES = [
     initiatedBy: "Amit Verma",
     campaignId: 5,
     campaignName: "Campaign OPD and DIGIT PAYMENT PROTECTION",
-    status: "Initiated",
+    status: "Pending payment",
     chequePhotoUrl: "doc-viewer?type=cheque&name=Meera Joshi&bank=Union Bank&account=8901234567890&ifsc=UBIN0567890",
   },
   {
     id: "CHQ-2026-008",
     customerName: "Vikram Rao",
     mobileNo: "9687654321",
-    policyNo: "POL-2026-1015",
+    policyNo: null,
     product: "Bajaj Allianz Comprehensive",
     bank: "Kotak Bank",
     branch: "Worli Branch",
@@ -156,14 +157,14 @@ const MOCK_CHEQUES = [
     initiatedBy: "Pooja Desai",
     campaignId: 5,
     campaignName: "Campaign OPD and DIGIT PAYMENT PROTECTION",
-    status: "Initiated",
+    status: "Pending payment",
     chequePhotoUrl: "doc-viewer?type=cheque&name=Vikram Rao&bank=Kotak Bank&account=9012345678901&ifsc=KKBK0009012",
   },
   {
     id: "CHQ-2026-009",
     customerName: "Deepika Kulkarni",
     mobileNo: "9654321098",
-    policyNo: "POL-2026-1016",
+    policyNo: null,
     product: "Star Comprehensive Health",
     bank: "Canara Bank",
     branch: "Vashi Branch",
@@ -174,14 +175,14 @@ const MOCK_CHEQUES = [
     initiatedBy: "Ravi Kulkarni",
     campaignId: 5,
     campaignName: "Campaign OPD and DIGIT PAYMENT PROTECTION",
-    status: "Initiated",
+    status: "Pending payment",
     chequePhotoUrl: "doc-viewer?type=cheque&name=Deepika Kulkarni&bank=Canara Bank&account=1122334455667&ifsc=CNRB0001122",
   },
   {
     id: "CHQ-2026-010",
     customerName: "Suresh Patil",
     mobileNo: "9643210987",
-    policyNo: "POL-2026-1017",
+    policyNo: null,
     product: "HDFC ERGO Optima Secure",
     bank: "Bank of India",
     branch: "Borivali Branch",
@@ -192,14 +193,14 @@ const MOCK_CHEQUES = [
     initiatedBy: "Amit Verma",
     campaignId: 5,
     campaignName: "Campaign OPD and DIGIT PAYMENT PROTECTION",
-    status: "Initiated",
+    status: "Pending payment",
     chequePhotoUrl: "doc-viewer?type=cheque&name=Suresh Patil&bank=Bank of India&account=2233445566778&ifsc=BKID0002233",
   },
   {
     id: "CHQ-2026-011",
     customerName: "Anjali Deshmukh",
     mobileNo: "9632109876",
-    policyNo: "POL-2026-1018",
+    policyNo: null,
     product: "Bajaj Allianz Health Guard",
     bank: "Indian Bank",
     branch: "Goregaon Branch",
@@ -210,14 +211,14 @@ const MOCK_CHEQUES = [
     initiatedBy: "Pooja Desai",
     campaignId: 5,
     campaignName: "Campaign OPD and DIGIT PAYMENT PROTECTION",
-    status: "Initiated",
+    status: "Pending payment",
     chequePhotoUrl: "doc-viewer?type=cheque&name=Anjali Deshmukh&bank=Indian Bank&account=3344556677889&ifsc=IDIB0003344",
   },
   {
     id: "CHQ-2026-012",
     customerName: "Rajesh Nair",
     mobileNo: "9621098765",
-    policyNo: "POL-2026-1019",
+    policyNo: null,
     product: "Star Comprehensive Health",
     bank: "Federal Bank",
     branch: "Malad Branch",
@@ -228,14 +229,14 @@ const MOCK_CHEQUES = [
     initiatedBy: "Ravi Kulkarni",
     campaignId: 5,
     campaignName: "Campaign OPD and DIGIT PAYMENT PROTECTION",
-    status: "Initiated",
+    status: "Pending payment",
     chequePhotoUrl: "doc-viewer?type=cheque&name=Rajesh Nair&bank=Federal Bank&account=4455667788990&ifsc=FDRL0004455",
   },
   {
     id: "CHQ-2026-013",
     customerName: "Nandini Reddy",
     mobileNo: "9610987654",
-    policyNo: "POL-2026-1020",
+    policyNo: null,
     product: "HDFC ERGO Optima Secure",
     bank: "South Indian Bank",
     branch: "Kandivali Branch",
@@ -246,14 +247,14 @@ const MOCK_CHEQUES = [
     initiatedBy: "Amit Verma",
     campaignId: 5,
     campaignName: "Campaign OPD and DIGIT PAYMENT PROTECTION",
-    status: "Initiated",
+    status: "Pending payment",
     chequePhotoUrl: "doc-viewer?type=cheque&name=Nandini Reddy&bank=South Indian Bank&account=5566778899001&ifsc=SIBL0005566",
   },
   {
     id: "CHQ-2026-014",
     customerName: "Prakash Gupta",
     mobileNo: "9509876543",
-    policyNo: "POL-2026-1021",
+    policyNo: null,
     product: "Bajaj Allianz Comprehensive",
     bank: "IDBI Bank",
     branch: "Churchgate Branch",
@@ -264,14 +265,14 @@ const MOCK_CHEQUES = [
     initiatedBy: "Pooja Desai",
     campaignId: 5,
     campaignName: "Campaign OPD and DIGIT PAYMENT PROTECTION",
-    status: "Initiated",
+    status: "Pending payment",
     chequePhotoUrl: "doc-viewer?type=cheque&name=Prakash Gupta&bank=IDBI Bank&account=6677889900112&ifsc=IBKL0006677",
   },
   {
     id: "CHQ-2026-015",
     customerName: "Shalini Bose",
     mobileNo: "9498765432",
-    policyNo: "POL-2026-1022",
+    policyNo: null,
     product: "Star Comprehensive Health",
     bank: "Yes Bank",
     branch: "Juhu Branch",
@@ -282,14 +283,14 @@ const MOCK_CHEQUES = [
     initiatedBy: "Ravi Kulkarni",
     campaignId: 5,
     campaignName: "Campaign OPD and DIGIT PAYMENT PROTECTION",
-    status: "Initiated",
+    status: "Pending payment",
     chequePhotoUrl: "doc-viewer?type=cheque&name=Shalini Bose&bank=Yes Bank&account=7788990011223&ifsc=YESB0007788",
   },
   {
     id: "CHQ-2026-016",
     customerName: "Manoj Tiwari",
     mobileNo: "9487654321",
-    policyNo: "POL-2026-1023",
+    policyNo: null,
     product: "HDFC ERGO Optima Secure",
     bank: "UCO Bank",
     branch: "Colaba Branch",
@@ -300,14 +301,14 @@ const MOCK_CHEQUES = [
     initiatedBy: "Amit Verma",
     campaignId: 5,
     campaignName: "Campaign OPD and DIGIT PAYMENT PROTECTION",
-    status: "Initiated",
+    status: "Pending payment",
     chequePhotoUrl: "doc-viewer?type=cheque&name=Manoj Tiwari&bank=UCO Bank&account=8899001122334&ifsc=UCBA0008899",
   },
   {
     id: "CHQ-2026-017",
     customerName: "Poornima Hegde",
     mobileNo: "9476543210",
-    policyNo: "POL-2026-1024",
+    policyNo: null,
     product: "Bajaj Allianz Health Guard",
     bank: "Indian Overseas Bank",
     branch: "Santacruz Branch",
@@ -318,14 +319,14 @@ const MOCK_CHEQUES = [
     initiatedBy: "Pooja Desai",
     campaignId: 5,
     campaignName: "Campaign OPD and DIGIT PAYMENT PROTECTION",
-    status: "Initiated",
+    status: "Pending payment",
     chequePhotoUrl: "doc-viewer?type=cheque&name=Poornima Hegde&bank=Indian Overseas Bank&account=9900112233445&ifsc=IOBA0009900",
   },
   {
     id: "CHQ-2026-018",
     customerName: "Aditya Bhatt",
     mobileNo: "9465432109",
-    policyNo: "POL-2026-1025",
+    policyNo: null,
     product: "Star Comprehensive Health",
     bank: "Central Bank of India",
     branch: "Fort Branch",
@@ -336,14 +337,14 @@ const MOCK_CHEQUES = [
     initiatedBy: "Ravi Kulkarni",
     campaignId: 5,
     campaignName: "Campaign OPD and DIGIT PAYMENT PROTECTION",
-    status: "Initiated",
+    status: "Pending payment",
     chequePhotoUrl: "doc-viewer?type=cheque&name=Aditya Bhatt&bank=Central Bank of India&account=1011121314151&ifsc=CBIN0010111",
   },
   {
     id: "CHQ-2026-019",
     customerName: "Lakshmi Menon",
     mobileNo: "9454321098",
-    policyNo: "POL-2026-1026",
+    policyNo: null,
     product: "HDFC ERGO Optima Secure",
     bank: "Karur Vysya Bank",
     branch: "Mulund Branch",
@@ -354,14 +355,14 @@ const MOCK_CHEQUES = [
     initiatedBy: "Amit Verma",
     campaignId: 5,
     campaignName: "Campaign OPD and DIGIT PAYMENT PROTECTION",
-    status: "Initiated",
+    status: "Pending payment",
     chequePhotoUrl: "doc-viewer?type=cheque&name=Lakshmi Menon&bank=Karur Vysya Bank&account=1213141516171&ifsc=KVBL0012131",
   },
   {
     id: "CHQ-2026-020",
     customerName: "Sameer Jain",
     mobileNo: "9443210987",
-    policyNo: "POL-2026-1027",
+    policyNo: null,
     product: "Bajaj Allianz Comprehensive",
     bank: "Bandhan Bank",
     branch: "Vikhroli Branch",
@@ -372,7 +373,7 @@ const MOCK_CHEQUES = [
     initiatedBy: "Pooja Desai",
     campaignId: 5,
     campaignName: "Campaign OPD and DIGIT PAYMENT PROTECTION",
-    status: "Initiated",
+    status: "Pending payment",
     chequePhotoUrl: "doc-viewer?type=cheque&name=Sameer Jain&bank=Bandhan Bank&account=1415161718192&ifsc=BDBL0014151",
   },
 ];
@@ -695,7 +696,7 @@ function ChequeDetailModal({ cheque, onClose, onAccept, onReject }) {
               {cheque.id}
             </div>
             <div style={{ fontSize: 13, color: "#64748b", marginTop: 2 }}>
-              {cheque.customerName} &middot; {cheque.policyNo}
+              {cheque.customerName}{cheque.policyNo ? ` · ${cheque.policyNo}` : ""}
             </div>
           </div>
           <div
@@ -718,9 +719,9 @@ function ChequeDetailModal({ cheque, onClose, onAccept, onReject }) {
               }}
             >
               {phase === "accepted"
-                ? "Accepted"
+                ? "Payment received (completed)"
                 : phase === "rejected"
-                  ? "Rejected"
+                  ? "Payment Failed"
                   : cheque.status}
             </span>
             <button
@@ -1142,7 +1143,7 @@ export default function AcceptCheque() {
   const [selected, setSelected] = useState(null);
 
   const filtered = cheques.filter((c) => {
-    if (c.status !== "Initiated" && c.status !== "Accepted" && c.status !== "Rejected") return false;
+    if (c.status !== "Pending payment" && c.status !== "Payment received (completed)" && c.status !== "Payment Failed") return false;
     const q = search.toLowerCase();
     const matchQ =
       !q ||
@@ -1157,14 +1158,18 @@ export default function AcceptCheque() {
 
   const handleAccept = (id) => {
     setCheques((prev) =>
-      prev.map((c) => (c.id === id ? { ...c, status: "Accepted" } : c)),
+      prev.map((c) =>
+        c.id === id
+          ? { ...c, status: "Payment received (completed)", policyNo: c.policyNo ?? `POL-${id.replace("CHQ-", "")}` }
+          : c,
+      ),
     );
   };
 
   const handleReject = (id, reason) => {
     setCheques((prev) =>
       prev.map((c) =>
-        c.id === id ? { ...c, status: "Rejected", rejectionReason: reason } : c,
+        c.id === id ? { ...c, status: "Payment Failed", rejectionReason: reason } : c,
       ),
     );
   };
@@ -1176,7 +1181,7 @@ export default function AcceptCheque() {
       <PageHeader
         icon={<ChequeIcon />}
         title="Accept Cheque"
-        subtitle="Review and accept cheque payments with Initiated status"
+        subtitle="Review cheques customers have submitted offline, verify the details, and accept or reject each one"
       />
 
       <div className="card">
@@ -1239,15 +1244,15 @@ export default function AcceptCheque() {
             <table style={{ fontSize: 13 }}>
               <thead>
                 <tr>
-                  <th>Cheque ID</th>
+                  <th>Submission ID</th>
                   <th>Customer</th>
                   <th>Mobile No.</th>
                   <th>Policy No.</th>
                   <th>Cheque No.</th>
                   <th>Bank</th>
                   <th>Amount</th>
-                  <th>Initiated Date</th>
-                  <th>Status</th>
+                  <th>Submitted Date</th>
+                  <th>Payment Status</th>
                   <th>Action</th>
                 </tr>
               </thead>
@@ -1288,7 +1293,7 @@ export default function AcceptCheque() {
                           fontSize: 12,
                         }}
                       >
-                        {c.policyNo}
+                        {c.policyNo || "—"}
                       </td>
                       <td
                         style={{
@@ -1310,27 +1315,27 @@ export default function AcceptCheque() {
                             fontSize: 11,
                             fontWeight: 700,
                             background:
-                              c.status === "Accepted"
+                              c.status === "Payment received (completed)"
                                 ? "#dcfce7"
-                                : c.status === "Rejected"
+                                : c.status === "Payment Failed"
                                   ? "#fee2e2"
                                   : "#e0f2fe",
                             color:
-                              c.status === "Accepted"
+                              c.status === "Payment received (completed)"
                                 ? "#15803d"
-                                : c.status === "Rejected"
+                                : c.status === "Payment Failed"
                                   ? "#dc2626"
                                   : "#0369a1",
                             border: `1.5px solid ${
-                              c.status === "Accepted"
+                              c.status === "Payment received (completed)"
                                 ? "#86efac"
-                                : c.status === "Rejected"
+                                : c.status === "Payment Failed"
                                   ? "#fca5a5"
                                   : "#7dd3fc"
                             }`,
                           }}
                         >
-                          {c.status}
+                          {PAYMENT_STATUS_SHORT_LABEL[c.status] ?? c.status}
                         </span>
                       </td>
                       <td>

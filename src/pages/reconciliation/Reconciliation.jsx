@@ -5,6 +5,7 @@ import { POLICY_MOCK } from "../policy/PolicyList";
 import { ASSOCIATIONS } from "../customer/orgAssocData";
 import Pagination from "../../components/Pagination";
 import usePagination from "../../components/usePagination";
+import { PAYMENT_STATUS_META } from "../../constants/paymentStatus";
 
 const CAMPAIGNS = [
   { id: 1, name: "Campaign 1" },
@@ -37,11 +38,7 @@ const LABEL = {
   letterSpacing: ".5px",
 };
 
-const STATUS_META = {
-  Initiated: { color: "#0369a1", bg: "#e0f2fe", border: "#7dd3fc" },
-  Rejected: { color: "#dc2626", bg: "#fee2e2", border: "#fca5a5" },
-  Paid: { color: "#15803d", bg: "#dcfce7", border: "#86efac" },
-};
+const STATUS_META = PAYMENT_STATUS_META;
 
 const BANKS = ["HDFC Bank", "ICICI Bank", "SBI", "Axis Bank", "Kotak Bank", "PNB"];
 const BRANCHES = ["Andheri West", "Fort", "Bandra Kurla Complex", "Shivajinagar", "Connaught Place", "MG Road"];
@@ -56,7 +53,7 @@ const IN_FAVOUR = [
 
 const IFSC_PREFIXES = ["HDFC", "ICIC", "SBIN", "UTIB", "KKBK", "PUNB"];
 const BASE_DATA = POLICY_MOCK.filter(
-  (p) => p.paymentStatus === "Initiated" || p.paymentStatus === "Rejected",
+  (p) => p.paymentStatus === "Pending payment" || p.paymentStatus === "Payment Failed",
 ).map((p) => {
   const id = p.id;
   // Use id for deterministic type assignment so filtering never breaks consistency
@@ -101,7 +98,7 @@ const BASE_DATA = POLICY_MOCK.filter(
 });
 
 function StatusPill({ status }) {
-  const m = STATUS_META[status] ?? STATUS_META.Initiated;
+  const m = STATUS_META[status] ?? STATUS_META["Pending payment"];
   return (
     <span
       style={{
@@ -133,6 +130,308 @@ function TxnDetailRow({ label, value, mismatch }) {
         {value || "—"}{mismatch && <span style={{ marginLeft: 4 }}>⚠</span>}
       </div>
     </div>
+  );
+}
+
+function computeMatchSummary(up, pr, isCheque) {
+  const compareFields = isCheque
+    ? [
+        { key: "customerName", label: "Customer Name" },
+        { key: "chequeNumber", label: "Cheque Number" },
+        { key: "chequeDate", label: "Cheque Date" },
+        { key: "clearingDate", label: "Clearing Date" },
+      ]
+    : [
+        { key: "customerName", label: "Customer Name" },
+        { key: "transactionId", label: "Transaction ID" },
+        { key: "neftDate", label: "NEFT Date" },
+      ];
+
+  const matched = [];
+  const mismatched = [];
+  compareFields.forEach(({ key, label }) => {
+    const a = up[key] ?? "";
+    const b = pr[key] ?? "";
+    (a === b ? matched : mismatched).push(label);
+  });
+
+  if (up.premium !== pr.premium) mismatched.push("Premium Amount");
+  else matched.push("Premium Amount");
+
+  return { matched, mismatched };
+}
+
+function computePremiumDiff(up, pr) {
+  return (up.premium ?? 0) - (pr.premium ?? 0);
+}
+
+const MODAL_OVERLAY = { position: "fixed", inset: 0, background: "rgba(0,0,0,.45)", backdropFilter: "blur(2px)" };
+const MODAL_BOX = { position: "fixed", top: "50%", left: "50%", transform: "translate(-50%,-50%)", background: "#fff", borderRadius: 18, boxShadow: "0 24px 60px rgba(0,0,0,.22)", width: "92%", maxHeight: "90vh", overflowY: "auto" };
+
+function PendingPickerModal({
+  uploaded: up, availablePending, isCheque, isNeft,
+  search, onSearch, dateFrom, onDateFrom, dateTo, onDateTo,
+  onPick, onClose,
+}) {
+  const filtered = availablePending.filter((p) => {
+    const q = search.trim().toLowerCase();
+    const matchSearch =
+      !q ||
+      (p.chequeNumber ?? "").toLowerCase().includes(q) ||
+      p.customerName.toLowerCase().includes(q);
+    const dateField = isCheque ? p.chequeDate : p.neftDate;
+    const matchFrom = !dateFrom || (dateField && dateField >= dateFrom);
+    const matchTo = !dateTo || (dateField && dateField <= dateTo);
+    return matchSearch && matchFrom && matchTo;
+  });
+
+  const hasFilters = search || dateFrom || dateTo;
+  const refCellStyle = { padding: "8px 10px", fontSize: 12.5, color: "#92400e", whiteSpace: "nowrap" };
+
+  return (
+    <>
+      <div style={{ ...MODAL_OVERLAY, zIndex: 1000 }} onClick={onClose} />
+      <div style={{ ...MODAL_BOX, zIndex: 1001, maxWidth: 860 }}>
+        <div style={{ padding: "22px 26px 18px", borderBottom: "1.5px solid #f0edf8", display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 12 }}>
+          <div>
+            <div style={{ fontSize: 11, color: "#64748b", fontWeight: 600, letterSpacing: ".5px", textTransform: "uppercase", marginBottom: 4 }}>Match with Pending</div>
+            <div style={{ fontSize: 18, fontWeight: 800, color: "#1a1628" }}>Select a Pending Record to Compare</div>
+          </div>
+          <button onClick={onClose} style={{ width: 30, height: 30, borderRadius: 8, border: "1.5px solid #e8e4f0", background: "#faf9fc", cursor: "pointer", fontSize: 16, display: "flex", alignItems: "center", justifyContent: "center", color: "#64748b", lineHeight: 1, flexShrink: 0 }}>×</button>
+        </div>
+
+        <div style={{ padding: "18px 26px 26px" }}>
+          {/* Uploaded record being matched — same columns as the table below, for direct comparison */}
+          <div style={{ fontSize: 11, fontWeight: 700, color: "#a16207", textTransform: "uppercase", letterSpacing: ".5px", marginBottom: 6 }}>
+            Uploaded Record (IC Data) — matching this against pending records below
+          </div>
+          <div style={{ border: "1.5px solid #fde68a", borderRadius: 8, overflow: "hidden", marginBottom: 18 }}>
+            <table style={{ fontSize: 12.5, marginBottom: 0 }}>
+              <thead>
+                <tr>
+                  <th style={{ background: "#fefce8", color: "#a16207" }}>Proposal ID</th>
+                  <th style={{ background: "#fefce8", color: "#a16207" }}>Customer Name</th>
+                  {isCheque && <>
+                    <th style={{ background: "#fefce8", color: "#a16207" }}>Cheque No.</th>
+                    <th style={{ background: "#fefce8", color: "#a16207" }}>Cheque Date</th>
+                    <th style={{ background: "#fefce8", color: "#a16207" }}>Clearing Date</th>
+                  </>}
+                  {isNeft && <>
+                    <th style={{ background: "#fefce8", color: "#a16207" }}>Transaction No.</th>
+                    <th style={{ background: "#fefce8", color: "#a16207" }}>NEFT Date</th>
+                  </>}
+                  <th style={{ background: "#fefce8", color: "#a16207" }}>Amount</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr style={{ background: "#fffef0" }}>
+                  <td style={{ ...refCellStyle, fontFamily: "monospace", fontWeight: 700 }}>{up.proposalId}</td>
+                  <td style={{ ...refCellStyle, fontWeight: 600 }}>{up.customerName}</td>
+                  {isCheque && <>
+                    <td style={{ ...refCellStyle, fontFamily: "monospace", fontWeight: 600 }}>{up.chequeNumber ?? "—"}</td>
+                    <td style={refCellStyle}>{up.chequeDate ?? "—"}</td>
+                    <td style={refCellStyle}>{up.clearingDate ?? "—"}</td>
+                  </>}
+                  {isNeft && <>
+                    <td style={{ ...refCellStyle, fontFamily: "monospace", fontWeight: 600 }}>{up.transactionId ?? "—"}</td>
+                    <td style={refCellStyle}>{up.neftDate ?? "—"}</td>
+                  </>}
+                  <td style={{ ...refCellStyle, fontWeight: 700 }}>{fmt(up.premium)}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          {/* Filters */}
+          <div style={{ display: "flex", gap: 12, flexWrap: "wrap", alignItems: "flex-end", marginBottom: 16 }}>
+            <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
+              <label style={LABEL}>Search</label>
+              <input
+                className="field-input filter-search"
+                placeholder="Cheque number or customer name…"
+                value={search}
+                onChange={(e) => onSearch(e.target.value)}
+                style={{ width: 240 }}
+              />
+            </div>
+            <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
+              <label style={LABEL}>From Date</label>
+              <input type="date" className="field-input" value={dateFrom} onChange={(e) => onDateFrom(e.target.value)} />
+            </div>
+            <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
+              <label style={LABEL}>To Date</label>
+              <input type="date" className="field-input" value={dateTo} onChange={(e) => onDateTo(e.target.value)} />
+            </div>
+            {hasFilters && (
+              <button type="button" className="btn btn-ghost btn-sm" onClick={() => { onSearch(""); onDateFrom(""); onDateTo(""); }}>
+                Clear
+              </button>
+            )}
+          </div>
+
+          {/* List */}
+          {availablePending.length === 0 ? (
+            <div style={{ padding: "32px 0", textAlign: "center", color: "#64748b", fontSize: 13 }}>No pending records available</div>
+          ) : filtered.length === 0 ? (
+            <div style={{ padding: "32px 0", textAlign: "center", color: "#64748b", fontSize: 13 }}>No pending records match your search/filters</div>
+          ) : (
+            <div style={{ border: "1px solid var(--border)", borderRadius: 8, overflow: "hidden" }}>
+              <div style={{ maxHeight: 420, overflowY: "auto" }}>
+                <table style={{ fontSize: 13, marginBottom: 0 }}>
+                  <thead style={{ position: "sticky", top: 0, zIndex: 1 }}>
+                    <tr>
+                      <th style={{ position: "sticky", top: 0, background: "#eff6ff", color: "#1d4ed8" }}>Proposal ID</th>
+                      <th style={{ position: "sticky", top: 0, background: "#eff6ff", color: "#1d4ed8" }}>Customer Name</th>
+                      {isCheque && <>
+                        <th style={{ position: "sticky", top: 0, background: "#eff6ff", color: "#1d4ed8" }}>Cheque No.</th>
+                        <th style={{ position: "sticky", top: 0, background: "#eff6ff", color: "#1d4ed8" }}>Cheque Date</th>
+                        <th style={{ position: "sticky", top: 0, background: "#eff6ff", color: "#1d4ed8" }}>Clearing Date</th>
+                      </>}
+                      {isNeft && <>
+                        <th style={{ position: "sticky", top: 0, background: "#eff6ff", color: "#1d4ed8" }}>Transaction No.</th>
+                        <th style={{ position: "sticky", top: 0, background: "#eff6ff", color: "#1d4ed8" }}>NEFT Date</th>
+                      </>}
+                      <th style={{ position: "sticky", top: 0, background: "#eff6ff", color: "#1d4ed8" }}>Amount</th>
+                      <th style={{ position: "sticky", top: 0, background: "#eff6ff", color: "#1d4ed8" }}></th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {filtered.map((p) => {
+                      const chequeMatch = isCheque && up.chequeNumber && p.chequeNumber && up.chequeNumber === p.chequeNumber;
+                      const txnMatch = isNeft && up.transactionId && p.transactionId && up.transactionId === p.transactionId;
+                      const nameMatch = up.customerName === p.customerName;
+                      return (
+                        <tr
+                          key={p.id}
+                          onClick={() => onPick(p.id)}
+                          style={{ cursor: "pointer", background: "#f0f7ff" }}
+                          onMouseEnter={(e) => { e.currentTarget.style.background = "#f5f3ff"; }}
+                          onMouseLeave={(e) => { e.currentTarget.style.background = "#f0f7ff"; }}
+                        >
+                          <td style={{ fontFamily: "monospace", fontWeight: 700, color: "#1d4ed8", fontSize: 12 }}>{p.proposalId}</td>
+                          <td style={{ fontWeight: 600, color: nameMatch ? "#15803d" : "#1e293b" }}>{p.customerName}{nameMatch && <span style={{ marginLeft: 4 }} title="Name matches uploaded record">✓</span>}</td>
+                          {isCheque && <>
+                            <td style={{ fontFamily: "monospace", fontWeight: 600, color: chequeMatch ? "#15803d" : "inherit" }}>{p.chequeNumber ?? "—"}{chequeMatch && <span style={{ marginLeft: 4 }} title="Cheque number matches uploaded record">✓</span>}</td>
+                            <td style={{ whiteSpace: "nowrap" }}>{p.chequeDate ?? "—"}</td>
+                            <td style={{ whiteSpace: "nowrap" }}>{p.clearingDate ?? "—"}</td>
+                          </>}
+                          {isNeft && <>
+                            <td style={{ fontFamily: "monospace", fontWeight: 600, color: txnMatch ? "#15803d" : "#0369a1" }}>{p.transactionId ?? "—"}{txnMatch && <span style={{ marginLeft: 4 }} title="Transaction number matches uploaded record">✓</span>}</td>
+                            <td style={{ whiteSpace: "nowrap" }}>{p.neftDate ?? "—"}</td>
+                          </>}
+                          <td style={{ fontWeight: 700, whiteSpace: "nowrap" }}>{fmt(p.premium)}</td>
+                          <td style={{ fontSize: 16, color: "#a78bfa", textAlign: "center" }}>→</td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+    </>
+  );
+}
+
+function MatchComparisonModal({
+  uploaded: up, pending: pr, isCheque, isNeft,
+  manualMatch,
+  onAccept, onReject, onSetReason, onBack, onClose,
+}) {
+  const { matched, mismatched } = computeMatchSummary(up, pr, isCheque);
+  const diff = computePremiumDiff(up, pr);
+  const showingReasonSelect = manualMatch?.action === "reject" && manualMatch?.reason === "";
+
+  return (
+    <>
+      <div style={{ ...MODAL_OVERLAY, zIndex: 1010 }} onClick={onClose} />
+      <div style={{ ...MODAL_BOX, zIndex: 1011, maxWidth: 760 }}>
+        <div style={{ padding: "22px 26px 18px", borderBottom: "1.5px solid #f0edf8", display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 12 }}>
+          <div>
+            <button type="button" onClick={onBack} style={{ fontSize: 12, color: "#7c3aed", background: "none", border: "none", cursor: "pointer", fontWeight: 600, fontFamily: "inherit", padding: 0, marginBottom: 6 }}>
+              ← Back
+            </button>
+            <div style={{ fontSize: 18, fontWeight: 800, color: "#1a1628" }}>Compare &amp; Match</div>
+            <div style={{ fontSize: 13, color: "#64748b", marginTop: 2 }}>{up.proposalId} ↔ {pr.proposalId}</div>
+          </div>
+          <button onClick={onClose} style={{ width: 30, height: 30, borderRadius: 8, border: "1.5px solid #e8e4f0", background: "#faf9fc", cursor: "pointer", fontSize: 16, display: "flex", alignItems: "center", justifyContent: "center", color: "#64748b", lineHeight: 1, flexShrink: 0 }}>×</button>
+        </div>
+
+        <div style={{ padding: "20px 26px" }}>
+          {/* Match summary banner */}
+          <div style={{ background: mismatched.length === 0 ? "#f0fdf4" : "#fff3e0", border: `1.5px solid ${mismatched.length === 0 ? "#86efac" : "#fcd34d"}`, borderRadius: 10, padding: "12px 16px", marginBottom: 18, fontSize: 13, color: mismatched.length === 0 ? "#15803d" : "#92400e" }}>
+            {matched.length > 0 && <div><strong>Matched on:</strong> {matched.join(", ")}</div>}
+            {mismatched.length > 0 && <div style={{ marginTop: matched.length > 0 ? 4 : 0 }}><strong>{mismatched.length} mismatch{mismatched.length > 1 ? "es" : ""}:</strong> {mismatched.join(", ")}</div>}
+          </div>
+
+          {/* Side-by-side comparison */}
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 20, marginBottom: 18 }}>
+            <div style={{ background: "#eff6ff", borderRadius: 10, padding: "14px 16px" }}>
+              <div style={{ fontSize: 12, fontWeight: 700, color: "#1d4ed8", textTransform: "uppercase", letterSpacing: ".5px", marginBottom: 10 }}>System (Pending)</div>
+              <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+                <TxnDetailRow label="Customer Name" value={pr.customerName} />
+                {isCheque && <>
+                  <TxnDetailRow label="Cheque Number" value={pr.chequeNumber} />
+                  <TxnDetailRow label="Cheque Date" value={pr.chequeDate} />
+                  <TxnDetailRow label="Clearing Date" value={pr.clearingDate} />
+                </>}
+                {isNeft && <>
+                  <TxnDetailRow label="Transaction ID" value={pr.transactionId} />
+                  <TxnDetailRow label="NEFT Date" value={pr.neftDate} />
+                </>}
+                <TxnDetailRow label="Amount" value={fmt(pr.premium)} />
+              </div>
+            </div>
+            <div style={{ background: "#fefce8", borderRadius: 10, padding: "14px 16px" }}>
+              <div style={{ fontSize: 12, fontWeight: 700, color: "#a16207", textTransform: "uppercase", letterSpacing: ".5px", marginBottom: 10 }}>Uploaded (IC Data)</div>
+              <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+                <TxnDetailRow label="Customer Name" value={up.customerName} mismatch={up.customerName !== pr.customerName} />
+                {isCheque && <>
+                  <TxnDetailRow label="Cheque Number" value={up.chequeNumber} mismatch={(up.chequeNumber ?? "") !== (pr.chequeNumber ?? "")} />
+                  <TxnDetailRow label="Cheque Date" value={up.chequeDate} mismatch={(up.chequeDate ?? "") !== (pr.chequeDate ?? "")} />
+                  <TxnDetailRow label="Clearing Date" value={up.clearingDate} mismatch={(up.clearingDate ?? "") !== (pr.clearingDate ?? "")} />
+                </>}
+                {isNeft && <>
+                  <TxnDetailRow label="Transaction ID" value={up.transactionId} mismatch={(up.transactionId ?? "") !== (pr.transactionId ?? "")} />
+                  <TxnDetailRow label="NEFT Date" value={up.neftDate} mismatch={(up.neftDate ?? "") !== (pr.neftDate ?? "")} />
+                </>}
+                <TxnDetailRow label="Amount" value={fmt(up.premium)} mismatch={up.premium !== pr.premium} />
+              </div>
+            </div>
+          </div>
+
+          {/* Payment difference banner */}
+          {diff !== 0 && (
+            <div style={{ background: "linear-gradient(135deg,#f5f3ff,#ede9fe)", borderRadius: 12, padding: "14px 20px", marginBottom: 18, fontSize: 13.5, color: "#3b0764" }}>
+              {diff > 0
+                ? <><strong>Customer overpaid by {fmt(diff)}.</strong> The extra amount will be refunded.</>
+                : <><strong>Customer underpaid by {fmt(-diff)}.</strong> The remaining amount is due.</>}
+            </div>
+          )}
+
+          {/* Accept / Reject */}
+          <div style={{ display: "flex", gap: 10, alignItems: "center", flexWrap: "wrap" }}>
+            <button type="button" onClick={onAccept}
+              style={{ padding: "8px 20px", borderRadius: 8, border: "none", background: "#16a34a", color: "#fff", fontWeight: 700, fontSize: 13.5, cursor: "pointer", fontFamily: "inherit" }}>
+              {diff > 0 ? `✓ Accept & Refund ${fmt(diff)}` : diff < 0 ? `✓ Accept (${fmt(-diff)} Due)` : "✓ Accept"}
+            </button>
+            <button type="button" onClick={onReject}
+              style={{ padding: "8px 20px", borderRadius: 8, border: "1.5px solid #dc2626", background: "#fff", color: "#dc2626", fontWeight: 700, fontSize: 13.5, cursor: "pointer", fontFamily: "inherit" }}>
+              ✕ Reject
+            </button>
+            {showingReasonSelect && (
+              <select className="field-select" style={{ fontSize: 12, padding: "4px 8px", maxWidth: 240 }} value=""
+                onChange={(e) => onSetReason(e.target.value)}>
+                <option value="">Select reason…</option>
+                {REJECT_REASONS.map((r) => (<option key={r}>{r}</option>))}
+              </select>
+            )}
+          </div>
+        </div>
+      </div>
+    </>
   );
 }
 
@@ -332,7 +631,7 @@ function buildUploadedRows(records) {
       premium: premiumDiff ? r.premium + 500 : r.premium,
       paymentType: r.paymentType,
       icName: r.icName,
-      uploadedStatus: "Paid",
+      uploadedStatus: "Payment received (completed)",
     };
 
     if (r.paymentType === "Cheque") {
@@ -373,7 +672,7 @@ function buildUploadedRows(records) {
       premium: 3500 + k * 250,
       paymentType: pt,
       icName: "External IC",
-      uploadedStatus: "Paid",
+      uploadedStatus: "Payment received (completed)",
     };
     if (pt === "Cheque") {
       row.chequeNumber = String(800000 + idx);
@@ -422,11 +721,14 @@ export default function Reconciliation() {
   const [expandedUnmatched, setExpandedUnmatched] = useState(null);
   const [selectedPending, setSelectedPending] = useState(null);
   const [manualMatches, setManualMatches] = useState({});
+  const [pendingSearch, setPendingSearch] = useState("");
+  const [pendingDateFrom, setPendingDateFrom] = useState("");
+  const [pendingDateTo, setPendingDateTo] = useState("");
   const [viewTransaction, setViewTransaction] = useState(null); // { system, uploaded }
   const [countAdj, setCountAdj] = useState({
-    acceptedInitiated: 0,
-    acceptedRejected: 0,
-    movedToRejected: 0,
+    acceptedPending: 0,
+    acceptedFailed: 0,
+    movedToFailed: 0,
   });
 
   const handleApply = () => setCampaignFilter(topCampaign);
@@ -448,9 +750,9 @@ export default function Reconciliation() {
 
   const pg = usePagination(filtered, 10);
   const counts = {
-    All: 462 - countAdj.acceptedInitiated - countAdj.acceptedRejected,
-    Initiated: 82 - countAdj.acceptedInitiated - countAdj.movedToRejected,
-    Rejected: 380 - countAdj.acceptedRejected + countAdj.movedToRejected,
+    All: 462 - countAdj.acceptedPending - countAdj.acceptedFailed,
+    PendingPayment: 82 - countAdj.acceptedPending - countAdj.movedToFailed,
+    PaymentFailed: 380 - countAdj.acceptedFailed + countAdj.movedToFailed,
   };
 
   // ── start reconcile ────────────────────────────────────────────────────────
@@ -481,31 +783,31 @@ export default function Reconciliation() {
     setRowReasons((prev) => ({ ...prev, [id]: reason }));
 
   const handleFinalize = () => {
-    const acceptedInitiated = reconcileBase.filter(
-      (r) => rowActions[r.id] === "accept" && r.paymentStatus === "Initiated",
+    const acceptedPending = reconcileBase.filter(
+      (r) => rowActions[r.id] === "accept" && r.paymentStatus === "Pending payment",
     ).length;
-    const acceptedRejected = reconcileBase.filter(
-      (r) => rowActions[r.id] === "accept" && r.paymentStatus === "Rejected",
+    const acceptedFailed = reconcileBase.filter(
+      (r) => rowActions[r.id] === "accept" && r.paymentStatus === "Payment Failed",
     ).length;
-    const movedToRejected = reconcileBase.filter(
-      (r) => rowActions[r.id] === "reject" && r.paymentStatus === "Initiated",
+    const movedToFailed = reconcileBase.filter(
+      (r) => rowActions[r.id] === "reject" && r.paymentStatus === "Pending payment",
     ).length;
 
     setCountAdj((prev) => ({
-      acceptedInitiated: prev.acceptedInitiated + acceptedInitiated,
-      acceptedRejected: prev.acceptedRejected + acceptedRejected,
-      movedToRejected: prev.movedToRejected + movedToRejected,
+      acceptedPending: prev.acceptedPending + acceptedPending,
+      acceptedFailed: prev.acceptedFailed + acceptedFailed,
+      movedToFailed: prev.movedToFailed + movedToFailed,
     }));
 
     setListData((prev) =>
       prev
         .map((p) => {
           const action = rowActions[p.id];
-          if (action === "accept") return { ...p, paymentStatus: "Paid" };
-          if (action === "reject") return { ...p, paymentStatus: "Rejected" };
+          if (action === "accept") return { ...p, paymentStatus: "Payment received (completed)" };
+          if (action === "reject") return { ...p, paymentStatus: "Payment Failed" };
           return p;
         })
-        .filter((p) => p.paymentStatus !== "Paid"),
+        .filter((p) => p.paymentStatus !== "Payment received (completed)"),
     );
 
     setMode("done");
@@ -710,13 +1012,13 @@ export default function Reconciliation() {
                   color: "#7c3aed",
                 },
                 {
-                  label: "Accepted (Paid)",
+                  label: "Accepted (Payment Received)",
                   value: reviewCounts.accepted,
                   bg: "#dcfce7",
                   color: "#15803d",
                 },
                 {
-                  label: "Rejected",
+                  label: "Payment Failed",
                   value: reviewCounts.rejected,
                   bg: "#fee2e2",
                   color: "#dc2626",
@@ -775,7 +1077,7 @@ export default function Reconciliation() {
                 onClick={() => {
                   setMode("list");
                   setFile(null);
-                  setStatusFilter("Rejected");
+                  setStatusFilter("Payment Failed");
                 }}
               >
                 Done
@@ -798,7 +1100,7 @@ export default function Reconciliation() {
         <PageHeader
           icon={<DocumentIcon />}
           title="Reconciliation Review"
-          subtitle={`${file?.name} · ${reconcileBase.length} records matched`}
+          subtitle={`${file?.name} ·`}
         >
           <div style={{ display: "flex", gap: 10 }}>
             <button className="btn btn-ghost" onClick={() => setMode("upload")}>
@@ -813,9 +1115,10 @@ export default function Reconciliation() {
         {/* Tab bar */}
         <div style={{ display: "flex", gap: 0, marginBottom: 0, borderBottom: "2px solid var(--border)" }}>
           {[
-            { key: "pending",   label: "Pending",   count: pendingRecords.length,   color: "#92400e", bg: "#fff3e0" },
-            { key: "matched",   label: "Matched",   count: matchedRecords.length,   color: "#15803d", bg: "#dcfce7" },
-            { key: "unmatched", label: "Unmatched",  count: unmatchedUploaded.length, color: "#dc2626", bg: "#fee2e2" },
+            { key: "matched",   label: "Matched Payments",   count: matchedRecords.length,   color: "#15803d", bg: "#dcfce7" },
+
+            { key: "pending",   label: "Pending Payments",   count: pendingRecords.length,   color: "#92400e", bg: "#fff3e0" },
+            { key: "unmatched", label: "Unmatched Payments",  count: unmatchedUploaded.length, color: "#dc2626", bg: "#fee2e2" },
           ].map((t) => (
             <button
               key={t.key}
@@ -1061,6 +1364,19 @@ export default function Reconciliation() {
           const colCount = isCheque ? 6 : isNeft ? 5 : 3;
           const alreadyMatchedPendingIds = new Set(Object.values(manualMatches).map((m) => m.pendingId));
           const availablePending = pendingRecords.filter((p) => !alreadyMatchedPendingIds.has(p.id));
+          const activeUnmatchedRow = expandedUnmatched
+            ? unmatchedUploaded.find((u) => u.proposalId === expandedUnmatched)
+            : null;
+          const activePendingRecord = selectedPending
+            ? pendingRecords.find((p) => p.id === selectedPending)
+            : null;
+          const closeMatchFlow = () => {
+            setExpandedUnmatched(null);
+            setSelectedPending(null);
+            setPendingSearch("");
+            setPendingDateFrom("");
+            setPendingDateTo("");
+          };
 
           return (
           <div className="card" style={{ borderTopLeftRadius: 0, borderTopRightRadius: 0 }}>
@@ -1131,176 +1447,13 @@ export default function Reconciliation() {
                                 </button>
                               )}
                               {!mm && isExpanded && (
-                                <button type="button" onClick={() => { setExpandedUnmatched(null); setSelectedPending(null); }}
+                                <button type="button" onClick={closeMatchFlow}
                                   style={{ padding: "5px 14px", borderRadius: 7, border: "1.5px solid #64748b", background: "#fff", color: "#64748b", fontWeight: 700, fontSize: 12.5, cursor: "pointer", fontFamily: "inherit" }}>
                                   Cancel
                                 </button>
                               )}
                             </td>
                           </tr>,
-
-                          /* ── Expanded: clickable pending cards + comparison ── */
-                          isExpanded && (
-                            <tr key={`${up.proposalId}-expand`}>
-                              <td colSpan={colCount} style={{ padding: 0, background: "#f8fafc", borderTop: "2px dashed #a78bfa" }}>
-                                <div style={{ padding: "14px 16px" }}>
-
-                                  {/* Step 1: Pick a pending record */}
-                                  {!selectedPending && (
-                                    <div>
-                                      <div style={{ fontSize: 12, fontWeight: 700, color: "#64748b", textTransform: "uppercase", letterSpacing: ".5px", marginBottom: 10 }}>
-                                        Select a pending record to compare
-                                      </div>
-                                      {availablePending.length === 0 ? (
-                                        <div style={{ padding: "16px 0", textAlign: "center", color: "#64748b", fontSize: 13 }}>No pending records available</div>
-                                      ) : (
-                                        <div style={{ display: "flex", flexDirection: "column", gap: 6, maxHeight: 240, overflowY: "auto" }}>
-                                          {availablePending.map((p) => (
-                                            <div
-                                              key={p.id}
-                                              onClick={() => setSelectedPending(p.id)}
-                                              style={{
-                                                display: "flex", alignItems: "center", gap: 16,
-                                                padding: "10px 14px", borderRadius: 8,
-                                                border: "1.5px solid #dbeafe", background: "#f0f7ff",
-                                                cursor: "pointer", transition: "all .12s",
-                                              }}
-                                              onMouseEnter={(e) => { e.currentTarget.style.borderColor = "#7c3aed"; e.currentTarget.style.background = "#f5f3ff"; }}
-                                              onMouseLeave={(e) => { e.currentTarget.style.borderColor = "#dbeafe"; e.currentTarget.style.background = "#f0f7ff"; }}
-                                            >
-                                              <div style={{ flex: "0 0 auto" }}>
-                                                <div style={{ fontSize: 11, fontWeight: 700, color: "#1d4ed8", fontFamily: "monospace" }}>{p.proposalId}</div>
-                                              </div>
-                                              <div style={{ flex: 1, fontSize: 13, fontWeight: 500, color: "#1e293b" }}>{p.customerName}</div>
-                                              {isCheque && <>
-                                                <div style={{ fontSize: 12, color: "#64748b" }}>
-                                                  <span style={{ fontWeight: 600, fontFamily: "monospace" }}>{p.chequeNumber ?? "—"}</span>
-                                                  <span style={{ margin: "0 6px", color: "#cbd5e1" }}>|</span>
-                                                  {p.chequeDate ?? "—"}
-                                                </div>
-                                              </>}
-                                              {isNeft && <>
-                                                <div style={{ fontSize: 12, color: "#64748b" }}>
-                                                  <span style={{ fontWeight: 600, fontFamily: "monospace", color: "#0369a1" }}>{p.transactionId ?? "—"}</span>
-                                                  <span style={{ margin: "0 6px", color: "#cbd5e1" }}>|</span>
-                                                  {p.neftDate ?? "—"}
-                                                </div>
-                                              </>}
-                                              <div style={{ fontWeight: 700, fontSize: 13, color: "#1e293b", whiteSpace: "nowrap" }}>{fmt(p.premium)}</div>
-                                              <div style={{ fontSize: 18, color: "#a78bfa", flexShrink: 0 }}>→</div>
-                                            </div>
-                                          ))}
-                                        </div>
-                                      )}
-                                    </div>
-                                  )}
-
-                                  {/* Step 2: Comparison after selection */}
-                                  {selectedPending && (() => {
-                                    const pr = pendingRecords.find((p) => p.id === selectedPending);
-                                    if (!pr) return null;
-                                    return (
-                                      <div>
-                                        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 10 }}>
-                                          <span style={{ fontSize: 12, fontWeight: 700, color: "#64748b", textTransform: "uppercase", letterSpacing: ".5px" }}>Comparison</span>
-                                          <button type="button" onClick={() => setSelectedPending(null)}
-                                            style={{ fontSize: 12, color: "#7c3aed", background: "none", border: "none", cursor: "pointer", fontWeight: 600, fontFamily: "inherit" }}>
-                                            ← Pick different record
-                                          </button>
-                                        </div>
-                                        <div style={{ border: "1px solid var(--border)", borderRadius: 10, overflow: "hidden" }}>
-                                          <table style={{ fontSize: 13, marginBottom: 0 }}>
-                                            <thead>
-                                              <tr>
-                                                <th style={{ background: "#f1f5f9", width: 100 }}>Source</th>
-                                                {isCheque && <>
-                                                  <th style={{ background: "#f1f5f9" }}>Cheque No.</th>
-                                                  <th style={{ background: "#f1f5f9" }}>Cheque Date</th>
-                                                  <th style={{ background: "#f1f5f9" }}>Clearing Date</th>
-                                                </>}
-                                                {isNeft && <>
-                                                  <th style={{ background: "#f1f5f9" }}>Transaction No.</th>
-                                                  <th style={{ background: "#f1f5f9" }}>Transaction Date</th>
-                                                </>}
-                                                <th style={{ background: "#f1f5f9" }}>Amount</th>
-                                              </tr>
-                                            </thead>
-                                            <tbody>
-                                              <tr style={{ background: "#eff6ff" }}>
-                                                <td style={{ fontWeight: 700, color: "#1d4ed8", fontSize: 12 }}>System</td>
-                                                {isCheque && <>
-                                                  <td style={{ fontFamily: "monospace", fontWeight: 600 }}>{pr.chequeNumber ?? "—"}</td>
-                                                  <td style={{ whiteSpace: "nowrap" }}>{pr.chequeDate ?? "—"}</td>
-                                                  <td style={{ whiteSpace: "nowrap" }}>{pr.clearingDate ?? "—"}</td>
-                                                </>}
-                                                {isNeft && <>
-                                                  <td style={{ fontFamily: "monospace", fontWeight: 600, color: "#0369a1" }}>{pr.transactionId ?? "—"}</td>
-                                                  <td style={{ whiteSpace: "nowrap" }}>{pr.neftDate ?? "—"}</td>
-                                                </>}
-                                                <td style={{ fontWeight: 600 }}>{fmt(pr.premium)}</td>
-                                              </tr>
-                                              <tr style={{ background: "#fefce8" }}>
-                                                <td style={{ fontWeight: 700, color: "#a16207", fontSize: 12 }}>Uploaded</td>
-                                                {isCheque && <>
-                                                  <td style={{ fontFamily: "monospace", fontWeight: 600, color: up.chequeNumber !== (pr.chequeNumber ?? "") ? "#dc2626" : "inherit" }}>
-                                                    {up.chequeNumber ?? "—"}{up.chequeNumber !== (pr.chequeNumber ?? "") && <span style={{ marginLeft: 4 }}>⚠</span>}
-                                                  </td>
-                                                  <td style={{ whiteSpace: "nowrap", color: up.chequeDate !== (pr.chequeDate ?? "") ? "#dc2626" : "inherit" }}>
-                                                    {up.chequeDate ?? "—"}{up.chequeDate !== (pr.chequeDate ?? "") && <span style={{ marginLeft: 4 }}>⚠</span>}
-                                                  </td>
-                                                  <td style={{ whiteSpace: "nowrap", color: up.clearingDate !== (pr.clearingDate ?? "") ? "#dc2626" : "inherit" }}>
-                                                    {up.clearingDate ?? "—"}{up.clearingDate !== (pr.clearingDate ?? "") && <span style={{ marginLeft: 4 }}>⚠</span>}
-                                                  </td>
-                                                </>}
-                                                {isNeft && <>
-                                                  <td style={{ fontFamily: "monospace", fontWeight: 600, color: up.transactionId !== (pr.transactionId ?? "") ? "#dc2626" : "#0369a1" }}>
-                                                    {up.transactionId ?? "—"}{up.transactionId !== (pr.transactionId ?? "") && <span style={{ marginLeft: 4 }}>⚠</span>}
-                                                  </td>
-                                                  <td style={{ whiteSpace: "nowrap", color: up.neftDate !== (pr.neftDate ?? "") ? "#dc2626" : "inherit" }}>
-                                                    {up.neftDate ?? "—"}{up.neftDate !== (pr.neftDate ?? "") && <span style={{ marginLeft: 4 }}>⚠</span>}
-                                                  </td>
-                                                </>}
-                                                <td style={{ fontWeight: 600, color: up.premium !== pr.premium ? "#dc2626" : "inherit" }}>
-                                                  {fmt(up.premium)}{up.premium !== pr.premium && <span style={{ marginLeft: 4 }}>⚠</span>}
-                                                </td>
-                                              </tr>
-                                            </tbody>
-                                          </table>
-
-                                          {/* Accept / Reject buttons */}
-                                          <div style={{ display: "flex", gap: 10, alignItems: "center", padding: "12px 16px", borderTop: "1px solid var(--border)", background: "#fff" }}>
-                                            <button type="button" onClick={() => {
-                                              setManualMatches((prev) => ({ ...prev, [up.proposalId]: { pendingId: selectedPending, action: "accept" } }));
-                                              setExpandedUnmatched(null); setSelectedPending(null);
-                                            }}
-                                              style={{ padding: "6px 18px", borderRadius: 7, border: "none", background: "#16a34a", color: "#fff", fontWeight: 700, fontSize: 13, cursor: "pointer", fontFamily: "inherit" }}>
-                                              ✓ Accept
-                                            </button>
-                                            <button type="button" onClick={() => {
-                                              setManualMatches((prev) => ({ ...prev, [up.proposalId]: { pendingId: selectedPending, action: "reject", reason: "" } }));
-                                            }}
-                                              style={{ padding: "6px 18px", borderRadius: 7, border: "1.5px solid #dc2626", background: "#fff", color: "#dc2626", fontWeight: 700, fontSize: 13, cursor: "pointer", fontFamily: "inherit" }}>
-                                              ✕ Reject
-                                            </button>
-                                            {manualMatches[up.proposalId]?.action === "reject" && manualMatches[up.proposalId]?.reason === "" && (
-                                              <select className="field-select" style={{ fontSize: 12, padding: "4px 8px", maxWidth: 220 }} value=""
-                                                onChange={(e) => {
-                                                  setManualMatches((prev) => ({ ...prev, [up.proposalId]: { ...prev[up.proposalId], reason: e.target.value } }));
-                                                  setExpandedUnmatched(null); setSelectedPending(null);
-                                                }}>
-                                                <option value="">Select reason…</option>
-                                                {REJECT_REASONS.map((r) => (<option key={r}>{r}</option>))}
-                                              </select>
-                                            )}
-                                          </div>
-                                        </div>
-                                      </div>
-                                    );
-                                  })()}
-                                </div>
-                              </td>
-                            </tr>
-                          ),
 
                           /* ── Matched pending row shown below after action ── */
                           mm && matchedPendingRec && (
@@ -1326,6 +1479,46 @@ export default function Reconciliation() {
                 </table>
               </div>
             </div>
+
+            {expandedUnmatched && activeUnmatchedRow && (
+              <PendingPickerModal
+                uploaded={activeUnmatchedRow}
+                availablePending={availablePending}
+                isCheque={isCheque}
+                isNeft={isNeft}
+                search={pendingSearch}
+                onSearch={setPendingSearch}
+                dateFrom={pendingDateFrom}
+                onDateFrom={setPendingDateFrom}
+                dateTo={pendingDateTo}
+                onDateTo={setPendingDateTo}
+                onPick={(id) => setSelectedPending(id)}
+                onClose={closeMatchFlow}
+              />
+            )}
+
+            {expandedUnmatched && activeUnmatchedRow && selectedPending && activePendingRecord && (
+              <MatchComparisonModal
+                uploaded={activeUnmatchedRow}
+                pending={activePendingRecord}
+                isCheque={isCheque}
+                isNeft={isNeft}
+                manualMatch={manualMatches[activeUnmatchedRow.proposalId]}
+                onAccept={() => {
+                  setManualMatches((prev) => ({ ...prev, [activeUnmatchedRow.proposalId]: { pendingId: selectedPending, action: "accept" } }));
+                  closeMatchFlow();
+                }}
+                onReject={() => {
+                  setManualMatches((prev) => ({ ...prev, [activeUnmatchedRow.proposalId]: { pendingId: selectedPending, action: "reject", reason: "" } }));
+                }}
+                onSetReason={(reason) => {
+                  setManualMatches((prev) => ({ ...prev, [activeUnmatchedRow.proposalId]: { ...prev[activeUnmatchedRow.proposalId], reason } }));
+                  closeMatchFlow();
+                }}
+                onBack={() => setSelectedPending(null)}
+                onClose={closeMatchFlow}
+              />
+            )}
           </div>
           );
         })()}
@@ -1354,8 +1547,8 @@ export default function Reconciliation() {
           }}
         >
           <span style={{ fontSize: 13, color: "var(--text-3)" }}>
-            {reviewCounts.pending} record{reviewCounts.pending !== 1 ? "s" : ""}{" "}
-            still pending
+            {/* {reviewCounts.pending} record{reviewCounts.pending !== 1 ? "s" : ""}{" "}
+            still pending */}
           </span>
           <button className="btn btn-primary" onClick={handleFinalize}>
             Finalise Reconciliation →
@@ -1477,15 +1670,15 @@ export default function Reconciliation() {
             border: "#ddd6fe",
           },
           {
-            label: "Initiated",
-            count: counts.Initiated,
+            label: "Pending Payment",
+            count: counts.PendingPayment,
             amount: "₹28,70,000",
-            color: "#0369a1",
-            border: "#7dd3fc",
+            color: "#a05c00",
+            border: "#fcd34d",
           },
           {
-            label: "Rejected",
-            count: counts.Rejected,
+            label: "Payment Failed",
+            count: counts.PaymentFailed,
             amount: "₹1,33,00,000",
             color: "#dc2626",
             border: "#fca5a5",
@@ -1576,8 +1769,8 @@ export default function Reconciliation() {
                 }}
               >
                 <option value="">All Status</option>
-                <option value="Initiated">Initiated</option>
-                <option value="Rejected">Rejected</option>
+                <option value="Pending payment">Pending Payment</option>
+                <option value="Payment Failed">Payment Failed</option>
               </select>
             </div>
             {(statusFilter || payTypeFilter || search) && (
@@ -1663,48 +1856,59 @@ export default function Reconciliation() {
               <table style={{ fontSize: 13 }}>
                 <thead>
                   <tr>
-                    <th>ID</th>
-                    <th>Payment Detail ID</th>
-                    <th>Cheque No.</th>
-                    <th>Amount</th>
-                    <th>Bank Name</th>
-                    <th>Date</th>
-                    <th>In Favour Of</th>
-                    <th>Photo Doc</th>
-                    <th>Deposit Location</th>
-                    <th>IFSC Code</th>
-                    <th>MICR Code</th>
-                    <th>User ID</th>
-                    <th>Campaign ID</th>
-                    <th>Policy ID</th>
+                    <th colSpan={3} style={{ textAlign: "center", background: "#fff", color: "#1a1628" }}>Customer</th>
+                    <th colSpan={10} style={{ textAlign: "center", background: "#f0f7ff", color: "#1d4ed8" }}>Cheque / Bank Details</th>
+                    <th rowSpan={2} style={{ verticalAlign: "bottom" }}>Amount</th>
+                    <th rowSpan={2} style={{ verticalAlign: "bottom" }}>Status</th>
+                    <th colSpan={2} style={{ textAlign: "center", background: "#f8fafc", color: "#64748b" }}>Meta</th>
+                  </tr>
+                  <tr>
+                    <th>Proposal ID</th>
+                    <th>Customer Name</th>
+                    <th>Mobile</th>
+                    <th style={{ background: "#f0f7ff" }}>Payment Detail ID</th>
+                    <th style={{ background: "#f0f7ff" }}>Cheque No.</th>
+                    <th style={{ background: "#f0f7ff" }}>Bank Name</th>
+                    <th style={{ background: "#f0f7ff" }}>Cheque Date</th>
+                    <th style={{ background: "#f0f7ff" }}>Clearing Date</th>
+                    <th style={{ background: "#f0f7ff" }}>In Favour Of</th>
+                    <th style={{ background: "#f0f7ff" }}>Deposit Location</th>
+                    <th style={{ background: "#f0f7ff" }}>IFSC Code</th>
+                    <th style={{ background: "#f0f7ff" }}>MICR Code</th>
+                    <th style={{ background: "#f0f7ff" }}>Photo Doc</th>
+                    <th style={{ background: "#f8fafc" }}>User ID</th>
+                    <th style={{ background: "#f8fafc" }}>Campaign ID</th>
                   </tr>
                 </thead>
                 <tbody>
                   {pg.slice.length === 0 ? (
                     <tr>
-                      <td colSpan={14} style={{ textAlign: "center", padding: "32px 0", color: "#64748b" }}>
+                      <td colSpan={17} style={{ textAlign: "center", padding: "32px 0", color: "#64748b" }}>
                         No records found
                       </td>
                     </tr>
                   ) : (
                     pg.slice.map((p) => (
                       <tr key={p.id}>
-                        <td style={{ color: "var(--text-3)" }}>{p.id}</td>
+                        <td style={{ fontFamily: "monospace", fontSize: 13, color: "#7c3aed" }}>{p.proposalId}</td>
+                        <td style={{ fontWeight: 500 }}>{p.customerName}</td>
+                        <td style={{ color: "#64748b" }}>{p.mobile}</td>
                         <td style={{ fontFamily: "monospace", fontSize: 13, color: "#7c3aed" }}>{p.paymentDetailId ?? "—"}</td>
                         <td style={{ fontFamily: "monospace", fontWeight: 600 }}>{p.chequeNumber ?? "—"}</td>
-                        <td style={{ fontWeight: 600 }}>{fmt(p.premium)}</td>
                         <td>{p.bankName ?? "—"}</td>
                         <td style={{ whiteSpace: "nowrap" }}>{p.chequeDate ?? "—"}</td>
+                        <td style={{ whiteSpace: "nowrap" }}>{p.clearingDate ?? "—"}</td>
                         <td style={{ maxWidth: 160, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{p.inFavourOf ?? "—"}</td>
-                        <td style={{ fontSize: 13, color: "#7c3aed", maxWidth: 140, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-                          {p.chequePhotoDocumentName ?? "—"}
-                        </td>
                         <td style={{ maxWidth: 160, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{p.chequeDepositLocation ?? "—"}</td>
                         <td style={{ fontFamily: "monospace", fontSize: 12 }}>{p.ifscCode ?? "—"}</td>
                         <td style={{ fontFamily: "monospace", fontSize: 12 }}>{p.micrCode ?? "—"}</td>
+                        <td style={{ fontSize: 13, color: "#7c3aed", maxWidth: 140, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                          {p.chequePhotoDocumentName ?? "—"}
+                        </td>
+                        <td style={{ fontWeight: 600 }}>{fmt(p.premium)}</td>
+                        <td><StatusPill status={p.paymentStatus} /></td>
                         <td style={{ color: "var(--text-3)" }}>{p.userId ?? "—"}</td>
                         <td style={{ color: "var(--text-3)" }}>{p.campaignId ?? "—"}</td>
-                        <td style={{ color: "var(--text-3)" }}>{p.id}</td>
                       </tr>
                     ))
                   )}
@@ -1714,31 +1918,42 @@ export default function Reconciliation() {
               <table style={{ fontSize: 13 }}>
                 <thead>
                   <tr>
-                    <th>Payment Detail ID</th>
-                    <th>Bank Name</th>
-                    <th>Branch Name</th>
-                    <th>Account Number</th>
-                    <th>Account Name</th>
-                    <th>IFSC Code</th>
-                    <th>Transaction ID</th>
-                    <th>Amount</th>
-                    <th>Date</th>
-                    <th>Receipt Doc</th>
-                    <th>User ID</th>
-                    <th>Campaign ID</th>
-                    <th>Policy ID</th>
+                    <th colSpan={3} style={{ textAlign: "center", background: "#fff", color: "#1a1628" }}>Customer</th>
+                    <th colSpan={9} style={{ textAlign: "center", background: "#f0f7ff", color: "#1d4ed8" }}>NEFT / Bank Details</th>
+                    <th rowSpan={2} style={{ verticalAlign: "bottom" }}>Amount</th>
+                    <th rowSpan={2} style={{ verticalAlign: "bottom" }}>Status</th>
+                    <th colSpan={2} style={{ textAlign: "center", background: "#f8fafc", color: "#64748b" }}>Meta</th>
+                  </tr>
+                  <tr>
+                    <th>Proposal ID</th>
+                    <th>Customer Name</th>
+                    <th>Mobile</th>
+                    <th style={{ background: "#f0f7ff" }}>Payment Detail ID</th>
+                    <th style={{ background: "#f0f7ff" }}>Bank Name</th>
+                    <th style={{ background: "#f0f7ff" }}>Branch Name</th>
+                    <th style={{ background: "#f0f7ff" }}>Account Number</th>
+                    <th style={{ background: "#f0f7ff" }}>Account Name</th>
+                    <th style={{ background: "#f0f7ff" }}>IFSC Code</th>
+                    <th style={{ background: "#f0f7ff" }}>Transaction ID</th>
+                    <th style={{ background: "#f0f7ff" }}>NEFT Date</th>
+                    <th style={{ background: "#f0f7ff" }}>Receipt Doc</th>
+                    <th style={{ background: "#f8fafc" }}>User ID</th>
+                    <th style={{ background: "#f8fafc" }}>Campaign ID</th>
                   </tr>
                 </thead>
                 <tbody>
                   {pg.slice.length === 0 ? (
                     <tr>
-                      <td colSpan={13} style={{ textAlign: "center", padding: "32px 0", color: "#64748b" }}>
+                      <td colSpan={16} style={{ textAlign: "center", padding: "32px 0", color: "#64748b" }}>
                         No records found
                       </td>
                     </tr>
                   ) : (
                     pg.slice.map((p) => (
                       <tr key={p.id}>
+                        <td style={{ fontFamily: "monospace", fontSize: 13, color: "#7c3aed" }}>{p.proposalId}</td>
+                        <td style={{ fontWeight: 500 }}>{p.customerName}</td>
+                        <td style={{ color: "#64748b" }}>{p.mobile}</td>
                         <td style={{ fontFamily: "monospace", fontSize: 13, color: "#7c3aed" }}>{p.paymentDetailId ?? "—"}</td>
                         <td>{p.bankName ?? "—"}</td>
                         <td>{p.branchName ?? "—"}</td>
@@ -1746,14 +1961,14 @@ export default function Reconciliation() {
                         <td style={{ fontWeight: 500 }}>{p.accountName ?? "—"}</td>
                         <td style={{ fontFamily: "monospace", fontSize: 12 }}>{p.ifscCode ?? "—"}</td>
                         <td style={{ fontFamily: "monospace", fontSize: 13, color: "#0369a1" }}>{p.transactionId ?? "—"}</td>
-                        <td style={{ fontWeight: 600 }}>{fmt(p.premium)}</td>
                         <td style={{ whiteSpace: "nowrap" }}>{p.neftDate ?? "—"}</td>
                         <td style={{ fontSize: 13, color: "#7c3aed", maxWidth: 160, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
                           {p.neftReceiptDocumentName ?? "—"}
                         </td>
+                        <td style={{ fontWeight: 600 }}>{fmt(p.premium)}</td>
+                        <td><StatusPill status={p.paymentStatus} /></td>
                         <td style={{ color: "var(--text-3)" }}>{p.userId ?? "—"}</td>
                         <td style={{ color: "var(--text-3)" }}>{p.campaignId ?? "—"}</td>
-                        <td style={{ color: "var(--text-3)" }}>{p.id}</td>
                       </tr>
                     ))
                   )}

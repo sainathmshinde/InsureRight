@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { PageHeader, Button } from "../../components/UI";
 import { PaymentIcon } from "../../icons";
+import { PAYMENT_STATUS_META, PAYMENT_STATUS_SHORT_LABEL } from "../../constants/paymentStatus";
 
 const METHOD_META = {
   Cheque: { color: "#7c3aed", bg: "#f5f3ff", icon: "🏦" },
@@ -9,12 +10,7 @@ const METHOD_META = {
   IMPS: { color: "#0369a1", bg: "#e0f2fe", icon: "⚡" },
 };
 
-const STATUS_META = {
-  Pending: { color: "#a05c00", bg: "#fff3e0", border: "#fcd34d" },
-  Initiated: { color: "#0369a1", bg: "#e0f2fe", border: "#7dd3fc" },
-  Rejected: { color: "#dc2626", bg: "#fee2e2", border: "#fca5a5" },
-  Accepted: { color: "#15803d", bg: "#dcfce7", border: "#86efac" },
-};
+const STATUS_META = PAYMENT_STATUS_META;
 
 const CAMPAIGNS = [
   { id: 1, name: "Campaign 1" },
@@ -30,7 +26,7 @@ const MOCK = [
   {
     id: "PAY-2026-001",
     customerName: "Aarav Sharma",
-    policyNo: "POL-2026-1001",
+    policyNo: null,
     product: "Star Comprehensive Health",
     method: "Cheque",
     bank: "HDFC Bank",
@@ -42,13 +38,13 @@ const MOCK = [
     initiatedBy: "Ravi Kulkarni",
     campaignId: 5,
     campaignName: "Campaign OPD and DIGIT PAYMENT PROTECTION",
-    status: "Pending",
+    status: "Pending payment",
     rejectionReason: null,
   },
   {
     id: "PAY-2026-002",
     customerName: "Priya Mehta",
-    policyNo: "POL-2026-1002",
+    policyNo: null,
     product: "HDFC ERGO Optima Secure",
     method: "NEFT",
     bank: "ICICI Bank",
@@ -60,13 +56,13 @@ const MOCK = [
     initiatedBy: "Pooja Desai",
     campaignId: 5,
     campaignName: "Campaign OPD and DIGIT PAYMENT PROTECTION",
-    status: "Initiated",
+    status: "Pending payment",
     rejectionReason: null,
   },
   {
     id: "PAY-2026-003",
     customerName: "Rohan Verma",
-    policyNo: "POL-2026-1003",
+    policyNo: null,
     product: "Bajaj Allianz Health Guard",
     method: "Cheque",
     bank: "SBI",
@@ -78,13 +74,13 @@ const MOCK = [
     initiatedBy: "Ravi Kulkarni",
     campaignId: 5,
     campaignName: "Campaign OPD and DIGIT PAYMENT PROTECTION",
-    status: "Rejected",
+    status: "Payment Failed",
     rejectionReason: "Cheque signature mismatch",
   },
   {
     id: "PAY-2026-004",
     customerName: "Sneha Iyer",
-    policyNo: "POL-2026-1004",
+    policyNo: null,
     product: "Star Comprehensive Health",
     method: "RTGS",
     bank: "Axis Bank",
@@ -96,13 +92,13 @@ const MOCK = [
     initiatedBy: "Amit Verma",
     campaignId: 5,
     campaignName: "Campaign OPD and DIGIT PAYMENT PROTECTION",
-    status: "Pending",
+    status: "Pending payment",
     rejectionReason: null,
   },
   {
     id: "PAY-2026-005",
     customerName: "Rahul Gupta",
-    policyNo: "POL-2026-1005",
+    policyNo: null,
     product: "Bajaj Allianz Comprehensive",
     method: "IMPS",
     bank: "Kotak Bank",
@@ -114,13 +110,13 @@ const MOCK = [
     initiatedBy: "Pooja Desai",
     campaignId: 5,
     campaignName: "Campaign OPD and DIGIT PAYMENT PROTECTION",
-    status: "Initiated",
+    status: "Pending payment",
     rejectionReason: null,
   },
   {
     id: "PAY-2026-006",
     customerName: "Kavita Pillai",
-    policyNo: "POL-2026-1006",
+    policyNo: null,
     product: "HDFC ERGO Optima Secure",
     method: "Cheque",
     bank: "Bank of Baroda",
@@ -132,13 +128,13 @@ const MOCK = [
     initiatedBy: "Ravi Kulkarni",
     campaignId: 5,
     campaignName: "Campaign OPD and DIGIT PAYMENT PROTECTION",
-    status: "Rejected",
+    status: "Payment Failed",
     rejectionReason: "Cheque date expired",
   },
   {
     id: "PAY-2026-007",
     customerName: "Vikram Rao",
-    policyNo: "POL-2026-1007",
+    policyNo: null,
     product: "Star Comprehensive Health",
     method: "NEFT",
     bank: "Union Bank",
@@ -150,13 +146,13 @@ const MOCK = [
     initiatedBy: "Amit Verma",
     campaignId: 5,
     campaignName: "Campaign OPD and DIGIT PAYMENT PROTECTION",
-    status: "Pending",
+    status: "Pending payment",
     rejectionReason: null,
   },
   {
     id: "PAY-2026-008",
     customerName: "Divya Nair",
-    policyNo: "POL-2026-1008",
+    policyNo: null,
     product: "Bajaj Allianz Health Guard",
     method: "IMPS",
     bank: "Yes Bank",
@@ -168,13 +164,13 @@ const MOCK = [
     initiatedBy: "Pooja Desai",
     campaignId: 5,
     campaignName: "Campaign OPD and DIGIT PAYMENT PROTECTION",
-    status: "Initiated",
+    status: "Pending payment",
     rejectionReason: null,
   },
   {
     id: "PAY-2026-009",
     customerName: "Arjun Singh",
-    policyNo: "POL-2026-1009",
+    policyNo: null,
     product: "HDFC ERGO Optima Secure",
     method: "Cheque",
     bank: "Punjab National Bank",
@@ -186,13 +182,13 @@ const MOCK = [
     initiatedBy: "Ravi Kulkarni",
     campaignId: 5,
     campaignName: "Campaign OPD and DIGIT PAYMENT PROTECTION",
-    status: "Pending",
+    status: "Pending payment",
     rejectionReason: null,
   },
   {
     id: "PAY-2026-010",
     customerName: "Meera Joshi",
-    policyNo: "POL-2026-1010",
+    policyNo: null,
     product: "Star Comprehensive Health",
     method: "RTGS",
     bank: "HDFC Bank",
@@ -204,7 +200,7 @@ const MOCK = [
     initiatedBy: "Amit Verma",
     campaignId: 5,
     campaignName: "Campaign OPD and DIGIT PAYMENT PROTECTION",
-    status: "Rejected",
+    status: "Payment Failed",
     rejectionReason: "Insufficient funds at time of transfer",
   },
 ];
@@ -225,7 +221,7 @@ function fmt(amount) {
 }
 
 function StatusPill({ status, onClick }) {
-  const m = STATUS_META[status] ?? STATUS_META.Pending;
+  const m = STATUS_META[status] ?? STATUS_META["Pending payment"];
   return (
     <button
       type="button"
@@ -249,7 +245,7 @@ function StatusPill({ status, onClick }) {
         e.currentTarget.style.opacity = "1";
       }}
     >
-      {status}
+      {PAYMENT_STATUS_SHORT_LABEL[status] ?? status}
     </button>
   );
 }
@@ -281,7 +277,7 @@ function PaymentModal({ payment, onClose, onAccept, onReject }) {
   const [notes, setNotes] = useState("");
 
   const m = METHOD_META[payment.method] ?? METHOD_META["NEFT"];
-  const canAct = payment.status === "Pending" || payment.status === "Initiated";
+  const canAct = payment.status === "Pending payment";
 
   const confirmAccept = () => {
     onAccept(payment.id);
@@ -352,7 +348,7 @@ function PaymentModal({ payment, onClose, onAccept, onReject }) {
               {payment.id}
             </div>
             <div style={{ fontSize: 13, color: "#64748b", marginTop: 2 }}>
-              {payment.customerName} · {payment.policyNo}
+              {payment.customerName}{payment.policyNo ? ` · ${payment.policyNo}` : ""}
             </div>
           </div>
           <div
@@ -474,7 +470,7 @@ function PaymentModal({ payment, onClose, onAccept, onReject }) {
           </div>
 
           {/* Rejection reason (already rejected) */}
-          {payment.status === "Rejected" && payment.rejectionReason && (
+          {payment.status === "Payment Failed" && payment.rejectionReason && (
             <div
               style={{
                 background: "#fef2f2",
@@ -788,13 +784,17 @@ export default function UpdatePayment() {
 
   const handleAccept = (id) => {
     setPayments((prev) =>
-      prev.map((p) => (p.id === id ? { ...p, status: "Accepted" } : p)),
+      prev.map((p) =>
+        p.id === id
+          ? { ...p, status: "Payment received (completed)", policyNo: p.policyNo ?? `POL-${id.replace("PAY-", "")}` }
+          : p,
+      ),
     );
   };
   const handleReject = (id, reason) => {
     setPayments((prev) =>
       prev.map((p) =>
-        p.id === id ? { ...p, status: "Rejected", rejectionReason: reason } : p,
+        p.id === id ? { ...p, status: "Payment Failed", rejectionReason: reason } : p,
       ),
     );
   };
@@ -897,28 +897,21 @@ export default function UpdatePayment() {
             border: "#ddd6fe",
           },
           {
-            label: "Pending",
-            count: 17,
-            amount: "₹3,14,500",
+            label: "Pending Payment",
+            count: 99,
+            amount: "₹18,31,500",
             color: "#a05c00",
             border: "#fde68a",
           },
           {
-            label: "Initiated",
-            count: 82,
-            amount: "₹15,17,000",
-            color: "#0369a1",
-            border: "#7dd3fc",
-          },
-          {
-            label: "Rejected",
+            label: "Payment Failed",
             count: 11,
             amount: "₹2,03,500",
             color: "#dc2626",
             border: "#fca5a5",
           },
           {
-            label: "Accepted",
+            label: "Payment Received",
             count: 990,
             amount: "₹1,83,15,000",
             color: "#15803d",
@@ -1090,7 +1083,7 @@ export default function UpdatePayment() {
                   <th>Date</th>
                   <th>Reference</th>
                   <th>
-                    Status
+                    Payment Status
                     <div
                       style={{
                         fontSize: 10,
@@ -1144,7 +1137,7 @@ export default function UpdatePayment() {
                             fontSize: 13,
                           }}
                         >
-                          {p.policyNo}
+                          {p.policyNo || "—"}
                         </td>
                         <td>
                           <span

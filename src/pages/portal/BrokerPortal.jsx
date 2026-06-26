@@ -557,7 +557,7 @@ export default function BrokerPortal() {
     const params = new URLSearchParams();
     const id = CAMPAIGN_ID_MAP[campaignFilter];
     if (id) params.set("campaignId", id);
-    params.set("payment", "Paid");
+    params.set("payment", "Payment received (completed)");
     navigate(`/policy?${params.toString()}`);
   };
 
@@ -565,7 +565,7 @@ export default function BrokerPortal() {
     const params = new URLSearchParams();
     const id = CAMPAIGN_ID_MAP[campaignFilter];
     if (id) params.set("campaignId", id);
-    params.set("payment", "Rejected");
+    params.set("payment", "Payment Failed");
     navigate(`/policy?${params.toString()}`);
   };
 
@@ -573,7 +573,7 @@ export default function BrokerPortal() {
     const params = new URLSearchParams();
     const id = CAMPAIGN_ID_MAP[campaignFilter];
     if (id) params.set("campaignId", id);
-    params.set("payment", "Pending");
+    params.set("payment", "Pending payment");
     navigate(`/policy?${params.toString()}`);
   };
 
@@ -605,7 +605,7 @@ export default function BrokerPortal() {
     const params = new URLSearchParams();
     const id = CAMPAIGN_ID_MAP[campaignFilter];
     if (id) params.set("campaignId", id);
-    params.set("payment", "Initiated");
+    params.set("payment", "Pending payment");
     params.set("paymentMode", "Offline");
     params.set("paymentType", "NEFT");
     navigate(`/policy?${params.toString()}`);
@@ -615,7 +615,7 @@ export default function BrokerPortal() {
     const params = new URLSearchParams();
     const id = CAMPAIGN_ID_MAP[campaignFilter];
     if (id) params.set("campaignId", id);
-    params.set("payment", "Initiated");
+    params.set("payment", "Pending payment");
     params.set("paymentMode", "Offline");
     params.set("paymentType", "Cheque");
     navigate(`/policy?${params.toString()}`);
@@ -626,7 +626,7 @@ export default function BrokerPortal() {
     const id = CAMPAIGN_ID_MAP[campaignFilter];
     if (id) params.set("campaignId", id);
     params.set("paymentMode", "Online");
-    params.set("payment", "Paid");
+    params.set("payment", "Payment received (completed)");
     navigate(`/policy?${params.toString()}`);
   };
 
@@ -635,7 +635,7 @@ export default function BrokerPortal() {
     const id = CAMPAIGN_ID_MAP[campaignFilter];
     if (id) params.set("campaignId", id);
     params.set("paymentMode", "Offline");
-    params.set("payment", "Paid");
+    params.set("payment", "Payment received (completed)");
     navigate(`/policy?${params.toString()}`);
   };
 
@@ -645,7 +645,7 @@ export default function BrokerPortal() {
     if (id) params.set("campaignId", id);
     params.set("paymentMode", "Offline");
     params.set("paymentType", "Cheque");
-    params.set("payment", "Paid");
+    params.set("payment", "Payment received (completed)");
     navigate(`/policy?${params.toString()}`);
   };
 
@@ -655,7 +655,7 @@ export default function BrokerPortal() {
     if (id) params.set("campaignId", id);
     params.set("paymentMode", "Offline");
     params.set("paymentType", "NEFT");
-    params.set("payment", "Paid");
+    params.set("payment", "Payment received (completed)");
     navigate(`/policy?${params.toString()}`);
   };
 

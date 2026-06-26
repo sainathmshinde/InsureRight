@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { PageHeader } from '../../components/UI'
 import { DownloadPolicyIcon } from '../../icons'
+import { PAYMENT_STATUSES } from '../../constants/paymentStatus'
 
 const CAMPAIGNS = [
   { id: 1,  name: 'Campaign 1' },
@@ -14,20 +15,18 @@ const CAMPAIGNS = [
 
 const PAYMENT_TYPES = ['Cheque', 'NEFT', 'UPI', 'Gateway', 'Unknown']
 
-const PAYMENT_STATUSES = ['Pending', 'Completed', 'Rejected', 'Initiated', 'Failed', 'Unknown', 'NotStarted']
-
 // Mock records used to derive preview count and CSV rows
 const MOCK_RECORDS = [
-  { id: 'PAY-2026-001', customer: 'Aarav Sharma',   policy: 'POL-2026-1001', product: 'Star Comprehensive Health',    campaignId: 11, campaignName: 'BPP Campaign_2026-2027',  method: 'Cheque',  amount: 18500, date: '2026-04-12', status: 'Pending',    reference: 'CHQ-004521'        },
-  { id: 'PAY-2026-002', customer: 'Priya Mehta',    policy: 'POL-2026-1002', product: 'HDFC ERGO Optima Secure',      campaignId: 11, campaignName: 'BPP Campaign_2026-2027',  method: 'NEFT',    amount: 24200, date: '2026-04-14', status: 'Initiated',  reference: 'NEFT240412001823'  },
-  { id: 'PAY-2026-003', customer: 'Rohan Verma',    policy: 'POL-2026-1003', product: 'Bajaj Allianz Health Guard',   campaignId: 6,  campaignName: 'BPP Campaign',            method: 'Cheque',  amount: 12800, date: '2026-04-15', status: 'Rejected',   reference: 'CHQ-009832'        },
-  { id: 'PAY-2026-004', customer: 'Sneha Iyer',     policy: 'POL-2026-1004', product: 'Star Comprehensive Health',    campaignId: 8,  campaignName: 'SBI_STP_Campaign',        method: 'UPI',     amount: 52000, date: '2026-04-15', status: 'Completed',  reference: 'UPI240415002711'   },
-  { id: 'PAY-2026-005', customer: 'Rahul Gupta',    policy: 'POL-2026-1005', product: 'Bajaj Allianz Comprehensive',  campaignId: 1,  campaignName: 'Campaign 1',              method: 'Gateway', amount: 9500,  date: '2026-04-16', status: 'Initiated',  reference: 'GTW240416008842'   },
-  { id: 'PAY-2026-006', customer: 'Kavita Pillai',  policy: 'POL-2026-1006', product: 'HDFC ERGO Optima Secure',      campaignId: 11, campaignName: 'BPP Campaign_2026-2027',  method: 'Cheque',  amount: 31000, date: '2026-04-17', status: 'Rejected',   reference: 'CHQ-012203'        },
-  { id: 'PAY-2026-007', customer: 'Vikram Rao',     policy: 'POL-2026-1007', product: 'Star Comprehensive Health',    campaignId: 8,  campaignName: 'SBI_STP_Campaign',        method: 'NEFT',    amount: 16750, date: '2026-04-18', status: 'Failed',     reference: 'NEFT240418003512'  },
-  { id: 'PAY-2026-008', customer: 'Divya Nair',     policy: 'POL-2026-1008', product: 'Bajaj Allianz Health Guard',   campaignId: 6,  campaignName: 'BPP Campaign',            method: 'Unknown', amount: 8200,  date: '2026-04-20', status: 'Unknown',    reference: '—'                 },
-  { id: 'PAY-2026-009', customer: 'Arjun Singh',    policy: 'POL-2026-1009', product: 'HDFC ERGO Optima Secure',      campaignId: 1,  campaignName: 'Campaign 1',              method: 'Cheque',  amount: 44500, date: '2026-04-21', status: 'Pending',    reference: 'CHQ-019882'        },
-  { id: 'PAY-2026-010', customer: 'Meera Joshi',    policy: 'POL-2026-1010', product: 'Star Comprehensive Health',    campaignId: 12, campaignName: 'Standalone campaign',     method: 'Gateway', amount: 67000, date: '2026-04-22', status: 'NotStarted', reference: '—'                 },
+  { id: 'PAY-2026-001', customer: 'Aarav Sharma',   policy: 'POL-2026-1001', product: 'Star Comprehensive Health',    campaignId: 11, campaignName: 'BPP Campaign_2026-2027',  method: 'Cheque',  amount: 18500, date: '2026-04-12', status: 'Pending payment',    reference: 'CHQ-004521'        },
+  { id: 'PAY-2026-002', customer: 'Priya Mehta',    policy: 'POL-2026-1002', product: 'HDFC ERGO Optima Secure',      campaignId: 11, campaignName: 'BPP Campaign_2026-2027',  method: 'NEFT',    amount: 24200, date: '2026-04-14', status: 'Pending payment',  reference: 'NEFT240412001823'  },
+  { id: 'PAY-2026-003', customer: 'Rohan Verma',    policy: 'POL-2026-1003', product: 'Bajaj Allianz Health Guard',   campaignId: 6,  campaignName: 'BPP Campaign',            method: 'Cheque',  amount: 12800, date: '2026-04-15', status: 'Payment Failed',   reference: 'CHQ-009832'        },
+  { id: 'PAY-2026-004', customer: 'Sneha Iyer',     policy: 'POL-2026-1004', product: 'Star Comprehensive Health',    campaignId: 8,  campaignName: 'SBI_STP_Campaign',        method: 'UPI',     amount: 52000, date: '2026-04-15', status: 'Payment received (completed)',  reference: 'UPI240415002711'   },
+  { id: 'PAY-2026-005', customer: 'Rahul Gupta',    policy: 'POL-2026-1005', product: 'Bajaj Allianz Comprehensive',  campaignId: 1,  campaignName: 'Campaign 1',              method: 'Gateway', amount: 9500,  date: '2026-04-16', status: 'Pending payment',  reference: 'GTW240416008842'   },
+  { id: 'PAY-2026-006', customer: 'Kavita Pillai',  policy: 'POL-2026-1006', product: 'HDFC ERGO Optima Secure',      campaignId: 11, campaignName: 'BPP Campaign_2026-2027',  method: 'Cheque',  amount: 31000, date: '2026-04-17', status: 'Payment Failed',   reference: 'CHQ-012203'        },
+  { id: 'PAY-2026-007', customer: 'Vikram Rao',     policy: 'POL-2026-1007', product: 'Star Comprehensive Health',    campaignId: 8,  campaignName: 'SBI_STP_Campaign',        method: 'NEFT',    amount: 16750, date: '2026-04-18', status: 'Payment Failed',     reference: 'NEFT240418003512'  },
+  { id: 'PAY-2026-008', customer: 'Divya Nair',     policy: 'POL-2026-1008', product: 'Bajaj Allianz Health Guard',   campaignId: 6,  campaignName: 'BPP Campaign',            method: 'Unknown', amount: 8200,  date: '2026-04-20', status: 'Pending payment',    reference: '—'                 },
+  { id: 'PAY-2026-009', customer: 'Arjun Singh',    policy: 'POL-2026-1009', product: 'HDFC ERGO Optima Secure',      campaignId: 1,  campaignName: 'Campaign 1',              method: 'Cheque',  amount: 44500, date: '2026-04-21', status: 'Pending payment',    reference: 'CHQ-019882'        },
+  { id: 'PAY-2026-010', customer: 'Meera Joshi',    policy: 'POL-2026-1010', product: 'Star Comprehensive Health',    campaignId: 12, campaignName: 'Standalone campaign',     method: 'Gateway', amount: 67000, date: '2026-04-22', status: 'Pending payment', reference: '—'                 },
 ]
 
 function applyFilters(records, campaign, paymentType, paymentStatus) {

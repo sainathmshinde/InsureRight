@@ -10,7 +10,10 @@
       "Bash(wait)",
       "Bash(command -v nvm)",
       "Bash(nvm --version)",
-      "Bash(command -v brew)"
+      "Bash(command -v brew)",
+      "Bash(node verify-full.js)",
+      "Bash(node verify-accept-reject.js)",
+      "Bash(lsof -i :5173 -sTCP:LISTEN)"
     ]
   }
 }
