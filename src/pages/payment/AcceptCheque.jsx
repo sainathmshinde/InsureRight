@@ -630,7 +630,7 @@ function ChequeDetailModal({ cheque, onClose, onAccept, onReject }) {
 
   const confirmAccept = () => {
     onAccept(cheque.id);
-    setPhase("accepted");
+    setPhase("received");
   };
 
   const confirmReject = () => {
@@ -895,7 +895,7 @@ function ChequeDetailModal({ cheque, onClose, onAccept, onReject }) {
           </div>
 
           {/* Success states */}
-          {phase === "accepted" && (
+          {phase === "received" && (
             <div
               style={{
                 background: "#f0fdf4",
@@ -917,12 +917,12 @@ function ChequeDetailModal({ cheque, onClose, onAccept, onReject }) {
                     marginBottom: 4,
                   }}
                 >
-                  Cheque Accepted
+                  Cheque Received
                 </div>
                 <div style={{ fontSize: 13, color: "#166534" }}>
                   Cheque payment of <strong>{fmt(cheque.amount)}</strong> from{" "}
                   <strong>{cheque.customerName}</strong> (Cheque No:{" "}
-                  {cheque.chequeNo}) has been verified and accepted. Policy{" "}
+                  {cheque.chequeNo}) has been verified and received. Policy{" "}
                   <strong>{cheque.policyNo}</strong> will now be activated.
                 </div>
               </div>
@@ -1083,7 +1083,7 @@ function ChequeDetailModal({ cheque, onClose, onAccept, onReject }) {
                 onMouseEnter={(e) => (e.currentTarget.style.opacity = ".85")}
                 onMouseLeave={(e) => (e.currentTarget.style.opacity = "1")}
               >
-                &#x2713; Accept Cheque
+                &#x2713; Receive Cheque
               </button>
               <button
                 type="button"
@@ -1113,7 +1113,7 @@ function ChequeDetailModal({ cheque, onClose, onAccept, onReject }) {
             </div>
           )}
 
-          {(phase === "accepted" || phase === "rejected") && (
+          {(phase === "received" || phase === "rejected") && (
             <div style={{ marginTop: 16, textAlign: "right" }}>
               <button type="button" className="btn btn-ghost" onClick={onClose}>
                 Close

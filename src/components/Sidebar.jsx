@@ -97,7 +97,7 @@ const BROKER_NAV = [
   },
   {
     key: "accept-cheque",
-    label: "Accept Cheque",
+    label: "Receive Cheque",
     icon: ChequeIcon,
     children: [{ label: "Cheque Payments", path: "/accept-cheque" }],
   },
