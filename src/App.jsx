@@ -70,6 +70,8 @@ import Reconciliation from "./pages/reconciliation/Reconciliation";
 import UpdatePayment   from "./pages/payment/UpdatePayment";
 import ExtractPayments from "./pages/payment/ExtractPayments";
 import AcceptCheque    from "./pages/payment/AcceptCheque";
+import RefundList      from "./pages/payment/RefundList";
+import { RefundProvider } from "./context/RefundContext";
 
 // Portals
 import BrokerPortal    from "./pages/portal/BrokerPortal";
@@ -98,6 +100,7 @@ export default function App() {
       <OrganisationProvider>
       <AssociationProvider>
       <CustomerProvider>
+      <RefundProvider>
         <Routes>
           {/* ── Public auth routes (no sidebar/topbar) ── */}
           <Route path="/login"    element={<SignIn />} />
@@ -204,6 +207,7 @@ export default function App() {
                 <Route path="reconciliation" element={<Reconciliation />} />
                 <Route path="update-payment"  element={<UpdatePayment />} />
                 <Route path="accept-cheque"    element={<AcceptCheque />} />
+                <Route path="refund"           element={<RefundList />} />
                 <Route path="extract-payments" element={<ExtractPayments />} />
               </Route>
 
@@ -214,6 +218,7 @@ export default function App() {
           {/* Catch-all → login */}
           <Route path="*" element={<Navigate to="/login" replace />} />
         </Routes>
+      </RefundProvider>
       </CustomerProvider>
       </AssociationProvider>
       </OrganisationProvider>

@@ -164,7 +164,7 @@ export default function PolicyList() {
   const handle = setter => v => { setter(v); pg.reset() }
 
   const columns = [
-    { key: 'proposalId',    label: 'Order Id',
+    { key: 'proposalId',    label: 'Order ID',
       style: { fontFamily: 'monospace', fontSize: 13.5, color: 'var(--brand)', fontWeight: 600 } },
     ...(!isCustomer ? [{
       key: 'customerName', label: 'Customer',
@@ -220,7 +220,7 @@ export default function PolicyList() {
           <div className="filter-bar" style={{ alignItems: 'flex-end' }}>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
               <label style={filterLabel}>Search</label>
-              <input className="field-input filter-search" placeholder={isCustomer ? "Search by order ID or policy no…" : "Search by customer, order ID or policy no…"}
+              <input className="field-input filter-search" placeholder={isCustomer ? "Search by Order ID or policy no…" : "Search by customer, Order ID or policy no…"}
                 value={search} onChange={e => handle(setSearch)(e.target.value)} />
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
@@ -339,7 +339,7 @@ export default function PolicyList() {
                         </div>
                       )}
                       <div style={{ gridColumn: 'span 2' }}>
-                        <div style={{ fontSize: 10.5, color: 'var(--text-3)', marginBottom: 2 }}>Order Id</div>
+                        <div style={{ fontSize: 10.5, color: 'var(--text-3)', marginBottom: 2 }}>Order ID</div>
                         <div style={{ fontFamily: 'monospace', fontSize: 13, color: 'var(--text-2)' }}>{row.proposalId}</div>
                       </div>
                     </div>

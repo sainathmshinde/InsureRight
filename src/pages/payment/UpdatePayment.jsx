@@ -25,6 +25,7 @@ const CAMPAIGNS = [
 const MOCK = [
   {
     id: "PAY-2026-001",
+    proposalId: "PRO-2025-1001",
     customerName: "Aarav Sharma",
     policyNo: null,
     product: "Star Comprehensive Health",
@@ -43,6 +44,7 @@ const MOCK = [
   },
   {
     id: "PAY-2026-002",
+    proposalId: "PRO-2025-1002",
     customerName: "Priya Mehta",
     policyNo: null,
     product: "HDFC ERGO Optima Secure",
@@ -61,6 +63,7 @@ const MOCK = [
   },
   {
     id: "PAY-2026-003",
+    proposalId: "PRO-2025-1003",
     customerName: "Rohan Verma",
     policyNo: null,
     product: "Bajaj Allianz Health Guard",
@@ -79,6 +82,7 @@ const MOCK = [
   },
   {
     id: "PAY-2026-004",
+    proposalId: "PRO-2025-1004",
     customerName: "Sneha Iyer",
     policyNo: null,
     product: "Star Comprehensive Health",
@@ -97,6 +101,7 @@ const MOCK = [
   },
   {
     id: "PAY-2026-005",
+    proposalId: "PRO-2025-1005",
     customerName: "Rahul Gupta",
     policyNo: null,
     product: "Bajaj Allianz Comprehensive",
@@ -115,6 +120,7 @@ const MOCK = [
   },
   {
     id: "PAY-2026-006",
+    proposalId: "PRO-2025-1006",
     customerName: "Kavita Pillai",
     policyNo: null,
     product: "HDFC ERGO Optima Secure",
@@ -133,6 +139,7 @@ const MOCK = [
   },
   {
     id: "PAY-2026-007",
+    proposalId: "PRO-2025-1007",
     customerName: "Vikram Rao",
     policyNo: null,
     product: "Star Comprehensive Health",
@@ -151,6 +158,7 @@ const MOCK = [
   },
   {
     id: "PAY-2026-008",
+    proposalId: "PRO-2025-1008",
     customerName: "Divya Nair",
     policyNo: null,
     product: "Bajaj Allianz Health Guard",
@@ -169,6 +177,7 @@ const MOCK = [
   },
   {
     id: "PAY-2026-009",
+    proposalId: "PRO-2025-1009",
     customerName: "Arjun Singh",
     policyNo: null,
     product: "HDFC ERGO Optima Secure",
@@ -187,6 +196,7 @@ const MOCK = [
   },
   {
     id: "PAY-2026-010",
+    proposalId: "PRO-2025-1010",
     customerName: "Meera Joshi",
     policyNo: null,
     product: "Star Comprehensive Health",
@@ -345,7 +355,7 @@ function PaymentModal({ payment, onClose, onAccept, onReject }) {
               Payment Details
             </div>
             <div style={{ fontSize: 18, fontWeight: 800, color: "#1a1628" }}>
-              {payment.id}
+              {payment.proposalId}
             </div>
             <div style={{ fontSize: 13, color: "#64748b", marginTop: 2 }}>
               {payment.customerName}{payment.policyNo ? ` · ${payment.policyNo}` : ""}
@@ -1075,7 +1085,7 @@ export default function UpdatePayment() {
             <table style={{ fontSize: 13, borderCollapse: "separate", borderSpacing: 0 }}>
               <thead>
                 <tr>
-                  <th style={{ position: "sticky", top: 0, zIndex: 2, background: "var(--card-bg, #fff)", borderBottom: "2px solid var(--border)" }}>Payment ID</th>
+                  <th style={{ position: "sticky", top: 0, zIndex: 2, background: "var(--card-bg, #fff)", borderBottom: "2px solid var(--border)" }}>Order ID</th>
                   <th style={{ position: "sticky", top: 0, zIndex: 2, background: "var(--card-bg, #fff)", borderBottom: "2px solid var(--border)" }}>Customer</th>
                   <th style={{ position: "sticky", top: 0, zIndex: 2, background: "var(--card-bg, #fff)", borderBottom: "2px solid var(--border)" }}>Method</th>
                   <th style={{ position: "sticky", top: 0, zIndex: 2, background: "var(--card-bg, #fff)", borderBottom: "2px solid var(--border)" }}>Amount</th>
@@ -1126,7 +1136,7 @@ export default function UpdatePayment() {
                             color: "#7c3aed",
                           }}
                         >
-                          {p.id}
+                          {p.proposalId}
                         </td>
                         <td style={{ fontWeight: 500 }}>{p.customerName}</td>
                         <td>

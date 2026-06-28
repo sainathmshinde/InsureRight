@@ -17,7 +17,7 @@ const CAMPAIGNS = [
 
 const MOCK_CHEQUES = [
   {
-    id: "CHQ-2026-001",
+    id: "CHQ-2026-001", proposalId: "PRO-2025-1001",
     customerName: "Aarav Sharma",
     mobileNo: "9876543210",
     policyNo: null,
@@ -35,7 +35,7 @@ const MOCK_CHEQUES = [
     chequePhotoUrl: "doc-viewer?type=cheque&name=Aarav Sharma&bank=HDFC Bank&account=1234567890123&ifsc=HDFC0001234",
   },
   {
-    id: "CHQ-2026-002",
+    id: "CHQ-2026-002", proposalId: "PRO-2025-1002",
     customerName: "Priya Mehta",
     mobileNo: "9823456789",
     policyNo: null,
@@ -53,7 +53,7 @@ const MOCK_CHEQUES = [
     chequePhotoUrl: "doc-viewer?type=cheque&name=Priya Mehta&bank=ICICI Bank&account=9876543210456&ifsc=ICIC0005678",
   },
   {
-    id: "CHQ-2026-003",
+    id: "CHQ-2026-003", proposalId: "PRO-2025-1003",
     customerName: "Rohan Verma",
     mobileNo: "9812345678",
     policyNo: null,
@@ -71,7 +71,7 @@ const MOCK_CHEQUES = [
     chequePhotoUrl: "doc-viewer?type=cheque&name=Rohan Verma&bank=SBI&account=3456789012345&ifsc=SBIN0003456",
   },
   {
-    id: "CHQ-2026-004",
+    id: "CHQ-2026-004", proposalId: "PRO-2025-1004",
     customerName: "Sneha Iyer",
     mobileNo: "9801234567",
     policyNo: null,
@@ -89,7 +89,7 @@ const MOCK_CHEQUES = [
     chequePhotoUrl: "doc-viewer?type=cheque&name=Sneha Iyer&bank=Axis Bank&account=5678901234567&ifsc=UTIB0007890",
   },
   {
-    id: "CHQ-2026-005",
+    id: "CHQ-2026-005", proposalId: "PRO-2025-1005",
     customerName: "Kavita Pillai",
     mobileNo: "9790123456",
     policyNo: null,
@@ -107,7 +107,7 @@ const MOCK_CHEQUES = [
     chequePhotoUrl: "doc-viewer?type=cheque&name=Kavita Pillai&bank=Bank of Baroda&account=6789012345678&ifsc=BARB0PUNE01",
   },
   {
-    id: "CHQ-2026-006",
+    id: "CHQ-2026-006", proposalId: "PRO-2025-1006",
     customerName: "Arjun Singh",
     mobileNo: "9712345678",
     policyNo: null,
@@ -125,7 +125,7 @@ const MOCK_CHEQUES = [
     chequePhotoUrl: "doc-viewer?type=cheque&name=Arjun Singh&bank=Punjab National Bank&account=7890123456789&ifsc=PUNB0123400",
   },
   {
-    id: "CHQ-2026-007",
+    id: "CHQ-2026-007", proposalId: "PRO-2025-1007",
     customerName: "Meera Joshi",
     mobileNo: "9698765432",
     policyNo: null,
@@ -143,7 +143,7 @@ const MOCK_CHEQUES = [
     chequePhotoUrl: "doc-viewer?type=cheque&name=Meera Joshi&bank=Union Bank&account=8901234567890&ifsc=UBIN0567890",
   },
   {
-    id: "CHQ-2026-008",
+    id: "CHQ-2026-008", proposalId: "PRO-2025-1008",
     customerName: "Vikram Rao",
     mobileNo: "9687654321",
     policyNo: null,
@@ -161,7 +161,7 @@ const MOCK_CHEQUES = [
     chequePhotoUrl: "doc-viewer?type=cheque&name=Vikram Rao&bank=Kotak Bank&account=9012345678901&ifsc=KKBK0009012",
   },
   {
-    id: "CHQ-2026-009",
+    id: "CHQ-2026-009", proposalId: "PRO-2025-1009",
     customerName: "Deepika Kulkarni",
     mobileNo: "9654321098",
     policyNo: null,
@@ -179,7 +179,7 @@ const MOCK_CHEQUES = [
     chequePhotoUrl: "doc-viewer?type=cheque&name=Deepika Kulkarni&bank=Canara Bank&account=1122334455667&ifsc=CNRB0001122",
   },
   {
-    id: "CHQ-2026-010",
+    id: "CHQ-2026-010", proposalId: "PRO-2025-1010",
     customerName: "Suresh Patil",
     mobileNo: "9643210987",
     policyNo: null,
@@ -197,7 +197,7 @@ const MOCK_CHEQUES = [
     chequePhotoUrl: "doc-viewer?type=cheque&name=Suresh Patil&bank=Bank of India&account=2233445566778&ifsc=BKID0002233",
   },
   {
-    id: "CHQ-2026-011",
+    id: "CHQ-2026-011", proposalId: "PRO-2025-1011",
     customerName: "Anjali Deshmukh",
     mobileNo: "9632109876",
     policyNo: null,
@@ -215,7 +215,7 @@ const MOCK_CHEQUES = [
     chequePhotoUrl: "doc-viewer?type=cheque&name=Anjali Deshmukh&bank=Indian Bank&account=3344556677889&ifsc=IDIB0003344",
   },
   {
-    id: "CHQ-2026-012",
+    id: "CHQ-2026-012", proposalId: "PRO-2025-1012",
     customerName: "Rajesh Nair",
     mobileNo: "9621098765",
     policyNo: null,
@@ -233,7 +233,7 @@ const MOCK_CHEQUES = [
     chequePhotoUrl: "doc-viewer?type=cheque&name=Rajesh Nair&bank=Federal Bank&account=4455667788990&ifsc=FDRL0004455",
   },
   {
-    id: "CHQ-2026-013",
+    id: "CHQ-2026-013", proposalId: "PRO-2025-1013",
     customerName: "Nandini Reddy",
     mobileNo: "9610987654",
     policyNo: null,
@@ -251,7 +251,7 @@ const MOCK_CHEQUES = [
     chequePhotoUrl: "doc-viewer?type=cheque&name=Nandini Reddy&bank=South Indian Bank&account=5566778899001&ifsc=SIBL0005566",
   },
   {
-    id: "CHQ-2026-014",
+    id: "CHQ-2026-014", proposalId: "PRO-2025-1014",
     customerName: "Prakash Gupta",
     mobileNo: "9509876543",
     policyNo: null,
@@ -269,7 +269,7 @@ const MOCK_CHEQUES = [
     chequePhotoUrl: "doc-viewer?type=cheque&name=Prakash Gupta&bank=IDBI Bank&account=6677889900112&ifsc=IBKL0006677",
   },
   {
-    id: "CHQ-2026-015",
+    id: "CHQ-2026-015", proposalId: "PRO-2025-1015",
     customerName: "Shalini Bose",
     mobileNo: "9498765432",
     policyNo: null,
@@ -287,7 +287,7 @@ const MOCK_CHEQUES = [
     chequePhotoUrl: "doc-viewer?type=cheque&name=Shalini Bose&bank=Yes Bank&account=7788990011223&ifsc=YESB0007788",
   },
   {
-    id: "CHQ-2026-016",
+    id: "CHQ-2026-016", proposalId: "PRO-2025-1016",
     customerName: "Manoj Tiwari",
     mobileNo: "9487654321",
     policyNo: null,
@@ -305,7 +305,7 @@ const MOCK_CHEQUES = [
     chequePhotoUrl: "doc-viewer?type=cheque&name=Manoj Tiwari&bank=UCO Bank&account=8899001122334&ifsc=UCBA0008899",
   },
   {
-    id: "CHQ-2026-017",
+    id: "CHQ-2026-017", proposalId: "PRO-2025-1017",
     customerName: "Poornima Hegde",
     mobileNo: "9476543210",
     policyNo: null,
@@ -323,7 +323,7 @@ const MOCK_CHEQUES = [
     chequePhotoUrl: "doc-viewer?type=cheque&name=Poornima Hegde&bank=Indian Overseas Bank&account=9900112233445&ifsc=IOBA0009900",
   },
   {
-    id: "CHQ-2026-018",
+    id: "CHQ-2026-018", proposalId: "PRO-2025-1018",
     customerName: "Aditya Bhatt",
     mobileNo: "9465432109",
     policyNo: null,
@@ -341,7 +341,7 @@ const MOCK_CHEQUES = [
     chequePhotoUrl: "doc-viewer?type=cheque&name=Aditya Bhatt&bank=Central Bank of India&account=1011121314151&ifsc=CBIN0010111",
   },
   {
-    id: "CHQ-2026-019",
+    id: "CHQ-2026-019", proposalId: "PRO-2025-1019",
     customerName: "Lakshmi Menon",
     mobileNo: "9454321098",
     policyNo: null,
@@ -359,7 +359,7 @@ const MOCK_CHEQUES = [
     chequePhotoUrl: "doc-viewer?type=cheque&name=Lakshmi Menon&bank=Karur Vysya Bank&account=1213141516171&ifsc=KVBL0012131",
   },
   {
-    id: "CHQ-2026-020",
+    id: "CHQ-2026-020", proposalId: "PRO-2025-1020",
     customerName: "Sameer Jain",
     mobileNo: "9443210987",
     policyNo: null,
@@ -693,7 +693,7 @@ function ChequeDetailModal({ cheque, onClose, onAccept, onReject }) {
               Cheque Payment Details
             </div>
             <div style={{ fontSize: 18, fontWeight: 800, color: "#1a1628" }}>
-              {cheque.id}
+              {cheque.proposalId}
             </div>
             <div style={{ fontSize: 13, color: "#64748b", marginTop: 2 }}>
               {cheque.customerName}{cheque.policyNo ? ` · ${cheque.policyNo}` : ""}
@@ -1244,7 +1244,7 @@ export default function AcceptCheque() {
             <table style={{ fontSize: 13, borderCollapse: "separate", borderSpacing: 0 }}>
               <thead>
                 <tr>
-                  <th style={{ position: "sticky", top: 0, zIndex: 2, background: "var(--card-bg, #fff)", borderBottom: "2px solid var(--border)" }}>Submission ID</th>
+                  <th style={{ position: "sticky", top: 0, zIndex: 2, background: "var(--card-bg, #fff)", borderBottom: "2px solid var(--border)" }}>Order ID</th>
                   <th style={{ position: "sticky", top: 0, zIndex: 2, background: "var(--card-bg, #fff)", borderBottom: "2px solid var(--border)" }}>Customer</th>
                   <th style={{ position: "sticky", top: 0, zIndex: 2, background: "var(--card-bg, #fff)", borderBottom: "2px solid var(--border)" }}>Mobile No.</th>
                   <th style={{ position: "sticky", top: 0, zIndex: 2, background: "var(--card-bg, #fff)", borderBottom: "2px solid var(--border)" }}>Cheque No.</th>
@@ -1279,7 +1279,7 @@ export default function AcceptCheque() {
                           color: "#7c3aed",
                         }}
                       >
-                        {c.id}
+                        {c.proposalId}
                       </td>
                       <td style={{ fontWeight: 500 }}>{c.customerName}</td>
                       <td style={{ color: "#64748b", fontSize: 12 }}>

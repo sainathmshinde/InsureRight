@@ -6,6 +6,7 @@ import { ASSOCIATIONS } from "../customer/orgAssocData";
 import Pagination from "../../components/Pagination";
 import usePagination from "../../components/usePagination";
 import { PAYMENT_STATUS_META } from "../../constants/paymentStatus";
+import { useRefunds } from "../../context/RefundContext";
 
 const CAMPAIGNS = [
   { id: 1, name: "Campaign 1" },
@@ -206,7 +207,6 @@ function PendingPickerModal({
             <table style={{ fontSize: 12.5, marginBottom: 0 }}>
               <thead>
                 <tr>
-                  <th style={{ background: "#fefce8", color: "#a16207" }}>Order Id</th>
                   {isCheque && <>
                     <th style={{ background: "#fefce8", color: "#a16207" }}>Cheque No.</th>
                     <th style={{ background: "#fefce8", color: "#a16207" }}>Cheque Date</th>
@@ -220,7 +220,6 @@ function PendingPickerModal({
               </thead>
               <tbody>
                 <tr style={{ background: "#fffef0" }}>
-                  <td style={{ ...refCellStyle, fontFamily: "monospace", fontWeight: 700 }}>{up.proposalId}</td>
                   {isCheque && <>
                     <td style={{ ...refCellStyle, fontFamily: "monospace", fontWeight: 600 }}>{up.chequeNumber ?? "—"}</td>
                     <td style={refCellStyle}>{up.chequeDate ?? "—"}</td>
@@ -273,7 +272,7 @@ function PendingPickerModal({
                 <table style={{ fontSize: 13, marginBottom: 0 }}>
                   <thead style={{ position: "sticky", top: 0, zIndex: 1 }}>
                     <tr>
-                      <th style={{ position: "sticky", top: 0, background: "#eff6ff", color: "#1d4ed8" }}>Order Id</th>
+                      <th style={{ position: "sticky", top: 0, background: "#eff6ff", color: "#1d4ed8" }}>Order ID</th>
                       <th style={{ position: "sticky", top: 0, background: "#eff6ff", color: "#1d4ed8" }}>Customer Name</th>
                       {isCheque && <>
                         <th style={{ position: "sticky", top: 0, background: "#eff6ff", color: "#1d4ed8" }}>Cheque No.</th>
@@ -394,8 +393,8 @@ function MatchComparisonModal({
           {diff !== 0 && (
             <div style={{ background: "linear-gradient(135deg,#f5f3ff,#ede9fe)", borderRadius: 12, padding: "14px 20px", marginBottom: 18, fontSize: 13.5, color: "#3b0764" }}>
               {diff > 0
-                ? <><strong>Customer overpaid by {fmt(diff)}.</strong> The extra amount will be refunded.</>
-                : <><strong>Customer underpaid by {fmt(-diff)}.</strong> The remaining amount is due.</>}
+                ? <><strong>Customer overpaid by {fmt(diff)}.</strong> Please initiate a refund for the extra amount.</>
+                : <><strong>Customer underpaid by {fmt(-diff)}.</strong> Please collect the remaining amount from the customer.</>}
             </div>
           )}
 
@@ -465,7 +464,7 @@ function TransactionDetailModal({ system: rec, uploaded: up, onClose }) {
           <div style={{ fontSize: 12, fontWeight: 700, color: "#1d4ed8", textTransform: "uppercase", letterSpacing: ".5px", marginBottom: 10 }}>System Record</div>
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "14px 24px", marginBottom: 20 }}>
             <TxnDetailRow label="Customer Name" value={rec.customerName} />
-            <TxnDetailRow label="Order Id" value={rec.proposalId} />
+            <TxnDetailRow label="Order ID" value={rec.proposalId} />
             <TxnDetailRow label="Product" value={rec.product} />
             <TxnDetailRow label="Campaign" value={rec.campaignName} />
             <TxnDetailRow label="IC Name" value={rec.icName} />
@@ -549,7 +548,7 @@ function TransactionDetailModal({ system: rec, uploaded: up, onClose }) {
 function exportToExcel(rows) {
   const headers = [
     "ID",
-    "Order Id",
+    "Order ID",
     "Customer Name",
     "Mobile",
     "Product",
@@ -676,6 +675,7 @@ function buildUploadedRows(records) {
 
 export default function Reconciliation() {
   const fileRef = useRef();
+  const { addRefund } = useRefunds();
 
   // mode: list | upload | review | done
   const [mode, setMode] = useState("list");
@@ -1147,7 +1147,7 @@ export default function Reconciliation() {
               <table style={{ fontSize: 13 }}>
                 <thead style={{ position: "sticky", top: 0, zIndex: 2 }}>
                   <tr>
-                    <th style={{ position: "sticky", top: 0, background: "#eff6ff", zIndex: 3 }}>Order Id</th>
+                    <th style={{ position: "sticky", top: 0, background: "#eff6ff", zIndex: 3 }}>Order ID</th>
                     <th style={{ position: "sticky", top: 0, background: "#eff6ff", zIndex: 3 }}>Customer</th>
                     {payTypeFilter === "Cheque" && <>
                       <th style={{ position: "sticky", top: 0, background: "#eff6ff", zIndex: 3 }}>Cheque No.</th>
@@ -1233,7 +1233,7 @@ export default function Reconciliation() {
               <table style={{ fontSize: 13 }}>
                 <thead style={{ position: "sticky", top: 0, zIndex: 2 }}>
                   <tr>
-                    <th rowSpan={2} style={{ verticalAlign: "bottom", position: "sticky", top: 0, background: "#fff", zIndex: 3 }}>Order Id</th>
+                    <th rowSpan={2} style={{ verticalAlign: "bottom", position: "sticky", top: 0, background: "#fff", zIndex: 3 }}>Order ID</th>
                     <th rowSpan={2} style={{ verticalAlign: "bottom", position: "sticky", top: 0, background: "#fff", zIndex: 3 }}>Customer</th>
                     <th colSpan={3} style={{ textAlign: "center", position: "sticky", top: 0, background: "#eff6ff", color: "#1d4ed8", borderBottom: "2px solid #93c5fd", zIndex: 3 }}>System Record</th>
                     <th colSpan={3} style={{ textAlign: "center", position: "sticky", top: 0, background: "#fefce8", color: "#a16207", borderBottom: "2px solid #fde047", zIndex: 3 }}>Uploaded Record</th>
@@ -1283,7 +1283,7 @@ export default function Reconciliation() {
               <table style={{ fontSize: 13 }}>
                 <thead style={{ position: "sticky", top: 0, zIndex: 2 }}>
                   <tr>
-                    <th rowSpan={2} style={{ verticalAlign: "bottom", position: "sticky", top: 0, background: "#fff", zIndex: 3 }}>Order Id</th>
+                    <th rowSpan={2} style={{ verticalAlign: "bottom", position: "sticky", top: 0, background: "#fff", zIndex: 3 }}>Order ID</th>
                     <th rowSpan={2} style={{ verticalAlign: "bottom", position: "sticky", top: 0, background: "#fff", zIndex: 3 }}>Customer</th>
                     <th colSpan={3} style={{ textAlign: "center", position: "sticky", top: 0, background: "#eff6ff", color: "#1d4ed8", borderBottom: "2px solid #93c5fd", zIndex: 3 }}>System Record</th>
                     <th colSpan={3} style={{ textAlign: "center", position: "sticky", top: 0, background: "#fefce8", color: "#a16207", borderBottom: "2px solid #fde047", zIndex: 3 }}>Uploaded Record</th>
@@ -1481,6 +1481,20 @@ export default function Reconciliation() {
                 manualMatch={manualMatches[activeUnmatchedRow.proposalId]}
                 onAccept={() => {
                   setManualMatches((prev) => ({ ...prev, [activeUnmatchedRow.proposalId]: { pendingId: selectedPending, action: "accept" } }));
+                  const diff = (activeUnmatchedRow.premium ?? 0) - (activePendingRecord.premium ?? 0);
+                  if (diff > 0) {
+                    addRefund({
+                      proposalId: activePendingRecord.proposalId,
+                      customerName: activePendingRecord.customerName,
+                      mobile: activePendingRecord.mobile,
+                      product: activePendingRecord.product,
+                      icName: activePendingRecord.icName,
+                      systemAmount: activePendingRecord.premium,
+                      uploadedAmount: activeUnmatchedRow.premium,
+                      refundAmount: diff,
+                      paymentType: activePendingRecord.paymentType,
+                    });
+                  }
                   closeMatchFlow();
                 }}
                 onReject={() => {
@@ -1838,7 +1852,7 @@ export default function Reconciliation() {
                     <th style={{ textAlign: "center", background: "#f8fafc", color: "#64748b" }}>Meta</th>
                   </tr>
                   <tr>
-                    <th style={{ background: "#fff" }}>Order Id</th>
+                    <th style={{ background: "#fff" }}>Order ID</th>
                     <th style={{ background: "#fff" }}>Customer Name</th>
                     <th style={{ background: "#fff" }}>Mobile</th>
                     <th style={{ background: "#f0f7ff" }}>Cheque No.</th>
@@ -1894,7 +1908,7 @@ export default function Reconciliation() {
                     <th style={{ textAlign: "center", background: "#f8fafc", color: "#64748b" }}>Meta</th>
                   </tr>
                   <tr>
-                    <th style={{ background: "#fff" }}>Order Id</th>
+                    <th style={{ background: "#fff" }}>Order ID</th>
                     <th style={{ background: "#fff" }}>Customer Name</th>
                     <th style={{ background: "#fff" }}>Mobile</th>
                     <th style={{ background: "#f0f7ff" }}>Bank Name</th>
@@ -1946,7 +1960,7 @@ export default function Reconciliation() {
                     <th style={{ background: "var(--card-bg, #fff)" }}>#</th>
                     <th style={{ background: "var(--card-bg, #fff)" }}>Customer</th>
                     <th style={{ background: "var(--card-bg, #fff)" }}>Mobile</th>
-                    <th style={{ background: "var(--card-bg, #fff)" }}>Order Id</th>
+                    <th style={{ background: "var(--card-bg, #fff)" }}>Order ID</th>
                     <th style={{ background: "var(--card-bg, #fff)" }}>Product</th>
                     <th style={{ background: "var(--card-bg, #fff)" }}>IC Name</th>
                     <th style={{ background: "var(--card-bg, #fff)" }}>Premium</th>

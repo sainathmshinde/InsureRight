@@ -724,3 +724,12 @@ export const AnalyticsIcon = (p) => (
     <path d="M3 20h18" />
   </I>
 );
+
+export const RefundIcon = (p) => (
+  <I {...p}>
+    <polyline points="1 4 1 10 7 10" />
+    <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10" />
+    <line x1="12" y1="8" x2="12" y2="16" />
+    <path d="M15 11h-4.5a1.5 1.5 0 0 0 0 3H13a1.5 1.5 0 0 1 0 3H9" />
+  </I>
+);

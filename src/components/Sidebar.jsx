@@ -19,6 +19,7 @@ import {
   PaymentIcon,
   DownloadPolicyIcon,
   ChequeIcon,
+  RefundIcon,
 } from "../icons";
 import { useAuth } from "../context/AuthContext";
 
@@ -100,6 +101,12 @@ const BROKER_NAV = [
     label: "Receive Cheque",
     icon: ChequeIcon,
     children: [{ label: "Cheque Payments", path: "/accept-cheque" }],
+  },
+  {
+    key: "refund",
+    label: "Refund",
+    icon: RefundIcon,
+    children: [{ label: "Refund Requests", path: "/refund" }],
   },
   {
     key: "extract-payments",
