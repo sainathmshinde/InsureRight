@@ -6,18 +6,11 @@ import { INITIAL_CUSTOMERS } from "../../context/CustomerContext";
 
 const STATS = [
   {
-    label: "Total Operators",
-    value: "12",
-    sub: "9 active",
-    color: "#7c3aed",
-    bg: "#ede9fe",
-  },
-  {
-    label: "Total Customers",
-    value: "8,800",
-    sub: "+14 this month",
-    color: "#1d4ed8",
-    bg: "#dbeafe",
+    label: "Premium Collected",
+    value: "₹9,62,00,000",
+    sub: "April 2026",
+    color: "#b45309",
+    bg: "#fef3c7",
   },
   {
     label: "Policy Purchased",
@@ -27,11 +20,18 @@ const STATS = [
     bg: "#dcfce7",
   },
   {
-    label: "Premium Collected",
-    value: "₹9,62,00,000",
-    sub: "April 2026",
-    color: "#b45309",
-    bg: "#fef3c7",
+    label: "Total Customers",
+    value: "8,800",
+    sub: "+14 this month",
+    color: "#1d4ed8",
+    bg: "#dbeafe",
+  },
+  {
+    label: "Total Operators",
+    value: "12",
+    sub: "9 active",
+    color: "#7c3aed",
+    bg: "#ede9fe",
   },
 ];
 
@@ -74,9 +74,9 @@ const RECENT_AGENTS = [
 ];
 
 const ACTIVE_CAMPAIGNS = [
-  { name: "BPP Campaign_2026-2027", agents: 3, leads: 21, status: "Active" },
-  { name: "SBI_STP_Campaign", agents: 2, leads: 38, status: "Completed" },
-  { name: "BPP Campaign", agents: 3, leads: 36, status: "Completed" },
+  { name: "BPP Campaign_2026-2027", operators: 3, leads: 21, status: "Active" },
+  { name: "SBI_STP_Campaign", operators: 2, leads: 38, status: "Completed" },
+  { name: "BPP Campaign", operators: 3, leads: 36, status: "Completed" },
 ];
 
 const QUICK_ACTIONS = [
@@ -775,6 +775,18 @@ export default function BrokerPortal() {
             </button>
           </div>
 
+          {/* Stats row */}
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 12, marginBottom: 16 }}>
+            {STATS.map((s) => (
+              <div key={s.label} style={{ background: "#fff", borderTop: `1.5px solid ${s.color}`, borderRight: `1.5px solid ${s.color}`, borderBottom: `1.5px solid ${s.color}`, borderLeft: `4px solid ${s.color}`, borderRadius: 12, padding: "14px 16px", cursor: "default", transition: "box-shadow .15s", boxShadow: "0 1px 4px rgba(0,0,0,.06)" }}>
+                <div style={{ fontSize: 13, fontWeight: 700, color: "#64748b", textTransform: "uppercase", letterSpacing: ".4px", marginBottom: 8 }}>{s.label}</div>
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline" }}>
+                  <div style={{ fontSize: 24, fontWeight: 800, color: "#6b7280", lineHeight: 1 }}>{s.value}</div>
+                </div>
+              </div>
+            ))}
+          </div>
+
           {/* Action bar */}
           {(() => {
             const totalCustomers = mis.engagedCustomer + mis.nonEngagedCustomer;
@@ -1058,57 +1070,6 @@ export default function BrokerPortal() {
         </div>
       </div>
 
-      {/* Stats */}
-      <div
-        className="bd-stats"
-        style={{
-          display: "grid",
-          gridTemplateColumns: "repeat(4,1fr)",
-          gap: 16,
-        }}
-      >
-        {STATS.map((s) => (
-          <div
-            key={s.label}
-            style={{
-              background: "#fff",
-              borderRadius: 14,
-              padding: "20px 22px",
-              boxShadow:
-                "0 1px 3px rgba(0,0,0,.06), 0 4px 16px rgba(0,0,0,.05)",
-              border: "1px solid #e2e8f0",
-              borderLeft: `4px solid ${s.color}`,
-            }}
-          >
-            <div
-              style={{
-                fontSize: 13,
-                fontWeight: 700,
-                color: "#64748b",
-                textTransform: "uppercase",
-                letterSpacing: ".5px",
-                marginBottom: 8,
-              }}
-            >
-              {s.label}
-            </div>
-            <div
-              style={{
-                fontSize: 30,
-                fontWeight: 800,
-                color: s.color,
-                lineHeight: 1,
-              }}
-            >
-              {s.value}
-            </div>
-            <div style={{ fontSize: 13, color: "#64748b", marginTop: 6 }}>
-              {s.sub}
-            </div>
-          </div>
-        ))}
-      </div>
-
       {/* Quick actions */}
       <div className="card">
         <div className="card-body">
@@ -1170,7 +1131,7 @@ export default function BrokerPortal() {
         className="bd-two-col"
         style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 20 }}
       >
-        {/* Recent Agents */}
+        {/* Recent Operators */}
         <div className="card">
           <div className="card-body">
             <div

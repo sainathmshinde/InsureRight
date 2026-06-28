@@ -17,7 +17,7 @@ import {
   CustomerIcon,
 } from "../../icons";
 import { PRODUCTS, PRODUCTS_BY_TYPE, POLICY_TYPE_ICON, PREMIUM_CHART, PRODUCT_DETAILS } from "../product/productData";
-import { AGENTS as KMD_AGENTS } from "../agent/agentData";
+import { OPERATORS as KMD_AGENTS } from "../agent/agentData";
 import { INITIAL_LEADS, CAMPAIGNS } from "../crm/crmData";
 import { POLICY_MOCK } from "./PolicyList";
 import { ASSOCIATIONS } from "../customer/orgAssocData";
@@ -389,7 +389,7 @@ export default function BuyPolicy() {
     return new Set(myCampaigns.flatMap(c => c.productIds ?? []));
   }, [myAgentId, isCustomer]);
 
-  // Base customer pool — sales agents see only their assigned customers
+  // Base customer pool — sales operators see only their assigned customers
   const baseCustomers = salesAssignedCustomerIds
     ? CUSTOMERS.filter(c => salesAssignedCustomerIds.has(c.id))
     : CUSTOMERS;
@@ -683,7 +683,7 @@ export default function BuyPolicy() {
     return [...pool].sort((a, b) => score(b) - score(a));
   }, [insuranceType, agentCampaignProductIds]);
 
-  // Customer search filter — sales agents already scoped to their assigned customers
+  // Customer search filter — sales operators already scoped to their assigned customers
   const filteredCustomers = useMemo(() => {
     const q = custSearch.trim().toLowerCase();
     if (!q) return baseCustomers;

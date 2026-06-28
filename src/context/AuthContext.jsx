@@ -25,7 +25,7 @@ const MOCK_USERS = {
     id: "a2",
     role: "agent",
     agentType: "calling",
-    password: "agent@123",
+    password: "operator@123",
     name: "Pooja Desai",
     company: "K.M. Dastur & Co.",
     phone: "9812345678",

@@ -269,7 +269,7 @@ const MOCK_USERS = [
     gender: "Male",
     marital: "Married",
     segment: "Renewal Due (30 days)",
-    type: "Agent",
+    type: "Operator",
     state: "Maharashtra",
   },
   {
@@ -279,7 +279,7 @@ const MOCK_USERS = [
     gender: "Female",
     marital: "Single",
     segment: "Active Policyholders",
-    type: "Agent",
+    type: "Operator",
     state: "Uttar Pradesh",
   },
   {
@@ -289,7 +289,7 @@ const MOCK_USERS = [
     gender: "Male",
     marital: "Married",
     segment: "High Value Customers",
-    type: "Agent",
+    type: "Operator",
     state: "Delhi",
   },
   {
@@ -299,7 +299,7 @@ const MOCK_USERS = [
     gender: "Female",
     marital: "Divorced",
     segment: "Active Policyholders",
-    type: "Agent",
+    type: "Operator",
     state: "Uttarakhand",
   },
   {
@@ -309,7 +309,7 @@ const MOCK_USERS = [
     gender: "Male",
     marital: "Married",
     segment: "Renewal Due (30 days)",
-    type: "Agent",
+    type: "Operator",
     state: "Punjab",
   },
   {
@@ -319,7 +319,7 @@ const MOCK_USERS = [
     gender: "Female",
     marital: "Single",
     segment: "New Registrations",
-    type: "Agent",
+    type: "Operator",
     state: "Tamil Nadu",
   },
   {
@@ -329,7 +329,7 @@ const MOCK_USERS = [
     gender: "Male",
     marital: "Married",
     segment: "Lapsed Customers",
-    type: "Agent",
+    type: "Operator",
     state: "Madhya Pradesh",
   },
   {
@@ -339,7 +339,7 @@ const MOCK_USERS = [
     gender: "Female",
     marital: "Married",
     segment: "Active Policyholders",
-    type: "Agent",
+    type: "Operator",
     state: "Gujarat",
   },
   {
@@ -349,7 +349,7 @@ const MOCK_USERS = [
     gender: "Male",
     marital: "Widowed",
     segment: "High Value Customers",
-    type: "Agent",
+    type: "Operator",
     state: "Karnataka",
   },
   {
@@ -359,14 +359,14 @@ const MOCK_USERS = [
     gender: "Female",
     marital: "Single",
     segment: "New Registrations",
-    type: "Agent",
+    type: "Operator",
     state: "West Bengal",
   },
 ];
 
 const PAGE_SIZE = 10;
 
-const AGENTS = [
+const OPERATORS = [
   {
     id: 1,
     name: "Ravi Kulkarni",
@@ -432,8 +432,8 @@ const AGENTS = [
   },
 ];
 
-const CALLING_AGENTS = AGENTS.filter((a) => a.agentType === "calling");
-const SALES_AGENTS = AGENTS.filter((a) => a.agentType === "sales");
+const CALLING_AGENTS = OPERATORS.filter((a) => a.agentType === "calling");
+const SALES_AGENTS = OPERATORS.filter((a) => a.agentType === "sales");
 
 const INITIAL = {
   name: "",
@@ -898,7 +898,7 @@ export default function CampaignCreate() {
                       required
                     >
                       <option>Customer</option>
-                      <option>Agent</option>
+                      <option>Operator</option>
                     </Select>
                   </Field>
                   <Field label="Select Segment">
@@ -1367,12 +1367,12 @@ export default function CampaignCreate() {
               </div>
             </SectionBlock>
 
-            {/* ── 6. Assign Agents ─────────────────────── */}
-            <SectionBlock icon="👤" title="Assign Agents">
+            {/* ── 6. Assign Operators ─────────────────────── */}
+            <SectionBlock icon="👤" title="Assign Operators">
               <div
                 style={{ display: "flex", flexDirection: "column", gap: 24 }}
               >
-                {/* ── Calling Agents ── */}
+                {/* ── Calling Operators ── */}
                 <div>
                   <div
                     style={{
@@ -1394,7 +1394,7 @@ export default function CampaignCreate() {
                         fontSize: 13,
                       }}
                     >
-                      📞 Calling Agents
+                      📞 Calling Operators
                     </span>
                   </div>
 
@@ -1462,7 +1462,7 @@ export default function CampaignCreate() {
                     >
                       <input
                         type="text"
-                        placeholder="Search calling agents…"
+                        placeholder="Search calling operators…"
                         value={callingSearch}
                         onChange={(e) => {
                           setCallingSearch(e.target.value);
@@ -1518,7 +1518,7 @@ export default function CampaignCreate() {
                                 color: "var(--text-3)",
                               }}
                             >
-                              No agents found.
+                              No operators found.
                             </div>
                           ) : (
                             filteredCalling.map((a) => (
@@ -1564,7 +1564,7 @@ export default function CampaignCreate() {
                   </div>
                 </div>
 
-                {/* ── Sales Agents ── */}
+                {/* ── Sales Operators ── */}
                 <div>
                   <div
                     style={{
@@ -1586,7 +1586,7 @@ export default function CampaignCreate() {
                         fontSize: 13,
                       }}
                     >
-                      💼 Sales Agents
+                      💼 Sales Operators
                     </span>
                   </div>
 
@@ -1654,7 +1654,7 @@ export default function CampaignCreate() {
                     >
                       <input
                         type="text"
-                        placeholder="Search sales agents…"
+                        placeholder="Search sales operators…"
                         value={salesSearch}
                         onChange={(e) => {
                           setSalesSearch(e.target.value);
@@ -1710,7 +1710,7 @@ export default function CampaignCreate() {
                                 color: "var(--text-3)",
                               }}
                             >
-                              No agents found.
+                              No operators found.
                             </div>
                           ) : (
                             filteredSales.map((a) => (

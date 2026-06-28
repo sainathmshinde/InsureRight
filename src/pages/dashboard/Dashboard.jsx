@@ -1,6 +1,6 @@
 ﻿import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
-import { AGENTS } from "../agent/agentData";
+import { OPERATORS } from "../agent/agentData";
 import { CUSTOMER_MOCK } from "../customer/CustomerList";
 import { POLICY_MOCK } from "../policy/PolicyList";
 import { PRODUCT_MOCK } from "../product/ProductList";
@@ -52,8 +52,8 @@ function BrokerDashboard({ user }) {
   const greet =
     hour < 12 ? "Good morning" : hour < 17 ? "Good afternoon" : "Good evening";
 
-  const totalAgents = AGENTS.length;
-  const activeAgents = AGENTS.filter((a) => a.status === "Active").length;
+  const totalAgents = OPERATORS.length;
+  const activeAgents = OPERATORS.filter((a) => a.status === "Active").length;
 
   const brokerStats = [
     {

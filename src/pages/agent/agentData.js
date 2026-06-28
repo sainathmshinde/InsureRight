@@ -1,7 +1,7 @@
 const doc = (type, params) =>
   `/documents/preview.html?type=${type}&${new URLSearchParams(params)}`;
 
-export const AGENTS = [
+export const OPERATORS = [
   {
     id: 1,
     name: "Ravi Kulkarni",
@@ -378,4 +378,4 @@ export const AGENTS = [
   },
 ];
 
-export const AGENT_MAP = Object.fromEntries(AGENTS.map((a) => [a.id, a]));
+export const AGENT_MAP = Object.fromEntries(OPERATORS.map((a) => [a.id, a]));

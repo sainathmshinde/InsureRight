@@ -43,7 +43,7 @@ export default function AgentProfile() {
           <Row label="Full Name"       value={user.name} />
           <Row label="Email"           value={user.email} />
           <Row label="Mobile"          value={user.phone} />
-          <Row label="Agent Type"      value={user.agentType ? user.agentType.charAt(0).toUpperCase() + user.agentType.slice(1) : null} />
+          <Row label="Operator Type"      value={user.agentType ? user.agentType.charAt(0).toUpperCase() + user.agentType.slice(1) : null} />
 
         </div>
       </div>

@@ -10,9 +10,9 @@ import {
   EmptyState,
 } from "../../components/UI";
 import { AgentIcon } from "../../icons";
-import { AGENTS } from "./agentData";
+import { OPERATORS } from "./agentData";
 
-const MOCK = AGENTS.map((a) => ({
+const MOCK = OPERATORS.map((a) => ({
   id: a.id,
   name: a.name,
   mobile: a.mobile,

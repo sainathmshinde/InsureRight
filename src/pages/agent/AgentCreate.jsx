@@ -91,7 +91,7 @@ export default function AgentCreate() {
                 <Field label="Email" required>
                   <Input
                     type="email"
-                    placeholder="agent@email.com"
+                    placeholder="operator@email.com"
                     value={form.email}
                     onChange={set("email")}
                     required

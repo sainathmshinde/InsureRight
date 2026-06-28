@@ -3,7 +3,7 @@ import { Field, Select } from '../../components/Field'
 import { PageHeader } from '../../components/UI'
 import { CRMIcon } from '../../icons'
 import { useAuth } from '../../context/AuthContext'
-import { AGENTS as KMD_AGENTS } from '../agent/agentData'
+import { OPERATORS as KMD_AGENTS } from '../agent/agentData'
 import { CAMPAIGNS, INITIAL_LEADS } from './crmData'
 
 const SALES_AGENTS       = KMD_AGENTS.filter(a => a.agentType === 'sales')
@@ -211,7 +211,7 @@ export default function CrmPage() {
 
   return (
     <div>
-      <PageHeader icon={<CRMIcon />} title="CRM" subtitle="K.M. Dastur & Co. — Campaign lead tracking & agent performance" />
+      <PageHeader icon={<CRMIcon />} title="CRM" subtitle="K.M. Dastur & Co. — Campaign lead tracking & operator performance" />
 
       {/* ══════════════════════════════════════════════════════════════════════
           CALLING AGENT VIEW
