@@ -212,6 +212,9 @@ export default function CustomerPortal() {
   const { user }   = useAuth()
   const navigate   = useNavigate()
   const myPolicies = POLICY_MOCK.filter(p => p.customerId === user?.id)
+  const [helpOpen, setHelpOpen]       = useState(false)
+  const [helpReason, setHelpReason]   = useState('')
+  const [helpSubmitted, setHelpSubmitted] = useState(false)
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 0 }}>
@@ -383,6 +386,66 @@ export default function CustomerPortal() {
           </div>
         </div>
       </div>
+
+      {/* ══════════════════════════════════════════════════
+          FLOATING HELP BUTTON
+      ══════════════════════════════════════════════════ */}
+      <button
+        onClick={() => { setHelpOpen(true); setHelpSubmitted(false); setHelpReason(''); }}
+        style={{ position: 'fixed', bottom: 28, right: 28, padding: '12px 24px', borderRadius: 99, border: 'none', background: 'linear-gradient(135deg, #fb7185 0%, #a855f7 100%)', color: '#fff', fontSize: 14, fontWeight: 700, cursor: 'pointer', boxShadow: '0 6px 20px rgba(168,85,247,.4)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 900, transition: 'transform .15s', fontFamily: 'inherit', letterSpacing: '.3px' }}
+        onMouseEnter={e => e.currentTarget.style.transform = 'scale(1.05)'}
+        onMouseLeave={e => e.currentTarget.style.transform = 'scale(1)'}
+        title="Need Help?"
+      >
+        NEED HELP
+      </button>
+
+      {/* ══════════════════════════════════════════════════
+          HELP POPUP
+      ══════════════════════════════════════════════════ */}
+      {helpOpen && (
+        <>
+          <div onClick={() => setHelpOpen(false)} style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,.35)', zIndex: 1000 }} />
+          <div style={{ position: 'fixed', top: '50%', left: '50%', transform: 'translate(-50%,-50%)', background: '#fff', borderRadius: 16, boxShadow: '0 24px 60px rgba(0,0,0,.22)', width: '90%', maxWidth: 480, zIndex: 1001, overflow: 'hidden' }}>
+            <div style={{ padding: '22px 26px 18px', borderBottom: '1.5px solid #f0edf8', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <div style={{ fontSize: 18, fontWeight: 800, color: '#1a1628' }}>Need Help?</div>
+              <button onClick={() => setHelpOpen(false)} style={{ width: 30, height: 30, borderRadius: 8, border: '1.5px solid #e8e4f0', background: '#faf9fc', cursor: 'pointer', fontSize: 16, display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#64748b' }}>x</button>
+            </div>
+            <div style={{ padding: '20px 26px 26px' }}>
+              {helpSubmitted ? (
+                <div style={{ textAlign: 'center', padding: '20px 0' }}>
+                  <div style={{ fontSize: 40, marginBottom: 12 }}>&#10003;</div>
+                  <div style={{ fontSize: 16, fontWeight: 700, color: '#15803d', marginBottom: 6 }}>Request Submitted!</div>
+                  <div style={{ fontSize: 13, color: '#64748b', lineHeight: 1.6 }}>Our team will get back to you shortly. You can also call us at <strong>1800-XXX-XXXX</strong></div>
+                  <button onClick={() => setHelpOpen(false)} style={{ marginTop: 18, padding: '9px 28px', borderRadius: 8, border: 'none', background: 'linear-gradient(135deg, #fb7185 0%, #a855f7 100%)', color: '#fff', fontWeight: 700, fontSize: 13.5, cursor: 'pointer', fontFamily: 'inherit' }}>Close</button>
+                </div>
+              ) : (
+                <>
+                  <div style={{ fontSize: 13, color: '#64748b', marginBottom: 16, lineHeight: 1.6 }}>Tell us how we can help you. Our support team will respond within 24 hours.</div>
+                  <div style={{ marginBottom: 18 }}>
+                    <label style={{ display: 'block', fontSize: 12, fontWeight: 700, color: '#64748b', textTransform: 'uppercase', letterSpacing: '.4px', marginBottom: 6 }}>Reason for Help</label>
+                    <textarea
+                      className="field-input"
+                      rows={4}
+                      style={{ width: '100%', height: 'auto', resize: 'vertical', fontFamily: 'inherit', padding: '10px 12px' }}
+                      placeholder="Describe your issue or question..."
+                      value={helpReason}
+                      onChange={e => setHelpReason(e.target.value)}
+                    />
+                  </div>
+                  <button
+                    onClick={() => { if (helpReason.trim()) setHelpSubmitted(true); }}
+                    disabled={!helpReason.trim()}
+                    style={{ width: '100%', padding: '11px', borderRadius: 9, border: 'none', background: helpReason.trim() ? 'linear-gradient(135deg, #fb7185 0%, #a855f7 100%)' : '#e2e8f0', color: helpReason.trim() ? '#fff' : '#94a3b8', fontWeight: 700, fontSize: 14, cursor: helpReason.trim() ? 'pointer' : 'not-allowed', fontFamily: 'inherit', boxShadow: helpReason.trim() ? '0 4px 14px rgba(168,85,247,.35)' : 'none' }}
+                  >
+                    Submit Request
+                  </button>
+                </>
+              )}
+            </div>
+          </div>
+        </>
+      )}
 
     </div>
   )
