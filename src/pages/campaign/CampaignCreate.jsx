@@ -14,9 +14,18 @@ import {
   CheckboxGroup,
 } from "../../components/UI";
 import { Tabs } from "../../components/ui/Tabs";
-import { CampaignIcon } from "../../icons";
-import { PRODUCTS, POLICY_TYPE_ICON } from "../product/productData";
+import { CampaignIcon, SearchIcon } from "../../icons";
+import { PRODUCTS, POLICY_TYPE_ICON, PREMIUM_CHART, PRODUCT_DETAILS } from "../product/productData";
 import { ASSOCIATIONS } from "../member/orgAssocData";
+
+const TYPE_COLORS = {
+  "Base Policy":        "#1d4ed8",
+  "OPD":                "#15803d",
+  "Payment Protection": "#b45309",
+  "Age Band Premium":   "#7c3aed",
+  "Super Top Up":       "#f57c82",
+  "Top Up Policy":      "#4f46e5",
+};
 
 const PTYPE_META = {
   "Base Policy": { color: "#2563eb", bg: "#dbeafe", border: "#bfdbfe" },
@@ -26,6 +35,33 @@ const PTYPE_META = {
   "Age Band Premium": { color: "#7c3aed", bg: "#f5f3ff", border: "#c4b5fd" },
   "Payment Protection": { color: "#d97706", bg: "#fef3c7", border: "#fcd34d" },
   Other: { color: "#6b7280", bg: "#f3f4f6", border: "#d1d5db" },
+};
+
+const fmtSI = v => v >= 100000 ? `₹${(v / 100000).toFixed(0)}L` : v >= 1000 ? `₹${(v / 1000).toFixed(0)}K` : `₹${v}`;
+
+function getChartData(id) {
+  const rows   = PREMIUM_CHART[id] ?? [];
+  const sis    = [...new Set(rows.map(r => r.sumInsured))];
+  const allP   = rows.flatMap(r => [r.selfOnly, r.selfSpouse, r.selfSpouse2Children].filter(Boolean));
+  const minP   = allP.length > 0 ? Math.min(...allP) : null;
+  const covKeys = ['selfOnly', 'selfSpouse', 'selfSpouse2Children'].filter(k => rows[0]?.[k] != null);
+  return { sis, minP, covKeys };
+}
+
+function applyDiscount(premium, offerType, offerValue) {
+  if (!offerValue || !premium) return null;
+  const v = Number(offerValue);
+  if (!v) return null;
+  return offerType === 'Percent' ? Math.round(premium * (1 - v / 100)) : Math.max(0, premium - v);
+}
+
+const LINKED_TYPES = {
+  'Base Policy':        ['Super Top Up', 'Top Up Policy', 'OPD', 'Payment Protection'],
+  'Super Top Up':       ['Base Policy', 'Age Band Premium'],
+  'Top Up Policy':      ['Base Policy', 'Age Band Premium'],
+  'OPD':                ['Base Policy', 'Age Band Premium'],
+  'Payment Protection': ['Base Policy', 'Age Band Premium'],
+  'Age Band Premium':   ['Super Top Up', 'Top Up Policy', 'OPD', 'Payment Protection'],
 };
 
 const INDIA_STATES = [
@@ -366,6 +402,449 @@ const MOCK_USERS = [
 
 const PAGE_SIZE = 10;
 
+const POLICY_TYPES_LIST = [...new Set(PRODUCTS.map(p => p.policyType))];
+
+function ProductDetailModal({ product, onClose }) {
+  const details       = PRODUCT_DETAILS[product.id];
+  const chartRows     = PREMIUM_CHART[product.id] ?? [];
+  const providerColor = TYPE_COLORS[product.policyType] ?? "#33b5e5";
+  const linkedBase    = product.linkedBaseId ? PRODUCTS.find(p => p.id === product.linkedBaseId) : null;
+
+  const sectionHead = (text) => (
+    <div style={{ fontSize: 13, fontWeight: 700, color: "#a855f7", textTransform: "uppercase",
+      letterSpacing: ".6px", marginBottom: 10, display: "flex", alignItems: "center", gap: 6 }}>
+      <div style={{ flex: 1, height: 1, background: "var(--border)" }} />
+      <span>{text}</span>
+      <div style={{ flex: 1, height: 1, background: "var(--border)" }} />
+    </div>
+  );
+
+  return (
+    <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,.5)", zIndex: 2000,
+      display: "flex", alignItems: "center", justifyContent: "center", padding: 20 }}
+      onClick={onClose}>
+      <div style={{ background: "#fff", borderRadius: 18, width: "100%", maxWidth: 640,
+        maxHeight: "90vh", overflow: "hidden", display: "flex", flexDirection: "column",
+        boxShadow: "0 32px 80px rgba(0,0,0,.25)" }}
+        onClick={e => e.stopPropagation()}>
+
+        {/* Header strip */}
+        <div style={{ background: "#f5f7f9", padding: "16px 16px 0", flexShrink: 0 }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+            <span style={{ flex: 1, fontSize: 18, fontWeight: 700, color: providerColor,
+              overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+              {product.provider}
+            </span>
+            <button type="button" onClick={onClose}
+              style={{ width: 24, height: 24, borderRadius: 6, border: "1.5px solid #cbd5e1",
+                background: "#fff", cursor: "pointer", color: "#6d747a", fontSize: 14,
+                display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+              ×
+            </button>
+          </div>
+          <div style={{ display: "flex", alignItems: "center", gap: 6, flexWrap: "wrap", marginTop: 6, paddingBottom: 12 }}>
+            <span style={{ fontSize: 10.5, fontWeight: 700, color: "#6d747a" }}>{product.policyType}</span>
+            <span style={{ fontSize: 10.5, fontFamily: "monospace", color: "#94a3b8" }}>· {product.code}</span>
+          </div>
+        </div>
+
+        {/* Scrollable body */}
+        <div style={{ flex: 1, overflowY: "auto", padding: "20px 24px",
+          display: "flex", flexDirection: "column", gap: 20 }}>
+
+          {/* Name + tagline */}
+          <div>
+            <div style={{ fontWeight: 600, fontSize: 18, color: "#24304a", letterSpacing: "-.18px" }}>{product.name}</div>
+            {details?.tagline && (
+              <div style={{ fontSize: 13, fontStyle: "italic", color: "var(--text-2)", marginTop: 4, lineHeight: 1.5 }}>
+                "{details.tagline}"
+              </div>
+            )}
+          </div>
+
+          {/* ── Bundle offer banner ── */}
+          {linkedBase && product.bundleDiscount && (
+            <div style={{ background: "linear-gradient(135deg,#eff6ff 0%,#f0fdf4 100%)",
+              border: "1.5px solid #bfdbfe", borderRadius: 12, padding: "14px 16px",
+              display: "flex", alignItems: "center", gap: 14 }}>
+              <div style={{ fontSize: 28, flexShrink: 0 }}>🏷️</div>
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <div style={{ fontSize: 13, fontWeight: 700, color: "#1565d8", marginBottom: 3 }}>
+                  Bundle Offer — {product.bundleDiscount.type === "Percent"
+                    ? `${product.bundleDiscount.value}% off`
+                    : `₹${product.bundleDiscount.value} off`}
+                </div>
+                <div style={{ fontSize: 12.5, color: "#374151", lineHeight: 1.5 }}>
+                  Add <strong>{linkedBase.name}</strong> ({linkedBase.code} · {linkedBase.provider}) to the same campaign alongside this product to unlock the bundle discount on the top-up premium.
+                </div>
+              </div>
+              <div style={{ flexShrink: 0, textAlign: "center", minWidth: 54 }}>
+                <div style={{ fontSize: 24, fontWeight: 800, color: "#15803d", lineHeight: 1 }}>
+                  {product.bundleDiscount.type === "Percent"
+                    ? `${product.bundleDiscount.value}%`
+                    : `₹${product.bundleDiscount.value}`}
+                </div>
+                <div style={{ fontSize: 10.5, color: "#6d747a", textTransform: "uppercase", letterSpacing: ".4px", marginTop: 2 }}>
+                  {product.bundleDiscount.type === "Percent" ? "discount" : "flat off"}
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Highlight chips */}
+          {details?.highlights && (
+            <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+              {details.highlights.map(h => (
+                <div key={h.label} style={{ background: "#f5f7f9", border: "1px solid #dee1e5", borderRadius: 8, padding: "6px 12px" }}>
+                  <div style={{ fontSize: 10, color: "#6d747a", textTransform: "uppercase", letterSpacing: ".5px", marginBottom: 1 }}>{h.label}</div>
+                  <div style={{ fontSize: 13, fontWeight: 700, color: "#24304a" }}>{h.icon} {h.value}</div>
+                </div>
+              ))}
+            </div>
+          )}
+
+          {/* Jump nav */}
+          <div style={{ display: "flex", gap: 18, borderBottom: "1px solid var(--border)", paddingBottom: 10 }}>
+            <a href="#d-about"   style={{ fontSize: 13, fontWeight: 600, color: "#3b5bfd", textDecoration: "none" }}>About This Plan</a>
+            <a href="#d-covered" style={{ fontSize: 13, fontWeight: 600, color: "#3b5bfd", textDecoration: "none" }}>What's Covered</a>
+            <a href="#d-chart"   style={{ fontSize: 13, fontWeight: 600, color: "#3b5bfd", textDecoration: "none" }}>Premium Chart</a>
+          </div>
+
+          {details ? (<>
+            <div id="d-about">
+              {sectionHead("About This Plan")}
+              <p style={{ margin: 0, fontSize: 13.5, color: "var(--text-2)", lineHeight: 1.75 }}>{details.description}</p>
+            </div>
+
+            {details.target?.length > 0 && (
+              <div>
+                {sectionHead("Who Should Buy")}
+                <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+                  {details.target.map((t, i) => (
+                    <div key={i} style={{ display: "flex", alignItems: "flex-start", gap: 8, fontSize: 13, color: "var(--text-2)" }}>
+                      <span style={{ color: "#a855f7", fontWeight: 700, flexShrink: 0, marginTop: 1 }}>→</span>
+                      <span>{t}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {details.benefits?.length > 0 && (
+              <div>
+                {sectionHead("Key Benefits")}
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "7px 14px" }}>
+                  {details.benefits.map((b, i) => (
+                    <div key={i} style={{ display: "flex", alignItems: "flex-start", gap: 7, fontSize: 13, color: "var(--text-2)" }}>
+                      <span style={{ color: "#16a34a", fontWeight: 800, flexShrink: 0, marginTop: 1 }}>✓</span>
+                      <span style={{ lineHeight: 1.5 }}>{b}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            <div id="d-covered" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+              {details.covered?.length > 0 && (
+                <div style={{ background: "#f0fdf4", border: "1px solid #bbf7d0", borderRadius: 10, padding: "12px 14px" }}>
+                  <div style={{ fontSize: 13, fontWeight: 700, color: "#15803d", textTransform: "uppercase", letterSpacing: ".5px", marginBottom: 8 }}>✅ What's Covered</div>
+                  {details.covered.map((c, i) => (
+                    <div key={i} style={{ fontSize: 13.5, color: "#166534", lineHeight: 1.6, paddingLeft: 8, borderLeft: "2px solid #86efac", marginBottom: 4 }}>{c}</div>
+                  ))}
+                </div>
+              )}
+              {details.notCovered?.length > 0 && (
+                <div style={{ background: "#fff7ed", border: "1px solid #fed7aa", borderRadius: 10, padding: "12px 14px" }}>
+                  <div style={{ fontSize: 13, fontWeight: 700, color: "#c2410c", textTransform: "uppercase", letterSpacing: ".5px", marginBottom: 8 }}>⚠ Not Covered</div>
+                  {details.notCovered.map((c, i) => (
+                    <div key={i} style={{ fontSize: 13.5, color: "#9a3412", lineHeight: 1.6, paddingLeft: 8, borderLeft: "2px solid #fdba74", marginBottom: 4 }}>{c}</div>
+                  ))}
+                </div>
+              )}
+            </div>
+          </>) : (
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
+              {[["Code", product.code], ["Policy Type", product.policyType], ["Provider", product.provider], ["Status", "Active"]].map(([k, v]) => (
+                <div key={k} style={{ background: "var(--surface-2,#f8fafc)", borderRadius: 8, padding: "10px 14px" }}>
+                  <div style={{ fontSize: 13, color: "var(--text-3)", fontWeight: 600, textTransform: "uppercase", letterSpacing: ".4px", marginBottom: 3 }}>{k}</div>
+                  <div style={{ fontSize: 13, fontWeight: 600, color: "var(--text)", fontFamily: k === "Code" ? "monospace" : "inherit" }}>{v}</div>
+                </div>
+              ))}
+            </div>
+          )}
+
+          {/* Premium chart */}
+          {chartRows.length > 0 && (
+            <div id="d-chart">
+              {sectionHead("Premium Chart (Annual, incl. GST)")}
+              {product.bundleDiscount && (
+                <div style={{ fontSize: 12.5, color: "#15803d", background: "#f0fdf4", border: "1px solid #bbf7d0",
+                  borderRadius: 6, padding: "7px 12px", marginBottom: 10, fontWeight: 500 }}>
+                  🏷️ Prices shown are standard rates. Campaign bundle discount of{" "}
+                  <strong>{product.bundleDiscount.type === "Percent"
+                    ? `${product.bundleDiscount.value}%`
+                    : `₹${product.bundleDiscount.value}`}</strong> applies when {linkedBase?.name ?? "linked base policy"} is also in the campaign.
+                </div>
+              )}
+              <div style={{ overflowX: "auto", borderRadius: 8, border: "1px solid var(--border)" }}>
+                <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13.5 }}>
+                  <thead>
+                    <tr style={{ background: "var(--surface-2,#f8fafc)", borderBottom: "1.5px solid var(--border)" }}>
+                      <th style={{ padding: "8px 12px", textAlign: "left", fontWeight: 600, color: "var(--text-3)", whiteSpace: "nowrap" }}>Sum Insured</th>
+                      {chartRows[0]?.ageBandId != null && <th style={{ padding: "8px 12px", textAlign: "left", fontWeight: 600, color: "var(--text-3)" }}>Age Band</th>}
+                      {chartRows[0]?.selfOnly != null && <th style={{ padding: "8px 12px", textAlign: "right", fontWeight: 600, color: "var(--text-3)" }}>Self</th>}
+                      {chartRows.some(r => r.selfSpouse != null) && <th style={{ padding: "8px 12px", textAlign: "right", fontWeight: 600, color: "var(--text-3)" }}>Self + Spouse</th>}
+                      {chartRows.some(r => r.selfSpouse2Children != null) && <th style={{ padding: "8px 12px", textAlign: "right", fontWeight: 600, color: "var(--text-3)" }}>Family</th>}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {chartRows.map((r, i) => (
+                      <tr key={i} style={{ borderBottom: "1px solid var(--border)", background: i % 2 === 0 ? "#fff" : "var(--surface-2,#f8fafc)" }}>
+                        <td style={{ padding: "8px 12px", fontWeight: 600, whiteSpace: "nowrap" }}>₹{r.sumInsured.toLocaleString("en-IN")}</td>
+                        {r.ageBandId != null && <td style={{ padding: "8px 12px", color: "var(--text-2)" }}>Band {r.ageBandId}</td>}
+                        {chartRows[0]?.selfOnly != null && <td style={{ padding: "8px 12px", textAlign: "right" }}>{r.selfOnly != null ? `₹${r.selfOnly.toLocaleString("en-IN")}` : "—"}</td>}
+                        {chartRows.some(x => x.selfSpouse != null) && <td style={{ padding: "8px 12px", textAlign: "right" }}>{r.selfSpouse != null ? `₹${r.selfSpouse.toLocaleString("en-IN")}` : "—"}</td>}
+                        {chartRows.some(x => x.selfSpouse2Children != null) && <td style={{ padding: "8px 12px", textAlign: "right" }}>{r.selfSpouse2Children != null ? `₹${r.selfSpouse2Children.toLocaleString("en-IN")}` : "—"}</td>}
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          )}
+
+          {product.disclaimer && (
+            <div style={{ background: "#fffbeb", border: "1px solid #f59e0b", borderRadius: 8, padding: "12px 14px", fontSize: 13, color: "#78350f", lineHeight: 1.7 }}>
+              <div style={{ fontWeight: 700, marginBottom: 4 }}>⚠ Declaration</div>
+              {product.disclaimer}
+            </div>
+          )}
+        </div>
+
+        {/* Footer */}
+        <div style={{ padding: "14px 24px", borderTop: "1px solid var(--border)", background: "#fff",
+          flexShrink: 0, display: "flex", gap: 10, alignItems: "center", justifyContent: "flex-end" }}>
+          <button type="button" className="btn btn-ghost"
+            style={{ height: 44, fontSize: 14, fontWeight: 600, minWidth: 110, justifyContent: "center" }}
+            onClick={onClose}>
+            Close
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function ProductPickerModal({ selected, onToggle, onClose, offerType, offerValue }) {
+  const [search, setSearch]       = useState("");
+  const [typeFilter, setTypeFilter] = useState("");
+
+  const filtered = PRODUCTS.filter(p => {
+    if (typeFilter && p.policyType !== typeFilter) return false;
+    if (search) {
+      const q = search.toLowerCase();
+      return (
+        p.name.toLowerCase().includes(q) ||
+        p.provider.toLowerCase().includes(q) ||
+        p.code.toLowerCase().includes(q)
+      );
+    }
+    return true;
+  });
+
+  const hasFilter = search || typeFilter;
+
+  return (
+    <div
+      style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,.45)", zIndex: 1000,
+        display: "flex", alignItems: "center", justifyContent: "center", padding: 20 }}
+      onMouseDown={e => e.target === e.currentTarget && onClose()}
+    >
+      <div style={{ background: "var(--bg-card,#fff)", borderRadius: 14, width: "min(900px,100%)",
+        maxHeight: "88vh", display: "flex", flexDirection: "column",
+        boxShadow: "0 24px 60px rgba(0,0,0,.22)", overflow: "hidden" }}>
+
+        {/* Header */}
+        <div style={{ padding: "18px 24px", borderBottom: "1px solid var(--border)",
+          display: "flex", alignItems: "center", gap: 12, flexShrink: 0 }}>
+          <div style={{ flex: 1 }}>
+            <div style={{ fontWeight: 700, fontSize: 17, color: "var(--text-1)" }}>Select Products</div>
+            <div style={{ fontSize: 13, color: "var(--text-3)", marginTop: 2 }}>
+              {selected.length > 0
+                ? <span style={{ color: "var(--brand)", fontWeight: 600 }}>{selected.length} product{selected.length !== 1 ? "s" : ""} selected</span>
+                : "Choose products to promote in this campaign"}
+            </div>
+          </div>
+          <button type="button" onClick={onClose}
+            style={{ background: "none", border: "none", cursor: "pointer", fontSize: 24,
+              color: "var(--text-3)", lineHeight: 1, padding: "2px 6px", borderRadius: 6 }}>
+            ×
+          </button>
+        </div>
+
+        {/* Filter bar */}
+        <div style={{ padding: "12px 24px", borderBottom: "1px solid var(--border)",
+          display: "flex", gap: 10, alignItems: "center", flexShrink: 0, flexWrap: "wrap" }}>
+          <div style={{ position: "relative", flex: "1 1 200px" }}>
+            <span style={{ position: "absolute", left: 10, top: "50%", transform: "translateY(-50%)",
+              display: "flex", pointerEvents: "none" }}>
+              <SearchIcon size={14} color="var(--text-3)" />
+            </span>
+            <input
+              className="field-input"
+              placeholder="Search by name, provider or code…"
+              value={search}
+              onChange={e => setSearch(e.target.value)}
+              style={{ paddingLeft: 32, width: "100%" }}
+              autoFocus
+            />
+          </div>
+          <select className="field-select" style={{ width: 180 }} value={typeFilter}
+            onChange={e => setTypeFilter(e.target.value)}>
+            <option value="">All Policy Types</option>
+            {POLICY_TYPES_LIST.map(t => <option key={t} value={t}>{t}</option>)}
+          </select>
+          {hasFilter && (
+            <button type="button" className="btn btn-ghost" style={{ fontSize: 13, whiteSpace: "nowrap" }}
+              onClick={() => { setSearch(""); setTypeFilter(""); }}>
+              Clear
+            </button>
+          )}
+          {hasFilter && (
+            <span style={{ fontSize: 13, color: "var(--text-3)", whiteSpace: "nowrap" }}>
+              {filtered.length} result{filtered.length !== 1 ? "s" : ""}
+            </span>
+          )}
+        </div>
+
+        {/* Table */}
+        <div style={{ overflowY: "auto", flex: 1 }}>
+          {filtered.length === 0 ? (
+            <div style={{ textAlign: "center", padding: "40px 0", color: "var(--text-3)", fontSize: 14 }}>
+              No products match your filters.
+            </div>
+          ) : (
+            <div className="table-wrap" style={{ margin: 0, borderRadius: 0, border: "none" }}>
+              <table>
+                <thead>
+                  <tr>
+                    <th style={{ width: 40 }}>#</th>
+                    <th>Product Name</th>
+                    <th>Provider</th>
+                    <th>Policy Type</th>
+                    <th>Code</th>
+                    <th style={{ textAlign: "right" }}>Premium Starts</th>
+                    <th style={{ textAlign: "right" }}>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {filtered.map((p, i) => {
+                    const added = selected.includes(p.id);
+                    const color = TYPE_COLORS[p.policyType] ?? "#33b5e5";
+                    const icon  = POLICY_TYPE_ICON[p.policyType] ?? "📋";
+                    const { minP } = getChartData(p.id);
+                    const discountedP = applyDiscount(minP, offerType, offerValue);
+                    const pairedNames = selected
+                      .filter(sid => sid !== p.id)
+                      .map(sid => PRODUCTS.find(x => x.id === sid))
+                      .filter(Boolean)
+                      .filter(op => LINKED_TYPES[p.policyType]?.includes(op.policyType))
+                      .map(op => op.name.length > 24 ? op.name.slice(0, 22) + "…" : op.name);
+                    return (
+                      <tr key={p.id} style={{ background: added ? "var(--brand-light,#eff6ff)" : undefined }}>
+                        <td style={{ color: "var(--text-3)", fontWeight: 500 }}>{i + 1}</td>
+                        <td>
+                          <div style={{ fontWeight: 600, fontSize: 13.5, color: "var(--text-1)" }}>{p.name}</div>
+                          {pairedNames.length > 0 && (
+                            <div style={{ display: "flex", gap: 4, flexWrap: "wrap", marginTop: 4 }}>
+                              {pairedNames.map(n => (
+                                <span key={n} style={{ fontSize: 10.5, fontWeight: 600, background: "#eff6ff",
+                                  color: "#1565d8", border: "1px solid #bfdbfe", borderRadius: 99, padding: "1px 7px" }}>
+                                  🔗 {n}
+                                </span>
+                              ))}
+                            </div>
+                          )}
+                        </td>
+                        <td style={{ fontSize: 13, color: "var(--text-2)" }}>{p.provider}</td>
+                        <td>
+                          <span style={{ display: "inline-flex", alignItems: "center", gap: 5,
+                            fontSize: 11.5, fontWeight: 700, padding: "3px 9px", borderRadius: 99,
+                            background: `${color}18`, color, border: `1.5px solid ${color}40` }}>
+                            <span>{icon}</span> {p.policyType}
+                          </span>
+                        </td>
+                        <td>
+                          <span style={{ fontFamily: "monospace", fontSize: 11.5, color: "var(--text-3)",
+                            background: "var(--bg-subtle,#f8fafc)", border: "1px solid var(--border)",
+                            borderRadius: 4, padding: "2px 7px" }}>
+                            {p.code}
+                          </span>
+                        </td>
+                        <td style={{ textAlign: "right", whiteSpace: "nowrap" }}>
+                          {minP ? (
+                            discountedP != null ? (
+                              <div style={{ lineHeight: 1.5 }}>
+                                <span style={{ fontSize: 11.5, color: "#94a3b8", textDecoration: "line-through", display: "block" }}>
+                                  ₹{minP.toLocaleString("en-IN")}/yr
+                                </span>
+                                <span style={{ fontSize: 13, fontWeight: 700, color: "#15803d" }}>
+                                  ₹{discountedP.toLocaleString("en-IN")}/yr
+                                </span>
+                                {" "}
+                                <span style={{ fontSize: 10, fontWeight: 600, background: "#dcfce7",
+                                  color: "#15803d", borderRadius: 99, padding: "1px 6px" }}>
+                                  {offerType === "Percent" ? `${offerValue}% off` : `₹${offerValue} off`}
+                                </span>
+                              </div>
+                            ) : (
+                              <span style={{ fontSize: 13, fontWeight: 600, color: "var(--text-1)" }}>
+                                ₹{minP.toLocaleString("en-IN")}/yr
+                              </span>
+                            )
+                          ) : <span style={{ color: "var(--text-3)" }}>—</span>}
+                        </td>
+                        <td style={{ textAlign: "right" }}>
+                          <button
+                            type="button"
+                            onClick={() => onToggle(p.id)}
+                            style={{
+                              fontSize: 12, padding: "5px 16px", borderRadius: 7,
+                              border: "none", cursor: "pointer", fontWeight: 600,
+                              fontFamily: "inherit", whiteSpace: "nowrap",
+                              background: added ? "#dcfce7" : "linear-gradient(180deg,#1565d8,#104ea6)",
+                              color: added ? "#15803d" : "#fff",
+                              boxShadow: added ? "none" : "0 2px 6px rgba(21,101,216,.25)",
+                            }}
+                          >
+                            {added ? "✓ Added" : "+ Add"}
+                          </button>
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </div>
+
+        {/* Footer */}
+        <div style={{ padding: "14px 24px", borderTop: "1px solid var(--border)",
+          display: "flex", justifyContent: "space-between", alignItems: "center", flexShrink: 0 }}>
+          <span style={{ fontSize: 13, color: "var(--text-3)" }}>
+            {selected.length} product{selected.length !== 1 ? "s" : ""} selected for this campaign
+          </span>
+          <div style={{ display: "flex", gap: 10 }}>
+            <button type="button" className="btn btn-ghost" onClick={onClose}>Cancel</button>
+            <button type="button" className="btn btn-primary" onClick={onClose}>Done</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 const OPERATORS = [
   {
     id: 1,
@@ -437,11 +916,9 @@ const SALES_AGENTS = OPERATORS.filter((a) => a.agentType === "sales");
 
 const INITIAL = {
   name: "",
-  type: "",
   policyType: "",
   startDate: "",
   endDate: "",
-  extendOption: false,
   targetType: "Member",
   segment: "",
   ageMin: "",
@@ -459,7 +936,6 @@ const INITIAL = {
   whatsappTemplateId: "",
   clickTracking: false,
   conversionTracking: false,
-  status: "Active",
   // Health config
   hSumInsuredMin: "",
   hSumInsuredMax: "",
@@ -510,16 +986,8 @@ export default function CampaignCreate() {
     setForm((p) => ({ ...p, [f]: fromInputDate(e.target.value) }));
   const setBool = (f) => (val) => setForm((p) => ({ ...p, [f]: val }));
 
-  const [productSearch, setProductSearch] = useState("");
-  const filteredProducts = PRODUCTS.filter((p) => {
-    const q = productSearch.toLowerCase();
-    return (
-      p.name.toLowerCase().includes(q) ||
-      p.provider.toLowerCase().includes(q) ||
-      p.policyType.toLowerCase().includes(q) ||
-      p.code.toLowerCase().includes(q)
-    );
-  });
+  const [showProductPicker, setShowProductPicker] = useState(false);
+  const [viewingProduct, setViewingProduct] = useState(null);
 
   const [assocSearch, setAssocSearch] = useState("");
   const [assocOpen, setAssocOpen] = useState(false);
@@ -666,21 +1134,6 @@ export default function CampaignCreate() {
                     required
                   />
                 </Field>
-                <Field label="Campaign Type" required>
-                  <Select value={form.type} onChange={set("type")} required>
-                    <option value="">Select type</option>
-                    {[
-                      "Promotional",
-                      "Incentive",
-                      "Renewal",
-                      "Awareness",
-                      "Onboarding",
-                      "Seasonal",
-                    ].map((t) => (
-                      <option key={t}>{t}</option>
-                    ))}
-                  </Select>
-                </Field>
                 <Field label="Start Date" required>
                   <Input
                     type="date"
@@ -697,158 +1150,195 @@ export default function CampaignCreate() {
                     required
                   />
                 </Field>
-                <Field label="Extend Option">
-                  <div style={{ paddingTop: 8 }}>
-                    <Toggle
-                      checked={form.extendOption}
-                      onChange={setBool("extendOption")}
-                      label="Allow campaign end-date extension"
-                    />
-                  </div>
-                </Field>
-                <Field label="Status">
-                  <Select value={form.status} onChange={set("status")}>
-                    <option>Active</option>
-                    <option>Inactive</option>
-                  </Select>
-                </Field>
               </div>
             </SectionBlock>
 
             {/* ── 2. Product Mapping ────────────────────── */}
             <SectionBlock icon="📦" title="Product Mapping">
-              <div style={{ marginBottom: 4 }}>
-                <div style={{ display: "flex", alignItems: "center", marginBottom: 12, gap: 12 }}>
-                  <input
-                    type="text"
-                    className="field-input"
-                    placeholder="Search products…"
-                    value={productSearch}
-                    onChange={(e) => setProductSearch(e.target.value)}
-                    style={{ width: 220, fontSize: 13 }}
-                  />
-                  <div style={{ fontSize: 13, color: "var(--text-3)" }}>
-                    Select products to promote in this campaign
-                    {form.selectedProducts.length > 0 && (
-                      <span style={{ marginLeft: 8, fontWeight: 600, color: "var(--brand)" }}>
-                        · {form.selectedProducts.length} selected
-                      </span>
-                    )}
+              {/* ── Selected product cards (BuyPolicy style) ── */}
+              {form.selectedProducts.length > 0 && (
+                <div style={{ marginBottom: 16 }}>
+                  <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 14 }}>
+                    <span style={{ fontSize: 13, color: "var(--text-3)", fontWeight: 500 }}>
+                      {form.selectedProducts.length} product{form.selectedProducts.length !== 1 ? "s" : ""} added
+                    </span>
+                    <button type="button" className="btn btn-primary"
+                      style={{ fontSize: 13 }} onClick={() => setShowProductPicker(true)}>
+                      + Add More Products
+                    </button>
+                  </div>
+                  <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(340px, 1fr))", gap: 24 }}>
+                    {form.selectedProducts.map(id => {
+                      const p = PRODUCTS.find(x => x.id === id);
+                      if (!p) return null;
+                      const providerColor = TYPE_COLORS[p.policyType] ?? "#33b5e5";
+                      const { sis, minP, covKeys } = getChartData(p.id);
+                      const discountedMinP = applyDiscount(minP, form.offerType, form.offerValue);
+                      const linkedNames = form.selectedProducts
+                        .filter(sid => sid !== id)
+                        .map(sid => PRODUCTS.find(x => x.id === sid))
+                        .filter(Boolean)
+                        .filter(op => LINKED_TYPES[p.policyType]?.includes(op.policyType))
+                        .map(op => op.name.length > 28 ? op.name.slice(0, 26) + "…" : op.name);
+                      return (
+                        <div key={id} style={{
+                          borderRadius: 6, overflow: "hidden", background: "#fff",
+                          border: "2px solid #1565d8",
+                          boxShadow: "0 1px 11px rgba(63,151,233,.26)",
+                          transition: "all .15s",
+                          display: "flex", flexDirection: "column",
+                        }}>
+                          {/* Header strip — exact BuyPolicy style */}
+                          <div style={{ background: "#f5f7f9", padding: "16px 16px 0" }}>
+                            <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                              <span style={{ flex: 1, fontSize: 18, fontWeight: 700, color: providerColor,
+                                overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                                {p.provider}
+                              </span>
+                              {/* × remove button in place of BuyPolicy's checkbox */}
+                              <div onClick={() => toggleProduct(id)}
+                                style={{
+                                  width: 24, height: 24, borderRadius: 6, flexShrink: 0, cursor: "pointer",
+                                  display: "flex", alignItems: "center", justifyContent: "center",
+                                  background: "#1565d8", border: "1.5px solid #1565d8",
+                                }}>
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                                  <polyline points="20 6 9 17 4 12" />
+                                </svg>
+                              </div>
+                            </div>
+                            <div style={{ display: "flex", alignItems: "center", gap: 6, flexWrap: "wrap", marginTop: 6, paddingBottom: 12 }}>
+                              <span style={{ fontSize: 10.5, fontWeight: 700, color: "#6d747a" }}>{p.policyType}</span>
+                              <span style={{ fontSize: 10.5, fontFamily: "monospace", color: "#94a3b8" }}>· {p.code}</span>
+                            </div>
+                          </div>
+
+                          {/* Body — exact BuyPolicy style */}
+                          <div style={{ padding: "16px", flex: 1, display: "flex", flexDirection: "column", gap: 16 }}>
+                            {/* Product name */}
+                            <div style={{ fontWeight: 600, fontSize: 18, color: "#24304a", letterSpacing: "-.18px" }}>
+                              {p.name}
+                            </div>
+
+                            {/* Metrics */}
+                            <div style={{ display: "flex", gap: 24 }}>
+                              {sis.length > 0 && (
+                                <div style={{ flex: 1, minWidth: 0 }}>
+                                  <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 6 }}>
+                                    <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#00c851" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12" /></svg>
+                                    <span style={{ fontSize: 12, fontWeight: 500, color: "#6d747a", textTransform: "uppercase", letterSpacing: ".6px" }}>Sum Insured</span>
+                                  </div>
+                                  <div style={{ fontSize: 18, fontWeight: 600, color: "#24304a", letterSpacing: "-.18px" }}>
+                                    {fmtSI(Math.min(...sis))}{sis.length > 1 && ` – ${fmtSI(Math.max(...sis))}`}
+                                  </div>
+                                </div>
+                              )}
+                              {minP && (
+                                <div style={{ flex: 1, minWidth: 0 }}>
+                                  <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 6 }}>
+                                    <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#6d747a" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="9" /><path d="M12 7v10M9 9.5c0-1 .9-1.5 2-1.5s2.5.5 2.5 1.7c0 1.9-4.5 1.2-4.5 3.4 0 1.2 1.4 1.9 2.5 1.9s2-.6 2-1.6" /></svg>
+                                    <span style={{ fontSize: 12, fontWeight: 500, color: "#6d747a", textTransform: "uppercase", letterSpacing: ".6px" }}>Premium starts</span>
+                                  </div>
+                                  {discountedMinP != null ? (
+                                    <div>
+                                      <span style={{ fontSize: 13, color: "#94a3b8", textDecoration: "line-through" }}>
+                                        ₹ {minP.toLocaleString("en-IN")} /yr
+                                      </span>
+                                      <div style={{ display: "flex", alignItems: "center", gap: 6, marginTop: 2 }}>
+                                        <span style={{ fontSize: 18, fontWeight: 600, color: "#15803d", letterSpacing: "-.18px" }}>
+                                          ₹ {discountedMinP.toLocaleString("en-IN")}
+                                        </span>
+                                        <span style={{ fontSize: 14, color: "#6d747a" }}>/yr</span>
+                                        <span style={{ fontSize: 10.5, fontWeight: 700, background: "#dcfce7",
+                                          color: "#15803d", border: "1px solid #86efac", borderRadius: 99, padding: "2px 8px" }}>
+                                          {form.offerType === "Percent" ? `${form.offerValue}% off` : `₹${form.offerValue} off`}
+                                        </span>
+                                      </div>
+                                    </div>
+                                  ) : (
+                                    <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                                      <span style={{ fontSize: 18, fontWeight: 600, color: "#24304a", letterSpacing: "-.18px" }}>₹ {minP.toLocaleString("en-IN")}</span>
+                                      <span style={{ fontSize: 14, color: "#6d747a" }}>/yr</span>
+                                    </div>
+                                  )}
+                                </div>
+                              )}
+                            </div>
+
+                            {/* Coverage chips — exact BuyPolicy style */}
+                            {covKeys.length > 0 && (
+                              <div style={{ display: "flex", gap: 5, flexWrap: "wrap" }}>
+                                {covKeys.includes("selfOnly") && <span style={{ fontSize: 13, fontWeight: 500, background: "#fff", border: "1px solid #dee1e5", borderRadius: 20, padding: "3px 10px", color: "#6d747a" }}>Self</span>}
+                                {covKeys.includes("selfSpouse") && <span style={{ fontSize: 13, fontWeight: 500, background: "#fff", border: "1px solid #dee1e5", borderRadius: 20, padding: "3px 10px", color: "#6d747a" }}>Self + Spouse</span>}
+                                {covKeys.includes("selfSpouse2Children") && <span style={{ fontSize: 13, fontWeight: 500, background: "#fff", border: "1px solid #dee1e5", borderRadius: 20, padding: "3px 10px", color: "#6d747a" }}>Family</span>}
+                              </div>
+                            )}
+
+                            {/* Footer row — View Info + bundle badge (left) | Remove (right) */}
+                            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", paddingTop: 4, marginTop: "auto" }}>
+                              {/* Left side: View Info link + linked-product badges + bundle discount badge */}
+                              <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap", minWidth: 0 }}>
+                                <button type="button" onClick={() => setViewingProduct(p)}
+                                  style={{ fontSize: 13, fontWeight: 700, color: "#1565d8", border: "none",
+                                    background: "transparent", padding: 0, cursor: "pointer", fontFamily: "inherit",
+                                    display: "flex", alignItems: "center", gap: 3, flexShrink: 0 }}>
+                                  View Info
+                                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M9 18l6-6-6-6" /></svg>
+                                </button>
+                                {p.bundleDiscount && (
+                                  <span style={{ fontSize: 10.5, fontWeight: 700, background: "#f0fdf4",
+                                    color: "#15803d", border: "1px solid #bbf7d0", borderRadius: 99, padding: "2px 8px", flexShrink: 0 }}>
+                                    🏷️ {p.bundleDiscount.type === "Percent" ? `${p.bundleDiscount.value}% bundle` : `₹${p.bundleDiscount.value} off`}
+                                  </span>
+                                )}
+                                {linkedNames.length > 0 && (
+                                  <div style={{ display: "flex", alignItems: "center", gap: 4, flexWrap: "wrap" }}>
+                                    <span style={{ fontSize: 11, color: "#6d747a" }}>🔗</span>
+                                    {linkedNames.map(n => (
+                                      <span key={n} style={{ fontSize: 11, fontWeight: 600, background: "#eff6ff",
+                                        color: "#1565d8", border: "1px solid #bfdbfe", borderRadius: 99, padding: "2px 8px" }}>
+                                        {n}
+                                      </span>
+                                    ))}
+                                  </div>
+                                )}
+                              </div>
+                              <button type="button" onClick={() => toggleProduct(id)}
+                                style={{ fontSize: 13, fontWeight: 600, border: "none", color: "#ef4444",
+                                  background: "transparent", padding: 0, cursor: "pointer", fontFamily: "inherit",
+                                  display: "flex", alignItems: "center", gap: 4, flexShrink: 0 }}>
+                                Remove
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                                  <polyline points="3 6 5 6 21 6" /><path d="M19 6l-1 14H6L5 6" /><path d="M10 11v6M14 11v6" /><path d="M9 6V4h6v2" />
+                                </svg>
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    })}
                   </div>
                 </div>
-                <div
-                  style={{
-                    display: "grid",
-                    gridTemplateColumns:
-                      "repeat(auto-fill, minmax(256px, 1fr))",
-                    gap: 10,
-                  }}
-                >
-                  {filteredProducts.length === 0 && (
-                    <div style={{ gridColumn: "1 / -1", textAlign: "center", padding: "24px 0", color: "var(--text-3)", fontSize: 13 }}>
-                      No products match "{productSearch}"
-                    </div>
-                  )}
-                  {filteredProducts.map((p) => {
-                    const sel = form.selectedProducts.includes(p.id);
-                    const m = PTYPE_META[p.policyType] ?? PTYPE_META.Other;
-                    const icon = POLICY_TYPE_ICON[p.policyType] ?? "📋";
-                    return (
-                      <div
-                        key={p.id}
-                        onClick={() => toggleProduct(p.id)}
-                        style={{
-                          border: `1.5px solid ${sel ? m.color : "var(--border)"}`,
-                          borderRadius: 10,
-                          padding: "11px 13px",
-                          cursor: "pointer",
-                          background: sel ? m.bg : "#fff",
-                          transition: "all .13s",
-                          display: "flex",
-                          flexDirection: "column",
-                          gap: 5,
-                          userSelect: "none",
-                        }}
-                      >
-                        <div
-                          style={{
-                            display: "flex",
-                            alignItems: "center",
-                            justifyContent: "space-between",
-                          }}
-                        >
-                          <div
-                            style={{
-                              display: "flex",
-                              alignItems: "center",
-                              gap: 6,
-                            }}
-                          >
-                            <span style={{ fontSize: 17 }}>{icon}</span>
-                            <span
-                              style={{
-                                fontSize: 10.5,
-                                fontWeight: 700,
-                                color: m.color,
-                                textTransform: "uppercase",
-                                letterSpacing: ".4px",
-                              }}
-                            >
-                              {p.policyType}
-                            </span>
-                          </div>
-                          <div
-                            style={{
-                              display: "flex",
-                              alignItems: "center",
-                              gap: 5,
-                            }}
-                          >
-                            <span
-                              style={{
-                                fontFamily: "monospace",
-                                fontSize: 10,
-                                color: m.color,
-                                background: "#fff",
-                                border: `1px solid ${m.border}`,
-                                borderRadius: 4,
-                                padding: "1px 5px",
-                              }}
-                            >
-                              {p.code}
-                            </span>
-                            {sel && (
-                              <span
-                                style={{
-                                  color: m.color,
-                                  fontSize: 14,
-                                  fontWeight: 800,
-                                  lineHeight: 1,
-                                }}
-                              >
-                                ✓
-                              </span>
-                            )}
-                          </div>
-                        </div>
-                        <div
-                          style={{
-                            fontWeight: 700,
-                            fontSize: 13.5,
-                            color: "var(--text)",
-                            lineHeight: 1.3,
-                          }}
-                        >
-                          {p.name}
-                        </div>
-                        <div style={{ fontSize: 13, color: "var(--text-3)" }}>
-                          {p.provider}
-                        </div>
-                      </div>
-                    );
-                  })}
+              )}
+
+              {/* ── Empty state ── */}
+              {form.selectedProducts.length === 0 && (
+                <div style={{ textAlign: "center", padding: "36px 0", marginBottom: 16,
+                  border: "1.5px dashed var(--border)", borderRadius: 10,
+                  background: "var(--bg-subtle,#f8fafc)" }}>
+                  <div style={{ fontSize: 36, marginBottom: 10 }}>📦</div>
+                  <div style={{ fontWeight: 700, fontSize: 15, color: "var(--text-1)", marginBottom: 4 }}>
+                    No products added yet
+                  </div>
+                  <div style={{ fontSize: 13, color: "var(--text-3)", marginBottom: 18 }}>
+                    Browse and add products to promote in this campaign
+                  </div>
+                  <button type="button" className="btn btn-primary"
+                    onClick={() => setShowProductPicker(true)}>
+                    + Add Product
+                  </button>
                 </div>
-              </div>
+              )}
               <div className="form-grid-3" style={{ marginTop: 18 }}>
                 <Field label="Discount">
                   <Select value={form.offerType} onChange={set("offerType")}>
@@ -1783,6 +2273,22 @@ export default function CampaignCreate() {
           </form>
         </div>
       </div>
+
+      {showProductPicker && (
+        <ProductPickerModal
+          selected={form.selectedProducts}
+          onToggle={toggleProduct}
+          onClose={() => setShowProductPicker(false)}
+          offerType={form.offerType}
+          offerValue={form.offerValue}
+        />
+      )}
+      {viewingProduct && (
+        <ProductDetailModal
+          product={viewingProduct}
+          onClose={() => setViewingProduct(null)}
+        />
+      )}
     </div>
   );
 }

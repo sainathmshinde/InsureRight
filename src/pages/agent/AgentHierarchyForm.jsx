@@ -7,7 +7,6 @@ import {
   getHierarchyRule, addHierarchyRule, updateHierarchyRule,
 } from "./agentHierarchyData";
 
-// ── Designation badge ────────────────────────────────────────────────────────
 function DesigBadge({ value }) {
   const m = DESIG_META[value];
   if (!m) return null;
@@ -22,13 +21,16 @@ function DesigBadge({ value }) {
   );
 }
 
-// ── Custom multiselect dropdown ──────────────────────────────────────────────
+// Dropdown renders in a portal-like fixed layer — never clipped by card overflow
 function MultiSelectDropdown({ options, selectedIds, onChange, disabled, placeholder }) {
   const [open, setOpen]     = useState(false);
   const [search, setSearch] = useState("");
-  const wrapRef             = useRef(null);
-  const searchRef           = useRef(null);
+  const [dropStyle, setDropStyle] = useState({});
+  const wrapRef   = useRef(null);
+  const btnRef    = useRef(null);
+  const searchRef = useRef(null);
 
+  // Close on outside click
   useEffect(() => {
     if (!open) return;
     const handler = (e) => {
@@ -41,18 +43,41 @@ function MultiSelectDropdown({ options, selectedIds, onChange, disabled, placeho
     return () => document.removeEventListener("mousedown", handler);
   }, [open]);
 
+  // Focus search when opened
   useEffect(() => {
-    if (open) setTimeout(() => searchRef.current?.focus(), 50);
+    if (open) setTimeout(() => searchRef.current?.focus(), 40);
   }, [open]);
 
-  const close = () => { setOpen(false); setSearch(""); };
+  // Reposition on scroll/resize while open
+  useEffect(() => {
+    if (!open) return;
+    const recalc = () => {
+      if (!btnRef.current) return;
+      const r = btnRef.current.getBoundingClientRect();
+      setDropStyle({ top: r.bottom + 4, left: r.left, width: r.width });
+    };
+    window.addEventListener("scroll",  recalc, true);
+    window.addEventListener("resize",  recalc);
+    return () => {
+      window.removeEventListener("scroll",  recalc, true);
+      window.removeEventListener("resize",  recalc);
+    };
+  }, [open]);
 
+  const handleOpen = () => {
+    if (disabled) return;
+    if (!open && btnRef.current) {
+      const r = btnRef.current.getBoundingClientRect();
+      setDropStyle({ top: r.bottom + 4, left: r.left, width: r.width });
+    }
+    setOpen(o => !o);
+  };
+
+  const close = () => { setOpen(false); setSearch(""); };
   const toggle = (id) =>
     onChange(selectedIds.includes(id) ? selectedIds.filter(x => x !== id) : [...selectedIds, id]);
 
-  const filtered = options.filter(o =>
-    o.name.toLowerCase().includes(search.toLowerCase())
-  );
+  const filtered = options.filter(o => o.name.toLowerCase().includes(search.toLowerCase()));
 
   let label = placeholder ?? "Select employees…";
   if (selectedIds.length === 1) label = EMP_MAP[selectedIds[0]]?.name ?? "1 selected";
@@ -61,15 +86,16 @@ function MultiSelectDropdown({ options, selectedIds, onChange, disabled, placeho
   return (
     <div ref={wrapRef} style={{ position: "relative" }}>
       <button
+        ref={btnRef}
         type="button"
         disabled={disabled}
-        onClick={() => !disabled && setOpen(o => !o)}
+        onClick={handleOpen}
         style={{
           width: "100%", display: "flex", alignItems: "center", justifyContent: "space-between",
           padding: "8px 12px", borderRadius: 8, fontSize: 14, fontFamily: "inherit",
           border: `1.5px solid ${open ? "var(--brand)" : "var(--border)"}`,
           boxShadow: open ? "0 0 0 3px rgba(21,101,216,.12)" : "none",
-          background: disabled ? "var(--bg-subtle, #f8fafc)" : "var(--bg-card, #fff)",
+          background: disabled ? "var(--bg-subtle,#f8fafc)" : "var(--bg-card,#fff)",
           color: selectedIds.length ? "var(--text-1)" : "var(--text-3)",
           cursor: disabled ? "not-allowed" : "pointer", textAlign: "left",
           transition: "border-color .15s, box-shadow .15s",
@@ -85,11 +111,20 @@ function MultiSelectDropdown({ options, selectedIds, onChange, disabled, placeho
         }}>▼</span>
       </button>
 
+      {/* Fixed-position panel — never clipped by card overflow */}
       {open && (
         <div style={{
-          position: "absolute", top: "calc(100% + 4px)", left: 0, right: 0, zIndex: 300,
-          background: "var(--bg-card, #fff)", border: "1.5px solid var(--brand)",
-          borderRadius: 10, boxShadow: "0 8px 28px rgba(0,0,0,.15)", overflow: "hidden", minWidth: 220,
+          position: "fixed",
+          top: dropStyle.top,
+          left: dropStyle.left,
+          width: dropStyle.width,
+          zIndex: 9000,
+          background: "var(--bg-card,#fff)",
+          border: "1.5px solid var(--brand)",
+          borderRadius: 10,
+          boxShadow: "0 8px 28px rgba(0,0,0,.15)",
+          overflow: "hidden",
+          minWidth: 220,
         }}>
           <div style={{ padding: "10px 10px 8px", borderBottom: "1px solid var(--border)" }}>
             <input
@@ -116,7 +151,7 @@ function MultiSelectDropdown({ options, selectedIds, onChange, disabled, placeho
             </div>
           </div>
 
-          <div style={{ maxHeight: 200, overflowY: "auto" }}>
+          <div style={{ maxHeight: 220, overflowY: "auto" }}>
             {filtered.length === 0 ? (
               <div style={{ padding: "14px 12px", fontSize: 13, color: "var(--text-3)", textAlign: "center" }}>
                 No results for "{search}"
@@ -127,7 +162,7 @@ function MultiSelectDropdown({ options, selectedIds, onChange, disabled, placeho
                 <label key={emp.id} style={{
                   display: "flex", alignItems: "center", gap: 10,
                   padding: "9px 12px", cursor: "pointer",
-                  background: checked ? "var(--brand-light, #eff6ff)" : "transparent",
+                  background: checked ? "var(--brand-light,#eff6ff)" : "transparent",
                   borderBottom: "1px solid var(--border)",
                 }}>
                   <input type="checkbox" checked={checked} onChange={() => toggle(emp.id)}
@@ -146,7 +181,7 @@ function MultiSelectDropdown({ options, selectedIds, onChange, disabled, placeho
         </div>
       )}
 
-      {/* Selected chips */}
+      {/* Selected chips below the trigger */}
       {selectedIds.length > 0 && (
         <div style={{ display: "flex", flexWrap: "wrap", gap: 5, marginTop: 8 }}>
           {selectedIds.map(id => {
@@ -156,7 +191,7 @@ function MultiSelectDropdown({ options, selectedIds, onChange, disabled, placeho
               <span key={id} style={{
                 display: "inline-flex", alignItems: "center", gap: 4,
                 padding: "3px 8px 3px 10px", borderRadius: 99, fontSize: 12, fontWeight: 600,
-                background: "var(--brand-light, #eff6ff)", color: "var(--brand)", border: "1.5px solid var(--brand)",
+                background: "var(--brand-light,#eff6ff)", color: "var(--brand)", border: "1.5px solid var(--brand)",
               }}>
                 {emp.name}
                 <button type="button" onClick={() => toggle(id)}
@@ -174,7 +209,6 @@ function MultiSelectDropdown({ options, selectedIds, onChange, disabled, placeho
 
 const EMPTY_FORM = { reportingDesig: "", reportingEmpId: "", reporteeDesig: "", reporteeEmpIds: [] };
 
-// ── Page ─────────────────────────────────────────────────────────────────────
 export default function AgentHierarchyForm() {
   const navigate   = useNavigate();
   const { ruleId } = useParams();
@@ -222,12 +256,41 @@ export default function AgentHierarchyForm() {
       </div>
 
       <form onSubmit={handleSubmit}>
-        <div style={{ display: "flex", gap: 16, flexWrap: "wrap", alignItems: "flex-start", marginBottom: 20 }}>
+        {/* ── Single card ─────────────────────────────────────────────────── */}
+        <div className="card" style={{ marginBottom: 20 }}>
+          <div className="card-body">
 
-          {/* Reporting card */}
-          <div className="card" style={{ flex: "1 1 300px" }}>
-            <div className="card-body">
-              <SectionBlock icon={<GroupIcon />} title="Reporting">
+            {/* Section header */}
+            <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 24 }}>
+              <div style={{
+                width: 34, height: 34, borderRadius: 8, flexShrink: 0,
+                background: "var(--brand-light,#eff6ff)", display: "flex",
+                alignItems: "center", justifyContent: "center",
+              }}>
+                <GroupIcon size={17} />
+              </div>
+              <div>
+                <div style={{ fontWeight: 700, fontSize: 15, color: "var(--text)" }}>
+                  Reporting Relationship
+                </div>
+                <div style={{ fontSize: 12.5, color: "var(--text-3)", marginTop: 1 }}>
+                  Choose who reports to whom
+                </div>
+              </div>
+            </div>
+
+            {/* Two-column field layout */}
+            <div style={{ display: "grid", gridTemplateColumns: "1fr auto 1fr", gap: "0 20px", alignItems: "start" }}>
+
+              {/* ── Reporting side ── */}
+              <div>
+                <div style={{
+                  fontSize: 11, fontWeight: 800, color: "var(--brand)", textTransform: "uppercase",
+                  letterSpacing: ".7px", marginBottom: 14, paddingBottom: 8,
+                  borderBottom: "2px solid var(--brand-light,#eff6ff)",
+                }}>
+                  Reporting (Manager)
+                </div>
 
                 <Field label="Designation" required>
                   <Select
@@ -263,15 +326,15 @@ export default function AgentHierarchyForm() {
                   )}
                 </Field>
 
-                {/* Selected employee preview */}
                 {form.reportingEmpId && (
                   <div style={{
                     marginTop: 4, padding: "12px 14px", borderRadius: 10,
-                    background: "var(--bg-subtle, #f8fafc)", border: "1px solid var(--border)",
+                    background: "var(--bg-subtle,#f8fafc)", border: "1px solid var(--border)",
                     display: "flex", alignItems: "center", gap: 10,
                   }}>
                     <div style={{
-                      width: 36, height: 36, borderRadius: "50%", background: "var(--brand-light, #eff6ff)",
+                      width: 36, height: 36, borderRadius: "50%",
+                      background: "var(--brand-light,#eff6ff)",
                       display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0,
                     }}>
                       <GroupIcon size={18} />
@@ -282,25 +345,32 @@ export default function AgentHierarchyForm() {
                     </div>
                   </div>
                 )}
-
-              </SectionBlock>
-            </div>
-          </div>
-
-          {/* Arrow divider */}
-          <div style={{ display: "flex", alignItems: "center", justifyContent: "center", padding: "56px 4px 0" }}>
-            <div style={{ textAlign: "center" }}>
-              <div style={{ fontSize: 24, color: "var(--text-3)" }}>→</div>
-              <div style={{ fontSize: 10, fontWeight: 700, color: "var(--text-3)", textTransform: "uppercase", letterSpacing: ".4px" }}>
-                manages
               </div>
-            </div>
-          </div>
 
-          {/* Reportee card */}
-          <div className="card" style={{ flex: "1 1 300px" }}>
-            <div className="card-body">
-              <SectionBlock icon={<GroupIcon />} title="Reportee">
+              {/* ── Arrow divider ── */}
+              <div style={{ display: "flex", flexDirection: "column", alignItems: "center", paddingTop: 52, gap: 4 }}>
+                <div style={{
+                  width: 40, height: 40, borderRadius: "50%",
+                  background: "var(--bg-subtle,#f1f5f9)", border: "1.5px solid var(--border)",
+                  display: "flex", alignItems: "center", justifyContent: "center",
+                  fontSize: 20, color: "var(--text-3)",
+                }}>
+                  →
+                </div>
+                <div style={{ fontSize: 10, fontWeight: 700, color: "var(--text-3)", textTransform: "uppercase", letterSpacing: ".5px" }}>
+                  manages
+                </div>
+              </div>
+
+              {/* ── Reportee side ── */}
+              <div>
+                <div style={{
+                  fontSize: 11, fontWeight: 800, color: "#15803d", textTransform: "uppercase",
+                  letterSpacing: ".7px", marginBottom: 14, paddingBottom: 8,
+                  borderBottom: "2px solid #dcfce7",
+                }}>
+                  Reportee (Team)
+                </div>
 
                 <Field label="Designation" required>
                   <Select
@@ -330,9 +400,9 @@ export default function AgentHierarchyForm() {
                     </div>
                   )}
                 </Field>
-
-              </SectionBlock>
+              </div>
             </div>
+
           </div>
         </div>
 

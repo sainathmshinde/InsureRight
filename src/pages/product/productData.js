@@ -92,6 +92,8 @@ const ALL_PRODUCTS = [
     provider: 'SBI General Insurance Company Limited',
     policyTypeId: 6,
     disclaimer: null,
+    linkedBaseId: 42,
+    bundleDiscount: { type: 'Percent', value: 10 },
   },
   {
     id: 39,
@@ -99,6 +101,8 @@ const ALL_PRODUCTS = [
     provider: 'SBI General Insurance Co. Ltd.',
     policyTypeId: 6,
     disclaimer: null,
+    linkedBaseId: 42,
+    bundleDiscount: { type: 'Percent', value: 8 },
   },
   {
     id: 40,
@@ -106,6 +110,8 @@ const ALL_PRODUCTS = [
     provider: 'SBI General Insurance Co. Ltd.',
     policyTypeId: 6,
     disclaimer: null,
+    linkedBaseId: 42,
+    bundleDiscount: { type: 'Percent', value: 5 },
   },
   {
     id: 42,
@@ -148,6 +154,15 @@ const ALL_PRODUCTS = [
     provider: 'SBI General Insurance Company Limited',
     policyTypeId: 1,
     disclaimer: 'test',
+  },
+  {
+    id: 48,
+    name: 'SBI Arogya Plus — Top Up Health Plan',
+    provider: 'SBI General Insurance Company Limited',
+    policyTypeId: 2,
+    disclaimer: null,
+    linkedBaseId: 42,
+    bundleDiscount: { type: 'Percent', value: 15 },
   },
 ]
 
@@ -456,6 +471,12 @@ export const PREMIUM_CHART = {
   47: [
     { sumInsured: 100, selfOnly: 1, selfSpouse: 2 },
   ],
+  48: [
+    { sumInsured: 500000,  selfOnly: 4250,  selfSpouse: 6800  },
+    { sumInsured: 1000000, selfOnly: 7500,  selfSpouse: 12000 },
+    { sumInsured: 1500000, selfOnly: 10800, selfSpouse: 17300 },
+    { sumInsured: 2000000, selfOnly: 14200, selfSpouse: 22700 },
+  ],
 }
 
 // Rich brochure content keyed by productId — shown in "View Details" modal.
@@ -737,6 +758,49 @@ export const PRODUCT_DETAILS = {
       { label: 'Premium From', value: '₹3,353/yr', icon: '💰' },
       { label: 'Age Bands', value: '11 bands', icon: '📊' },
       { label: 'Insurer', value: 'SBI General', icon: '🏢' },
+    ],
+  },
+  48: {
+    tagline: 'Smart Top-Up — 15% Bundle Savings with SBI Base Policy',
+    description: 'SBI Arogya Plus is a dedicated Top Up Health Plan engineered to pair with the SBI Base Policy (KMD-042). Once your base plan limit is exhausted, it kicks in seamlessly — adding ₹5L to ₹20L of hospitalisation coverage at a fraction of the standalone cost. Campaigns that include both this plan and the SBI Base Policy automatically unlock a 15% bundle discount on the top-up premium.',
+    target: [
+      'SBI Base Policy holders wanting higher total coverage',
+      'Members seeking ₹10L – ₹25L combined hospitalisation cover',
+      'Families wanting maximum protection at minimal extra cost',
+      'First-time top-up buyers who already hold an SBI base plan',
+    ],
+    benefits: [
+      'Activates only after SBI Base Policy (KMD-042) is exhausted',
+      '15% bundle discount when paired with SBI Base Policy in campaign',
+      'Sum insured options: ₹5L, ₹10L, ₹15L and ₹20L',
+      'Covers self, spouse, and up to 2 children',
+      'In-patient and day care hospitalisation covered',
+      'Pre-hospitalisation (60 days) & post-hospitalisation (90 days)',
+      'Cashless access at 6,000+ SBI network hospitals',
+      'Annual renewal with continuity benefit bonus',
+    ],
+    covered: [
+      'Hospitalisation beyond SBI Base Policy limit',
+      'ICU and critical care charges',
+      'Surgical and procedure expenses',
+      'Day care treatments (540+ listed)',
+      'Pre-hospitalisation (60 days)',
+      'Post-hospitalisation (90 days)',
+      'Ambulance charges',
+    ],
+    notCovered: [
+      'Expenses below the base policy deductible',
+      'OPD consultations',
+      'Pre-existing diseases (first year)',
+      'Cosmetic or plastic surgery',
+      'Dental treatment (unless accidental)',
+      'Self-inflicted injuries or war events',
+    ],
+    highlights: [
+      { label: 'Sum Insured',    value: '₹5L – ₹20L', icon: '🛡️' },
+      { label: 'Premium From',   value: '₹4,250/yr',   icon: '💰' },
+      { label: 'Bundle Discount',value: '15% off',      icon: '🏷️' },
+      { label: 'Pairs With',     value: 'KMD-042',      icon: '🔗' },
     ],
   },
   45: {

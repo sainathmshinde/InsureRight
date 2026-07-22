@@ -180,19 +180,40 @@ export default function AgentHierarchy() {
         <div style={{ display: "flex", gap: 6, justifyContent: "flex-end" }}>
           <button
             type="button"
-            className="btn btn-secondary"
-            style={{ padding: "4px 14px", fontSize: 12 }}
+            title="Edit"
             onClick={() => navigate(`/agent/hierarchy/${row.id}/edit`)}
+            style={{
+              background: "linear-gradient(180deg,#1565d8,#104ea6)",
+              border: "none", borderRadius: 6, cursor: "pointer",
+              padding: "5px 6px", color: "#fff",
+              display: "inline-flex", alignItems: "center",
+              boxShadow: "0 2px 6px rgba(21,101,216,.30)",
+            }}
           >
-            Edit
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+              stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z" />
+            </svg>
           </button>
           <button
             type="button"
-            className="btn btn-ghost"
-            style={{ padding: "4px 14px", fontSize: 12, color: "#dc2626" }}
+            title="Delete"
             onClick={() => handleDelete(row.id)}
+            style={{
+              background: "linear-gradient(180deg,#ef4444,#dc2626)",
+              border: "none", borderRadius: 6, cursor: "pointer",
+              padding: "5px 6px", color: "#fff",
+              display: "inline-flex", alignItems: "center",
+              boxShadow: "0 2px 6px rgba(220,38,38,.30)",
+            }}
           >
-            Delete
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+              stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <polyline points="3 6 5 6 21 6" />
+              <path d="M19 6l-1 14H6L5 6" />
+              <path d="M10 11v6M14 11v6" />
+              <path d="M9 6V4h6v2" />
+            </svg>
           </button>
         </div>
       ),
