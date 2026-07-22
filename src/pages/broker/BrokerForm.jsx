@@ -6,7 +6,7 @@ export default function BrokerForm({ form, set, setFile, onSubmit, onCancel, sub
 
       {/* ── 1. Basic Information ─────────────── */}
       <SectionBlock icon="📋" title="Basic Information">
-        <div className="form-grid">
+        <div className="form-grid-3">
           <Field label="Broker Name" required>
             <Input placeholder="Enter broker name" value={form.brokerName} onChange={set('brokerName')} required />
           </Field>
@@ -33,8 +33,8 @@ export default function BrokerForm({ form, set, setFile, onSubmit, onCancel, sub
       </SectionBlock>
 
       {/* ── 2. KYC Details ───────────────────── */}
-      <SectionBlock icon="🪪" title="KYC Details">
-        <div className="form-grid">
+      <SectionBlock icon="🪪" title="KYC Info">
+        <div className="form-grid-3">
           <Field label="PAN Number" required>
             <Input placeholder="ABCDE1234F" value={form.panNumber} onChange={set('panNumber')} required />
           </Field>
@@ -58,8 +58,8 @@ export default function BrokerForm({ form, set, setFile, onSubmit, onCancel, sub
       </SectionBlock>
 
       {/* ── 3. Contact Details ───────────────── */}
-      <SectionBlock icon="📞" title="Contact Details">
-        <div className="form-grid">
+      <SectionBlock icon="📞" title="Contact Info">
+        <div className="form-grid-3">
           <Field label="Email" required>
             <Input type="email" placeholder="email@example.com" value={form.email} onChange={set('email')} required />
           </Field>
@@ -77,7 +77,7 @@ export default function BrokerForm({ form, set, setFile, onSubmit, onCancel, sub
 
       {/* ── 4. Address ───────────────────────── */}
       <SectionBlock icon="📍" title="Address">
-        <div className="form-grid">
+        <div className="form-grid-3">
           <Field label="Registered Address" required>
             <Textarea placeholder="Enter registered address" value={form.registeredAddress} onChange={set('registeredAddress')} required />
           </Field>
@@ -104,8 +104,8 @@ export default function BrokerForm({ form, set, setFile, onSubmit, onCancel, sub
       </SectionBlock>
 
       {/* ── 5. Bank Details ──────────────────── */}
-      <SectionBlock icon="🏦" title="Bank Details (Commission Payout)">
-        <div className="form-grid">
+      <SectionBlock icon="🏦" title="Bank Info (Commission Payout)">
+        <div className="form-grid-3">
           <Field label="Account Holder Name" required>
             <Input placeholder="Full name as per bank" value={form.accountHolder} onChange={set('accountHolder')} required />
           </Field>
@@ -126,7 +126,7 @@ export default function BrokerForm({ form, set, setFile, onSubmit, onCancel, sub
 
       {/* ── 6. Agreement & Compliance ────────── */}
       <SectionBlock icon="📄" title="Agreement & Compliance">
-        <div className="form-grid">
+        <div className="form-grid-3">
           <Field label="Agreement Upload">
             <UploadBox label="Upload agreement (PDF)" hint="PDF only" value={form.agreementFile} onChange={setFile('agreementFile')} />
           </Field>

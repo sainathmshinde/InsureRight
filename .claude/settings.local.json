@@ -13,7 +13,17 @@
       "Bash(command -v brew)",
       "Bash(node verify-full.js)",
       "Bash(node verify-accept-reject.js)",
-      "Bash(lsof -i :5173 -sTCP:LISTEN)"
+      "Bash(lsof -i :5173 -sTCP:LISTEN)",
+      "Bash(node hexcheck2.js)",
+      "Bash(pkill -f vite)",
+      "mcp__plugin_figma_figma__get_design_context",
+      "mcp__plugin_figma_figma__get_metadata",
+      "Bash(node -e ' *)",
+      "Bash(npx eslint *)",
+      "Read(//c/Users/User/.claude/projects/d--Insurance/**)",
+      "Read(//c/Users/User/.claude/projects/d--Insurance/de971784-6eed-4bdc-83fb-a8908be5726e/**)",
+      "Bash(netstat -ano)",
+      "Bash(taskkill //PID 21108 //F)"
     ]
   }
 }

@@ -11,7 +11,7 @@ const _EXTRA = Array.from({length:216},(_,i)=>{
   return { id, name:`${_FN[id%_FN.length]} ${_LN[Math.floor(id/7)%_LN.length]}`, mobile:`987${String(id).padStart(7,'0')}`, email:`cust${id}@email.com`, dob:`${1975+(id%28)}-${String((id%12)+1).padStart(2,'0')}-${String((id%28)+1).padStart(2,'0')}`, gender:id%3===0?'Female':'Male', kyc, policies:kyc==='Verified'?id%3:0, agentId:id%2===0?'a2':'a1', organisationId:_ORG[id%_ORG.length], associationId:_ASC[id%_ASC.length], campaignId:cid, campaignName:cn, engaged:kyc==='Verified'&&id%5!==0 }
 })
 
-export const INITIAL_CUSTOMERS = [
+export const INITIAL_MEMBERS = [
   { id: 1,  name: 'Aarav Sharma',  mobile: '9876543210', email: 'aarav@gmail.com',  dob: '1990-03-15', gender: 'Male',   kyc: 'Verified',  policies: 1, agentId: 'a1', organisationId: 1003, associationId: 1007, campaignId: 11, campaignName: 'BPP Campaign_2026-2027',              engaged: true  },
   { id: 2,  name: 'Rohit Sharma',  mobile: '9812000000', email: 'rohit@gmail.com',  dob: '1990-11-20', gender: 'Male',   kyc: 'Pending',   policies: 0, agentId: 'a2', organisationId: 1005, associationId: 1033, campaignId: 8,  campaignName: 'SBI_STP_Campaign',                    engaged: false },
   { id: 3,  name: 'Divya Nair',    mobile: '9911223344', email: 'divya@gmail.com',  dob: '1978-06-05', gender: 'Female', kyc: 'Verified',  policies: 3, agentId: 'a1', organisationId: 1006, associationId: 1023, campaignId: 5,  campaignName: 'Campaign OPD and DIGIT PAYMENT PROTECTION', engaged: true  },
@@ -49,24 +49,24 @@ export const INITIAL_CUSTOMERS = [
   ..._EXTRA,
 ]
 
-const CustomerContext = createContext(null)
+const MemberContext = createContext(null)
 
-export function CustomerProvider({ children }) {
-  const [customers, setCustomers] = useState(INITIAL_CUSTOMERS)
+export function MemberProvider({ children }) {
+  const [members, setMembers] = useState(INITIAL_MEMBERS)
 
   const updateKycStatus = (id, status) => {
-    setCustomers(prev =>
+    setMembers(prev =>
       prev.map(c => c.id === Number(id) ? { ...c, kyc: status } : c)
     )
   }
 
   return (
-    <CustomerContext.Provider value={{ customers, updateKycStatus }}>
+    <MemberContext.Provider value={{ members, updateKycStatus }}>
       {children}
-    </CustomerContext.Provider>
+    </MemberContext.Provider>
   )
 }
 
-export function useCustomers() {
-  return useContext(CustomerContext)
+export function useMembers() {
+  return useContext(MemberContext)
 }

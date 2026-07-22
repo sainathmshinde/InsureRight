@@ -26,7 +26,7 @@ const MOCK = [
   {
     id: "PAY-2026-001",
     proposalId: "PRO-2025-1001",
-    customerName: "Aarav Sharma",
+    memberName: "Aarav Sharma",
     policyNo: null,
     product: "Star Comprehensive Health",
     method: "Cheque",
@@ -45,7 +45,7 @@ const MOCK = [
   {
     id: "PAY-2026-002",
     proposalId: "PRO-2025-1002",
-    customerName: "Priya Mehta",
+    memberName: "Priya Mehta",
     policyNo: null,
     product: "HDFC ERGO Optima Secure",
     method: "NEFT",
@@ -64,7 +64,7 @@ const MOCK = [
   {
     id: "PAY-2026-003",
     proposalId: "PRO-2025-1003",
-    customerName: "Rohan Verma",
+    memberName: "Rohan Verma",
     policyNo: null,
     product: "Bajaj Allianz Health Guard",
     method: "Cheque",
@@ -83,7 +83,7 @@ const MOCK = [
   {
     id: "PAY-2026-004",
     proposalId: "PRO-2025-1004",
-    customerName: "Sneha Iyer",
+    memberName: "Sneha Iyer",
     policyNo: null,
     product: "Star Comprehensive Health",
     method: "RTGS",
@@ -102,7 +102,7 @@ const MOCK = [
   {
     id: "PAY-2026-005",
     proposalId: "PRO-2025-1005",
-    customerName: "Rahul Gupta",
+    memberName: "Rahul Gupta",
     policyNo: null,
     product: "Bajaj Allianz Comprehensive",
     method: "IMPS",
@@ -121,7 +121,7 @@ const MOCK = [
   {
     id: "PAY-2026-006",
     proposalId: "PRO-2025-1006",
-    customerName: "Kavita Pillai",
+    memberName: "Kavita Pillai",
     policyNo: null,
     product: "HDFC ERGO Optima Secure",
     method: "Cheque",
@@ -140,7 +140,7 @@ const MOCK = [
   {
     id: "PAY-2026-007",
     proposalId: "PRO-2025-1007",
-    customerName: "Vikram Rao",
+    memberName: "Vikram Rao",
     policyNo: null,
     product: "Star Comprehensive Health",
     method: "NEFT",
@@ -159,7 +159,7 @@ const MOCK = [
   {
     id: "PAY-2026-008",
     proposalId: "PRO-2025-1008",
-    customerName: "Divya Nair",
+    memberName: "Divya Nair",
     policyNo: null,
     product: "Bajaj Allianz Health Guard",
     method: "IMPS",
@@ -178,7 +178,7 @@ const MOCK = [
   {
     id: "PAY-2026-009",
     proposalId: "PRO-2025-1009",
-    customerName: "Arjun Singh",
+    memberName: "Arjun Singh",
     policyNo: null,
     product: "HDFC ERGO Optima Secure",
     method: "Cheque",
@@ -197,7 +197,7 @@ const MOCK = [
   {
     id: "PAY-2026-010",
     proposalId: "PRO-2025-1010",
-    customerName: "Meera Joshi",
+    memberName: "Meera Joshi",
     policyNo: null,
     product: "Star Comprehensive Health",
     method: "RTGS",
@@ -352,13 +352,13 @@ function PaymentModal({ payment, onClose, onAccept, onReject }) {
                 marginBottom: 4,
               }}
             >
-              Payment Details
+              Payment Info
             </div>
             <div style={{ fontSize: 18, fontWeight: 800, color: "#1a1628" }}>
               {payment.proposalId}
             </div>
             <div style={{ fontSize: 13, color: "#64748b", marginTop: 2 }}>
-              {payment.customerName}{payment.policyNo ? ` · ${payment.policyNo}` : ""}
+              {payment.memberName}{payment.policyNo ? ` · ${payment.policyNo}` : ""}
             </div>
           </div>
           <div
@@ -461,7 +461,7 @@ function PaymentModal({ payment, onClose, onAccept, onReject }) {
               marginBottom: 20,
             }}
           >
-            <DetailRow label="Customer Name" value={payment.customerName} />
+            <DetailRow label="Member Name" value={payment.memberName} />
             <DetailRow label="Policy Number" value={payment.policyNo} />
             <DetailRow label="Product" value={payment.product} />
             <DetailRow label="Campaign" value={payment.campaignName} />
@@ -533,7 +533,7 @@ function PaymentModal({ payment, onClose, onAccept, onReject }) {
                 </div>
                 <div style={{ fontSize: 13, color: "#166534" }}>
                   Payment of <strong>{fmt(payment.amount)}</strong> from{" "}
-                  <strong>{payment.customerName}</strong> has been successfully
+                  <strong>{payment.memberName}</strong> has been successfully
                   verified and accepted. Policy{" "}
                   <strong>{payment.policyNo}</strong> will now be activated.
                 </div>
@@ -567,7 +567,7 @@ function PaymentModal({ payment, onClose, onAccept, onReject }) {
                 </div>
                 <div style={{ fontSize: 13, color: "#7f1d1d" }}>
                   Payment of <strong>{fmt(payment.amount)}</strong> has been
-                  rejected. Reason: <strong>{reason}</strong>. The customer will
+                  rejected. Reason: <strong>{reason}</strong>. The member will
                   be notified to re-submit the payment.
                 </div>
               </div>
@@ -777,7 +777,7 @@ export default function UpdatePayment() {
   const filtered = payments.filter((p) => {
     const q = search.toLowerCase();
     const matchQ =
-      p.customerName.toLowerCase().includes(q) ||
+      p.memberName.toLowerCase().includes(q) ||
       p.id.toLowerCase().includes(q) ||
       p.policyNo.toLowerCase().includes(q) ||
       p.method.toLowerCase().includes(q);
@@ -1004,7 +1004,7 @@ export default function UpdatePayment() {
               </label>
               <input
                 className="field-input filter-search"
-                placeholder="Search by payment ID, customer, policy…"
+                placeholder="Search by payment ID, member, policy…"
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 style={{ width: "100%" }}
@@ -1085,13 +1085,13 @@ export default function UpdatePayment() {
             <table style={{ fontSize: 13, borderCollapse: "separate", borderSpacing: 0 }}>
               <thead>
                 <tr>
-                  <th style={{ position: "sticky", top: 0, zIndex: 2, background: "var(--card-bg, #fff)", borderBottom: "2px solid var(--border)" }}>Order ID</th>
-                  <th style={{ position: "sticky", top: 0, zIndex: 2, background: "var(--card-bg, #fff)", borderBottom: "2px solid var(--border)" }}>Customer</th>
-                  <th style={{ position: "sticky", top: 0, zIndex: 2, background: "var(--card-bg, #fff)", borderBottom: "2px solid var(--border)" }}>Method</th>
-                  <th style={{ position: "sticky", top: 0, zIndex: 2, background: "var(--card-bg, #fff)", borderBottom: "2px solid var(--border)" }}>Amount</th>
-                  <th style={{ position: "sticky", top: 0, zIndex: 2, background: "var(--card-bg, #fff)", borderBottom: "2px solid var(--border)" }}>Date</th>
-                  <th style={{ position: "sticky", top: 0, zIndex: 2, background: "var(--card-bg, #fff)", borderBottom: "2px solid var(--border)" }}>Reference</th>
-                  <th style={{ position: "sticky", top: 0, zIndex: 2, background: "var(--card-bg, #fff)", borderBottom: "2px solid var(--border)" }}>
+                  <th style={{ position: "sticky", top: 0, zIndex: 2, background: "var(--surface-2)", borderBottom: "2px solid var(--border)" }}>Order ID</th>
+                  <th style={{ position: "sticky", top: 0, zIndex: 2, background: "var(--surface-2)", borderBottom: "2px solid var(--border)" }}>Member</th>
+                  <th style={{ position: "sticky", top: 0, zIndex: 2, background: "var(--surface-2)", borderBottom: "2px solid var(--border)" }}>Method</th>
+                  <th style={{ position: "sticky", top: 0, zIndex: 2, background: "var(--surface-2)", borderBottom: "2px solid var(--border)" }}>Amount</th>
+                  <th style={{ position: "sticky", top: 0, zIndex: 2, background: "var(--surface-2)", borderBottom: "2px solid var(--border)" }}>Date</th>
+                  <th style={{ position: "sticky", top: 0, zIndex: 2, background: "var(--surface-2)", borderBottom: "2px solid var(--border)" }}>Reference</th>
+                  <th style={{ position: "sticky", top: 0, zIndex: 2, background: "var(--surface-2)", borderBottom: "2px solid var(--border)" }}>
                     Payment Status
                     <div
                       style={{
@@ -1132,13 +1132,13 @@ export default function UpdatePayment() {
                         <td
                           style={{
                             fontFamily: "monospace",
-                            fontSize: 13,
+                            fontSize: 12,
                             color: "#7c3aed",
                           }}
                         >
                           {p.proposalId}
                         </td>
-                        <td style={{ fontWeight: 500 }}>{p.customerName}</td>
+                        <td style={{ fontWeight: 500 }}>{p.memberName}</td>
                         <td>
                           <span
                             style={{
@@ -1161,8 +1161,8 @@ export default function UpdatePayment() {
                         <td
                           style={{
                             fontFamily: "monospace",
-                            fontSize: 13,
-                            color: "#64748b",
+                            fontSize: 12,
+                            fontWeight: 600,
                           }}
                         >
                           {p.chequeNo || p.referenceNo || "—"}

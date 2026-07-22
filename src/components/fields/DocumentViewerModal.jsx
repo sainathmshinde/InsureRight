@@ -519,7 +519,7 @@ function Agreement({ p }) {
               ['1. Appointment', `The Company hereby appoints ${p.name} as an authorized Broker for soliciting and procuring insurance business in accordance with IRDAI (Insurance Brokers) Regulations, 2018.`],
               ['2. Commission', 'The Broker shall be entitled to commission as per IRDAI approved rates. Commissions shall be credited within 30 (thirty) working days of premium receipt and realization.'],
               ['3. Obligations', 'The Broker shall maintain a valid IRDAI license, comply with all KYC requirements, and ensure proper documentation for each policyholder.'],
-              ['4. Confidentiality', 'Both parties shall maintain strict confidentiality of customer data, business plans, and proprietary information. This obligation shall survive termination for a period of 3 years.'],
+              ['4. Confidentiality', 'Both parties shall maintain strict confidentiality of member data, business plans, and proprietary information. This obligation shall survive termination for a period of 3 years.'],
               ['5. Termination', 'This Agreement may be terminated by either party with 30 days written notice. The Company may terminate immediately for regulatory violations or material breach.'],
             ].map(([title, text]) => (
               <div key={title} style={{ marginBottom: 11 }}>

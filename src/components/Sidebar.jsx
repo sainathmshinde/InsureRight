@@ -5,7 +5,7 @@ import {
   DashboardIcon,
   UserIcon,
   AgentIcon,
-  CustomerIcon,
+  MemberIcon,
   ProductIcon,
   PolicyIcon,
   CampaignIcon,
@@ -16,10 +16,6 @@ import {
   DocumentIcon,
   BankIcon,
   GroupIcon,
-  PaymentIcon,
-  DownloadPolicyIcon,
-  ChequeIcon,
-  RefundIcon,
 } from "../icons";
 import { useAuth } from "../context/AuthContext";
 
@@ -31,12 +27,12 @@ const BROKER_NAV = [
     children: [{ label: "Overview", path: "/broker-portal" }],
   },
   {
-    key: "agent",
-    label: "Operators",
-    icon: AgentIcon,
+    key: "product",
+    label: "Products",
+    icon: ProductIcon,
     children: [
-      { label: "All Operators", path: "/agent" },
-      { label: "Add Operator", path: "/agent/create" },
+      { label: "Product Catalogue", path: "/product" },
+      { label: "Add Product", path: "/product/create" },
     ],
   },
   {
@@ -58,21 +54,21 @@ const BROKER_NAV = [
     ],
   },
   {
-    key: "customer",
-    label: "Customers",
-    icon: CustomerIcon,
+    key: "member",
+    label: "Members",
+    icon: MemberIcon,
     children: [
-      { label: "All Customers", path: "/customer" },
-      { label: "Add Customer", path: "/customer/create" },
+      { label: "All Members", path: "/member" },
+      { label: "Add Member", path: "/member/create" },
     ],
   },
   {
-    key: "product",
-    label: "Products",
-    icon: ProductIcon,
+    key: "agent",
+    label: "Operators",
+    icon: AgentIcon,
     children: [
-      { label: "Product Catalogue", path: "/product" },
-      { label: "Add Product", path: "/product/create" },
+      { label: "All Operators", path: "/agent" },
+      { label: "Add Operator", path: "/agent/create" },
     ],
   },
   {
@@ -85,42 +81,33 @@ const BROKER_NAV = [
     ],
   },
   {
+    key: "reconciliation",
+    label: "Reconciliation",
+    icon: DocumentIcon,
+    children: [
+      { label: "Receive Cheque", path: "/accept-cheque" },
+      { label: "Update Payment", path: "/update-payment" },
+      { label: "Reconcile Data", path: "/reconciliation" },
+      { label: "Refund", path: "/refund" },
+    ],
+  },
+  {
     key: "policy",
     label: "Policy Issuance",
     icon: PolicyIcon,
     children: [{ label: "Policies", path: "/policy" }],
   },
   {
-    key: "update-payment",
-    label: "Update Payment",
-    icon: PaymentIcon,
-    children: [{ label: "Offline Payments", path: "/update-payment" }],
-  },
-  {
-    key: "accept-cheque",
-    label: "Receive Cheque",
-    icon: ChequeIcon,
-    children: [{ label: "Cheque Payments", path: "/accept-cheque" }],
-  },
-  {
-    key: "refund",
-    label: "Refund",
-    icon: RefundIcon,
-    children: [{ label: "Refund Requests", path: "/refund" }],
-  },
-  {
-    key: "extract-payments",
-    label: "Extract Payments",
-    icon: DownloadPolicyIcon,
-    children: [
-      { label: "Extract Customer & Payments", path: "/extract-payments" },
-    ],
-  },
-  {
     key: "crm",
     label: "CRM",
     icon: CRMIcon,
     children: [{ label: "CRM", path: "/crm" }],
+  },
+  {
+    key: "reports",
+    label: "Reports",
+    icon: ReportIcon,
+    children: [{ label: "All Reports", path: "/reports" }],
   },
   {
     key: "ic",
@@ -130,18 +117,6 @@ const BROKER_NAV = [
       { label: "IC Master", path: "/ic" },
       { label: "Add IC", path: "/ic/create" },
     ],
-  },
-  {
-    key: "reports",
-    label: "Reports",
-    icon: ReportIcon,
-    children: [{ label: "All Reports", path: "/reports" }],
-  },
-  {
-    key: "reconciliation",
-    label: "Reconciliation",
-    icon: DocumentIcon,
-    children: [{ label: "Reconcile Data", path: "/reconciliation" }],
   },
 ];
 
@@ -162,12 +137,12 @@ const AGENT_NAV = [
     ],
   },
   {
-    key: "customer",
-    label: "My Customers",
-    icon: CustomerIcon,
+    key: "member",
+    label: "My Members",
+    icon: MemberIcon,
     children: [
-      { label: "All Customers", path: "/customer" },
-      { label: "Add Customer", path: "/customer/create" },
+      { label: "All Members", path: "/member" },
+      { label: "Add Member", path: "/member/create" },
     ],
   },
   {
@@ -184,12 +159,12 @@ const AGENT_NAV = [
   },
 ];
 
-const CUSTOMER_NAV = [
+const MEMBER_NAV = [
   {
-    key: "customer-portal",
+    key: "member-portal",
     label: "Dashboard",
     icon: DashboardIcon,
-    children: [{ label: "Overview", path: "/customer-portal" }],
+    children: [{ label: "Overview", path: "/member-portal" }],
   },
   {
     key: "profile",
@@ -225,18 +200,22 @@ export default function Sidebar({ mobileOpen = false, onMobileClose }) {
   const activeNav =
     user?.role === "agent"
       ? AGENT_NAV
-      : user?.role === "customer"
-        ? CUSTOMER_NAV
+      : user?.role === "member"
+        ? MEMBER_NAV
         : BROKER_NAV;
 
-  // Precise match: avoids "policy" matching "/policy-catalogue" etc.
-  const matchesKey = (pathname, key) =>
-    pathname === "/" + key || pathname.startsWith("/" + key + "/");
+  // Precise match against each item's own child routes — avoids "policy" matching
+  // "/policy-catalogue" etc, and correctly handles items whose children don't share
+  // the parent's key prefix (e.g. Reconciliation's Receive Cheque / Update Payment / Refund).
+  const matchesNav = (pathname, item) =>
+    item.children.some(
+      (c) => pathname === c.path || pathname.startsWith(c.path + "/"),
+    );
 
   const [collapsed, setCollapsed] = useState(false);
   const [openKey, setOpenKey] = useState(
     () =>
-      activeNav.find((n) => matchesKey(location.pathname, n.key))?.key ??
+      activeNav.find((n) => matchesNav(location.pathname, n))?.key ??
       activeNav[0]?.key,
   );
   const [hoveredKey, setHoveredKey] = useState(null);
@@ -249,7 +228,7 @@ export default function Sidebar({ mobileOpen = false, onMobileClose }) {
       return;
     }
     // Auto-expand the matching section and close mobile drawer on route change
-    const match = activeNav.find((n) => matchesKey(location.pathname, n.key));
+    const match = activeNav.find((n) => matchesNav(location.pathname, n));
     if (match) setOpenKey(match.key);
     setHoveredKey(null);
     if (onMobileClose) onMobileClose();
@@ -296,10 +275,10 @@ export default function Sidebar({ mobileOpen = false, onMobileClose }) {
     <>
       <style>{`
         @keyframes flyIn { from{opacity:0;transform:translateX(-6px)} to{opacity:1;transform:translateX(0)} }
-        .sb-child:hover  { background:#f5f3ff !important; color:#7c3aed !important; }
-        .sb-fly:hover    { background:#f5f3ff !important; color:#7c3aed !important; }
-        .sb-toggle:hover { background:#ede9fe !important; }
-        .sb-nav:not(.sb-active):hover { background:#f5f3ff !important; }
+        .sb-child:hover  { background:#eef5ff !important; color:#1565d8 !important; }
+        .sb-fly:hover    { background:#eef5ff !important; color:#1565d8 !important; }
+        .sb-toggle:hover { background:#e7f0fc !important; }
+        .sb-nav:not(.sb-active):hover { background:#eef5ff !important; }
         .sb-logout:hover { background:#fef2f2 !important; color:#dc2626 !important; }
       `}</style>
 
@@ -353,7 +332,7 @@ export default function Sidebar({ mobileOpen = false, onMobileClose }) {
         <nav style={{ ...S.nav, alignItems: collapsed ? "center" : "stretch" }}>
           {activeNav.map((item) => {
             const Icon = item.icon;
-            const moduleActive = matchesKey(location.pathname, item.key);
+            const moduleActive = matchesNav(location.pathname, item);
             const isOpen = !collapsed && openKey === item.key;
             const flyOpen = collapsed && hoveredKey === item.key;
 
@@ -386,7 +365,7 @@ export default function Sidebar({ mobileOpen = false, onMobileClose }) {
                           transform: isOpen ? "rotate(90deg)" : "rotate(0deg)",
                           color: moduleActive
                             ? "rgba(255,255,255,0.7)"
-                            : "#a78bfa",
+                            : "var(--brand-mid)",
                         }}
                       >
                         <ChevronRight />
@@ -415,8 +394,8 @@ export default function Sidebar({ mobileOpen = false, onMobileClose }) {
                             ...S.dot,
                             background:
                               location.pathname === child.path
-                                ? "#a855f7"
-                                : "#c4b8e8",
+                                ? "var(--brand)"
+                                : "var(--brand-mid)",
                           }}
                         />
                         {child.label}
@@ -557,7 +536,7 @@ const S = {
   aside: {
     minHeight: "100vh",
     background: "#fff",
-    borderRight: "1.5px solid #e8e4f0",
+    borderRight: "1.5px solid #dee1e5",
     display: "flex",
     flexDirection: "column",
     flexShrink: 0,
@@ -572,7 +551,7 @@ const S = {
     height: "var(--topbar-h,58px)",
     display: "flex",
     alignItems: "center",
-    borderBottom: "1.5px solid #e8e4f0",
+    borderBottom: "1.5px solid #dee1e5",
     flexShrink: 0,
     gap: 8,
   },
@@ -587,8 +566,8 @@ const S = {
     width: 32,
     height: 32,
     borderRadius: 7,
-    border: "1.5px solid #e8e4f0",
-    background: "#faf9fc",
+    border: "1.5px solid #dee1e5",
+    background: "#f5f6fa",
     cursor: "pointer",
     display: "flex",
     alignItems: "center",
@@ -601,14 +580,14 @@ const S = {
     alignItems: "center",
     gap: 10,
     padding: "10px 14px",
-    borderBottom: "1px solid #f0edf8",
-    background: "#faf9fc",
+    borderBottom: "1px solid #eef1f5",
+    background: "#f5f6fa",
   },
   userAvatar: {
     width: 32,
     height: 32,
     borderRadius: 8,
-    background: "#a855f7",
+    background: "var(--grad-purple)",
     color: "#fff",
     fontSize: 12,
     fontWeight: 700,
@@ -662,7 +641,7 @@ const S = {
     borderRadius: 10,
   },
   navBtnActive: {
-    background: "linear-gradient(135deg,#fb7185 0%,#a855f7 100%)",
+    background: "var(--grad-purple)",
     color: "#fff",
   },
   iconWrap: {
@@ -708,7 +687,7 @@ const S = {
     textDecoration: "none",
     transition: "background .12s,color .12s",
   },
-  childActive: { background: "#ede9fe", color: "#7c3aed", fontWeight: 600 },
+  childActive: { background: "var(--brand-light)", color: "var(--brand)", fontWeight: 600 },
   dot: {
     width: 5,
     height: 5,
@@ -722,9 +701,9 @@ const S = {
     top: 0,
     minWidth: 196,
     background: "#fff",
-    border: "1.5px solid #e8e4f0",
+    border: "1.5px solid #dee1e5",
     borderRadius: 12,
-    boxShadow: "0 8px 28px rgba(100,80,160,.14),0 2px 8px rgba(0,0,0,.06)",
+    boxShadow: "0 8px 28px rgba(21,101,216,.14),0 2px 8px rgba(0,0,0,.06)",
     zIndex: 300,
     overflow: "hidden",
     animation: "flyIn .15s ease",
@@ -736,11 +715,11 @@ const S = {
     padding: "10px 14px 9px",
     fontSize: 13,
     fontWeight: 700,
-    color: "#7c3aed",
+    color: "var(--brand)",
     textTransform: "uppercase",
     letterSpacing: ".6px",
-    borderBottom: "1px solid #e8e4f0",
-    background: "#faf9fc",
+    borderBottom: "1px solid #dee1e5",
+    background: "#f5f6fa",
   },
   flyoutItem: {
     display: "flex",
@@ -752,14 +731,14 @@ const S = {
     transition: "background .1s,color .1s",
     cursor: "pointer",
     fontFamily: "inherit",
-    borderBottom: "1px solid #f0edf8",
+    borderBottom: "1px solid #eef1f5",
   },
   flyoutItemActive: {
-    background: "#ede9fe",
-    color: "#7c3aed",
+    background: "var(--brand-light)",
+    color: "var(--brand)",
     fontWeight: 600,
   },
-  logoutWrap: { borderTop: "1.5px solid #e8e4f0", padding: "10px 10px" },
+  logoutWrap: { borderTop: "1.5px solid #dee1e5", padding: "10px 10px" },
   logoutBtn: {
     display: "flex",
     alignItems: "center",

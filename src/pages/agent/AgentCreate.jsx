@@ -11,7 +11,9 @@ import { AgentIcon } from "../../icons";
 
 const INITIAL = {
   // Basic
-  name: "",
+  firstName: "",
+  middleName: "",
+  lastName: "",
   mobile: "",
   email: "",
   dob: "",
@@ -45,7 +47,11 @@ export default function AgentCreate() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log("Create agent:", form);
+    const name = [form.firstName, form.middleName, form.lastName]
+      .map((s) => s.trim())
+      .filter(Boolean)
+      .join(" ");
+    console.log("Create agent:", { ...form, name });
     navigate("/agent");
   };
 
@@ -53,9 +59,7 @@ export default function AgentCreate() {
     <div>
       <div className="page-header">
         <div className="page-title-row">
-          <div className="page-icon">
-            <AgentIcon />
-          </div>
+          <span className="page-bar" />
           <div>
             <div className="page-title">Add Operator</div>
             <div className="page-subtitle">Register a new operator</div>
@@ -70,15 +74,32 @@ export default function AgentCreate() {
         <div className="card-body">
           <form onSubmit={handleSubmit}>
             <SectionBlock icon={<AgentIcon />} title="Basic Information">
-              <div className="form-grid">
-                <Field label="Full Name" required>
+              <div className="form-grid-3" style={{ marginBottom: 18 }}>
+                <Field label="First Name" required>
                   <Input
-                    placeholder="Enter full name"
-                    value={form.name}
-                    onChange={set("name")}
+                    placeholder="Enter first name"
+                    value={form.firstName}
+                    onChange={set("firstName")}
                     required
                   />
                 </Field>
+                <Field label="Middle Name">
+                  <Input
+                    placeholder="Enter middle name"
+                    value={form.middleName}
+                    onChange={set("middleName")}
+                  />
+                </Field>
+                <Field label="Last Name" required>
+                  <Input
+                    placeholder="Enter last name"
+                    value={form.lastName}
+                    onChange={set("lastName")}
+                    required
+                  />
+                </Field>
+              </div>
+              <div className="form-grid-3" style={{ marginBottom: 18 }}>
                 <Field label="Mobile" required>
                   <Input
                     type="tel"
@@ -97,6 +118,8 @@ export default function AgentCreate() {
                     required
                   />
                 </Field>
+              </div>
+              <div className="form-grid-3">
                 <Field label="Date of Birth" required>
                   <Input
                     type="date"
@@ -122,6 +145,8 @@ export default function AgentCreate() {
                     <option value="">Select operator type</option>
                     <option value="calling">Calling Operator</option>
                     <option value="sales">Sales Operator</option>
+                    <option value="sales-manager">Sales Manager</option>
+                    <option value="leader">Leader</option>
                   </Select>
                 </Field>
               </div>
@@ -169,7 +194,7 @@ export default function AgentCreate() {
               </div>
             </SectionBlock>
 
-            <SectionBlock icon="💼" title="Professional Details">
+            <SectionBlock icon="💼" title="Professional Info">
               <div className="form-grid">
                 <Field label="POS License Number">
                   <Input
@@ -203,7 +228,7 @@ export default function AgentCreate() {
               </div>
             </SectionBlock>
 
-            <SectionBlock icon="🏦" title="Bank Details">
+            <SectionBlock icon="🏦" title="Bank Info">
               <div className="form-grid">
                 <Field label="Account Number">
                   <Input

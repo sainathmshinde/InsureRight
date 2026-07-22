@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
-import { useCustomers } from '../../context/CustomerContext'
+import { useMembers } from '../../context/MemberContext'
 import { KYCIcon } from '../../icons'
 
 const doc = (type, params) =>
@@ -73,7 +73,7 @@ export default function KYCReview() {
   const navigate = useNavigate()
   const cust = MOCK_KYC[id]
 
-  const { updateKycStatus } = useCustomers()
+  const { updateKycStatus } = useMembers()
   const [action, setAction]       = useState(null) // 'approve' | 'reject' | 'done'
   const [rejectReason, setRejectReason] = useState('')
   const [doneAction, setDoneAction]     = useState(null)
@@ -83,8 +83,8 @@ export default function KYCReview() {
       <div style={{ padding: 40, textAlign: 'center', color: 'var(--text-3)' }}>
         <div style={{ fontSize: 40, marginBottom: 12 }}>🔍</div>
         <div style={{ fontSize: 16, fontWeight: 600 }}>KYC record not found</div>
-        <button className="btn btn-ghost" style={{ marginTop: 16 }} onClick={() => navigate('/customer')}>
-          ← Back to Customers
+        <button className="btn btn-ghost" style={{ marginTop: 16 }} onClick={() => navigate('/member')}>
+          ← Back to Members
         </button>
       </div>
     )
@@ -121,10 +121,10 @@ export default function KYCReview() {
             </div>
           )}
           <div style={{ display: 'flex', gap: 10, marginTop: 24, justifyContent: 'center' }}>
-            <button className="btn btn-ghost" onClick={() => navigate('/customer')}>
-              ← Back to Customers
+            <button className="btn btn-ghost" onClick={() => navigate('/member')}>
+              ← Back to Members
             </button>
-            <button className="btn btn-secondary" onClick={() => navigate(`/customer/${id}/360`)}>
+            <button className="btn btn-secondary" onClick={() => navigate(`/member/${id}/360`)}>
               View 360°
             </button>
           </div>
@@ -145,8 +145,8 @@ export default function KYCReview() {
           </div>
         </div>
         <div style={{ display: 'flex', gap: 10 }}>
-          <button className="btn btn-secondary" onClick={() => navigate(`/customer/${id}/360`)}>360° View</button>
-          <button className="btn btn-ghost" onClick={() => navigate('/customer')}>← Back</button>
+          <button className="btn btn-secondary" onClick={() => navigate(`/member/${id}/360`)}>360° View</button>
+          <button className="btn btn-ghost" onClick={() => navigate('/member')}>← Back</button>
         </div>
       </div>
 
@@ -197,7 +197,7 @@ export default function KYCReview() {
       {/* Address */}
       <div className="card" style={{ marginTop: 16 }}>
         <div className="card-body">
-          <div style={S.cardSectionTitle}>📍 Address Details</div>
+          <div style={S.cardSectionTitle}>📍 Address Info</div>
           <div style={S.infoGrid}>
             <InfoRow label="Address" value={cust.address} />
             <InfoRow label="City"    value={cust.city} />
@@ -236,7 +236,7 @@ export default function KYCReview() {
           ) : (
             <div style={S.actionRow}>
               <div style={{ fontSize: 13.5, color: 'var(--text-3)', flex: 1 }}>
-                Carefully review the uploaded documents and customer details before making a decision.
+                Carefully review the uploaded documents and member details before making a decision.
               </div>
               <div style={{ display: 'flex', gap: 12 }}>
                 <button

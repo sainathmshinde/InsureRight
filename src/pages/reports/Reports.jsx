@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { ReportIcon, AgentIcon, CampaignIcon } from "../../icons";
+import { AgentIcon, CampaignIcon } from "../../icons";
 
 const CALLING_AGENTS = [
   { id: 1, name: "Pooja Desai",   campaigns: 3, leadsAssigned: 38, converted: 27, convRate: 71, avgCallsPerLead: 2.4 },
@@ -10,11 +10,11 @@ const CALLING_AGENTS = [
 ];
 
 const SALES_AGENTS = [
-  { id: 1, name: "Ravi Kulkarni",  campaigns: 3, customers: 8,  policiesIssued: 5,  premiumCollected: 42500, avgPremium: 8500 },
-  { id: 2, name: "Priya Nambiar",  campaigns: 2, customers: 11, policiesIssued: 9,  premiumCollected: 78300, avgPremium: 8700 },
-  { id: 3, name: "Deepak Menon",   campaigns: 3, customers: 6,  policiesIssued: 4,  premiumCollected: 31200, avgPremium: 7800 },
-  { id: 4, name: "Anjali Verma",   campaigns: 1, customers: 9,  policiesIssued: 7,  premiumCollected: 63000, avgPremium: 9000 },
-  { id: 5, name: "Sanjay Iyer",    campaigns: 2, customers: 7,  policiesIssued: 5,  premiumCollected: 38500, avgPremium: 7700 },
+  { id: 1, name: "Ravi Kulkarni",  campaigns: 3, members: 8,  policiesIssued: 5,  premiumCollected: 42500, avgPremium: 8500 },
+  { id: 2, name: "Priya Nambiar",  campaigns: 2, members: 11, policiesIssued: 9,  premiumCollected: 78300, avgPremium: 8700 },
+  { id: 3, name: "Deepak Menon",   campaigns: 3, members: 6,  policiesIssued: 4,  premiumCollected: 31200, avgPremium: 7800 },
+  { id: 4, name: "Anjali Verma",   campaigns: 1, members: 9,  policiesIssued: 7,  premiumCollected: 63000, avgPremium: 9000 },
+  { id: 5, name: "Sanjay Iyer",    campaigns: 2, members: 7,  policiesIssued: 5,  premiumCollected: 38500, avgPremium: 7700 },
 ];
 
 const CAMPAIGNS = [
@@ -100,7 +100,7 @@ export default function Reports() {
     <div>
       <div className="page-header">
         <div className="page-title-row">
-          <div className="page-icon"><ReportIcon /></div>
+          <span className="page-bar" />
           <div>
             <div className="page-title">Reports</div>
             <div className="page-subtitle">Operator performance and campaign analytics</div>
@@ -219,7 +219,7 @@ export default function Reports() {
             <div className="rp-kpi-grid" style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 14, marginBottom: 22 }}>
               {[
                 { label: "Total Sales Operators",     value: SALES_AGENTS.length,                                                                                     color: "#7c3aed", bg: "#f5f3ff" },
-                { label: "Total Customers",        value: SALES_AGENTS.reduce((s,a)=>s+a.customers,0),                                                             color: "#0a7ea4", bg: "#e0f4fb" },
+                { label: "Total Members",        value: SALES_AGENTS.reduce((s,a)=>s+a.members,0),                                                             color: "#0a7ea4", bg: "#e0f4fb" },
                 { label: "Policies Issued",        value: SALES_AGENTS.reduce((s,a)=>s+a.policiesIssued,0),                                                        color: "#2d7d46", bg: "#e6f4ea" },
                 { label: "Total Premium (₹)",      value: "₹" + SALES_AGENTS.reduce((s,a)=>s+a.premiumCollected,0).toLocaleString("en-IN"),                        color: "#a05c00", bg: "#fff3e0" },
               ].map(k => (
@@ -239,7 +239,7 @@ export default function Reports() {
                     <span style={{ fontSize: 13, color: "var(--text-3)" }}>{a.campaigns} campaign{a.campaigns !== 1 ? "s" : ""}</span>
                   </div>
                   <div style={{ display: "grid", gridTemplateColumns: "repeat(2,1fr)", gap: 8, fontSize: 12 }}>
-                    <div><div style={{ color: "var(--text-3)", marginBottom: 2 }}>Customers</div><div style={{ fontWeight: 700 }}>{a.customers}</div></div>
+                    <div><div style={{ color: "var(--text-3)", marginBottom: 2 }}>Members</div><div style={{ fontWeight: 700 }}>{a.members}</div></div>
                     <div><div style={{ color: "var(--text-3)", marginBottom: 2 }}>Policies</div><div style={{ fontWeight: 700, color: "#2d7d46" }}>{a.policiesIssued}</div></div>
                     <div><div style={{ color: "var(--text-3)", marginBottom: 2 }}>Premium</div><div style={{ fontWeight: 700, color: "#a05c00" }}>₹{a.premiumCollected.toLocaleString("en-IN")}</div></div>
                     <div><div style={{ color: "var(--text-3)", marginBottom: 2 }}>Avg Premium</div><div style={{ fontWeight: 700 }}>₹{a.avgPremium.toLocaleString("en-IN")}</div></div>
@@ -256,7 +256,7 @@ export default function Reports() {
                     <th>#</th>
                     <th>Operator Name</th>
                     <th>Campaigns</th>
-                    <th>Customers</th>
+                    <th>Members</th>
                     <th>Policies Issued</th>
                     <th>Premium Collected (₹)</th>
                     <th>Avg Premium (₹)</th>
@@ -268,7 +268,7 @@ export default function Reports() {
                       <td style={{ color: "var(--text-3)" }}>{i + 1}</td>
                       <td style={{ fontWeight: 600 }}>{a.name}</td>
                       <td>{a.campaigns}</td>
-                      <td>{a.customers}</td>
+                      <td>{a.members}</td>
                       <td style={{ fontWeight: 600, color: "#2d7d46" }}>{a.policiesIssued}</td>
                       <td style={{ fontWeight: 700, color: "#a05c00" }}>₹{a.premiumCollected.toLocaleString("en-IN")}</td>
                       <td style={{ color: "var(--text-2)" }}>₹{a.avgPremium.toLocaleString("en-IN")}</td>

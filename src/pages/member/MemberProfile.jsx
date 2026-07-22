@@ -1,10 +1,10 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../../context/AuthContext'
-import { useCustomers } from '../../context/CustomerContext'
+import { useMembers } from '../../context/MemberContext'
 import { UserIcon } from '../../icons'
 import { TYPE_ICON } from './FamilyMembersSection'
-import { MOCK, DOCS, PERSONAL, DocCard } from './Customer360'
+import { MOCK, DOCS, PERSONAL, DocCard } from './Member360'
 import { ORGANISATIONS, ASSOCIATIONS } from './orgAssocData'
 
 function calcAge(dob) {
@@ -20,19 +20,19 @@ const KYC_CONFIG = {
   Pending:  { badge: 'badge-amber', icon: '⏳', label: 'KYC Pending Review', bannerBg: '#fffbeb', bannerBorder: '#fcd34d', textColor: '#92400e', descColor: '#b45309', desc: 'Documents submitted and awaiting verification.' },
 }
 
-export default function CustomerProfile() {
+export default function MemberProfile() {
   const navigate = useNavigate()
   const { user } = useAuth()
-  const { customers } = useCustomers()
+  const { members } = useMembers()
   const [tab, setTab] = useState(0)
 
   if (!user) return null
 
-  const contextCustomer = customers.find(c => c.email === user.email)
-  const kycStatus = contextCustomer?.kyc ?? 'Pending'
+  const contextMember = members.find(c => c.email === user.email)
+  const kycStatus = contextMember?.kyc ?? 'Pending'
   const kyc = KYC_CONFIG[kycStatus] ?? KYC_CONFIG.Pending
 
-  // Find matching Customer 360 data by name
+  // Find matching Member 360 data by name
   const mockId = Object.keys(MOCK).find(k => MOCK[k].name === user.name)
   const c = mockId ? MOCK[mockId] : null
 
@@ -151,7 +151,7 @@ export default function CustomerProfile() {
               <div>
                 <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fill, minmax(340px, 1fr))', gap:20 }}>
                   {docs.aadhaar
-                    ? <DocCard type="aadhaar" data={docs.aadhaar} customerName={user.name} />
+                    ? <DocCard type="aadhaar" data={docs.aadhaar} memberName={user.name} />
                     : (
                       <div style={{ border:'1.5px dashed var(--border)', borderRadius:'var(--r-lg)', padding:'40px 24px', textAlign:'center', color:'var(--text-3)' }}>
                         <div style={{ fontSize:36, marginBottom:10 }}>🪪</div>
@@ -161,7 +161,7 @@ export default function CustomerProfile() {
                     )
                   }
                   {docs.pan
-                    ? <DocCard type="pan" data={docs.pan} customerName={user.name} />
+                    ? <DocCard type="pan" data={docs.pan} memberName={user.name} />
                     : (
                       <div style={{ border:'1.5px dashed var(--border)', borderRadius:'var(--r-lg)', padding:'40px 24px', textAlign:'center', color:'var(--text-3)' }}>
                         <div style={{ fontSize:36, marginBottom:10 }}>💳</div>

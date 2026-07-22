@@ -17,16 +17,16 @@ const PAYMENT_TYPES = ['Cheque', 'NEFT', 'UPI', 'Gateway', 'Unknown']
 
 // Mock records used to derive preview count and CSV rows
 const MOCK_RECORDS = [
-  { id: 'PAY-2026-001', customer: 'Aarav Sharma',   policy: 'POL-2026-1001', product: 'Star Comprehensive Health',    campaignId: 11, campaignName: 'BPP Campaign_2026-2027',  method: 'Cheque',  amount: 18500, date: '2026-04-12', status: 'Pending payment',    reference: 'CHQ-004521'        },
-  { id: 'PAY-2026-002', customer: 'Priya Mehta',    policy: 'POL-2026-1002', product: 'HDFC ERGO Optima Secure',      campaignId: 11, campaignName: 'BPP Campaign_2026-2027',  method: 'NEFT',    amount: 24200, date: '2026-04-14', status: 'Pending payment',  reference: 'NEFT240412001823'  },
-  { id: 'PAY-2026-003', customer: 'Rohan Verma',    policy: 'POL-2026-1003', product: 'Bajaj Allianz Health Guard',   campaignId: 6,  campaignName: 'BPP Campaign',            method: 'Cheque',  amount: 12800, date: '2026-04-15', status: 'Payment Failed',   reference: 'CHQ-009832'        },
-  { id: 'PAY-2026-004', customer: 'Sneha Iyer',     policy: 'POL-2026-1004', product: 'Star Comprehensive Health',    campaignId: 8,  campaignName: 'SBI_STP_Campaign',        method: 'UPI',     amount: 52000, date: '2026-04-15', status: 'Payment received (completed)',  reference: 'UPI240415002711'   },
-  { id: 'PAY-2026-005', customer: 'Rahul Gupta',    policy: 'POL-2026-1005', product: 'Bajaj Allianz Comprehensive',  campaignId: 1,  campaignName: 'Campaign 1',              method: 'Gateway', amount: 9500,  date: '2026-04-16', status: 'Pending payment',  reference: 'GTW240416008842'   },
-  { id: 'PAY-2026-006', customer: 'Kavita Pillai',  policy: 'POL-2026-1006', product: 'HDFC ERGO Optima Secure',      campaignId: 11, campaignName: 'BPP Campaign_2026-2027',  method: 'Cheque',  amount: 31000, date: '2026-04-17', status: 'Payment Failed',   reference: 'CHQ-012203'        },
-  { id: 'PAY-2026-007', customer: 'Vikram Rao',     policy: 'POL-2026-1007', product: 'Star Comprehensive Health',    campaignId: 8,  campaignName: 'SBI_STP_Campaign',        method: 'NEFT',    amount: 16750, date: '2026-04-18', status: 'Payment Failed',     reference: 'NEFT240418003512'  },
-  { id: 'PAY-2026-008', customer: 'Divya Nair',     policy: 'POL-2026-1008', product: 'Bajaj Allianz Health Guard',   campaignId: 6,  campaignName: 'BPP Campaign',            method: 'Unknown', amount: 8200,  date: '2026-04-20', status: 'Pending payment',    reference: '—'                 },
-  { id: 'PAY-2026-009', customer: 'Arjun Singh',    policy: 'POL-2026-1009', product: 'HDFC ERGO Optima Secure',      campaignId: 1,  campaignName: 'Campaign 1',              method: 'Cheque',  amount: 44500, date: '2026-04-21', status: 'Pending payment',    reference: 'CHQ-019882'        },
-  { id: 'PAY-2026-010', customer: 'Meera Joshi',    policy: 'POL-2026-1010', product: 'Star Comprehensive Health',    campaignId: 12, campaignName: 'Standalone campaign',     method: 'Gateway', amount: 67000, date: '2026-04-22', status: 'Pending payment', reference: '—'                 },
+  { id: 'PAY-2026-001', member: 'Aarav Sharma',   policy: 'POL-2026-1001', product: 'Star Comprehensive Health',    campaignId: 11, campaignName: 'BPP Campaign_2026-2027',  method: 'Cheque',  amount: 18500, date: '2026-04-12', status: 'Pending payment',    reference: 'CHQ-004521'        },
+  { id: 'PAY-2026-002', member: 'Priya Mehta',    policy: 'POL-2026-1002', product: 'HDFC ERGO Optima Secure',      campaignId: 11, campaignName: 'BPP Campaign_2026-2027',  method: 'NEFT',    amount: 24200, date: '2026-04-14', status: 'Pending payment',  reference: 'NEFT240412001823'  },
+  { id: 'PAY-2026-003', member: 'Rohan Verma',    policy: 'POL-2026-1003', product: 'Bajaj Allianz Health Guard',   campaignId: 6,  campaignName: 'BPP Campaign',            method: 'Cheque',  amount: 12800, date: '2026-04-15', status: 'Payment Failed',   reference: 'CHQ-009832'        },
+  { id: 'PAY-2026-004', member: 'Sneha Iyer',     policy: 'POL-2026-1004', product: 'Star Comprehensive Health',    campaignId: 8,  campaignName: 'SBI_STP_Campaign',        method: 'UPI',     amount: 52000, date: '2026-04-15', status: 'Payment received (completed)',  reference: 'UPI240415002711'   },
+  { id: 'PAY-2026-005', member: 'Rahul Gupta',    policy: 'POL-2026-1005', product: 'Bajaj Allianz Comprehensive',  campaignId: 1,  campaignName: 'Campaign 1',              method: 'Gateway', amount: 9500,  date: '2026-04-16', status: 'Pending payment',  reference: 'GTW240416008842'   },
+  { id: 'PAY-2026-006', member: 'Kavita Pillai',  policy: 'POL-2026-1006', product: 'HDFC ERGO Optima Secure',      campaignId: 11, campaignName: 'BPP Campaign_2026-2027',  method: 'Cheque',  amount: 31000, date: '2026-04-17', status: 'Payment Failed',   reference: 'CHQ-012203'        },
+  { id: 'PAY-2026-007', member: 'Vikram Rao',     policy: 'POL-2026-1007', product: 'Star Comprehensive Health',    campaignId: 8,  campaignName: 'SBI_STP_Campaign',        method: 'NEFT',    amount: 16750, date: '2026-04-18', status: 'Payment Failed',     reference: 'NEFT240418003512'  },
+  { id: 'PAY-2026-008', member: 'Divya Nair',     policy: 'POL-2026-1008', product: 'Bajaj Allianz Health Guard',   campaignId: 6,  campaignName: 'BPP Campaign',            method: 'Unknown', amount: 8200,  date: '2026-04-20', status: 'Pending payment',    reference: '—'                 },
+  { id: 'PAY-2026-009', member: 'Arjun Singh',    policy: 'POL-2026-1009', product: 'HDFC ERGO Optima Secure',      campaignId: 1,  campaignName: 'Campaign 1',              method: 'Cheque',  amount: 44500, date: '2026-04-21', status: 'Pending payment',    reference: 'CHQ-019882'        },
+  { id: 'PAY-2026-010', member: 'Meera Joshi',    policy: 'POL-2026-1010', product: 'Star Comprehensive Health',    campaignId: 12, campaignName: 'Standalone campaign',     method: 'Gateway', amount: 67000, date: '2026-04-22', status: 'Pending payment', reference: '—'                 },
 ]
 
 function applyFilters(records, campaign, paymentType, paymentStatus) {
@@ -40,11 +40,11 @@ function applyFilters(records, campaign, paymentType, paymentStatus) {
 
 function buildCSV(records) {
   const headers = [
-    'Payment ID', 'Customer Name', 'Product',
+    'Payment ID', 'Member Name', 'Product',
     'Campaign', 'Payment Method', 'Amount (INR)', 'Date', 'Status', 'Reference / Cheque No',
   ]
   const rows = records.map(r => [
-    r.id, r.customer, r.product,
+    r.id, r.member, r.product,
     r.campaignName, r.method, r.amount, r.date, r.status, r.reference,
   ])
   return [headers, ...rows]
@@ -95,12 +95,13 @@ export default function ExtractPayments() {
     <div>
       <PageHeader
         icon={<DownloadPolicyIcon />}
-        title="Extract Customer & Payments"
+        title="Extract Member & Payments"
         subtitle="Filter and download offline payment data as an Excel file"
       />
 
-      <div className="card" style={{ maxWidth: 680, margin: '0 auto' }}>
+      <div className="card">
         <div className="card-body">
+        <div style={{ maxWidth: 480 }}>
 
           <div style={{ fontWeight: 700, fontSize: 15, marginBottom: 4 }}>Select Filters</div>
           <div style={{ fontSize: 13, color: '#64748b', marginBottom: 22 }}>
@@ -164,7 +165,7 @@ export default function ExtractPayments() {
             style={{
               display: 'flex', alignItems: 'center', gap: 10,
               padding: '12px 28px', borderRadius: 10, border: 'none',
-              background: preview.length === 0 ? '#e5e7eb' : 'linear-gradient(135deg,#fb7185 0%,#a855f7 100%)',
+              background: preview.length === 0 ? '#e5e7eb' : 'linear-gradient(180deg,#1565d8 0%,#104ea6 100%)',
               color: preview.length === 0 ? '#9ca3af' : '#fff',
               fontWeight: 700, fontSize: 15, cursor: preview.length === 0 ? 'not-allowed' : 'pointer',
               fontFamily: 'inherit', transition: 'opacity .15s', width: '100%', justifyContent: 'center',
@@ -205,6 +206,7 @@ export default function ExtractPayments() {
             </div>
           )}
 
+        </div>
         </div>
       </div>
     </div>

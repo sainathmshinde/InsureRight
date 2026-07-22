@@ -21,6 +21,14 @@ function authUserToAgent(u) {
   };
 }
 
+function splitName(full) {
+  const parts = (full || "").trim().split(/\s+/).filter(Boolean);
+  if (parts.length === 0) return { firstName: "", middleName: "", lastName: "" };
+  if (parts.length === 1) return { firstName: parts[0], middleName: "", lastName: "" };
+  if (parts.length === 2) return { firstName: parts[0], middleName: "", lastName: parts[1] };
+  return { firstName: parts[0], middleName: parts.slice(1, -1).join(" "), lastName: parts[parts.length - 1] };
+}
+
 export default function AgentEdit() {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -38,12 +46,15 @@ export default function AgentEdit() {
   const initial = isProfile
     ? {
         ...profileAgent,
-        name: user?.name || profileAgent?.name || "",
+        ...splitName(user?.name || profileAgent?.name || ""),
         mobile: user?.phone || profileAgent?.mobile || "",
         email: user?.email || profileAgent?.email || "",
         assignedBroker: user?.company || profileAgent?.assignedBroker || "",
       }
-    : (AGENT_MAP[Number(id)] ?? {});
+    : {
+        ...(AGENT_MAP[Number(id)] ?? {}),
+        ...splitName(AGENT_MAP[Number(id)]?.name || ""),
+      };
   const [form, setForm] = useState(initial);
   const set = (f) => (e) => setForm((p) => ({ ...p, [f]: e.target.value }));
   const setF = (f) => (e) =>
@@ -51,7 +62,11 @@ export default function AgentEdit() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log(isProfile ? "Update agent profile:" : "Update agent:", form);
+    const name = [form.firstName, form.middleName, form.lastName]
+      .map((s) => (s || "").trim())
+      .filter(Boolean)
+      .join(" ");
+    console.log(isProfile ? "Update agent profile:" : "Update agent:", { ...form, name });
     navigate(isProfile ? "/profile" : "/agent");
   };
 
@@ -95,14 +110,29 @@ export default function AgentEdit() {
         <div className="card-body">
           <form onSubmit={handleSubmit}>
             <SectionBlock icon={<AgentIcon />} title="Basic Information">
-              <div className="form-grid">
-                <Field label="Full Name" required>
+              <div className="form-grid-3" style={{ marginBottom: 18 }}>
+                <Field label="First Name" required>
                   <Input
-                    value={form.name || ""}
-                    onChange={set("name")}
+                    value={form.firstName || ""}
+                    onChange={set("firstName")}
                     required
                   />
                 </Field>
+                <Field label="Middle Name">
+                  <Input
+                    value={form.middleName || ""}
+                    onChange={set("middleName")}
+                  />
+                </Field>
+                <Field label="Last Name" required>
+                  <Input
+                    value={form.lastName || ""}
+                    onChange={set("lastName")}
+                    required
+                  />
+                </Field>
+              </div>
+              <div className="form-grid-3" style={{ marginBottom: 18 }}>
                 <Field label="Mobile" required>
                   <Input
                     type="tel"
@@ -119,6 +149,8 @@ export default function AgentEdit() {
                     required
                   />
                 </Field>
+              </div>
+              <div className="form-grid-3">
                 <Field label="Date of Birth">
                   <Input
                     type="date"
@@ -143,6 +175,8 @@ export default function AgentEdit() {
                     <option value="">Select operator type</option>
                     <option value="calling">Calling Operator</option>
                     <option value="sales">Sales Operator</option>
+                    <option value="sales-manager">Sales Manager</option>
+                    <option value="leader">Leader</option>
                   </Select>
                 </Field>
               </div>
@@ -191,7 +225,7 @@ export default function AgentEdit() {
               </div>
             </SectionBlock>
 
-            <SectionBlock icon="💼" title="Professional Details">
+            <SectionBlock icon="💼" title="Professional Info">
               <div className="form-grid">
                 <Field label="POS License Number">
                   <Input
@@ -222,7 +256,7 @@ export default function AgentEdit() {
               </div>
             </SectionBlock>
 
-            <SectionBlock icon="🏦" title="Bank Details">
+            <SectionBlock icon="🏦" title="Bank Info">
               <div className="form-grid">
                 <Field label="Account Number">
                   <Input

@@ -1,8 +1,8 @@
-export function PageHeader({ icon, title, subtitle, children }) {
+export function PageHeader({ title, subtitle, children }) {
   return (
     <div className="page-header">
       <div className="page-title-row">
-        <div className="page-icon">{icon}</div>
+        <span className="page-bar" />
         <div>
           <div className="page-title">{title}</div>
           {subtitle && <div className="page-subtitle">{subtitle}</div>}

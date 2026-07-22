@@ -21,7 +21,7 @@ export function Table({ columns, rows, empty, rowKey = 'id', stickyHeader = fals
                 style={{
                   ...(col.width ? { width: col.width } : {}),
                   ...col.headerStyle,
-                  ...(stickyHeader ? { position: 'sticky', top: 0, zIndex: 2, background: 'var(--card-bg, #fff)', borderBottom: '2px solid var(--border)' } : {}),
+                  ...(stickyHeader ? { position: 'sticky', top: 0, zIndex: 2, background: 'var(--surface-2)', borderBottom: '2px solid var(--border)' } : {}),
                 }}
               >
                 {col.label}

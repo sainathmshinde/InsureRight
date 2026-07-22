@@ -86,53 +86,56 @@ export default function ProductList() {
 
                 return (
                   <div key={p.id} style={{
-                    borderRadius: 14, overflow: 'hidden', background: '#fff',
-                    border: '1.5px solid #e2e8f0',
-                    boxShadow: '0 1px 6px rgba(0,0,0,.06)',
+                    borderRadius: 6, overflow: 'hidden', background: '#fff',
+                    border: '1px solid #dee1e5',
+                    boxShadow: '0 1px 4.5px rgba(193,197,212,.27)',
                     display: 'flex', flexDirection: 'column',
-                    transition: 'box-shadow .15s',
                   }}>
-                    {/* Top accent */}
-                    <div style={{ height: 4, background: `linear-gradient(90deg,${tc.color},${tc.color}88)` }} />
+
+                    {/* Header strip */}
+                    <div style={{ background: '#f5f7f9', padding: '16px 16px 0' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                        <span style={{ flex: 1, fontSize: 18, fontWeight: 700, color: tc.color, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                          {p.provider}
+                        </span>
+                        <span style={{ fontSize: 20, flexShrink: 0 }}>{icon}</span>
+                      </div>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap', marginTop: 6, paddingBottom: 12 }}>
+                        <span style={{ fontSize: 10.5, fontWeight: 700, color: '#6d747a' }}>{p.policyType}</span>
+                        <span style={{ fontSize: 10.5, fontFamily: 'monospace', color: '#94a3b8' }}>· {p.code}</span>
+                        <span style={{ fontSize: 10.5, fontWeight: 700, color: '#15803d' }}>● Active</span>
+                      </div>
+                    </div>
 
                     {/* Body */}
-                    <div style={{ padding: '14px 16px', flex: 1, display: 'flex', flexDirection: 'column', gap: 12 }}>
-
-                      {/* Provider + type row */}
-                      <div style={{ display: 'flex', alignItems: 'flex-start', gap: 10 }}>
-                        <div style={{ width: 40, height: 40, borderRadius: 10, background: tc.bg, border: `1.5px solid ${tc.border}`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 20, flexShrink: 0 }}>{icon}</div>
-                        <div style={{ flex: 1, minWidth: 0 }}>
-                          <div style={{ fontSize: 13, fontWeight: 700, color: tc.color, letterSpacing: '.2px', marginBottom: 4, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{p.provider}</div>
-                          <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap' }}>
-                            <span style={{ fontSize: 10.5, fontWeight: 700, background: tc.bg, color: tc.color, border: `1px solid ${tc.border}`, borderRadius: 4, padding: '1px 7px' }}>{p.policyType}</span>
-                            <span style={{ fontSize: 10.5, fontFamily: 'monospace', color: '#94a3b8' }}>{p.code}</span>
-                            <span style={{ fontSize: 10.5, fontWeight: 700, color: '#15803d' }}>● Active</span>
-                          </div>
-                        </div>
-                      </div>
+                    <div style={{ padding: 16, flex: 1, display: 'flex', flexDirection: 'column', gap: 16 }}>
 
                       {/* Product name */}
-                      <div style={{ fontWeight: 800, fontSize: 14, color: '#1e293b', lineHeight: 1.4, letterSpacing: '-.1px' }}>{p.name}</div>
+                      <div style={{ fontWeight: 600, fontSize: 18, color: '#24304a', letterSpacing: '-.18px' }}>{p.name}</div>
 
                       {/* Metrics */}
-                      <div style={{ display: 'flex', gap: 8 }}>
+                      <div style={{ display: 'flex', gap: 24 }}>
                         {uniqueSIs.length > 0 && (
-                          <div style={{ flex: 1, background: '#f8fafc', borderRadius: 8, padding: '8px 10px', border: '1px solid #e2e8f0' }}>
-                            <div style={{ fontSize: 12, fontWeight: 700, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '.5px', marginBottom: 3 }}>Sum Insured</div>
-                            <div style={{ fontSize: 13, fontWeight: 700, color: '#1e293b' }}>
+                          <div style={{ flex: 1, minWidth: 0 }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 6 }}>
+                              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#00c851" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12" /></svg>
+                              <span style={{ fontSize: 12, fontWeight: 500, color: '#6d747a', textTransform: 'uppercase', letterSpacing: '.6px' }}>Sum Insured</span>
+                            </div>
+                            <div style={{ fontSize: 18, fontWeight: 600, color: '#24304a', letterSpacing: '-.18px' }}>
                               {fmtSI(Math.min(...uniqueSIs))}{uniqueSIs.length > 1 && ` – ${fmtSI(Math.max(...uniqueSIs))}`}
                             </div>
                           </div>
                         )}
-                        {minPremium ? (
-                          <div style={{ flex: 1, background: tc.bg, borderRadius: 8, padding: '8px 10px', border: `1px solid ${tc.border}` }}>
-                            <div style={{ fontSize: 12, fontWeight: 700, color: tc.color, textTransform: 'uppercase', letterSpacing: '.5px', marginBottom: 3, opacity: .8 }}>Starts From</div>
-                            <div style={{ fontSize: 13, fontWeight: 800, color: tc.color }}>₹{minPremium.toLocaleString('en-IN')}<span style={{ fontSize: 10, fontWeight: 600 }}>/yr</span></div>
-                          </div>
-                        ) : (
-                          <div style={{ flex: 1, background: '#f8fafc', borderRadius: 8, padding: '8px 10px', border: '1px solid #e2e8f0' }}>
-                            <div style={{ fontSize: 12, fontWeight: 700, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '.5px', marginBottom: 3 }}>Premium</div>
-                            <div style={{ fontSize: 12, fontWeight: 600, color: '#94a3b8' }}>On request</div>
+                        {minPremium && (
+                          <div style={{ flex: 1, minWidth: 0 }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 6 }}>
+                              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#6d747a" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="9" /><path d="M12 7v10M9 9.5c0-1 .9-1.5 2-1.5s2.5.5 2.5 1.7c0 1.9-4.5 1.2-4.5 3.4 0 1.2 1.4 1.9 2.5 1.9s2-.6 2-1.6" /></svg>
+                              <span style={{ fontSize: 12, fontWeight: 500, color: '#6d747a', textTransform: 'uppercase', letterSpacing: '.6px' }}>Starts From</span>
+                            </div>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                              <span style={{ fontSize: 18, fontWeight: 600, color: '#24304a', letterSpacing: '-.18px' }}>₹ {minPremium.toLocaleString('en-IN')}</span>
+                              <span style={{ fontSize: 14, color: '#6d747a' }}>/yr</span>
+                            </div>
                           </div>
                         )}
                       </div>
@@ -140,30 +143,23 @@ export default function ProductList() {
                       {/* Coverage chips */}
                       {covKeys.length > 0 && (
                         <div style={{ display: 'flex', gap: 5, flexWrap: 'wrap' }}>
-                          {covKeys.includes('selfOnly')            && <span style={{ fontSize: 13, fontWeight: 600, background: '#fff', border: '1px solid #e2e8f0', borderRadius: 20, padding: '3px 10px', color: '#475569' }}>👤 Self</span>}
-                          {covKeys.includes('selfSpouse')          && <span style={{ fontSize: 13, fontWeight: 600, background: '#fff', border: '1px solid #e2e8f0', borderRadius: 20, padding: '3px 10px', color: '#475569' }}>👫 Self + Spouse</span>}
-                          {covKeys.includes('selfSpouse2Children') && <span style={{ fontSize: 13, fontWeight: 600, background: '#fff', border: '1px solid #e2e8f0', borderRadius: 20, padding: '3px 10px', color: '#475569' }}>👨‍👩‍👧 Family</span>}
+                          {covKeys.includes('selfOnly')            && <span style={{ fontSize: 13, fontWeight: 500, background: '#fff', border: '1px solid #dee1e5', borderRadius: 20, padding: '3px 10px', color: '#6d747a' }}>Self</span>}
+                          {covKeys.includes('selfSpouse')          && <span style={{ fontSize: 13, fontWeight: 500, background: '#fff', border: '1px solid #dee1e5', borderRadius: 20, padding: '3px 10px', color: '#6d747a' }}>Self + Spouse</span>}
+                          {covKeys.includes('selfSpouse2Children') && <span style={{ fontSize: 13, fontWeight: 500, background: '#fff', border: '1px solid #dee1e5', borderRadius: 20, padding: '3px 10px', color: '#6d747a' }}>Family</span>}
                         </div>
                       )}
-                    </div>
 
-                    {/* Footer */}
-                    <div style={{ padding: '10px 16px', borderTop: '1px solid #f1f5f9', background: '#fafafa', display: 'flex', justifyContent: 'flex-end' }}>
-                      <button
-                        type="button"
-                        onClick={() => navigate(`/product/${p.id}/edit`)}
-                        style={{
-                          padding: '6px 18px', borderRadius: 7, border: `1.5px solid ${tc.color}`,
-                          background: '#fff', color: tc.color, fontWeight: 700, fontSize: 13.5,
-                          cursor: 'pointer', fontFamily: 'inherit', transition: 'all .15s',
-                          display: 'inline-flex', alignItems: 'center', gap: 6,
-                        }}
-                        onMouseEnter={e => { e.currentTarget.style.background = tc.bg }}
-                        onMouseLeave={e => { e.currentTarget.style.background = '#fff' }}
-                      >
-                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"/></svg>
-                        Edit Product
-                      </button>
+                      {/* Footer */}
+                      <div style={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', gap: 2, paddingTop: 4, marginTop: 'auto' }}>
+                        <button
+                          type="button"
+                          onClick={() => navigate(`/product/${p.id}/edit`)}
+                          style={{ fontSize: 15, fontWeight: 600, border: 'none', color: '#3b5bfd', background: 'transparent', padding: 0, cursor: 'pointer', fontFamily: 'inherit', display: 'flex', alignItems: 'center', gap: 5 }}
+                        >
+                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#3b5bfd" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"/></svg>
+                          Edit Product
+                        </button>
+                      </div>
                     </div>
                   </div>
                 )

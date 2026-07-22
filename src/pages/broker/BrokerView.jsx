@@ -4,7 +4,7 @@ import { useAuth } from '../../context/AuthContext'
 import { BrokerIcon } from '../../icons'
 import { BROKER_MAP } from './brokerData'
 
-const tabs = ['Basic Info', 'KYC', 'Contact & Address', 'Bank Details', 'Agreement']
+const tabs = ['Basic Info', 'KYC', 'Contact & Address', 'Bank Info', 'Agreement']
 
 function Row({ label, value }) {
   return (

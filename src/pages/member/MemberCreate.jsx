@@ -7,12 +7,12 @@ import {
   UploadBox,
   SectionBlock,
 } from "../../components/Field";
-import { CustomerIcon } from "../../icons";
-import FamilyMembersSection from "./FamilyMembersSection";
+import { MemberIcon } from "../../icons";
 import { ORGANISATIONS, ASSOCIATIONS } from "./orgAssocData";
 
 const INITIAL = {
   firstName: "",
+  middleName: "",
   lastName: "",
   empId: "",
   mobile: "",
@@ -24,21 +24,19 @@ const INITIAL = {
   photoFile: null,
   aadhaarFile: null,
   panFile: null,
-  address: "",
+  address1: "",
+  address2: "",
   city: "",
   state: "",
   pincode: "",
-  members: [],
-  nomineeName: "",
-  nomineeRelation: "",
-  nomineeShare: "100",
+  country: "India",
 };
 
 const MOCK_OCR = {
   aadhaar: {
     firstName: "Rajesh", lastName: "Kumar",
     dob: "1988-04-12", gender: "Male",
-    address: "24, Shivaji Park, Dadar", city: "Mumbai", state: "Maharashtra", pincode: "400028",
+    address1: "24, Shivaji Park, Dadar", city: "Mumbai", state: "Maharashtra", pincode: "400028",
   },
   pan: {
     firstName: "Rajesh", lastName: "Kumar",
@@ -46,10 +44,9 @@ const MOCK_OCR = {
   },
 };
 
-export default function CustomerCreate() {
+export default function MemberCreate() {
   const navigate = useNavigate();
   const [form, setForm] = useState(INITIAL);
-  const [members, setMembers] = useState([]);
   const [kycFetching, setKycFetching] = useState(null);
   const [kycFetched, setKycFetched] = useState(null);
 
@@ -80,25 +77,27 @@ export default function CustomerCreate() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log("Create customer:", { ...form, members });
-    navigate("/customer");
+    const name = [form.firstName, form.middleName, form.lastName]
+      .map((s) => s.trim())
+      .filter(Boolean)
+      .join(" ");
+    console.log("Create member:", { ...form, name });
+    navigate("/member");
   };
 
   return (
     <div>
       <div className="page-header">
         <div className="page-title-row">
-          <div className="page-icon">
-            <CustomerIcon />
-          </div>
+          <span className="page-bar" />
           <div>
-            <div className="page-title">Add Customer</div>
+            <div className="page-title">Add Member</div>
             <div className="page-subtitle">
-              Onboard a new customer with KYC and family details
+              Onboard a new member with KYC and family details
             </div>
           </div>
         </div>
-        <button className="btn btn-ghost" onClick={() => navigate("/customer")}>
+        <button className="btn btn-ghost" onClick={() => navigate("/member")}>
           ← Back
         </button>
       </div>
@@ -114,14 +113,14 @@ export default function CustomerCreate() {
                   padding: '10px 14px', marginBottom: 16, display: 'flex', alignItems: 'center', gap: 8,
                   fontSize: 13.5, color: '#166534',
                 }}>
-                  ✅ Details auto-filled from {kycFetched === 'aadhaar' ? 'Aadhaar' : 'PAN'} — please review and confirm below.
+                  ✅ Info auto-filled from {kycFetched === 'aadhaar' ? 'Aadhaar' : 'PAN'} — please review and confirm below.
                 </div>
               )}
-              <div className="form-grid">
-                <Field label="Upload Aadhaar (Auto fetch details)">
+              <div className="form-grid-3">
+                <Field label="Upload Aadhaar (Auto fetch info)">
                   <UploadBox
                     label="Upload Aadhaar card"
-                    hint="JPG, PNG or PDF — details auto-filled"
+                    hint="JPG, PNG or PDF — info auto-filled"
                     onChange={setF("aadhaarFile")}
                   />
                   {form.aadhaarFile && (
@@ -132,7 +131,7 @@ export default function CustomerCreate() {
                       onClick={() => fetchFromDoc('aadhaar')}
                       disabled={kycFetching !== null}
                     >
-                      {kycFetching === 'aadhaar' ? '⏳ Fetching details…' : '🔍 Get Details from Aadhaar'}
+                      {kycFetching === 'aadhaar' ? '⏳ Fetching info…' : '🔍 Get Info from Aadhaar'}
                     </button>
                   )}
                 </Field>
@@ -158,7 +157,7 @@ export default function CustomerCreate() {
             </SectionBlock>
 
             {/* Basic Info */}
-            <SectionBlock icon={<CustomerIcon />} title="Basic Information">
+            <SectionBlock icon={<MemberIcon />} title="Basic Information">
               {/* Photo upload */}
               <div style={{ display: 'flex', alignItems: 'center', gap: 20, paddingBottom: 18, borderBottom: '1px solid var(--border)', marginBottom: 18 }}>
                 <div style={{
@@ -167,7 +166,7 @@ export default function CustomerCreate() {
                   display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden',
                 }}>
                   {photoPreview
-                    ? <img src={photoPreview} alt="Customer" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                    ? <img src={photoPreview} alt="Member" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                     : <span style={{ fontSize: 38, lineHeight: 1 }}>👤</span>
                   }
                 </div>
@@ -188,13 +187,20 @@ export default function CustomerCreate() {
                   <div style={{ fontSize: 12, color: 'var(--text-3)', marginTop: 6 }}>JPG or PNG · Max 2 MB</div>
                 </div>
               </div>
-              <div className="form-grid">
+              <div className="form-grid-3" style={{ marginBottom: 18 }}>
                 <Field label="First Name" required>
                   <Input
                     placeholder="First name"
                     value={form.firstName}
                     onChange={set("firstName")}
                     required
+                  />
+                </Field>
+                <Field label="Middle Name">
+                  <Input
+                    placeholder="Middle name"
+                    value={form.middleName}
+                    onChange={set("middleName")}
                   />
                 </Field>
                 <Field label="Last Name" required>
@@ -205,14 +211,9 @@ export default function CustomerCreate() {
                     required
                   />
                 </Field>
-                <Field label="EMP ID / PF No.">
-                  <Input
-                    placeholder="e.g. EMP-001 or PF123456"
-                    value={form.empId}
-                    onChange={set("empId")}
-                  />
-                </Field>
-                <Field label="Mobile" required style={{ gridColumnStart: 1 }}>
+              </div>
+              <div className="form-grid-3" style={{ marginBottom: 18 }}>
+                <Field label="Mobile" required>
                   <Input
                     type="tel"
                     placeholder="+91 XXXXX XXXXX"
@@ -224,11 +225,13 @@ export default function CustomerCreate() {
                 <Field label="Email">
                   <Input
                     type="email"
-                    placeholder="customer@email.com"
+                    placeholder="member@email.com"
                     value={form.email}
                     onChange={set("email")}
                   />
                 </Field>
+              </div>
+              <div className="form-grid-3" style={{ marginBottom: 18 }}>
                 <Field label="Date of Birth" required>
                   <Input
                     type="date"
@@ -244,6 +247,15 @@ export default function CustomerCreate() {
                     <option>Female</option>
                     <option>Other</option>
                   </Select>
+                </Field>
+              </div>
+              <div className="form-grid-3">
+                <Field label="EMP ID / PF No.">
+                  <Input
+                    placeholder="e.g. EMP-001 or PF123456"
+                    value={form.empId}
+                    onChange={set("empId")}
+                  />
                 </Field>
                 <Field label="Organisation">
                   <Select
@@ -271,13 +283,20 @@ export default function CustomerCreate() {
 
             {/* Address */}
             <SectionBlock icon="📍" title="Address (Auto-filled from Aadhaar)">
-              <div className="form-grid">
-                <Field label="Address" required className="col-span-2">
+              <div className="form-grid-3" style={{ marginBottom: 18 }}>
+                <Field label="Address Line 1" required>
                   <Input
-                    placeholder="House/Flat, Street, Area"
-                    value={form.address}
-                    onChange={set("address")}
+                    placeholder="Street / Building"
+                    value={form.address1}
+                    onChange={set("address1")}
                     required
+                  />
+                </Field>
+                <Field label="Address Line 2">
+                  <Input
+                    placeholder="Area / Locality"
+                    value={form.address2}
+                    onChange={set("address2")}
                   />
                 </Field>
                 <Field label="City" required>
@@ -288,6 +307,8 @@ export default function CustomerCreate() {
                     required
                   />
                 </Field>
+              </div>
+              <div className="form-grid-3">
                 <Field label="State" required>
                   <Select value={form.state} onChange={set("state")} required>
                     <option value="">Select state</option>
@@ -305,9 +326,7 @@ export default function CustomerCreate() {
                     ))}
                   </Select>
                 </Field>
-              </div>
-              <div className="form-grid" style={{ marginTop: 18 }}>
-                <Field label="Pincode" required>
+                <Field label="PIN Code" required>
                   <Input
                     placeholder="400001"
                     maxLength={6}
@@ -316,49 +335,10 @@ export default function CustomerCreate() {
                     required
                   />
                 </Field>
-              </div>
-            </SectionBlock>
-
-            {/* Family Members */}
-            <SectionBlock icon="👨‍👩‍👧" title="Family Details">
-              <FamilyMembersSection members={members} onChange={setMembers} />
-            </SectionBlock>
-
-            {/* Nominee */}
-            <SectionBlock icon="📝" title="Nominee Details">
-              <div className="form-grid-3">
-                <Field label="Nominee Name" required>
-                  <Input
-                    placeholder="Full name"
-                    value={form.nomineeName}
-                    onChange={set("nomineeName")}
-                    required
-                  />
-                </Field>
-                <Field label="Relation" required>
-                  <Select
-                    value={form.nomineeRelation}
-                    onChange={set("nomineeRelation")}
-                    required
-                  >
-                    <option value="">Select relation</option>
-                    <option>Spouse</option>
-                    <option>Child</option>
-                    <option>Parent</option>
-                    <option>Sibling</option>
-                    <option>Other</option>
+                <Field label="Country">
+                  <Select value={form.country ?? "India"} onChange={set("country")}>
+                    <option>India</option>
                   </Select>
-                </Field>
-                <Field label="Share %" required>
-                  <Input
-                    type="number"
-                    min="1"
-                    max="100"
-                    placeholder="100"
-                    value={form.nomineeShare}
-                    onChange={set("nomineeShare")}
-                    required
-                  />
                 </Field>
               </div>
             </SectionBlock>
@@ -367,12 +347,12 @@ export default function CustomerCreate() {
               <button
                 type="button"
                 className="btn btn-ghost"
-                onClick={() => navigate("/customer")}
+                onClick={() => navigate("/member")}
               >
                 Cancel
               </button>
               <button type="submit" className="btn btn-primary">
-                Create Customer
+                Create Member
               </button>
             </div>
           </form>

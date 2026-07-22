@@ -1,8 +1,8 @@
 import { useState, useRef } from "react";
 import { PageHeader } from "../../components/UI";
-import { DocumentIcon } from "../../icons";
+import { DocumentIcon, SearchIcon } from "../../icons";
 import { POLICY_MOCK } from "../policy/PolicyList";
-import { ASSOCIATIONS } from "../customer/orgAssocData";
+import { ASSOCIATIONS } from "../member/orgAssocData";
 import Pagination from "../../components/Pagination";
 import usePagination from "../../components/usePagination";
 import { PAYMENT_STATUS_META } from "../../constants/paymentStatus";
@@ -26,7 +26,7 @@ const REJECT_REASONS = [
   "UTR not found",
   "Duplicate entry",
   "Insufficient funds",
-  "Customer details mismatch",
+  "Member details mismatch",
   "Other",
 ];
 
@@ -86,7 +86,7 @@ const BASE_DATA = POLICY_MOCK.filter(
     bankName:                  BANKS[id % BANKS.length],
     branchName:                BRANCHES[id % BRANCHES.length],
     accountNumber:             `${30000 + id * 13}${String(id * 7 % 10000).padStart(6, "0")}`,
-    accountName:               p.customerName,
+    accountName:               p.memberName,
     ifscCode:                  `${IFSC_PREFIXES[id % 6]}0${String((id * 11) % 10000).padStart(6, "0")}`,
     transactionId:             `TXN${String(id * 98765 + 100000).slice(-9)}`,
     neftDate:                  `${yr}-${mm}-${dd}`,
@@ -176,7 +176,7 @@ function PendingPickerModal({
     const matchSearch =
       !q ||
       (p.chequeNumber ?? "").toLowerCase().includes(q) ||
-      p.customerName.toLowerCase().includes(q);
+      p.memberName.toLowerCase().includes(q);
     const dateField = isCheque ? p.chequeDate : p.neftDate;
     const matchFrom = !dateFrom || (dateField && dateField >= dateFrom);
     const matchTo = !dateTo || (dateField && dateField <= dateTo);
@@ -240,7 +240,7 @@ function PendingPickerModal({
               <label style={LABEL}>Search</label>
               <input
                 className="field-input filter-search"
-                placeholder="Cheque number or customer name…"
+                placeholder="Cheque number or member name…"
                 value={search}
                 onChange={(e) => onSearch(e.target.value)}
                 style={{ width: 240 }}
@@ -273,7 +273,7 @@ function PendingPickerModal({
                   <thead style={{ position: "sticky", top: 0, zIndex: 1 }}>
                     <tr>
                       <th style={{ position: "sticky", top: 0, background: "#eff6ff", color: "#1d4ed8" }}>Order ID</th>
-                      <th style={{ position: "sticky", top: 0, background: "#eff6ff", color: "#1d4ed8" }}>Customer Name</th>
+                      <th style={{ position: "sticky", top: 0, background: "#eff6ff", color: "#1d4ed8" }}>Member Name</th>
                       {isCheque && <>
                         <th style={{ position: "sticky", top: 0, background: "#eff6ff", color: "#1d4ed8" }}>Cheque No.</th>
                         <th style={{ position: "sticky", top: 0, background: "#eff6ff", color: "#1d4ed8" }}>Cheque Date</th>
@@ -290,7 +290,7 @@ function PendingPickerModal({
                     {filtered.map((p) => {
                       const chequeMatch = isCheque && up.chequeNumber && p.chequeNumber && up.chequeNumber === p.chequeNumber;
                       const txnMatch = isNeft && up.transactionId && p.transactionId && up.transactionId === p.transactionId;
-                      const nameMatch = up.customerName === p.customerName;
+                      const nameMatch = up.memberName === p.memberName;
                       return (
                         <tr
                           key={p.id}
@@ -300,7 +300,7 @@ function PendingPickerModal({
                           onMouseLeave={(e) => { e.currentTarget.style.background = "#f0f7ff"; }}
                         >
                           <td style={{ fontFamily: "monospace", fontWeight: 700, color: "#1d4ed8", fontSize: 12 }}>{p.proposalId}</td>
-                          <td style={{ fontWeight: 600, color: nameMatch ? "#15803d" : "#1e293b" }}>{p.customerName}{nameMatch && <span style={{ marginLeft: 4 }} title="Name matches uploaded record">✓</span>}</td>
+                          <td style={{ fontWeight: 600, color: nameMatch ? "#15803d" : "#1e293b" }}>{p.memberName}{nameMatch && <span style={{ marginLeft: 4 }} title="Name matches uploaded record">✓</span>}</td>
                           {isCheque && <>
                             <td style={{ fontFamily: "monospace", fontWeight: 600, color: chequeMatch ? "#15803d" : "inherit" }}>{p.chequeNumber ?? "—"}{chequeMatch && <span style={{ marginLeft: 4 }} title="Cheque number matches uploaded record">✓</span>}</td>
                             <td style={{ whiteSpace: "nowrap" }}>{p.chequeDate ?? "—"}</td>
@@ -361,7 +361,7 @@ function MatchComparisonModal({
             <div style={{ background: "#eff6ff", borderRadius: 10, padding: "14px 16px" }}>
               <div style={{ fontSize: 12, fontWeight: 700, color: "#1d4ed8", textTransform: "uppercase", letterSpacing: ".5px", marginBottom: 10 }}>System (Pending)</div>
               <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-                <TxnDetailRow label="Customer Name" value={pr.customerName} />
+                <TxnDetailRow label="Member Name" value={pr.memberName} />
                 {isCheque && <>
                   <TxnDetailRow label="Cheque Number" value={pr.chequeNumber} />
                   <TxnDetailRow label="Cheque Date" value={pr.chequeDate} />
@@ -393,8 +393,8 @@ function MatchComparisonModal({
           {diff !== 0 && (
             <div style={{ background: "linear-gradient(135deg,#f5f3ff,#ede9fe)", borderRadius: 12, padding: "14px 20px", marginBottom: 18, fontSize: 13.5, color: "#3b0764" }}>
               {diff > 0
-                ? <><strong>Customer overpaid by {fmt(diff)}.</strong> Please initiate a refund for the extra amount.</>
-                : <><strong>Customer underpaid by {fmt(-diff)}.</strong> Please collect the remaining amount from the customer.</>}
+                ? <><strong>Member overpaid by {fmt(diff)}.</strong> Please initiate a refund for the extra amount.</>
+                : <><strong>Member underpaid by {fmt(-diff)}.</strong> Please collect the remaining amount from the member.</>}
             </div>
           )}
 
@@ -436,9 +436,9 @@ function TransactionDetailModal({ system: rec, uploaded: up, onClose }) {
         {/* Header */}
         <div style={{ padding: "22px 26px 18px", borderBottom: "1.5px solid #f0edf8", display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 12 }}>
           <div>
-            <div style={{ fontSize: 11, color: "#64748b", fontWeight: 600, letterSpacing: ".5px", textTransform: "uppercase", marginBottom: 4 }}>Transaction Details</div>
+            <div style={{ fontSize: 11, color: "#64748b", fontWeight: 600, letterSpacing: ".5px", textTransform: "uppercase", marginBottom: 4 }}>Transaction Info</div>
             <div style={{ fontSize: 18, fontWeight: 800, color: "#1a1628" }}>{rec.proposalId}</div>
-            <div style={{ fontSize: 13, color: "#64748b", marginTop: 2 }}>{rec.customerName} · {rec.product}</div>
+            <div style={{ fontSize: 13, color: "#64748b", marginTop: 2 }}>{rec.memberName} · {rec.product}</div>
           </div>
           <div style={{ display: "flex", alignItems: "center", gap: 10, flexShrink: 0 }}>
             <button onClick={onClose} style={{ width: 30, height: 30, borderRadius: 8, border: "1.5px solid #e8e4f0", background: "#faf9fc", cursor: "pointer", fontSize: 16, display: "flex", alignItems: "center", justifyContent: "center", color: "#64748b", lineHeight: 1 }}>×</button>
@@ -463,7 +463,7 @@ function TransactionDetailModal({ system: rec, uploaded: up, onClose }) {
           {/* System details grid */}
           <div style={{ fontSize: 12, fontWeight: 700, color: "#1d4ed8", textTransform: "uppercase", letterSpacing: ".5px", marginBottom: 10 }}>System Record</div>
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "14px 24px", marginBottom: 20 }}>
-            <TxnDetailRow label="Customer Name" value={rec.customerName} />
+            <TxnDetailRow label="Member Name" value={rec.memberName} />
             <TxnDetailRow label="Order ID" value={rec.proposalId} />
             <TxnDetailRow label="Product" value={rec.product} />
             <TxnDetailRow label="Campaign" value={rec.campaignName} />
@@ -549,7 +549,7 @@ function exportToExcel(rows) {
   const headers = [
     "ID",
     "Order ID",
-    "Customer Name",
+    "Member Name",
     "Mobile",
     "Product",
     "IC Name",
@@ -571,7 +571,7 @@ function exportToExcel(rows) {
       [
         p.id,
         p.proposalId,
-        p.customerName,
+        p.memberName,
         p.mobile,
         p.product,
         p.icName,
@@ -610,9 +610,9 @@ function buildUploadedRows(records) {
 
     const base = {
       proposalId: r.proposalId,
-      customerName: nameDiff
-        ? r.customerName.split(" ").reverse().join(" ")
-        : r.customerName,
+      memberName: nameDiff
+        ? r.memberName.split(" ").reverse().join(" ")
+        : r.memberName,
       premium: premiumDiff ? r.premium + 500 : r.premium,
       paymentType: r.paymentType,
       icName: r.icName,
@@ -653,7 +653,7 @@ function buildUploadedRows(records) {
     const pt = k % 2 === 0 ? "Cheque" : "NEFT";
     const row = {
       proposalId: `EXT-PROP-${idx}`,
-      customerName: `Uploaded Customer ${k + 1}`,
+      memberName: `Uploaded Member ${k + 1}`,
       premium: 3500 + k * 250,
       paymentType: pt,
       icName: "External IC",
@@ -727,7 +727,7 @@ export default function Reconciliation() {
     const q = search.toLowerCase();
     const matchSearch =
       !search ||
-      p.customerName.toLowerCase().includes(q) ||
+      p.memberName.toLowerCase().includes(q) ||
       p.proposalId.toLowerCase().includes(q) ||
       p.product.toLowerCase().includes(q) ||
       p.mobile.includes(q);
@@ -1148,7 +1148,7 @@ export default function Reconciliation() {
                 <thead style={{ position: "sticky", top: 0, zIndex: 2 }}>
                   <tr>
                     <th style={{ position: "sticky", top: 0, background: "#eff6ff", zIndex: 3 }}>Order ID</th>
-                    <th style={{ position: "sticky", top: 0, background: "#eff6ff", zIndex: 3 }}>Customer</th>
+                    <th style={{ position: "sticky", top: 0, background: "#eff6ff", zIndex: 3 }}>Member</th>
                     {payTypeFilter === "Cheque" && <>
                       <th style={{ position: "sticky", top: 0, background: "#eff6ff", zIndex: 3 }}>Cheque No.</th>
                       <th style={{ position: "sticky", top: 0, background: "#eff6ff", zIndex: 3 }}>Cheque Date</th>
@@ -1168,7 +1168,7 @@ export default function Reconciliation() {
                     pendingRecords.map((rec) => (
                       <tr key={rec.id} style={{ background: "#f0f7ff" }}>
                         <td style={{ fontFamily: "monospace", fontSize: 13, color: "#7c3aed" }}>{rec.proposalId}</td>
-                        <td style={{ fontWeight: 500 }}>{rec.customerName}</td>
+                        <td style={{ fontWeight: 500 }}>{rec.memberName}</td>
                         {payTypeFilter === "Cheque" && <>
                           <td style={{ fontFamily: "monospace", fontWeight: 600 }}>{rec.chequeNumber ?? "—"}</td>
                           <td style={{ whiteSpace: "nowrap" }}>{rec.chequeDate ?? "—"}</td>
@@ -1234,7 +1234,7 @@ export default function Reconciliation() {
                 <thead style={{ position: "sticky", top: 0, zIndex: 2 }}>
                   <tr>
                     <th rowSpan={2} style={{ verticalAlign: "bottom", position: "sticky", top: 0, background: "#fff", zIndex: 3 }}>Order ID</th>
-                    <th rowSpan={2} style={{ verticalAlign: "bottom", position: "sticky", top: 0, background: "#fff", zIndex: 3 }}>Customer</th>
+                    <th rowSpan={2} style={{ verticalAlign: "bottom", position: "sticky", top: 0, background: "#fff", zIndex: 3 }}>Member</th>
                     <th colSpan={3} style={{ textAlign: "center", position: "sticky", top: 0, background: "#eff6ff", color: "#1d4ed8", borderBottom: "2px solid #93c5fd", zIndex: 3 }}>System Record</th>
                     <th colSpan={3} style={{ textAlign: "center", position: "sticky", top: 0, background: "#fefce8", color: "#a16207", borderBottom: "2px solid #fde047", zIndex: 3 }}>Uploaded Record</th>
                     <th rowSpan={2} style={{ verticalAlign: "bottom", minWidth: 230, position: "sticky", top: 0, background: "#fff", zIndex: 3 }}>Action</th>
@@ -1255,7 +1255,7 @@ export default function Reconciliation() {
                     matchedRecords.map(({ system: rec, uploaded: up }) => (
                         <tr key={rec.id} style={{ background: "#fff" }}>
                           <td style={{ fontFamily: "monospace", fontSize: 11.5, color: "#7c3aed" }}>{rec.proposalId}</td>
-                          <td style={{ fontWeight: 500 }}>{rec.customerName}</td>
+                          <td style={{ fontWeight: 500 }}>{rec.memberName}</td>
                           <td style={{ background: "#f0f7ff", fontFamily: "monospace", fontWeight: 600 }}>{rec.chequeNumber}</td>
                           <td style={{ background: "#f0f7ff", whiteSpace: "nowrap" }}>{rec.chequeDate}</td>
                           <td style={{ background: "#f0f7ff", fontWeight: 600 }}>{fmt(rec.premium)}</td>
@@ -1284,7 +1284,7 @@ export default function Reconciliation() {
                 <thead style={{ position: "sticky", top: 0, zIndex: 2 }}>
                   <tr>
                     <th rowSpan={2} style={{ verticalAlign: "bottom", position: "sticky", top: 0, background: "#fff", zIndex: 3 }}>Order ID</th>
-                    <th rowSpan={2} style={{ verticalAlign: "bottom", position: "sticky", top: 0, background: "#fff", zIndex: 3 }}>Customer</th>
+                    <th rowSpan={2} style={{ verticalAlign: "bottom", position: "sticky", top: 0, background: "#fff", zIndex: 3 }}>Member</th>
                     <th colSpan={3} style={{ textAlign: "center", position: "sticky", top: 0, background: "#eff6ff", color: "#1d4ed8", borderBottom: "2px solid #93c5fd", zIndex: 3 }}>System Record</th>
                     <th colSpan={3} style={{ textAlign: "center", position: "sticky", top: 0, background: "#fefce8", color: "#a16207", borderBottom: "2px solid #fde047", zIndex: 3 }}>Uploaded Record</th>
                     <th rowSpan={2} style={{ verticalAlign: "bottom", minWidth: 160, position: "sticky", top: 0, background: "#fff", zIndex: 3 }}>Action</th>
@@ -1305,7 +1305,7 @@ export default function Reconciliation() {
                     matchedRecords.map(({ system: rec, uploaded: up }) => (
                         <tr key={rec.id} style={{ background: "#fff" }}>
                           <td style={{ fontFamily: "monospace", fontSize: 11.5, color: "#7c3aed" }}>{rec.proposalId}</td>
-                          <td style={{ fontWeight: 500 }}>{rec.customerName}</td>
+                          <td style={{ fontWeight: 500 }}>{rec.memberName}</td>
                           <td style={{ background: "#f0f7ff", fontFamily: "monospace", fontWeight: 600, color: "#0369a1" }}>{rec.transactionId}</td>
                           <td style={{ background: "#f0f7ff", whiteSpace: "nowrap" }}>{rec.neftDate}</td>
                           <td style={{ background: "#f0f7ff", fontWeight: 600 }}>{fmt(rec.premium)}</td>
@@ -1485,7 +1485,7 @@ export default function Reconciliation() {
                   if (diff > 0) {
                     addRefund({
                       proposalId: activePendingRecord.proposalId,
-                      customerName: activePendingRecord.customerName,
+                      memberName: activePendingRecord.memberName,
                       mobile: activePendingRecord.mobile,
                       product: activePendingRecord.product,
                       icName: activePendingRecord.icName,
@@ -1628,8 +1628,8 @@ export default function Reconciliation() {
                 fontWeight: 700,
                 fontSize: 14,
                 color: "#fff",
-                background: "linear-gradient(135deg, #ec4899 0%, #a855f7 100%)",
-                boxShadow: "0 2px 8px rgba(168,85,247,0.35)",
+                background: "linear-gradient(180deg,#1565d8 0%,#104ea6 100%)",
+                boxShadow: "0 2px 8px rgba(21,101,216,0.35)",
                 flexShrink: 0,
               }}
               onMouseEnter={(e) => (e.currentTarget.style.opacity = ".85")}
@@ -1735,16 +1735,21 @@ export default function Reconciliation() {
           >
             <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
               <label style={LABEL}>Search</label>
-              <input
-                className="field-input filter-search"
-                placeholder="Customer, proposal, product, mobile…"
-                value={search}
-                onChange={(e) => {
-                  setSearch(e.target.value);
-                  pg.reset();
-                }}
-                style={{ width: 260 }}
-              />
+              <div style={{ position: "relative" }}>
+                <span style={{ position: "absolute", left: 11, top: "50%", transform: "translateY(-50%)", display: "flex", pointerEvents: "none" }}>
+                  <SearchIcon size={15} color="var(--text-3)" />
+                </span>
+                <input
+                  className="field-input filter-search"
+                  placeholder="Member, proposal, product, mobile…"
+                  value={search}
+                  onChange={(e) => {
+                    setSearch(e.target.value);
+                    pg.reset();
+                  }}
+                  style={{ width: 260, paddingLeft: 34 }}
+                />
+              </div>
             </div>
             <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
               <label style={LABEL}>Status</label>
@@ -1845,15 +1850,15 @@ export default function Reconciliation() {
               <table style={{ fontSize: 13, borderCollapse: "separate", borderSpacing: 0 }}>
                 <thead style={{ position: "sticky", top: 0, zIndex: 3 }}>
                   <tr>
-                    <th colSpan={3} style={{ textAlign: "center", background: "#fff", color: "#1a1628" }}>Customer</th>
-                    <th colSpan={8} style={{ textAlign: "center", background: "#f0f7ff", color: "#1d4ed8" }}>Cheque / Bank Details</th>
+                    <th colSpan={3} style={{ textAlign: "center", background: "#fff", color: "#1a1628" }}>Member</th>
+                    <th colSpan={8} style={{ textAlign: "center", background: "#f0f7ff", color: "#1d4ed8" }}>Cheque / Bank Info</th>
                     <th rowSpan={2} style={{ verticalAlign: "bottom", background: "#fff" }}>Amount</th>
                     <th rowSpan={2} style={{ verticalAlign: "bottom", background: "#fff" }}>Status</th>
                     <th style={{ textAlign: "center", background: "#f8fafc", color: "#64748b" }}>Meta</th>
                   </tr>
                   <tr>
                     <th style={{ background: "#fff" }}>Order ID</th>
-                    <th style={{ background: "#fff" }}>Customer Name</th>
+                    <th style={{ background: "#fff" }}>Member Name</th>
                     <th style={{ background: "#fff" }}>Mobile</th>
                     <th style={{ background: "#f0f7ff" }}>Cheque No.</th>
                     <th style={{ background: "#f0f7ff" }}>Bank Name</th>
@@ -1877,7 +1882,7 @@ export default function Reconciliation() {
                     pg.slice.map((p) => (
                       <tr key={p.id}>
                         <td style={{ fontFamily: "monospace", fontSize: 13, color: "#7c3aed" }}>{p.proposalId}</td>
-                        <td style={{ fontWeight: 500 }}>{p.customerName}</td>
+                        <td style={{ fontWeight: 500 }}>{p.memberName}</td>
                         <td style={{ color: "#64748b" }}>{p.mobile}</td>
                         <td style={{ fontFamily: "monospace", fontWeight: 600 }}>{p.chequeNumber ?? "—"}</td>
                         <td>{p.bankName ?? "—"}</td>
@@ -1901,15 +1906,15 @@ export default function Reconciliation() {
               <table style={{ fontSize: 13, borderCollapse: "separate", borderSpacing: 0 }}>
                 <thead style={{ position: "sticky", top: 0, zIndex: 3 }}>
                   <tr>
-                    <th colSpan={3} style={{ textAlign: "center", background: "#fff", color: "#1a1628" }}>Customer</th>
-                    <th colSpan={8} style={{ textAlign: "center", background: "#f0f7ff", color: "#1d4ed8" }}>NEFT / Bank Details</th>
+                    <th colSpan={3} style={{ textAlign: "center", background: "#fff", color: "#1a1628" }}>Member</th>
+                    <th colSpan={8} style={{ textAlign: "center", background: "#f0f7ff", color: "#1d4ed8" }}>NEFT / Bank Info</th>
                     <th rowSpan={2} style={{ verticalAlign: "bottom", background: "#fff" }}>Amount</th>
                     <th rowSpan={2} style={{ verticalAlign: "bottom", background: "#fff" }}>Status</th>
                     <th style={{ textAlign: "center", background: "#f8fafc", color: "#64748b" }}>Meta</th>
                   </tr>
                   <tr>
                     <th style={{ background: "#fff" }}>Order ID</th>
-                    <th style={{ background: "#fff" }}>Customer Name</th>
+                    <th style={{ background: "#fff" }}>Member Name</th>
                     <th style={{ background: "#fff" }}>Mobile</th>
                     <th style={{ background: "#f0f7ff" }}>Bank Name</th>
                     <th style={{ background: "#f0f7ff" }}>Branch Name</th>
@@ -1933,7 +1938,7 @@ export default function Reconciliation() {
                     pg.slice.map((p) => (
                       <tr key={p.id}>
                         <td style={{ fontFamily: "monospace", fontSize: 13, color: "#7c3aed" }}>{p.proposalId}</td>
-                        <td style={{ fontWeight: 500 }}>{p.customerName}</td>
+                        <td style={{ fontWeight: 500 }}>{p.memberName}</td>
                         <td style={{ color: "#64748b" }}>{p.mobile}</td>
                         <td>{p.bankName ?? "—"}</td>
                         <td>{p.branchName ?? "—"}</td>
@@ -1958,7 +1963,7 @@ export default function Reconciliation() {
                 <thead style={{ position: "sticky", top: 0, zIndex: 3 }}>
                   <tr>
                     <th style={{ background: "var(--card-bg, #fff)" }}>#</th>
-                    <th style={{ background: "var(--card-bg, #fff)" }}>Customer</th>
+                    <th style={{ background: "var(--card-bg, #fff)" }}>Member</th>
                     <th style={{ background: "var(--card-bg, #fff)" }}>Mobile</th>
                     <th style={{ background: "var(--card-bg, #fff)" }}>Order ID</th>
                     <th style={{ background: "var(--card-bg, #fff)" }}>Product</th>
@@ -1981,7 +1986,7 @@ export default function Reconciliation() {
                     pg.slice.map((p) => (
                       <tr key={p.id}>
                         <td style={{ color: "var(--text-3)" }}>{p.id}</td>
-                        <td style={{ fontWeight: 500 }}>{p.customerName}</td>
+                        <td style={{ fontWeight: 500 }}>{p.memberName}</td>
                         <td style={{ color: "#64748b" }}>{p.mobile}</td>
                         <td style={{ fontFamily: "monospace", fontSize: 13, color: "#7c3aed" }}>{p.proposalId}</td>
                         <td style={{ maxWidth: 180, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{p.product}</td>

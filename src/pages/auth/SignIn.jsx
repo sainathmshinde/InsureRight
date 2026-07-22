@@ -1,19 +1,45 @@
 import { useState, useRef } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
-import { ORGANISATIONS, ASSOCIATIONS } from "../customer/orgAssocData";
 import kmdLogo from "../../assets/kmd-logo.svg";
 
 const DEMO = [
   { role: "Broker",        email: "sainath@kmdastur.com", pass: "broker@123", mobile: "9000000001" },
   { role: "Calling Operator", email: "pooja@kmdastur.com",  pass: "operator@123",  mobile: "9000000002" },
   { role: "Sales Operator",   email: "ravi@kmdastur.com",   pass: "sales@123",  mobile: "9000000003" },
-  { role: "Customer",      email: "aarav@gmail.com",     pass: "cust@123",   mobile: "9876543210" },
+  { role: "Member",      email: "aarav@gmail.com",     pass: "cust@123",   mobile: "9876543210" },
 ];
 
 const MOBILE_CREDS = Object.fromEntries(
   DEMO.map(d => [d.mobile, { email: d.email, pass: d.pass }])
 );
+
+// ── hexagon-mesh background pattern (tiles seamlessly) ─────────────────────────
+const HEX_SVG = `<svg xmlns='http://www.w3.org/2000/svg' width='34.64' height='60' viewBox='0 0 34.64 60'><g fill='none' stroke='white' stroke-opacity='0.10'><path d='M0 -5 L17.32 5 L17.32 25 L0 35 L-17.32 25 L-17.32 5 Z'/><path d='M34.64 -5 L51.96 5 L51.96 25 L34.64 35 L17.32 25 L17.32 5 Z'/><path d='M17.32 25 L34.64 35 L34.64 55 L17.32 65 L0 55 L0 35 Z'/><path d='M-17.32 25 L0 35 L0 55 L-17.32 65 L-34.64 55 L-34.64 35 Z'/><path d='M51.96 25 L69.28 35 L69.28 55 L51.96 65 L34.64 55 L34.64 35 Z'/></g></svg>`;
+const HEX_BG = `url("data:image/svg+xml,${encodeURIComponent(HEX_SVG)}")`;
+
+const CHEVRON_SVG = `<svg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%236d747a' stroke-width='2'><path d='M6 9l6 6 6-6'/></svg>`;
+const CHEVRON_BG = `url("data:image/svg+xml,${CHEVRON_SVG}")`;
+
+// ── eye / eye-off icons (password visibility toggle) ───────────────────────────
+function IconEye({ size = 20, color = "#737373" }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M4.70104 12.5094C4.59728 12.3554 4.5454 12.2784 4.51636 12.1596C4.49455 12.0704 4.49455 11.9296 4.51636 11.8404C4.5454 11.7216 4.59728 11.6446 4.70104 11.4906C5.55845 10.2177 8.11063 7 12 7C15.8894 7 18.4415 10.2177 19.299 11.4906C19.4027 11.6446 19.4546 11.7216 19.4836 11.8404C19.5055 11.9296 19.5055 12.0704 19.4836 12.1596C19.4546 12.2784 19.4027 12.3554 19.299 12.5094C18.4415 13.7823 15.8894 17 12 17C8.11063 17 5.55846 13.7823 4.70104 12.5094Z" stroke={color} strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" />
+      <path d="M12 14.1429C13.2623 14.1429 14.2856 13.1835 14.2856 12C14.2856 10.8165 13.2623 9.85714 12 9.85714C10.7377 9.85714 9.71438 10.8165 9.71438 12C9.71438 13.1835 10.7377 14.1429 12 14.1429Z" stroke={color} strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
+function IconEyeOff({ size = 20, color = "#737373" }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M4.70104 12.5094C4.59728 12.3554 4.5454 12.2784 4.51636 12.1596C4.49455 12.0704 4.49455 11.9296 4.51636 11.8404C4.5454 11.7216 4.59728 11.6446 4.70104 11.4906C5.55845 10.2177 8.11063 7 12 7C15.8894 7 18.4415 10.2177 19.299 11.4906C19.4027 11.6446 19.4546 11.7216 19.4836 11.8404C19.5055 11.9296 19.5055 12.0704 19.4836 12.1596C19.4546 12.2784 19.4027 12.3554 19.299 12.5094C18.4415 13.7823 15.8894 17 12 17C8.11063 17 5.55846 13.7823 4.70104 12.5094Z" stroke={color} strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" />
+      <path d="M12 14.1429C13.2623 14.1429 14.2856 13.1835 14.2856 12C14.2856 10.8165 13.2623 9.85714 12 9.85714C10.7377 9.85714 9.71438 10.8165 9.71438 12C9.71438 13.1835 10.7377 14.1429 12 14.1429Z" stroke={color} strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" />
+      <line x1="4" y1="20" x2="20" y2="4" stroke={color} strokeWidth="1.2" strokeLinecap="round" />
+    </svg>
+  );
+}
 
 // ── 4-box OTP input ───────────────────────────────────────────────────────────
 function OtpInput({ value, onChange }) {
@@ -61,9 +87,9 @@ function OtpInput({ value, onChange }) {
           onPaste={handlePaste}
           style={{
             width: 52, height: 44, textAlign: "center", fontSize: 14, fontWeight: 600,
-            border: `1.5px solid ${d ? "#a855f7" : "#e2ddf0"}`,
-            borderRadius: 8, outline: "none", fontFamily: "inherit",
-            color: "#1a1628", background: d ? "#f5f3ff" : "#faf9fc",
+            border: `1.5px solid ${d ? "#1565d8" : "#dee1e5"}`,
+            borderRadius: 6, outline: "none", fontFamily: "inherit",
+            color: "#24304a", background: d ? "#eaf2ff" : "#f8fafc",
             boxSizing: "border-box", transition: "border-color .15s, background .15s",
           }}
         />
@@ -72,232 +98,14 @@ function OtpInput({ value, onChange }) {
   );
 }
 
-// ── Sign-up view ──────────────────────────────────────────────────────────────
-function SignUpView({ onBack }) {
-  const [firstName,   setFirstName]   = useState("");
-  const [lastName,    setLastName]    = useState("");
-  const [email,       setEmail]       = useState("");
-  const [mobile,      setMobile]      = useState("");
-  const [otpSent,     setOtpSent]     = useState(false);
-  const [otp,         setOtp]         = useState("");
-  const [otpVerified, setOtpVerified] = useState(false);
-  const [otpError,    setOtpError]    = useState("");
-  const [orgId,       setOrgId]       = useState("");
-  const [assocId,     setAssocId]     = useState("");
-  const [agreed,      setAgreed]      = useState(false);
-  const [submitted,   setSubmitted]   = useState(false);
-
-  const filteredAssocs = ASSOCIATIONS.filter(a => a.orgId === Number(orgId));
-
-  const handleSendOtp = () => {
-    setOtpSent(true);
-    setOtp("");
-    setOtpError("");
-  };
-
-  const handleVerifyOtp = () => {
-    if (otp === "1111") {
-      setOtpVerified(true);
-      setOtpError("");
-    } else {
-      setOtpError("Invalid OTP. Please try again.");
-    }
-  };
-
-  const handleResendOtp = () => {
-    setOtp("");
-    setOtpError("");
-  };
-
-  const handleSignUp = (e) => {
-    e.preventDefault();
-    console.log("Signup:", { firstName, lastName, email, mobile, orgId, assocId });
-    setSubmitted(true);
-  };
-
-  if (submitted) {
-    return (
-      <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 16, paddingTop: 24 }}>
-        <div style={{ fontSize: 48 }}>🎉</div>
-        <h2 style={{ ...S.title, textAlign: "center" }}>Registration Successful!</h2>
-        <p style={{ fontSize: 13.5, color: "#64748b", textAlign: "center" }}>
-          Your account has been created. You can now sign in.
-        </p>
-        <button type="button" style={S.btn} onClick={onBack}>Go to Sign In →</button>
-      </div>
-    );
-  }
-
-  return (
-    <form onSubmit={handleSignUp} style={{ display: "flex", flexDirection: "column", gap: 14 }}>
-      <div style={{ marginBottom: 4 }}>
-        <h2 style={S.title}>Create Account</h2>
-        <p style={S.sub}>Sign up to access your portal</p>
-      </div>
-
-      {/* Name row */}
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
-        <div>
-          <label style={S.lbl}>First Name</label>
-          <input style={S.inp} placeholder="First name" value={firstName}
-            onChange={e => setFirstName(e.target.value)} required />
-        </div>
-        <div>
-          <label style={S.lbl}>Last Name</label>
-          <input style={S.inp} placeholder="Last name" value={lastName}
-            onChange={e => setLastName(e.target.value)} required />
-        </div>
-      </div>
-
-      {/* Email */}
-      <div>
-        <label style={S.lbl}>Email</label>
-        <input type="email" style={S.inp} placeholder="your@email.com" value={email}
-          onChange={e => setEmail(e.target.value)} required />
-      </div>
-
-      {/* Mobile + Send OTP */}
-      <div>
-        <label style={S.lbl}>Mobile Number</label>
-        <div style={{ display: "flex", gap: 8 }}>
-          <input
-            type="tel" maxLength={10}
-            style={{ ...S.inp, flex: 1, ...(otpSent ? { background: "#f3f0fa", color: "#7c3aed", fontWeight: 600 } : {}) }}
-            placeholder="10-digit mobile number"
-            value={mobile}
-            readOnly={otpSent}
-            onChange={e => setMobile(e.target.value.replace(/\D/g, "").slice(0, 10))}
-          />
-          {!otpVerified && (
-            <button
-              type="button"
-              style={{ ...S.btn, marginTop: 0, padding: "10px 14px", fontSize: 13, whiteSpace: "nowrap", opacity: mobile.length < 10 ? 0.5 : 1 }}
-              disabled={mobile.length < 10}
-              onClick={handleSendOtp}
-            >
-              {otpSent ? "Resend" : "Send OTP"}
-            </button>
-          )}
-        </div>
-      </div>
-
-      {/* OTP input — shown after Send OTP */}
-      {otpSent && !otpVerified && (
-        <div>
-          <label style={S.lbl}>Enter OTP</label>
-          <OtpInput value={otp} onChange={v => { setOtp(v); setOtpError(""); }} />
-          <div style={{ fontSize: 13, color: "#64748b", marginTop: 8 }}>
-            OTP sent to +91-{mobile}
-          </div>
-
-          {/* Verify + Resend — shown once all 4 digits entered */}
-          {otp.length === 4 && (
-            <div style={{ display: "flex", gap: 8, marginTop: 12 }}>
-              <button
-                type="button"
-                style={{ ...S.btn, flex: 1, marginTop: 0 }}
-                onClick={handleVerifyOtp}
-              >
-                Verify OTP
-              </button>
-              <button
-                type="button"
-                style={{ ...S.btn, flex: 1, marginTop: 0, background: "transparent", color: "#a855f7", border: "1.5px solid #a855f7" }}
-                onClick={handleResendOtp}
-              >
-                Resend OTP
-              </button>
-            </div>
-          )}
-
-          {otpError && (
-            <div style={{ ...S.err, marginTop: 8, marginBottom: 0 }}>{otpError}</div>
-          )}
-        </div>
-      )}
-
-      {/* After OTP verified */}
-      {otpVerified && (
-        <>
-          <div style={{ background: "#d1fae5", border: "1px solid #6ee7b7", color: "#065f46", borderRadius: 8, padding: "10px 14px", fontSize: 13, display: "flex", alignItems: "center", gap: 8 }}>
-            ✓&nbsp; Mobile number verified successfully
-          </div>
-
-          {/* Organisation */}
-          <div>
-            <label style={S.lbl}>Organisation Name</label>
-            <select
-              style={S.sel}
-              value={orgId}
-              onChange={e => { setOrgId(e.target.value); setAssocId(""); }}
-            >
-              <option value="">Select organisation</option>
-              {ORGANISATIONS.map(o => (
-                <option key={o.id} value={o.id}>{o.name}</option>
-              ))}
-            </select>
-          </div>
-
-          {/* Association */}
-          <div>
-            <label style={S.lbl}>Association Name</label>
-            <select
-              style={{ ...S.sel, opacity: !orgId ? 0.6 : 1 }}
-              value={assocId}
-              onChange={e => setAssocId(e.target.value)}
-              disabled={!orgId}
-            >
-              <option value="">{orgId ? "Select association" : "Select organisation first"}</option>
-              {filteredAssocs.map(a => (
-                <option key={a.id} value={a.id}>{a.name}</option>
-              ))}
-            </select>
-          </div>
-
-          {/* Declaration */}
-          <label style={{ display: "flex", alignItems: "flex-start", gap: 10, cursor: "pointer", fontSize: 13, color: "#1a1628", lineHeight: 1.5 }}>
-            <input
-              type="checkbox"
-              checked={agreed}
-              onChange={e => setAgreed(e.target.checked)}
-              style={{ marginTop: 2, accentColor: "#7c3aed", width: 15, height: 15, flexShrink: 0, cursor: "pointer" }}
-            />
-            I agree to the declarations
-          </label>
-
-          {/* Sign Up button */}
-          <button
-            type="submit"
-            style={{ ...S.btn, opacity: (!agreed) ? 0.5 : 1 }}
-            disabled={!agreed}
-          >
-            Sign Up →
-          </button>
-        </>
-      )}
-
-      <p style={{ ...S.regLink, marginTop: 6 }}>
-        Already have an account?{" "}
-        <button
-          type="button"
-          onClick={onBack}
-          style={{ background: "none", border: "none", color: "#7c3aed", cursor: "pointer", fontSize: 13, fontWeight: 600, fontFamily: "inherit", padding: 0 }}
-        >
-          Sign in
-        </button>
-      </p>
-    </form>
-  );
-}
-
 // ── Sign-in page ──────────────────────────────────────────────────────────────
 export default function SignIn() {
-  const { login } = useAuth();
+  const { login, loginByMobile } = useAuth();
   const navigate  = useNavigate();
 
-  const [view,      setView]     = useState("signin"); // "signin" | "signup"
-  const [loginMode, setLoginMode] = useState("mobile");
+  const [loginMode, setLoginMode] = useState("mobile"); // "mobile" | "userid"
 
+  const [countryCode, setCountryCode] = useState("+91");
   const [mobile,  setMobile]  = useState("");
   const [otpSent, setOtpSent] = useState(false);
   const [otp,     setOtp]     = useState("");
@@ -316,6 +124,13 @@ export default function SignIn() {
     setOtp("");
   };
 
+  const quickLogin = (demo) => {
+    setLoginMode("userid");
+    setIdentifier(demo.email);
+    setPassword(demo.pass);
+    setError("");
+  };
+
   const handleGetOtp = () => {
     if (mobile.length < 10) { setError("Enter a valid 10-digit mobile number."); return; }
     setError("");
@@ -329,24 +144,19 @@ export default function SignIn() {
     setError("");
     setTimeout(() => {
       const creds = MOBILE_CREDS[mobile];
-      if (!creds) {
-        setLoading(false);
-        setError("Mobile number not registered. Try a demo number or use Username login.");
-        return;
-      }
-      const r = login(creds.email, creds.pass);
+      const r = creds ? login(creds.email, creds.pass) : loginByMobile(mobile);
       setLoading(false);
       if (r.ok) {
         navigate(
           r.user.role === "broker" ? "/broker-portal" :
-          r.user.role === "agent"  ? "/agent-portal"  : "/customer-portal",
+          r.user.role === "agent"  ? "/agent-portal"  : "/member-portal",
           { replace: true }
         );
-      } else setError(r.error);
+      } else setError("Mobile number not registered. Try a demo number, register, or use User ID login.");
     }, 500);
   };
 
-  const handleUsernameLogin = (e) => {
+  const handleUseridLogin = (e) => {
     e.preventDefault();
     setLoading(true);
     setError("");
@@ -356,195 +166,163 @@ export default function SignIn() {
       if (r.ok) {
         navigate(
           r.user.role === "broker" ? "/broker-portal" :
-          r.user.role === "agent"  ? "/agent-portal"  : "/customer-portal",
+          r.user.role === "agent"  ? "/agent-portal"  : "/member-portal",
           { replace: true }
         );
       } else setError(r.error);
     }, 500);
   };
 
-  const fillDemo = (d) => {
-    switchMode("username");
-    setIdentifier(d.email);
-    setPassword(d.pass);
-  };
-
   return (
     <div className="login-page" style={S.page}>
-      <div style={S.wrapper}>
+      <div style={S.glowOverlay} />
+      <div style={S.gridOverlay} />
 
-      {/* ── Left card ── */}
       <div className="login-card" style={S.card}>
 
-        {/* Brand — always visible */}
+        {/* Brand */}
         <div style={S.brand}>
           <img src={kmdLogo} alt="KMD" style={S.logoImg} />
-          <div>
-            <div style={S.brandName}>K.M. Dastur & Co.</div>
-            <div style={{ fontSize: 13, color: "#a855f7", fontWeight: 600, marginTop: 2 }}>Insurance Brokers · IRDAI Registered</div>
-          </div>
+          <div style={S.brandName}>K M Dastur</div>
         </div>
 
-        {view === "signup" ? (
-          <SignUpView onBack={() => setView("signin")} />
-        ) : (
-          <>
-            <h2 style={{ ...S.title, background:"linear-gradient(135deg,#fb7185,#a855f7)", WebkitBackgroundClip:"text", WebkitTextFillColor:"transparent", backgroundClip:"text" }}>Welcome back</h2>
-            <p style={S.sub}>Sign in to access your portal</p>
+        <h1 style={S.title}>Login</h1>
 
-            {/* Mode toggle */}
-            <div style={S.toggle}>
-              {[
-                { key: "mobile",   label: "📱 Mobile Number" },
-                { key: "username", label: "👤 Username" },
-              ].map(({ key, label }) => (
-                <button
-                  key={key}
-                  type="button"
-                  onClick={() => switchMode(key)}
-                  style={{
-                    ...S.toggleBtn,
-                    background: loginMode === key ? "linear-gradient(135deg,#fb7185 0%,#a855f7 100%)" : "transparent",
-                    color:      loginMode === key ? "#fff"    : "#a855f7",
-                    fontWeight: loginMode === key ? 600       : 400,
-                  }}
+        {/* Mode toggle */}
+        <div style={S.toggle}>
+          {[
+            { key: "mobile", label: "Mobile No" },
+            { key: "userid", label: "User ID" },
+          ].map(({ key, label }) => (
+            <button
+              key={key}
+              type="button"
+              onClick={() => switchMode(key)}
+              style={{
+                ...S.toggleBtn,
+                backgroundImage: loginMode === key ? "linear-gradient(180deg, #1565d8 0%, #104ea6 100%)" : "none",
+                color:      loginMode === key ? "#fff"    : "#1565d8",
+              }}
+            >
+              {label}
+            </button>
+          ))}
+        </div>
+
+        {error && <div style={S.err}>{error}</div>}
+
+        {/* Mobile OTP flow */}
+        {loginMode === "mobile" && (
+          <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+            <div>
+              <label style={S.lbl}>Mobile No</label>
+              <div style={{ ...S.phoneRow, ...(otpSent ? { background: "#f0f6ff" } : {}) }}>
+                <select
+                  value={countryCode}
+                  onChange={e => setCountryCode(e.target.value)}
+                  disabled={otpSent}
+                  style={S.countrySel}
                 >
-                  {label}
-                </button>
-              ))}
+                  <option value="+91">+91</option>
+                </select>
+                <input
+                  type="tel" maxLength={10} autoFocus={!otpSent}
+                  readOnly={otpSent}
+                  style={S.phoneInput}
+                  placeholder="98123 45678"
+                  value={mobile}
+                  onChange={e => { setMobile(e.target.value.replace(/\D/g, "").slice(0, 10)); setError(""); }}
+                />
+              </div>
             </div>
 
-            {error && <div style={S.err}>{error}</div>}
-
-            {/* Mobile OTP flow */}
-            {loginMode === "mobile" && (
-              <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+            {!otpSent ? (
+              <button
+                type="button"
+                style={{ ...S.btn, opacity: mobile.length < 10 ? 0.5 : 1 }}
+                disabled={mobile.length < 10}
+                onClick={handleGetOtp}
+              >
+                Get OTP
+              </button>
+            ) : (
+              <form onSubmit={handleOtpLogin} style={{ display: "flex", flexDirection: "column", gap: 16 }}>
                 <div>
-                  <label style={S.lbl}>Mobile Number</label>
-                  <input
-                    type="tel" maxLength={10} autoFocus={!otpSent}
-                    readOnly={otpSent}
-                    style={{ ...S.inp, ...(otpSent ? { background: "#f3f0fa", color: "#7c3aed", fontWeight: 600, cursor: "default" } : {}) }}
-                    placeholder="Enter 10-digit mobile number"
-                    value={mobile}
-                    onChange={e => { setMobile(e.target.value.replace(/\D/g, "").slice(0, 10)); setError(""); }}
-                  />
-                </div>
-
-                {!otpSent ? (
-                  <button
-                    type="button"
-                    style={{ ...S.btn, opacity: mobile.length < 10 ? 0.5 : 1 }}
-                    disabled={mobile.length < 10}
-                    onClick={handleGetOtp}
-                  >
-                    Get OTP →
-                  </button>
-                ) : (
-                  <form onSubmit={handleOtpLogin} style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-                    <div>
-                      <label style={S.lbl}>Enter OTP</label>
-                      <OtpInput value={otp} onChange={v => { setOtp(v); setError(""); }} />
-                      <div style={{ fontSize: 13, color: "#64748b", marginTop: 8 }}>
-                        OTP sent to +91-{mobile} ·{" "}
-                        <button
-                          type="button"
-                          onClick={() => { setOtpSent(false); setOtp(""); setError(""); }}
-                          style={{ background: "none", border: "none", color: "#7c3aed", cursor: "pointer", fontSize: 13, padding: 0, fontFamily: "inherit" }}
-                        >
-                          Change number
-                        </button>
-                      </div>
-                    </div>
-                    <button type="submit" style={{ ...S.btn, opacity: (loading || otp.length < 4) ? 0.75 : 1 }} disabled={loading || otp.length < 4}>
-                      {loading ? "Verifying…" : "Login →"}
+                  <label style={S.lbl}>Enter OTP</label>
+                  <OtpInput value={otp} onChange={v => { setOtp(v); setError(""); }} />
+                  <div style={{ fontSize: 13, color: "#6d747a", marginTop: 8 }}>
+                    OTP sent to {countryCode}-{mobile} ·{" "}
+                    <button
+                      type="button"
+                      onClick={() => { setOtpSent(false); setOtp(""); setError(""); }}
+                      style={{ background: "none", border: "none", color: "#006aff", cursor: "pointer", fontSize: 13, padding: 0, fontFamily: "inherit" }}
+                    >
+                      Change number
                     </button>
-                  </form>
-                )}
-              </div>
-            )}
-
-            {/* Username flow */}
-            {loginMode === "username" && (
-              <form onSubmit={handleUsernameLogin} style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-                <div>
-                  <label style={S.lbl}>Username / Email</label>
-                  <input
-                    type="text" required autoFocus
-                    style={S.inp} placeholder="Email or username"
-                    value={identifier}
-                    onChange={e => { setIdentifier(e.target.value); setError(""); }}
-                  />
+                  </div>
                 </div>
-                <div style={{ position: "relative" }}>
-                  <label style={S.lbl}>Password</label>
-                  <input
-                    type={showPass ? "text" : "password"} required
-                    style={S.inp} placeholder="••••••••"
-                    value={password}
-                    onChange={e => { setPassword(e.target.value); setError(""); }}
-                  />
-                  <button type="button" style={S.eyeBtn} onClick={() => setShowPass(v => !v)}>
-                    {showPass ? "🙈" : "👁️"}
-                  </button>
-                </div>
-                <button type="submit" style={{ ...S.btn, opacity: loading ? 0.75 : 1 }} disabled={loading}>
-                  {loading ? "Signing in…" : "Sign In →"}
+                <button type="submit" style={{ ...S.btn, opacity: (loading || otp.length < 4) ? 0.75 : 1 }} disabled={loading || otp.length < 4}>
+                  {loading ? "Verifying…" : "Login"}
                 </button>
               </form>
             )}
-
-            <p style={S.regLink}>
-              Don't have an account?{" "}
-              <button
-                type="button"
-                onClick={() => setView("signup")}
-                style={{ background: "none", border: "none", color: "#7c3aed", cursor: "pointer", fontSize: 13, fontWeight: 600, fontFamily: "inherit", padding: 0 }}
-              >
-                Sign up
-              </button>
-            </p>
-
-            {/* Demo credentials */}
-            <div style={{ ...S.demoBox, marginTop: "auto" }}>
-              <div style={S.demoHead}>Quick demo login</div>
-              <div style={S.demoBtns}>
-                {DEMO.map(d => (
-                  <button key={d.role} type="button" style={S.demoBtn} onClick={() => fillDemo(d)}>
-                    {d.role}
-                  </button>
-                ))}
-              </div>
-            </div>
-          </>
-        )}
-      </div>
-
-      {/* ── Right panel ── */}
-      <div className="login-panel" style={S.panel}>
-        <div style={S.panelInner}>
-          <div style={{ display: "flex", alignItems: "center", gap: 14, marginBottom: 18 }}>
-            <img src={kmdLogo} alt="KMD" style={S.shield} />
-            <h3 style={S.panelTitle}>K.M. Dastur Reinsurance Broker</h3>
           </div>
-          <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-            <div style={S.infoCard}>
-                <div style={S.panelSection}>Quality Policy</div>
-                <p style={S.panelText}>K.M. Dastur is committed to satisfy &amp; delight customers by meeting requirements through timely, error free and courteous services and to continually improve the effectiveness of its processes. This is achieved through statutory compliances.</p>
+        )}
+
+        {/* User ID flow */}
+        {loginMode === "userid" && (
+          <form onSubmit={handleUseridLogin} style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+            <div>
+              <label style={S.lbl}>User ID</label>
+              <input
+                type="text" required autoFocus
+                style={S.inp} placeholder="Enter User ID"
+                value={identifier}
+                onChange={e => { setIdentifier(e.target.value); setError(""); }}
+              />
             </div>
-            <div style={S.infoCard}>
-                <div style={S.panelSection}>Our Vision</div>
-                <p style={S.panelText}>KMD will be recognized as the best professional services company in the insurance industry worldwide.</p>
+            <div>
+              <div style={{ position: "relative" }}>
+                <label style={S.lbl}>Password</label>
+                <input
+                  type={showPass ? "text" : "password"} required
+                  style={S.inp} placeholder="Enter Password"
+                  value={password}
+                  onChange={e => { setPassword(e.target.value); setError(""); }}
+                />
+                <button type="button" style={S.eyeBtn} onClick={() => setShowPass(v => !v)}>
+                  {showPass ? <IconEyeOff /> : <IconEye />}
+                </button>
+              </div>
+              <div style={S.forgotRow}>Forgot password</div>
             </div>
-            <div style={S.infoCard}>
-                <div style={S.panelSection}>Our Mission</div>
-                <p style={S.panelText}>To render professional services of the highest order and be recognized as a professional company that consistently exceeds the expectations of our clients and our people through commitment to learning, integrity and hard work.</p>
-            </div>
+            <button type="submit" style={{ ...S.btn, opacity: loading ? 0.75 : 1 }} disabled={loading}>
+              {loading ? "Signing in…" : "Login"}
+            </button>
+          </form>
+        )}
+
+        <p style={S.regLink}>
+          Don't have an account? <Link to="/register" style={S.regLinkA}>Register</Link>
+        </p>
+
+        {/* Quick login (demo) */}
+        <div style={{ ...S.quickLoginWrap, marginTop: 20, marginBottom: 0 }}>
+          <span style={S.quickLoginLbl}>Quick Login (Demo)</span>
+          <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
+            {DEMO.map((d) => (
+              <button
+                key={d.role}
+                type="button"
+                onClick={() => quickLogin(d)}
+                style={S.quickLoginBtn}
+              >
+                {d.role}
+              </button>
+            ))}
           </div>
         </div>
       </div>
-
-      </div>{/* wrapper */}
     </div>
   );
 }
@@ -552,92 +330,96 @@ export default function SignIn() {
 const S = {
   page: {
     minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center",
-    background: "linear-gradient(135deg, #fde8ef 0%, #faf4ff 50%, #ede9fe 100%)",
-    padding: "24px 16px",
+    background: "linear-gradient(135deg, #1565d8 0%, #104ea6 100%)",
+    padding: "24px 16px", position: "relative", overflow: "hidden",
   },
-  wrapper: {
-    display: "flex", width: "100%", maxWidth: 880,
-    borderRadius: 24, background: "#fff",
-    boxShadow: "0 24px 64px rgba(168,85,247,0.18), 0 4px 20px rgba(0,0,0,0.08)",
-    overflow: "hidden",
+  glowOverlay: {
+    position: "absolute", inset: 0, pointerEvents: "none",
+    background:
+      "radial-gradient(60% 50% at 25% 15%, rgba(255,255,255,0.16), transparent 60%), " +
+      "radial-gradient(55% 45% at 85% 85%, rgba(8,40,90,0.35), transparent 70%)",
+  },
+  gridOverlay: {
+    position: "absolute", inset: 0, pointerEvents: "none",
+    backgroundImage: HEX_BG,
+    backgroundSize: "36px 62px",
   },
   card: {
-    width: 430, flexShrink: 0, padding: "44px 40px",
-    background: "#fff",
+    width: 460, maxWidth: "100%", padding: "40px 44px",
+    background: "linear-gradient(180deg, #ffffff 0%, #eeeeee 6%, #ffffff 32%, #ffffff 68%, #f4f4f4 91%, #d7d7d7 105%)",
+    borderRadius: 16, boxShadow: "0 2px 30px rgba(7,49,103,0.34)",
     display: "flex", flexDirection: "column",
-    overflowY: "auto", maxHeight: "92vh",
-    boxShadow: "4px 0 20px rgba(168,85,247,0.08)",
-    position: "relative", zIndex: 2,
+    position: "relative", zIndex: 1,
   },
-  brand: { display: "flex", alignItems: "center", gap: 13, marginBottom: 28, paddingBottom: 22, borderBottom: "1.5px solid #f3e8ff" },
-  logoImg: { width: 46, height: 46, flexShrink: 0, borderRadius: "50%", boxShadow: "0 2px 10px rgba(168,85,247,0.20)" },
-  brandName: { fontSize: 15, fontWeight: 700, color: "#1a1628" },
-  brandSub:  { fontSize: 13, color: "#64748b", marginTop: 2 },
-  title: { fontSize: 26, fontWeight: 800, color: "#1a1628", margin: "0 0 6px" },
-  sub:   { fontSize: 13, color: "#64748b", margin: "0 0 18px" },
+  brand: { display: "flex", alignItems: "center", gap: 12, marginBottom: 32 },
+  logoImg: { width: 44, height: 44, flexShrink: 0, borderRadius: "50%", boxShadow: "0 2px 8px rgba(0,0,0,0.15)" },
+  brandName: { fontSize: 22, fontWeight: 600, color: "#24304a", letterSpacing: -0.3 },
+  title: {
+    fontSize: 28, fontWeight: 700, letterSpacing: -0.6, margin: "0 0 22px",
+    backgroundImage: "linear-gradient(180deg, #1565d8 0%, #104ea6 100%)",
+    WebkitBackgroundClip: "text", backgroundClip: "text", color: "transparent",
+  },
   toggle: {
-    display: "flex", background: "#f3f0fa", borderRadius: 9,
-    padding: 4, gap: 4, marginBottom: 22,
+    display: "flex", background: "transparent", border: "1.5px solid #dee1e5",
+    borderRadius: 8, padding: 4, gap: 6, marginBottom: 24,
   },
   toggleBtn: {
-    flex: 1, padding: "9px 12px", border: "none", borderRadius: 7,
-    cursor: "pointer", fontSize: 13, fontFamily: "inherit", transition: "all .15s",
+    flex: 1, padding: "10px 16px", border: "none", borderRadius: 7,
+    cursor: "pointer", fontSize: 14, fontWeight: 600, fontFamily: "inherit", transition: "all .15s",
+  },
+  quickLoginWrap: { marginBottom: 20 },
+  quickLoginLbl: {
+    display: "block", fontSize: 12, fontWeight: 600, color: "#6d747a",
+    textTransform: "uppercase", letterSpacing: ".4px", marginBottom: 8,
+  },
+  quickLoginBtn: {
+    padding: "6px 12px", borderRadius: 20, fontSize: 12.5, fontWeight: 600,
+    border: "1.5px solid #dee1e5", background: "#fff", color: "#1565d8",
+    cursor: "pointer", fontFamily: "inherit", transition: "all .15s",
   },
   err: {
     background: "#fef2f2", border: "1px solid #fecaca", color: "#dc2626",
     padding: "10px 14px", borderRadius: 8, fontSize: 13, marginBottom: 4,
   },
-  lbl: { display: "block", fontFamily: '"Plus Jakarta Sans", sans-serif', fontSize: 13, fontWeight: 600, color: "#4a4566", marginBottom: 6, letterSpacing: ".1px" },
+  lbl: { display: "block", fontSize: 14, fontWeight: 500, color: "#24304a", marginBottom: 8 },
   inp: {
-    width: "100%", padding: "11px 14px", border: "1.5px solid #e8e4f3",
-    borderRadius: 10, fontSize: 14, outline: "none", fontFamily: "inherit",
-    color: "#1a1628", background: "#faf9fc", boxSizing: "border-box",
-    boxShadow: "0 1px 4px rgba(168,85,247,0.06)", transition: "border-color .15s",
+    width: "100%", height: 40, padding: "0 12px", border: "1.5px solid #dee1e5",
+    borderRadius: 6, fontSize: 14, outline: "none", fontFamily: "inherit",
+    color: "#24304a", background: "#fff", boxSizing: "border-box",
+    transition: "border-color .15s",
   },
-  sel: {
-    width: "100%", padding: "11px 14px", border: "1.5px solid #e8e4f3",
-    borderRadius: 10, fontSize: 14, outline: "none", fontFamily: "inherit",
-    color: "#1a1628", background: "#faf9fc", boxSizing: "border-box",
-    boxShadow: "0 1px 4px rgba(168,85,247,0.06)", cursor: "pointer",
+  phoneRow: {
+    display: "flex", alignItems: "center", gap: 12, border: "1.5px solid #dee1e5",
+    borderRadius: 6, background: "#fff", height: 40, padding: "0 12px",
+    boxSizing: "border-box", transition: "background .15s",
+  },
+  countrySel: {
+    border: "none", background: "transparent", outline: "none", fontFamily: "inherit",
+    fontSize: 14, color: "#1f2937", cursor: "pointer", appearance: "none",
+    padding: "0 20px 0 0", backgroundImage: CHEVRON_BG, backgroundRepeat: "no-repeat",
+    backgroundPosition: "right center", backgroundSize: "16px 16px",
+  },
+  phoneInput: {
+    flex: 1, border: "none", outline: "none", fontFamily: "inherit",
+    fontSize: 14, color: "#24304a", background: "transparent", padding: 0,
+    minWidth: 0,
   },
   eyeBtn: {
     position: "absolute", right: 12, bottom: 10, background: "none",
-    border: "none", cursor: "pointer", fontSize: 15, lineHeight: 1,
+    border: "none", cursor: "pointer", padding: 0, display: "flex", lineHeight: 1,
+  },
+  forgotRow: {
+    display: "flex", justifyContent: "flex-end", marginTop: 8,
+    fontSize: 14, color: "#006aff",
   },
   btn: {
-    background: "linear-gradient(135deg,#fb7185 0%,#a855f7 100%)", color: "#fff", border: "none", borderRadius: 10,
-    padding: "12px", fontSize: 14, fontWeight: 600, cursor: "pointer",
-    fontFamily: "inherit", marginTop: 4, transition: "opacity .15s, filter .15s", letterSpacing: 0.2,
-    boxShadow: "0 4px 14px rgba(168,85,247,0.35)",
+    backgroundImage: "linear-gradient(180deg, #1565d8 0%, #104ea6 100%)", color: "#fff",
+    border: "none", borderRadius: 8, height: 40, fontSize: 16, fontWeight: 600,
+    letterSpacing: -0.16, cursor: "pointer", fontFamily: "inherit",
+    display: "flex", alignItems: "center", justifyContent: "center",
+    transition: "opacity .15s, filter .15s",
+    boxShadow: "0 4px 14px rgba(21,101,216,0.28)",
   },
-  demoBox: { padding: "13px 15px", background: "#f5f3ff", border: "1px solid #ede9fe", borderRadius: 10 },
-  demoHead: { fontSize: 13, fontWeight: 700, color: "#7c3aed", textTransform: "uppercase", letterSpacing: ".6px", marginBottom: 8 },
-  demoBtns: { display: "flex", gap: 8, flexWrap: "wrap" },
-  demoBtn: {
-    padding: "5px 14px", background: "#ede9fe", color: "#7c3aed",
-    border: "1px solid #c4b5fd", borderRadius: 6, fontSize: 13.5,
-    cursor: "pointer", fontFamily: "inherit", fontWeight: 500,
-  },
-  regLink: { fontSize: 13, color: "#5c5573", marginTop: 18, textAlign: "center" },
-  panel: {
-    flex: 1, background: "linear-gradient(150deg, #fdf2f8 0%, #f5f0ff 100%)",
-    display: "flex", alignItems: "center", justifyContent: "center", padding: 44,
-    borderRadius: "18px", margin: "10px", marginLeft: "-18px",
-    boxShadow: "0 4px 20px rgba(168,85,247,0.10)", position: "relative", zIndex: 1,
-  },
-  panelInner: { maxWidth: 400 },
-  shield: { width: 50, height: 50, flexShrink: 0, borderRadius: "50%", opacity: 0.85 },
-  panelTitle:   { fontSize: 18, fontWeight: 800, margin: 0, color: "#4c1d6e", lineHeight: 1.2 },
-  panelSection: { fontSize: 10.5, fontWeight: 800, textTransform: "uppercase", letterSpacing: "1px", color: "#a855f7", marginBottom: 4 },
-  panelText:    { fontSize: 13.5, color: "#6b4e8a", lineHeight: 1.7, margin: 0, fontWeight: 500 },
-  infoCard: {
-    background: "rgba(255,255,255,0.65)",
-    borderRadius: 10, padding: "11px 14px",
-    borderLeft: "3px solid #d8b4fe",
-  },
-  badge: {
-    display: "inline-block", background: "rgba(255,255,255,0.15)",
-    border: "1px solid rgba(255,255,255,0.28)", color: "#fff",
-    padding: "5px 14px", borderRadius: 99, fontSize: 12, fontWeight: 600,
-  },
+  regLink: { fontSize: 14, color: "#6d747a", marginTop: 24, textAlign: "center" },
+  regLinkA: { color: "#006aff", fontWeight: 600, textDecoration: "none" },
 };

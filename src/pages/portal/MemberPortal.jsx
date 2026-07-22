@@ -208,10 +208,10 @@ function Stars({ n }) {
 }
 
 /* ─── component ─────────────────────────────────────────── */
-export default function CustomerPortal() {
+export default function MemberPortal() {
   const { user }   = useAuth()
   const navigate   = useNavigate()
-  const myPolicies = POLICY_MOCK.filter(p => p.customerId === user?.id)
+  const myPolicies = POLICY_MOCK.filter(p => p.memberId === user?.id)
   const [helpOpen, setHelpOpen]       = useState(false)
   const [helpReason, setHelpReason]   = useState('')
   const [helpSubmitted, setHelpSubmitted] = useState(false)
@@ -329,7 +329,7 @@ export default function CustomerPortal() {
           TESTIMONIALS
       ══════════════════════════════════════════════════ */}
       <div style={{ marginBottom:24 }}>
-        <div style={{ fontSize:18, fontWeight:800, color:'#1a1628', marginBottom:4 }}>What Our Customers Say</div>
+        <div style={{ fontSize:18, fontWeight:800, color:'#1a1628', marginBottom:4 }}>What Our Members Say</div>
         <div style={{ fontSize:13, color:'#64748b', marginBottom:14 }}>Trusted by 50,000+ policyholders across India</div>
         <div className="cp-testimonials" style={{ display:'grid', gridTemplateColumns:'repeat(3,1fr)', gap:14 }}>
           {TESTIMONIALS.map((t, i) => (
@@ -392,7 +392,7 @@ export default function CustomerPortal() {
       ══════════════════════════════════════════════════ */}
       <button
         onClick={() => { setHelpOpen(true); setHelpSubmitted(false); setHelpReason(''); }}
-        style={{ position: 'fixed', bottom: 28, right: 28, padding: '12px 24px', borderRadius: 99, border: 'none', background: 'linear-gradient(135deg, #fb7185 0%, #a855f7 100%)', color: '#fff', fontSize: 14, fontWeight: 700, cursor: 'pointer', boxShadow: '0 6px 20px rgba(168,85,247,.4)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 900, transition: 'transform .15s', fontFamily: 'inherit', letterSpacing: '.3px' }}
+        style={{ position: 'fixed', bottom: 28, right: 28, padding: '12px 24px', borderRadius: 99, border: 'none', background: 'linear-gradient(180deg, #1565d8 0%, #104ea6 100%)', color: '#fff', fontSize: 14, fontWeight: 700, cursor: 'pointer', boxShadow: '0 6px 20px rgba(168,85,247,.4)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 900, transition: 'transform .15s', fontFamily: 'inherit', letterSpacing: '.3px' }}
         onMouseEnter={e => e.currentTarget.style.transform = 'scale(1.05)'}
         onMouseLeave={e => e.currentTarget.style.transform = 'scale(1)'}
         title="Need Help?"
@@ -417,7 +417,7 @@ export default function CustomerPortal() {
                   <div style={{ fontSize: 40, marginBottom: 12 }}>&#10003;</div>
                   <div style={{ fontSize: 16, fontWeight: 700, color: '#15803d', marginBottom: 6 }}>Request Submitted!</div>
                   <div style={{ fontSize: 13, color: '#64748b', lineHeight: 1.6 }}>Our team will get back to you shortly. You can also call us at <strong>1800-XXX-XXXX</strong></div>
-                  <button onClick={() => setHelpOpen(false)} style={{ marginTop: 18, padding: '9px 28px', borderRadius: 8, border: 'none', background: 'linear-gradient(135deg, #fb7185 0%, #a855f7 100%)', color: '#fff', fontWeight: 700, fontSize: 13.5, cursor: 'pointer', fontFamily: 'inherit' }}>Close</button>
+                  <button onClick={() => setHelpOpen(false)} style={{ marginTop: 18, padding: '9px 28px', borderRadius: 8, border: 'none', background: 'linear-gradient(180deg, #1565d8 0%, #104ea6 100%)', color: '#fff', fontWeight: 700, fontSize: 13.5, cursor: 'pointer', fontFamily: 'inherit' }}>Close</button>
                 </div>
               ) : (
                 <>
@@ -436,7 +436,7 @@ export default function CustomerPortal() {
                   <button
                     onClick={() => { if (helpReason.trim()) setHelpSubmitted(true); }}
                     disabled={!helpReason.trim()}
-                    style={{ width: '100%', padding: '11px', borderRadius: 9, border: 'none', background: helpReason.trim() ? 'linear-gradient(135deg, #fb7185 0%, #a855f7 100%)' : '#e2e8f0', color: helpReason.trim() ? '#fff' : '#94a3b8', fontWeight: 700, fontSize: 14, cursor: helpReason.trim() ? 'pointer' : 'not-allowed', fontFamily: 'inherit', boxShadow: helpReason.trim() ? '0 4px 14px rgba(168,85,247,.35)' : 'none' }}
+                    style={{ width: '100%', padding: '11px', borderRadius: 9, border: 'none', background: helpReason.trim() ? 'linear-gradient(180deg, #1565d8 0%, #104ea6 100%)' : '#e2e8f0', color: helpReason.trim() ? '#fff' : '#94a3b8', fontWeight: 700, fontSize: 14, cursor: helpReason.trim() ? 'pointer' : 'not-allowed', fontFamily: 'inherit', boxShadow: helpReason.trim() ? '0 4px 14px rgba(168,85,247,.35)' : 'none' }}
                   >
                     Submit Request
                   </button>

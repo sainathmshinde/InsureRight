@@ -16,7 +16,7 @@ import {
 import { Tabs } from "../../components/ui/Tabs";
 import { CampaignIcon } from "../../icons";
 import { PRODUCTS, POLICY_TYPE_ICON } from "../product/productData";
-import { ASSOCIATIONS } from "../customer/orgAssocData";
+import { ASSOCIATIONS } from "../member/orgAssocData";
 
 const PTYPE_META = {
   "Base Policy": { color: "#2563eb", bg: "#dbeafe", border: "#bfdbfe" },
@@ -38,35 +38,35 @@ const INDIA_STATES = [
 ];
 
 const MOCK_USERS = [
-  { id: 1,  name: "Aarav Sharma",   age: 34, gender: "Male",   marital: "Married",  segment: "Active Policyholders",   type: "Customer", state: "Maharashtra" },
-  { id: 2,  name: "Priya Mehta",    age: 28, gender: "Female", marital: "Single",   segment: "New Registrations",       type: "Customer", state: "Gujarat" },
-  { id: 3,  name: "Rohan Verma",    age: 52, gender: "Male",   marital: "Married",  segment: "Renewal Due (30 days)",   type: "Customer", state: "Delhi" },
-  { id: 4,  name: "Sneha Iyer",     age: 41, gender: "Female", marital: "Divorced", segment: "High Value Customers",    type: "Customer", state: "Karnataka" },
-  { id: 5,  name: "Karan Patel",    age: 23, gender: "Male",   marital: "Single",   segment: "New Registrations",       type: "Customer", state: "Gujarat" },
-  { id: 6,  name: "Divya Nair",     age: 37, gender: "Female", marital: "Married",  segment: "Active Policyholders",    type: "Customer", state: "Kerala" },
-  { id: 7,  name: "Arjun Singh",    age: 60, gender: "Male",   marital: "Widowed",  segment: "Renewal Due (30 days)",   type: "Customer", state: "Punjab" },
-  { id: 8,  name: "Meera Joshi",    age: 45, gender: "Female", marital: "Married",  segment: "Lapsed Customers",        type: "Customer", state: "Rajasthan" },
-  { id: 9,  name: "Vikram Rao",     age: 31, gender: "Male",   marital: "Single",   segment: "Active Policyholders",    type: "Customer", state: "Telangana" },
-  { id: 10, name: "Anjali Desai",   age: 29, gender: "Female", marital: "Married",  segment: "New Registrations",       type: "Customer", state: "Maharashtra" },
-  { id: 11, name: "Rahul Gupta",    age: 48, gender: "Male",   marital: "Married",  segment: "High Value Customers",    type: "Customer", state: "Uttar Pradesh" },
-  { id: 12, name: "Pooja Reddy",    age: 33, gender: "Female", marital: "Single",   segment: "Active Policyholders",    type: "Customer", state: "Telangana" },
-  { id: 13, name: "Suresh Kumar",   age: 55, gender: "Male",   marital: "Married",  segment: "Renewal Due (30 days)",   type: "Customer", state: "Tamil Nadu" },
-  { id: 14, name: "Kavita Pillai",  age: 26, gender: "Female", marital: "Single",   segment: "New Registrations",       type: "Customer", state: "Kerala" },
-  { id: 15, name: "Nikhil Bansal",  age: 39, gender: "Male",   marital: "Divorced", segment: "Lapsed Customers",        type: "Customer", state: "Delhi" },
-  { id: 16, name: "Swati Tiwari",   age: 44, gender: "Female", marital: "Married",  segment: "Active Policyholders",    type: "Customer", state: "Madhya Pradesh" },
-  { id: 17, name: "Amit Saxena",    age: 57, gender: "Male",   marital: "Married",  segment: "High Value Customers",    type: "Customer", state: "Uttar Pradesh" },
-  { id: 18, name: "Ritu Bhatia",    age: 22, gender: "Female", marital: "Single",   segment: "New Registrations",       type: "Customer", state: "Haryana" },
-  { id: 19, name: "Deepak Mishra",  age: 36, gender: "Male",   marital: "Married",  segment: "Active Policyholders",    type: "Customer", state: "Bihar" },
-  { id: 20, name: "Nisha Chauhan",  age: 50, gender: "Female", marital: "Widowed",  segment: "Lapsed Customers",        type: "Customer", state: "Rajasthan" },
+  { id: 1,  name: "Aarav Sharma",   age: 34, gender: "Male",   marital: "Married",  segment: "Active Policyholders",   type: "Member", state: "Maharashtra" },
+  { id: 2,  name: "Priya Mehta",    age: 28, gender: "Female", marital: "Single",   segment: "New Registrations",       type: "Member", state: "Gujarat" },
+  { id: 3,  name: "Rohan Verma",    age: 52, gender: "Male",   marital: "Married",  segment: "Renewal Due (30 days)",   type: "Member", state: "Delhi" },
+  { id: 4,  name: "Sneha Iyer",     age: 41, gender: "Female", marital: "Divorced", segment: "High Value Members",    type: "Member", state: "Karnataka" },
+  { id: 5,  name: "Karan Patel",    age: 23, gender: "Male",   marital: "Single",   segment: "New Registrations",       type: "Member", state: "Gujarat" },
+  { id: 6,  name: "Divya Nair",     age: 37, gender: "Female", marital: "Married",  segment: "Active Policyholders",    type: "Member", state: "Kerala" },
+  { id: 7,  name: "Arjun Singh",    age: 60, gender: "Male",   marital: "Widowed",  segment: "Renewal Due (30 days)",   type: "Member", state: "Punjab" },
+  { id: 8,  name: "Meera Joshi",    age: 45, gender: "Female", marital: "Married",  segment: "Lapsed Members",        type: "Member", state: "Rajasthan" },
+  { id: 9,  name: "Vikram Rao",     age: 31, gender: "Male",   marital: "Single",   segment: "Active Policyholders",    type: "Member", state: "Telangana" },
+  { id: 10, name: "Anjali Desai",   age: 29, gender: "Female", marital: "Married",  segment: "New Registrations",       type: "Member", state: "Maharashtra" },
+  { id: 11, name: "Rahul Gupta",    age: 48, gender: "Male",   marital: "Married",  segment: "High Value Members",    type: "Member", state: "Uttar Pradesh" },
+  { id: 12, name: "Pooja Reddy",    age: 33, gender: "Female", marital: "Single",   segment: "Active Policyholders",    type: "Member", state: "Telangana" },
+  { id: 13, name: "Suresh Kumar",   age: 55, gender: "Male",   marital: "Married",  segment: "Renewal Due (30 days)",   type: "Member", state: "Tamil Nadu" },
+  { id: 14, name: "Kavita Pillai",  age: 26, gender: "Female", marital: "Single",   segment: "New Registrations",       type: "Member", state: "Kerala" },
+  { id: 15, name: "Nikhil Bansal",  age: 39, gender: "Male",   marital: "Divorced", segment: "Lapsed Members",        type: "Member", state: "Delhi" },
+  { id: 16, name: "Swati Tiwari",   age: 44, gender: "Female", marital: "Married",  segment: "Active Policyholders",    type: "Member", state: "Madhya Pradesh" },
+  { id: 17, name: "Amit Saxena",    age: 57, gender: "Male",   marital: "Married",  segment: "High Value Members",    type: "Member", state: "Uttar Pradesh" },
+  { id: 18, name: "Ritu Bhatia",    age: 22, gender: "Female", marital: "Single",   segment: "New Registrations",       type: "Member", state: "Haryana" },
+  { id: 19, name: "Deepak Mishra",  age: 36, gender: "Male",   marital: "Married",  segment: "Active Policyholders",    type: "Member", state: "Bihar" },
+  { id: 20, name: "Nisha Chauhan",  age: 50, gender: "Female", marital: "Widowed",  segment: "Lapsed Members",        type: "Member", state: "Rajasthan" },
   { id: 21, name: "Rajesh Agarwal", age: 43, gender: "Male",   marital: "Married",  segment: "Renewal Due (30 days)",   type: "Operator",    state: "Maharashtra" },
   { id: 22, name: "Sunita Yadav",   age: 30, gender: "Female", marital: "Single",   segment: "Active Policyholders",    type: "Operator",    state: "Uttar Pradesh" },
-  { id: 23, name: "Manoj Tomar",    age: 47, gender: "Male",   marital: "Married",  segment: "High Value Customers",    type: "Operator",    state: "Delhi" },
+  { id: 23, name: "Manoj Tomar",    age: 47, gender: "Male",   marital: "Married",  segment: "High Value Members",    type: "Operator",    state: "Delhi" },
   { id: 24, name: "Geeta Rawat",    age: 35, gender: "Female", marital: "Divorced", segment: "Active Policyholders",    type: "Operator",    state: "Uttarakhand" },
   { id: 25, name: "Sanjay Kapoor",  age: 53, gender: "Male",   marital: "Married",  segment: "Renewal Due (30 days)",   type: "Operator",    state: "Punjab" },
   { id: 26, name: "Lakshmi Menon",  age: 27, gender: "Female", marital: "Single",   segment: "New Registrations",       type: "Operator",    state: "Tamil Nadu" },
-  { id: 27, name: "Vivek Pandey",   age: 40, gender: "Male",   marital: "Married",  segment: "Lapsed Customers",        type: "Operator",    state: "Madhya Pradesh" },
+  { id: 27, name: "Vivek Pandey",   age: 40, gender: "Male",   marital: "Married",  segment: "Lapsed Members",        type: "Operator",    state: "Madhya Pradesh" },
   { id: 28, name: "Anita Soni",     age: 32, gender: "Female", marital: "Married",  segment: "Active Policyholders",    type: "Operator",    state: "Gujarat" },
-  { id: 29, name: "Harish Dubey",   age: 58, gender: "Male",   marital: "Widowed",  segment: "High Value Customers",    type: "Operator",    state: "Karnataka" },
+  { id: 29, name: "Harish Dubey",   age: 58, gender: "Male",   marital: "Widowed",  segment: "High Value Members",    type: "Operator",    state: "Karnataka" },
   { id: 30, name: "Rekha Malhotra", age: 24, gender: "Female", marital: "Single",   segment: "New Registrations",       type: "Operator",    state: "West Bengal" },
 ];
 
@@ -88,7 +88,7 @@ const CALLING_AGENTS = OPERATORS.filter((a) => a.agentType === "calling");
 const SALES_AGENTS   = OPERATORS.filter((a) => a.agentType === "sales");
 
 const BASE = {
-  type: "Promotional", extendOption: false, targetType: "Customer", segment: "",
+  type: "Promotional", extendOption: false, targetType: "Member", segment: "",
   ageMin: "", ageMax: "", gender: "", maritalStatus: "", state: "",
   selectedProducts: [], selectedAssociations: [], discountRules: "",
   offerType: "Percent", offerValue: "", channels: [], messageTemplate: "",
@@ -110,7 +110,7 @@ const MOCK_DATA = {
 
 const DEFAULT = {
   name: "", type: "", startDate: "", endDate: "", extendOption: false,
-  targetType: "Customer", segment: "", ageMin: "", ageMax: "", gender: "",
+  targetType: "Member", segment: "", ageMin: "", ageMax: "", gender: "",
   maritalStatus: "", state: "", selectedProducts: [], selectedAssociations: [],
   discountRules: "", offerType: "Flat", offerValue: "", channels: [],
   messageTemplate: "", whatsappTemplateId: "", clickTracking: false,
@@ -265,7 +265,7 @@ export default function CampaignEdit() {
           <form onSubmit={handleSubmit}>
             {/* ── 1. Campaign Information ── */}
             <SectionBlock icon="📢" title="Campaign Information">
-              <div className="form-grid">
+              <div className="form-grid-3">
                 <Field label="Campaign Name" required>
                   <Input placeholder="Campaign name" value={form.name} onChange={set("name")} required />
                 </Field>
@@ -360,7 +360,7 @@ export default function CampaignEdit() {
                   })}
                 </div>
               </div>
-              <div className="form-grid" style={{ marginTop: 18 }}>
+              <div className="form-grid-3" style={{ marginTop: 18 }}>
                 <Field label="Discount">
                   <Select value={form.offerType} onChange={set("offerType")}>
                     <option value="Flat">Flat (₹)</option>
@@ -370,7 +370,7 @@ export default function CampaignEdit() {
                 <Field label={`Discount Value ${form.offerType === "Flat" ? "(₹)" : "(%)"}`}>
                   <Input type="number" min="0" placeholder="e.g. 10" value={form.offerValue} onChange={set("offerValue")} />
                 </Field>
-                <Field label="Discount Rules" className="col-span-2">
+                <Field label="Discount Rules" className="col-span-3">
                   <Textarea placeholder="Describe applicable discount conditions…" value={form.discountRules} onChange={set("discountRules")} />
                 </Field>
               </div>
@@ -381,17 +381,17 @@ export default function CampaignEdit() {
               <Tabs
                 tabs={[
                   { key: "filter", label: "Filter for User" },
-                  { key: "upload", label: "Upload Customer List" },
+                  { key: "upload", label: "Upload Member List" },
                 ]}
                 active={audienceTab}
                 onChange={setAudienceTab}
               />
 
               {audienceTab === "filter" && (
-                <div className="form-grid" style={{ marginTop: 16 }}>
+                <div className="form-grid-3" style={{ marginTop: 16 }}>
                   <Field label="Target Type" required>
                     <Select value={form.targetType} onChange={set("targetType")} required>
-                      <option>Customer</option>
+                      <option>Member</option>
                       <option>Operator</option>
                     </Select>
                   </Field>
@@ -400,9 +400,9 @@ export default function CampaignEdit() {
                       <option value="">All {form.targetType}s</option>
                       <option>Active Policyholders</option>
                       <option>Renewal Due (30 days)</option>
-                      <option>Lapsed Customers</option>
+                      <option>Lapsed Members</option>
                       <option>New Registrations</option>
-                      <option>High Value Customers</option>
+                      <option>High Value Members</option>
                       <option>Corporate</option>
                     </Select>
                   </Field>
@@ -436,7 +436,7 @@ export default function CampaignEdit() {
                       {INDIA_STATES.map((s) => <option key={s}>{s}</option>)}
                     </Select>
                   </Field>
-                  <Field label="Association" className="col-span-2">
+                  <Field label="Association" className="col-span-3">
                     <div>
                       {form.selectedAssociations.length > 0 && (
                         <div style={{ display: "flex", flexWrap: "wrap", gap: 6, marginBottom: 8 }}>
@@ -573,9 +573,9 @@ export default function CampaignEdit() {
 
             {/* ── 5. Message Content ── */}
             <SectionBlock icon="✍️" title="Message Content">
-              <div className="form-grid">
+              <div className="form-grid-3">
                 <Field label="Message Template" required={form.channels.length > 0}>
-                  <Textarea placeholder="Hi {customer_name}…" value={form.messageTemplate} onChange={set("messageTemplate")} style={{ minHeight: 100 }} />
+                  <Textarea placeholder="Hi {member_name}…" value={form.messageTemplate} onChange={set("messageTemplate")} style={{ minHeight: 100 }} />
                 </Field>
                 <Field label="WhatsApp Template ID">
                   <Input placeholder="e.g. summer_health_v1" value={form.whatsappTemplateId} onChange={set("whatsappTemplateId")} disabled={!form.channels.includes("WhatsApp (Meta API)")} />

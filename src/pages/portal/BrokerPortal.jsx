@@ -2,73 +2,42 @@
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import { useAssociations } from "../association/AssociationContext";
-import { INITIAL_CUSTOMERS } from "../../context/CustomerContext";
-
-const STATS = [
-  {
-    label: "Premium Collected",
-    value: "₹9,62,00,000",
-    sub: "April 2026",
-    color: "#b45309",
-    bg: "#fef3c7",
-  },
-  {
-    label: "Policy Purchased",
-    value: "5,200",
-    sub: "This financial year",
-    color: "#15803d",
-    bg: "#dcfce7",
-  },
-  {
-    label: "Total Customers",
-    value: "8,800",
-    sub: "+14 this month",
-    color: "#1d4ed8",
-    bg: "#dbeafe",
-  },
-  {
-    label: "Total Operators",
-    value: "12",
-    sub: "9 active",
-    color: "#7c3aed",
-    bg: "#ede9fe",
-  },
-];
+import { INITIAL_MEMBERS } from "../../context/MemberContext";
 
 const RECENT_AGENTS = [
   {
     name: "Ravi Kulkarni",
     mobile: "9876543210",
     broker: "Mehta Insurance",
-    customers: 28,
+    members: 28,
     status: "Active",
   },
   {
     name: "Pooja Desai",
     mobile: "9812345678",
     broker: "Priya Brokers",
-    customers: 19,
+    members: 19,
     status: "Active",
   },
   {
     name: "Kavita Sharma",
     mobile: "9898989898",
     broker: "Shah Financial",
-    customers: 34,
+    members: 34,
     status: "Active",
   },
   {
     name: "Amit Verma",
     mobile: "9090909090",
     broker: "Mehta Insurance",
-    customers: 22,
+    members: 22,
     status: "Active",
   },
   {
     name: "Suresh Nair",
     mobile: "9800112233",
     broker: "AK Associates",
-    customers: 11,
+    members: 11,
     status: "Inactive",
   },
 ];
@@ -87,8 +56,8 @@ const QUICK_ACTIONS = [
     bg: "#ede9fe",
   },
   {
-    label: "Add Customer",
-    path: "/customer/create",
+    label: "Add Member",
+    path: "/member/create",
     color: "#1e3a8a",
     bg: "#dbeafe",
   },
@@ -145,8 +114,8 @@ function fmtPremium(v) {
 // Mock MIS datasets keyed by campaign name; default = all campaigns combined
 const MIS_DATA = {
   "": {
-    engagedCustomer: 30692,
-    nonEngagedCustomer: 3186,
+    engagedMember: 30692,
+    nonEngagedMember: 3186,
     policyPurchased: 21090,
     policyPending: 9602,
     onlinePurchased: 18042,
@@ -172,8 +141,8 @@ const MIS_DATA = {
     paymentRejectedAmt: 17482500,
   },
   "BPP Campaign_2026-2027": {
-    engagedCustomer: 12400,
-    nonEngagedCustomer: 1100,
+    engagedMember: 12400,
+    nonEngagedMember: 1100,
     policyPurchased: 8800,
     policyPending: 3600,
     onlinePurchased: 7200,
@@ -198,8 +167,8 @@ const MIS_DATA = {
     paymentRejectedAmt: 5920000,
   },
   SBI_STP_Campaign: {
-    engagedCustomer: 9800,
-    nonEngagedCustomer: 980,
+    engagedMember: 9800,
+    nonEngagedMember: 980,
     policyPurchased: 6900,
     policyPending: 2900,
     onlinePurchased: 5800,
@@ -224,8 +193,8 @@ const MIS_DATA = {
     paymentRejectedAmt: 5180000,
   },
   "BPP Campaign": {
-    engagedCustomer: 5200,
-    nonEngagedCustomer: 620,
+    engagedMember: 5200,
+    nonEngagedMember: 620,
     policyPurchased: 3600,
     policyPending: 1600,
     onlinePurchased: 2900,
@@ -250,8 +219,8 @@ const MIS_DATA = {
     paymentRejectedAmt: 3515000,
   },
   "Campaign OPD and DIGIT PAYMENT PROTECTION": {
-    engagedCustomer: 7840,
-    nonEngagedCustomer: 960,
+    engagedMember: 7840,
+    nonEngagedMember: 960,
     policyPurchased: 5200,
     policyPending: 2640,
     onlinePurchased: 4100,
@@ -276,8 +245,8 @@ const MIS_DATA = {
     paymentRejectedAmt: 7030000,
   },
   "Campaign 1": {
-    engagedCustomer: 2100,
-    nonEngagedCustomer: 310,
+    engagedMember: 2100,
+    nonEngagedMember: 310,
     policyPurchased: 1400,
     policyPending: 700,
     onlinePurchased: 1100,
@@ -304,7 +273,7 @@ const MIS_DATA = {
 };
 
 // ── MIS sub-components ─────────────────────────────────────────────────────────
-function DonutChart({ title, segments, note }) {
+function DonutChart({ title, segments, note, style, hidePercent }) {
   const total = segments.reduce((s, seg) => s + seg.value, 0);
   const r = 38;
   const circumference = 2 * Math.PI * r;
@@ -319,220 +288,169 @@ function DonutChart({ title, segments, note }) {
   return (
     <div
       style={{
-        borderRadius: 14,
-        overflow: "hidden",
+        borderRadius: 8,
         background: "#fff",
-        boxShadow: "0 1px 3px rgba(0,0,0,.07), 0 4px 18px rgba(0,0,0,.06)",
-        border: "1px solid #e2e8f0",
+        border: "1px solid #dee1e5",
+        padding: 16,
+        ...style,
       }}
     >
       <div
         style={{
-          height: 4,
-          background: `linear-gradient(90deg,${segments[0]?.color ?? "#a855f7"},${segments[1]?.color ?? "#0ea5e9"})`,
+          fontWeight: 600,
+          fontSize: 16,
+          color: "#24304a",
+          marginBottom: 16,
         }}
-      />
-      <div style={{ padding: "16px 16px 14px" }}>
-        <div
-          style={{
-            fontWeight: 700,
-            fontSize: 13,
-            color: "#374151",
-            marginBottom: 14,
-            textAlign: "center",
-            letterSpacing: ".2px",
-            textTransform: "uppercase",
-          }}
+      >
+        {title}
+      </div>
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          gap: 16,
+        }}
+      >
+        <svg
+          width="100"
+          height="100"
+          viewBox="0 0 100 100"
+          style={{ flexShrink: 0 }}
         >
-          {title}
-        </div>
+          {arcs.map((arc, i) => (
+            <circle
+              key={i}
+              cx="50"
+              cy="50"
+              r={r}
+              fill="none"
+              stroke={arc.color}
+              strokeWidth="18"
+              strokeDasharray={`${arc.dash} ${circumference - arc.dash}`}
+              strokeDashoffset={arc.dashOffset}
+              style={{
+                transform: "rotate(-90deg)",
+                transformOrigin: "50px 50px",
+              }}
+            />
+          ))}
+          <text
+            x="50"
+            y="46"
+            textAnchor="middle"
+            fontSize="11"
+            fontWeight="700"
+            fill="#24304a"
+          >
+            {total.toLocaleString("en-IN")}
+          </text>
+          <text
+            x="50"
+            y="58"
+            textAnchor="middle"
+            fontSize="8"
+            fill="#6d747a"
+          >
+            Total
+          </text>
+        </svg>
         <div
           style={{
             display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            gap: 14,
+            flexDirection: "column",
+            gap: 10,
+            flex: 1,
+            minWidth: 0,
           }}
         >
-          <svg
-            width="150"
-            height="150"
-            viewBox="0 0 100 100"
-            style={{ flexShrink: 0 }}
-          >
-            {arcs.map((arc, i) => (
-              <circle
+          {arcs.map((arc, i) => {
+            const premiumStr =
+              arc.premium != null ? fmtPremium(arc.premium) : null;
+            const clickable = !!arc.onClick;
+            return (
+              <div
                 key={i}
-                cx="50"
-                cy="50"
-                r={r}
-                fill="none"
-                stroke={arc.color}
-                strokeWidth="18"
-                strokeDasharray={`${arc.dash} ${circumference - arc.dash}`}
-                strokeDashoffset={arc.dashOffset}
+                onClick={arc.onClick}
                 style={{
-                  transform: "rotate(-90deg)",
-                  transformOrigin: "50px 50px",
+                  display: "flex",
+                  gap: 8,
+                  cursor: clickable ? "pointer" : "default",
+                  borderRadius: 6,
+                  padding: clickable ? "3px 4px" : 0,
+                  transition: "background .15s",
                 }}
-              />
-            ))}
-            <text
-              x="50"
-              y="46"
-              textAnchor="middle"
-              fontSize="7"
-              fill="#64748b"
-              fontWeight="500"
-            >
-              Total
-            </text>
-            <text
-              x="50"
-              y="58"
-              textAnchor="middle"
-              fontSize="10"
-              fontWeight="800"
-              fill="#1e293b"
-            >
-              {total.toLocaleString("en-IN")}
-            </text>
-          </svg>
-          <div
-            style={{
-              display: "flex",
-              flexDirection: "column",
-              gap: 12,
-            }}
-          >
-            {arcs.map((arc, i) => {
-              const premiumStr =
-                arc.premium != null ? fmtPremium(arc.premium) : null;
-              const clickable = !!arc.onClick;
-              return (
+                onMouseEnter={(e) => {
+                  if (clickable)
+                    e.currentTarget.style.background = `${arc.color}12`;
+                }}
+                onMouseLeave={(e) => {
+                  if (clickable)
+                    e.currentTarget.style.background = "transparent";
+                }}
+              >
                 <div
-                  key={i}
-                  onClick={arc.onClick}
                   style={{
-                    cursor: clickable ? "pointer" : "default",
-                    borderRadius: 8,
-                    padding: clickable ? "4px 6px" : 0,
-                    transition: "background .15s",
+                    width: 8,
+                    height: 8,
+                    borderRadius: "50%",
+                    background: arc.color,
+                    flexShrink: 0,
+                    marginTop: 3,
                   }}
-                  onMouseEnter={(e) => {
-                    if (clickable)
-                      e.currentTarget.style.background = `${arc.color}12`;
-                  }}
-                  onMouseLeave={(e) => {
-                    if (clickable)
-                      e.currentTarget.style.background = "transparent";
-                  }}
-                >
+                />
+                <div style={{ flex: 1, minWidth: 0 }}>
                   <div
                     style={{
                       display: "flex",
-                      alignItems: "center",
-                      gap: 6,
-                      marginBottom: 2,
+                      justifyContent: "space-between",
+                      gap: 8,
+                      fontSize: 14,
                     }}
                   >
-                    <div
-                      style={{
-                        width: 9,
-                        height: 9,
-                        borderRadius: 2,
-                        background: arc.color,
-                        flexShrink: 0,
-                      }}
-                    />
-                    <div
-                      style={{
-                        fontSize: 13,
-                        color: "#64748b",
-                        fontWeight: 600,
-                        letterSpacing: ".1px",
-                      }}
-                    >
+                    <span style={{ color: "#6d747a", fontWeight: 500 }}>
                       {arc.label}
-                    </div>
-                    {clickable && (
-                      <span
-                        style={{
-                          fontSize: 10,
-                          color: arc.color,
-                          marginLeft: 2,
-                        }}
-                      >
-                        ↗
+                      {clickable && (
+                        <span style={{ color: arc.color, marginLeft: 3 }}>↗</span>
+                      )}
+                    </span>
+                    {!hidePercent && (
+                      <span style={{ color: "#24304a", fontWeight: 600, flexShrink: 0 }}>
+                        {Math.round(arc.pct * 100)}%
                       </span>
                     )}
                   </div>
-                  <div
-                    style={{
-                      display: "flex",
-                      alignItems: "center",
-                      gap: 7,
-                      paddingLeft: 15,
-                    }}
-                  >
-                    <div
-                      style={{
-                        fontSize: 17,
-                        fontWeight: 800,
-                        color: "#1e293b",
-                        lineHeight: 1,
-                      }}
-                    >
-                      {arc.value.toLocaleString("en-IN")}
-                    </div>
-                    <span
-                      style={{
-                        fontSize: 10.5,
-                        fontWeight: 700,
-                        color: arc.color,
-                        background: `${arc.color}1a`,
-                        padding: "2px 7px",
-                        borderRadius: 99,
-                      }}
-                    >
-                      {Math.round(arc.pct * 100)}%
-                    </span>
+                  <div style={{ fontSize: 13, color: "#6d747a", fontWeight: 500, marginTop: 2 }}>
+                    {arc.value.toLocaleString("en-IN")}
                   </div>
                   {premiumStr && (
-                    <div
-                      style={{
-                        paddingLeft: 15,
-                        fontSize: 13,
-                        fontWeight: 700,
-                        color: "#475569",
-                        marginTop: 2,
-                      }}
-                    >
+                    <div style={{ fontSize: 13, color: "#6d747a", marginTop: 1 }}>
                       {premiumStr}
                     </div>
                   )}
                 </div>
-              );
-            })}
+              </div>
+            );
+          })}
           </div>
         </div>
-        {note && (
-          <div
-            style={{
-              fontSize: 13,
-              color: "#64748b",
-              marginTop: 10,
-              textAlign: "center",
-              fontStyle: "italic",
-            }}
-          >
-            {note}
-          </div>
-        )}
-      </div>
+      {note && (
+        <div
+          style={{
+            fontSize: 15,
+            color: "#64748b",
+            marginTop: 10,
+            textAlign: "center",
+            fontStyle: "italic",
+          }}
+        >
+          {note}
+        </div>
+      )}
     </div>
   );
 }
+
 
 // ── Main component ─────────────────────────────────────────────────────────────
 export default function BrokerPortal() {
@@ -561,14 +479,6 @@ export default function BrokerPortal() {
     navigate(`/policy?${params.toString()}`);
   };
 
-  const goToPaymentRejected = () => {
-    const params = new URLSearchParams();
-    const id = CAMPAIGN_ID_MAP[campaignFilter];
-    if (id) params.set("campaignId", id);
-    params.set("payment", "Payment Failed");
-    navigate(`/policy?${params.toString()}`);
-  };
-
   const goToPaymentPending = () => {
     const params = new URLSearchParams();
     const id = CAMPAIGN_ID_MAP[campaignFilter];
@@ -590,7 +500,7 @@ export default function BrokerPortal() {
     const id = CAMPAIGN_ID_MAP[campaignFilter];
     if (id) params.set("campaignId", id);
     params.set("engaged", "true");
-    navigate(`/customer?${params.toString()}`);
+    navigate(`/member?${params.toString()}`);
   };
 
   const goToNonEngaged = () => {
@@ -598,65 +508,7 @@ export default function BrokerPortal() {
     const id = CAMPAIGN_ID_MAP[campaignFilter];
     if (id) params.set("campaignId", id);
     params.set("engaged", "false");
-    navigate(`/customer?${params.toString()}`);
-  };
-
-  const goToRTGSInitiated = () => {
-    const params = new URLSearchParams();
-    const id = CAMPAIGN_ID_MAP[campaignFilter];
-    if (id) params.set("campaignId", id);
-    params.set("payment", "Pending payment");
-    params.set("paymentMode", "Offline");
-    params.set("paymentType", "NEFT");
-    navigate(`/policy?${params.toString()}`);
-  };
-
-  const goToChequeInitiated = () => {
-    const params = new URLSearchParams();
-    const id = CAMPAIGN_ID_MAP[campaignFilter];
-    if (id) params.set("campaignId", id);
-    params.set("payment", "Pending payment");
-    params.set("paymentMode", "Offline");
-    params.set("paymentType", "Cheque");
-    navigate(`/policy?${params.toString()}`);
-  };
-
-  const goToOnlinePurchased = () => {
-    const params = new URLSearchParams();
-    const id = CAMPAIGN_ID_MAP[campaignFilter];
-    if (id) params.set("campaignId", id);
-    params.set("paymentMode", "Online");
-    params.set("payment", "Payment received (completed)");
-    navigate(`/policy?${params.toString()}`);
-  };
-
-  const goToOfflinePurchased = () => {
-    const params = new URLSearchParams();
-    const id = CAMPAIGN_ID_MAP[campaignFilter];
-    if (id) params.set("campaignId", id);
-    params.set("paymentMode", "Offline");
-    params.set("payment", "Payment received (completed)");
-    navigate(`/policy?${params.toString()}`);
-  };
-
-  const goToChequePurchased = () => {
-    const params = new URLSearchParams();
-    const id = CAMPAIGN_ID_MAP[campaignFilter];
-    if (id) params.set("campaignId", id);
-    params.set("paymentMode", "Offline");
-    params.set("paymentType", "Cheque");
-    params.set("payment", "Payment received (completed)");
-    navigate(`/policy?${params.toString()}`);
-  };
-
-  const goToRTGSPurchased = () => {
-    const params = new URLSearchParams();
-    const id = CAMPAIGN_ID_MAP[campaignFilter];
-    if (id) params.set("campaignId", id);
-    params.set("paymentMode", "Offline");
-    params.set("paymentType", "NEFT");
-    params.set("payment", "Payment received (completed)");
-    navigate(`/policy?${params.toString()}`);
+    navigate(`/member?${params.toString()}`);
   };
 
   return (
@@ -678,7 +530,7 @@ export default function BrokerPortal() {
                 width: 4,
                 height: 22,
                 borderRadius: 99,
-                background: "linear-gradient(180deg,#fb7185,#a855f7)",
+                background: "linear-gradient(180deg,#1565d8,#104ea6)",
               }}
             />
             <div style={{ fontWeight: 800, fontSize: 22, color: "#1e293b" }}>
@@ -760,7 +612,7 @@ export default function BrokerPortal() {
               style={{
                 padding: "10px 30px",
                 borderRadius: 9,
-                background: "linear-gradient(135deg,#fb7185 0%,#a855f7 100%)",
+                background: "#1565d8",
                 color: "#fff",
                 border: "none",
                 fontWeight: 700,
@@ -768,362 +620,213 @@ export default function BrokerPortal() {
                 cursor: "pointer",
                 fontFamily: "inherit",
                 flexShrink: 0,
-                boxShadow: "0 4px 14px rgba(168,85,247,.35)",
+                boxShadow: "0 4px 14px rgba(21,101,216,.30)",
               }}
             >
               Apply
             </button>
           </div>
 
-          {/* Stats row */}
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 12, marginBottom: 16 }}>
-            {STATS.map((s) => (
-              <div key={s.label} style={{ background: "#fff", borderTop: `1.5px solid ${s.color}`, borderRight: `1.5px solid ${s.color}`, borderBottom: `1.5px solid ${s.color}`, borderLeft: `4px solid ${s.color}`, borderRadius: 12, padding: "14px 16px", cursor: "default", transition: "box-shadow .15s", boxShadow: "0 1px 4px rgba(0,0,0,.06)" }}>
-                <div style={{ fontSize: 13, fontWeight: 700, color: "#64748b", textTransform: "uppercase", letterSpacing: ".4px", marginBottom: 8 }}>{s.label}</div>
-                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline" }}>
-                  <div style={{ fontSize: 24, fontWeight: 800, color: "#6b7280", lineHeight: 1 }}>{s.value}</div>
-                </div>
-              </div>
-            ))}
-          </div>
-
-          {/* Action bar */}
+          {/* Stats + Quick Actions row */}
           {(() => {
-            const totalCustomers = mis.engagedCustomer + mis.nonEngagedCustomer;
-            const totalEngaged = mis.engagedCustomer;
-            const items = [
-              {
-                label: "Non-Engaged Customers",
-                value: mis.nonEngagedCustomer,
-                pct:
-                  totalCustomers > 0
-                    ? Math.round(
-                        (mis.nonEngagedCustomer / totalCustomers) * 100,
-                      )
-                    : 0,
-                color: "#6d6d6b",
-                // bg: "#fffbeb",
-                border: "#fde68a",
-                onClick: goToNonEngaged,
-              },
-              {
-                label: "Policy Pending",
-                value: mis.policyPending,
-                pct:
-                  totalEngaged > 0
-                    ? Math.round((mis.policyPending / totalEngaged) * 100)
-                    : 0,
-                amount: mis.policyPendingPremium,
-                color: "#f97316",
-                // bg: "#fff7ed",
-                border: "#fed7aa",
-                onClick: goToPolicyPending,
-              },
-              {
-                label: "Payment Pending",
-                value: mis.paymentPending,
-                pct:
-                  mis.policyPending > 0
-                    ? Math.round((mis.paymentPending / mis.policyPending) * 100)
-                    : 0,
-                amount: mis.paymentPendingAmt,
-                color: "#ef4444",
-                // bg: "#fef2f2",
-                border: "#fecaca",
-                onClick: goToPaymentPending,
-              },
-              {
-                label: "Payment Rejected",
-                value: mis.paymentRejected,
-                pct:
-                  mis.policyPending > 0
-                    ? Math.round(
-                        (mis.paymentRejected / mis.policyPending) * 100,
-                      )
-                    : 0,
-                amount: mis.paymentRejectedAmt,
-                color: "#dc2626",
-                // bg: "#fef2f2",
-                border: "#fca5a5",
-                onClick: goToPaymentRejected,
-              },
-            ];
+            const paymentInitiated = mis.policyPurchased + mis.paymentPending + mis.paymentRejected;
+            const paymentNotInitiated = Math.max(0, mis.engagedMember - paymentInitiated);
             return (
               <div
-                style={{
-                  display: "grid",
-                  gridTemplateColumns: "repeat(4,1fr)",
-                  gap: 12,
-                  marginBottom: 16,
-                }}
+                className="bd-stats-row"
+                style={{ display: "flex", gap: 12, alignItems: "stretch", marginBottom: 12 }}
               >
-                {items.map((it) => (
-                  <div
-                    key={it.label}
-                    onClick={it.onClick}
+                <div
+                  style={{
+                    flex: 1,
+                    display: "grid",
+                    gridTemplateColumns: "repeat(4,1fr)",
+                    gridAutoRows: "1fr",
+                    gap: 12,
+                  }}
+                >
+                  <DonutChart
+                    title="Total Members"
+                    segments={[
+                      {
+                        label: "Member Engaged",
+                        value: mis.engagedMember,
+                        color: "#1565D8",
+                        onClick: goToEngaged,
+                      },
+                      {
+                        label: "Member Not Engaged",
+                        value: mis.nonEngagedMember,
+                        color: "#FFBB33",
+                        onClick: goToNonEngaged,
+                      },
+                    ]}
+                    note="Number of Members"
+                    hidePercent
                     style={{
-                      background: "#fff",
-                      border: `1.5px solid ${it.color}`,
-                      borderRadius: 12,
-                      padding: "14px 16px",
-                      borderLeft: `4px solid ${it.color}`,
-                      cursor: it.onClick ? "pointer" : "default",
-                      transition: "box-shadow .15s",
-                      boxShadow: it.onClick
-                        ? "0 1px 4px rgba(0,0,0,.06)"
-                        : "none",
+                      gridColumn: "1 / 3",
+                      gridRow: "1 / 3",
+                      display: "flex",
+                      flexDirection: "column",
+                      justifyContent: "center",
+                      height: "100%",
                     }}
-                    onMouseEnter={(e) => {
-                      if (it.onClick)
-                        e.currentTarget.style.boxShadow = `0 4px 14px ${it.color}33`;
+                  />
+                  <DonutChart
+                    title="Engaged members"
+                    segments={[
+                      {
+                        label: "Payment Initiated",
+                        value: paymentInitiated,
+                        color: "#F57C00",
+                        onClick: goToPaymentPending,
+                      },
+                      {
+                        label: "Payment Not Initiated",
+                        value: paymentNotInitiated,
+                        color: "#1565D8",
+                      },
+                    ]}
+                    note="Number of Members"
+                    hidePercent
+                    style={{
+                      gridColumn: "3 / 5",
+                      gridRow: "1 / 3",
+                      display: "flex",
+                      flexDirection: "column",
+                      justifyContent: "center",
+                      height: "100%",
                     }}
-                    onMouseLeave={(e) => {
-                      if (it.onClick)
-                        e.currentTarget.style.boxShadow =
-                          "0 1px 4px rgba(0,0,0,.06)";
+                  />
+                </div>
+
+                <div
+                  style={{
+                    width: 210,
+                    flexShrink: 0,
+                    background: "#fff",
+                    border: "1px solid #dee1e5",
+                    borderRadius: 8,
+                    padding: 16,
+                    display: "flex",
+                    flexDirection: "column",
+                    gap: 16,
+                  }}
+                >
+                  <div
+                    style={{
+                      fontSize: 12,
+                      fontWeight: 700,
+                      color: "#24304a",
+                      textTransform: "uppercase",
                     }}
                   >
-                    <div
-                      style={{
-                        fontSize: 13,
-                        fontWeight: 700,
-                        color: "#64748b",
-                        textTransform: "uppercase",
-                        letterSpacing: ".4px",
-                        marginBottom: 8,
-                      }}
-                    >
-                      {it.label}
-                    </div>
-                    <div
-                      style={{
-                        display: "flex",
-                        justifyContent: "space-between",
-                        alignItems: "baseline",
-                      }}
-                    >
-                      <div
+                    Quick Actions
+                  </div>
+                  <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+                    {QUICK_ACTIONS.map((a) => (
+                      <button
+                        key={a.label}
+                        type="button"
+                        onClick={() => navigate(a.path)}
                         style={{
-                          fontSize: 24,
-                          fontWeight: 800,
-                          color: "#6b7280",
-                          lineHeight: 1,
+                          background: "#fff",
+                          border: "1px solid #dee1e5",
+                          borderRadius: 6,
+                          padding: "10px 12px",
+                          display: "flex",
+                          alignItems: "center",
+                          gap: 8,
+                          textAlign: "left",
+                          color: "#1565d8",
+                          fontWeight: 600,
+                          fontSize: 13,
+                          cursor: "pointer",
+                          fontFamily: "inherit",
                         }}
                       >
-                        {it.value.toLocaleString("en-IN")}
-                      </div>
-                      {it.amount != null && (
-                        <div
-                          style={{
-                            fontSize: 24,
-                            fontWeight: 800,
-                            color: "#6b7280",
-                            lineHeight: 1,
-                          }}
-                        >
-                          {fmtPremium(it.amount)}
-                        </div>
-                      )}
-                    </div>
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#1565d8" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
+                          <line x1="12" y1="5" x2="12" y2="19" />
+                          <line x1="5" y1="12" x2="19" y2="12" />
+                        </svg>
+                        {a.label}
+                      </button>
+                    ))}
                   </div>
-                ))}
+                </div>
               </div>
             );
           })()}
 
           <div
-            style={{
-              fontSize: 15,
-              fontWeight: 600,
-              color: "#64748b",
-              marginBottom: 20,
-            }}
-          >
-            * Count indicates number of customers
-          </div>
-
-          {/* MIS grid */}
-          <div
-            style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}
-          >
-            <DonutChart
-              title="Customer Details"
-              segments={[
-                {
-                  label: "Engaged",
-                  value: mis.engagedCustomer,
-                  color: "#7c3aed",
-                  premium: mis.engagedPremium,
-                  onClick: goToEngaged,
-                },
-                {
-                  label: "Non-Engaged",
-                  value: mis.nonEngagedCustomer,
-                  color: "#f59e0b",
-                  premium: mis.nonEngagedPremium,
-                  onClick: goToNonEngaged,
-                },
-              ]}
-            />
-
-            <DonutChart
-              title="Policy Overview"
-              segments={[
-                {
-                  label: "Policy Purchased",
-                  value: mis.policyPurchased,
-                  color: "#10b981",
-                  premium: mis.policyPurchasedPremium,
-                  onClick: goToPolicyPurchased,
-                },
-                {
-                  label: "Policy Pending",
-                  value: mis.policyPending,
-                  color: "#f59e0b",
-                  premium: mis.policyPendingPremium,
-                  onClick: goToPolicyPending,
-                },
-              ]}
-            />
-
-            <DonutChart
-              title="Payment Initiated"
-              segments={[
-                {
-                  label: "RTGS",
-                  value: mis.rtgsInitiated,
-                  color: "#0ea5e9",
-                  premium: mis.rtgsInitiatedAmt,
-                  onClick: goToRTGSInitiated,
-                },
-                {
-                  label: "Cheque",
-                  value: mis.chequeInitiated,
-                  color: "#6366f1",
-                  premium: mis.chequeInitiatedAmt,
-                  onClick: goToChequeInitiated,
-                },
-              ]}
-            />
-
-            <DonutChart
-              title="Online vs Offline"
-              segments={[
-                {
-                  label: "Online",
-                  value: mis.onlinePurchased,
-                  color: "#6366f1",
-                  premium: mis.onlinePremium,
-                  onClick: goToOnlinePurchased,
-                },
-                {
-                  label: "Offline",
-                  value: mis.offlinePurchased,
-                  color: "#f59e0b",
-                  premium: mis.offlinePremium,
-                  onClick: goToOfflinePurchased,
-                },
-              ]}
-              note={`of ${mis.policyPurchased.toLocaleString("en-IN")} total policies purchased`}
-            />
-
-            <DonutChart
-              title="Payment Pending / Rejected"
-              segments={[
-                {
-                  label: "Pending",
-                  value: mis.paymentPending,
-                  color: "#f59e0b",
-                  premium: mis.paymentPendingAmt,
-                  onClick: goToPaymentPending,
-                },
-                {
-                  label: "Rejected",
-                  value: mis.paymentRejected,
-                  color: "#ef4444",
-                  premium: mis.paymentRejectedAmt,
-                  onClick: goToPaymentRejected,
-                },
-              ]}
-            />
-
-            <DonutChart
-              title="Offline Purchased"
-              segments={[
-                {
-                  label: "RTGS",
-                  value: mis.rtgsPurchased,
-                  color: "#0ea5e9",
-                  premium: mis.rtgsPurchasedAmt,
-                  onClick: goToRTGSPurchased,
-                },
-                {
-                  label: "Cheque",
-                  value: mis.chequePurchased,
-                  color: "#7c3aed",
-                  premium: mis.chequePurchasedAmt,
-                  onClick: goToChequePurchased,
-                },
-              ]}
-            />
-          </div>
-        </div>
-      </div>
-
-      {/* Quick actions */}
-      <div className="card">
-        <div className="card-body">
-          <div
-            style={{
-              display: "flex",
-              alignItems: "center",
-              gap: 10,
-              marginBottom: 16,
-            }}
+            className="bd-stats-row"
+            style={{ display: "flex", gap: 12, alignItems: "stretch", marginBottom: 12 }}
           >
             <div
               style={{
-                width: 4,
-                height: 22,
-                borderRadius: 99,
-                background: "linear-gradient(180deg,#fb7185,#a855f7)",
+                flex: 1,
+                display: "grid",
+                gridTemplateColumns: "repeat(4,1fr)",
+                gridAutoRows: "1fr",
+                gap: 12,
               }}
-            />
-            <div style={{ fontWeight: 800, fontSize: 16, color: "#1e293b" }}>
-              Quick Actions
-            </div>
-          </div>
-          <div
-            className="bd-quick-actions"
-            style={{
-              display: "grid",
-              gridTemplateColumns: "repeat(4,1fr)",
-              gap: 12,
-            }}
-          >
-            {QUICK_ACTIONS.map((a) => (
-              <button
-                key={a.label}
-                type="button"
-                onClick={() => navigate(a.path)}
+            >
+              <DonutChart
+                title="Purchased Policies"
+                segments={[
+                  {
+                    label: "Payment Cleared",
+                    value: mis.policyPurchased,
+                    color: "#33B5E5",
+                    onClick: goToPolicyPurchased,
+                  },
+                  {
+                    label: "Payment Not Cleared",
+                    value: mis.policyPending,
+                    color: "#1565D8",
+                    onClick: goToPolicyPending,
+                  },
+                ]}
+                note="Number of Policies"
+                hidePercent
                 style={{
-                  padding: "13px 16px",
-                  borderRadius: 10,
-                  border: "none",
-                  background: a.bg,
-                  color: a.color,
-                  fontWeight: 700,
-                  fontSize: 13.5,
-                  cursor: "pointer",
-                  fontFamily: "inherit",
-                  boxShadow: `0 2px 8px ${a.color}22`,
-                  transition: "transform .15s",
+                  gridColumn: "1 / 3",
+                  display: "flex",
+                  flexDirection: "column",
+                  justifyContent: "center",
+                  height: "100%",
                 }}
-              >
-                + {a.label}
-              </button>
-            ))}
+              />
+              <DonutChart
+                title="Payments"
+                segments={[
+                  {
+                    label: "Payment Cleared",
+                    value: mis.policyPurchasedPremium,
+                    color: "#33B5E5",
+                    onClick: goToPolicyPurchased,
+                  },
+                  {
+                    label: "Payment Not Cleared",
+                    value: mis.policyPendingPremium,
+                    color: "#1565D8",
+                    onClick: goToPolicyPending,
+                  },
+                ]}
+                note="Amount"
+                hidePercent
+                style={{
+                  gridColumn: "3 / 5",
+                  display: "flex",
+                  flexDirection: "column",
+                  justifyContent: "center",
+                  height: "100%",
+                }}
+              />
+            </div>
+            <div style={{ width: 210, flexShrink: 0 }} />
           </div>
+
         </div>
       </div>
 
@@ -1195,7 +898,7 @@ export default function BrokerPortal() {
                       {a.name}
                     </div>
                     <div style={{ fontSize: 13, color: "#64748b" }}>
-                      {a.mobile} · {a.customers} customers
+                      {a.mobile} · {a.members} members
                     </div>
                   </div>
                   <span
@@ -1222,7 +925,7 @@ export default function BrokerPortal() {
                   <tr>
                     <th>Name</th>
                     <th>License</th>
-                    <th>Customers</th>
+                    <th>Members</th>
                     <th>Status</th>
                   </tr>
                 </thead>
@@ -1231,7 +934,7 @@ export default function BrokerPortal() {
                     <tr key={a.name}>
                       <td style={{ fontWeight: 500 }}>{a.name}</td>
                       <td style={{ color: "#64748b" }}>{a.mobile}</td>
-                      <td>{a.customers}</td>
+                      <td>{a.members}</td>
                       <td>
                         <span
                           style={{
@@ -1256,7 +959,7 @@ export default function BrokerPortal() {
           </div>
         </div>
 
-        {/* Recent Customers */}
+        {/* Recent Members */}
         <div className="card">
           <div className="card-body">
             <div
@@ -1279,20 +982,20 @@ export default function BrokerPortal() {
                 <div
                   style={{ fontWeight: 800, fontSize: 15, color: "#1e293b" }}
                 >
-                  Recent Customers
+                  Recent Members
                 </div>
               </div>
               <button
                 type="button"
                 className="btn btn-ghost"
                 style={{ fontSize: 13, padding: "4px 12px" }}
-                onClick={() => navigate("/customer")}
+                onClick={() => navigate("/member")}
               >
                 View All →
               </button>
             </div>
             <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-              {INITIAL_CUSTOMERS.slice(0, 5).map((c) => {
+              {INITIAL_MEMBERS.slice(0, 5).map((c) => {
                 const kycColor =
                   c.kyc === "Verified"
                     ? { bg: "#dcfce7", color: "#15803d" }
@@ -1323,7 +1026,7 @@ export default function BrokerPortal() {
                         width: 36,
                         height: 36,
                         borderRadius: "50%",
-                        background: "linear-gradient(135deg,#fb7185,#a855f7)",
+                        background: "linear-gradient(180deg,#1565d8,#104ea6)",
                         color: "#fff",
                         display: "flex",
                         alignItems: "center",

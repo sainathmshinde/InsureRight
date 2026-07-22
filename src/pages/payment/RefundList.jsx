@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { PageHeader, Button, EmptyState } from "../../components/UI";
-import { RefundIcon } from "../../icons";
+import { RefundIcon, UploadIcon, SearchIcon } from "../../icons";
 import Pagination from "../../components/Pagination";
 import usePagination from "../../components/usePagination";
 import { useRefunds } from "../../context/RefundContext";
@@ -30,7 +30,7 @@ export default function RefundList() {
 
   const filtered = refunds.filter((r) => {
     const q = search.toLowerCase();
-    const matchSearch = !q || r.proposalId.toLowerCase().includes(q) || r.customerName.toLowerCase().includes(q) || r.mobile.includes(q);
+    const matchSearch = !q || r.proposalId.toLowerCase().includes(q) || r.memberName.toLowerCase().includes(q) || r.mobile.includes(q);
     const matchStatus = !statusFilter || r.status === statusFilter;
     return matchSearch && matchStatus;
   });
@@ -38,24 +38,37 @@ export default function RefundList() {
   const pg = usePagination(filtered, 10);
   const handle = (setter) => (v) => { setter(v); pg.reset(); };
 
-  const stickyTh = { position: "sticky", top: 0, zIndex: 2, background: "var(--card-bg, #fff)", borderBottom: "2px solid var(--border)" };
+  const stickyTh = { position: "sticky", top: 0, zIndex: 2, background: "var(--surface-2)", borderBottom: "2px solid var(--border)" };
 
   return (
     <div>
-      <PageHeader icon={<RefundIcon />} title="Refunds" />
+      <PageHeader
+        icon={<RefundIcon />}
+        title="Refunds"
+        subtitle="View and manage all member refund requests"
+      >
+        <Button variant="ghost" icon={<UploadIcon size={16} />} onClick={() => {}}>
+          Export
+        </Button>
+      </PageHeader>
 
       <div className="card">
         <div className="card-body">
           <div style={{ display: "flex", gap: 14, alignItems: "flex-end", marginBottom: 18, flexWrap: "wrap" }}>
             <div style={{ flex: "1 1 220px" }}>
               <label style={labelStyle}>Search</label>
-              <input
-                className="field-input filter-search"
-                style={{ width: "100%" }}
-                placeholder="Search by Order ID, name or mobile..."
-                value={search}
-                onChange={(e) => handle(setSearch)(e.target.value)}
-              />
+              <div style={{ position: "relative" }}>
+                <span style={{ position: "absolute", left: 11, top: "50%", transform: "translateY(-50%)", display: "flex", pointerEvents: "none" }}>
+                  <SearchIcon size={15} color="var(--text-3)" />
+                </span>
+                <input
+                  className="field-input filter-search"
+                  style={{ width: "100%", paddingLeft: 34 }}
+                  placeholder="Search by Order ID, name or mobile..."
+                  value={search}
+                  onChange={(e) => handle(setSearch)(e.target.value)}
+                />
+              </div>
             </div>
             <div style={{ flex: "0 0 160px" }}>
               <label style={labelStyle}>Status</label>
@@ -79,7 +92,7 @@ export default function RefundList() {
               <thead>
                 <tr>
                   <th style={stickyTh}>Order ID</th>
-                  <th style={stickyTh}>Customer</th>
+                  <th style={stickyTh}>Member</th>
                   <th style={stickyTh}>Mobile</th>
                   <th style={stickyTh}>Product</th>
                   <th style={stickyTh}>IC</th>
@@ -102,7 +115,7 @@ export default function RefundList() {
                   pg.slice.map((r) => (
                     <tr key={r.id}>
                       <td style={{ fontFamily: "monospace", fontSize: 13, color: "#7c3aed", fontWeight: 600 }}>{r.proposalId}</td>
-                      <td style={{ fontWeight: 500 }}>{r.customerName}</td>
+                      <td style={{ fontWeight: 500 }}>{r.memberName}</td>
                       <td style={{ color: "#64748b" }}>{r.mobile}</td>
                       <td style={{ fontSize: 12.5, maxWidth: 180, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{r.product}</td>
                       <td style={{ color: "#64748b", fontSize: 13 }}>{r.icName}</td>

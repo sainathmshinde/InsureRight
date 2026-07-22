@@ -1,10 +1,12 @@
-export function SectionBlock({ icon, title, children }) {
+export function SectionBlock({ title, children }) {
   return (
     <div className="section-block">
-      <div className="section-heading">
-        {icon && <span className="section-icon">{icon}</span>}
-        <span>{title}</span>
-      </div>
+      {title && (
+        <div className="section-heading">
+          <span className="section-bar" />
+          <span>{title}</span>
+        </div>
+      )}
       <div className="section-body">
         {children}
       </div>

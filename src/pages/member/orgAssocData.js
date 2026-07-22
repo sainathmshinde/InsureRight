@@ -71,7 +71,7 @@ export const STATES = [
   { id: 36, name: "Telangana" },
 ];
 
-export const ASSOCIATIONS = [
+const ASSOCIATIONS_RAW = [
   { id: 1003, orgId: 1010, name: "AIBRF-ALL INDIA DENA BANK RETIREES FEDERATION",                       parentId: null, address1: "1 SHREEKUL APPT. SIDDHIVINAYAK LANE NO 4 PUMPING STATION GANGAPUR ROAD NASHIK", address2: "",                                                  city: "NASHIK",           stateId: 21, pinCode: "422013", isActive: true,  associationCode: "CCD00872530012" },
   { id: 1004, orgId: 1010, name: "DENA BANK RETIRED EMPLOYEES WELFARE ASSOCIATION (SURAT)",             parentId: null, address1: "107/108 NEW SAURABH SOCIETY",                                                   address2: "BEHIND PARITOSH CLINIC MORABHAGAL RANDER SURAT",    city: "SURAT",            stateId: 12, pinCode: "395005", isActive: true,  associationCode: "CCD00872530047" },
   { id: 1005, orgId: 1003, name: "BANK OF BARODA STAFF PENSIONERS ASSOCIATION GUJARAT, BARODA",         parentId: null, address1: "11 SWAROOP TENAMENT NR SHANTI KUNJ NO1 MANJLPUR,VADODARA",                       address2: "",                                                  city: "VADODARA",         stateId: 12, pinCode: "390011", isActive: true,  associationCode: "CCD00062530554" },
@@ -172,3 +172,9 @@ export const ASSOCIATIONS = [
   { id: 1100, orgId: 1008, name: "CENTRAL BANK OF INDIA PENSIONERS RETIREES ASSOCIATION",               parentId: null, address1: "33, Netaji Subas Road,",                                                        address2: "2nd Floor,",                                        city: "Kolkata",          stateId: 35, pinCode: "700001", isActive: true,  associationCode: "CCD00062532474" },
   { id: 1101, orgId: 1019, name: "ALL INDIA UNION BANK PENSIONERS AND RETIREES FEDERATION",             parentId: null, address1: "163/4, Kutchery Road",                                                          address2: "Mylapore",                                          city: "Chennai",          stateId: 31, pinCode: "600004", isActive: true,  associationCode: "CCD00062533140" },
 ];
+
+// "Federation"-level bodies are designated as eligible parent associations.
+export const ASSOCIATIONS = ASSOCIATIONS_RAW.map(a => ({
+  ...a,
+  isParentAssociation: /federation/i.test(a.name),
+}));

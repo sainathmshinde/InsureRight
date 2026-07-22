@@ -15,7 +15,7 @@ const IC_PRODUCT_FIELDS = [
   { icField: 'base_premium',       mapsTo: 'basePremium',       label: 'Base Premium'      },
   { icField: 'sum_insured',        mapsTo: 'sumInsuredOptions',  label: 'Sum Insured'       },
   { icField: 'gst_percent',        mapsTo: 'gstPercent',        label: 'GST %'             },
-  { icField: 'coverage_details',   mapsTo: 'coverageDetails',   label: 'Coverage Details'  },
+  { icField: 'coverage_details',   mapsTo: 'coverageDetails',   label: 'Coverage Info'  },
   { icField: 'waiting_period',     mapsTo: 'waitingPeriod',     label: 'Waiting Period'    },
   { icField: 'age_min',            mapsTo: 'ageMin',            label: 'Min Age'           },
   { icField: 'age_max',            mapsTo: 'ageMax',            label: 'Max Age'           },

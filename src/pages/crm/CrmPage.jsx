@@ -229,7 +229,7 @@ export default function CrmPage() {
                   <div style={{ fontSize: 13, color: '#0a7ea4', fontWeight: 500 }}>Calling Operator · {myAgentRecord?.posLicense}</div>
                 </div>
               </div>
-              <div className="form-grid">
+              <div className="form-grid-3">
                 <Field label="Select Campaign">
                   <Select value={selectedCampaignId} onChange={e => setSelectedCampaignId(e.target.value)}>
                     <option value="">{availCampaigns.length === 0 ? 'No campaigns assigned' : 'Select a campaign'}</option>
@@ -292,7 +292,7 @@ export default function CrmPage() {
             </div>
 
             {salesAgentCampaigns.length > 0 && (
-              <div className="form-grid" style={{ marginBottom: 20 }}>
+              <div className="form-grid-3" style={{ marginBottom: 20 }}>
                 <Field label="Filter by Campaign">
                   <Select value={selectedCampaignId} onChange={e => setSelectedCampaignId(e.target.value)}>
                     <option value="">All Campaigns</option>
@@ -325,7 +325,7 @@ export default function CrmPage() {
       {isBroker && (
         <div className="card">
           <div className="card-body">
-            <div className="form-grid" style={{ marginBottom: 24 }}>
+            <div className="form-grid-3" style={{ marginBottom: 24 }}>
               <Field label="Operator">
                 <Select value={selectedAgentId} onChange={handleAgentChange}>
                   {KMD_AGENTS.map(a => (

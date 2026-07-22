@@ -1,7 +1,6 @@
 import { useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { Field, Input, SectionBlock } from '../../components/Field'
-import { BankIcon } from '../../icons'
 import { useOrganisations } from './OrganisationContext'
 
 export default function OrganisationEdit() {
@@ -37,7 +36,7 @@ export default function OrganisationEdit() {
     <div>
       <div className="page-header">
         <div className="page-title-row">
-          <div className="page-icon"><BankIcon /></div>
+          <span className="page-bar" />
           <div>
             <div className="page-title">{isCreate ? 'Add Organisation' : 'Edit Organisation'}</div>
             <div className="page-subtitle">{isCreate ? 'Create a new organisation' : `Editing: ${existing.name}`}</div>
@@ -49,8 +48,8 @@ export default function OrganisationEdit() {
       <div className="card">
         <div className="card-body">
           <form onSubmit={handleSubmit}>
-            <SectionBlock icon="🏦" title="Organisation Details">
-              <div className="form-grid">
+            <SectionBlock icon="🏦" title="Organisation Info">
+              <div className="form-grid-3">
                 <Field label="Organisation Name" required>
                   <Input
                     placeholder="e.g. STATE BANK OF INDIA"
@@ -65,22 +64,6 @@ export default function OrganisationEdit() {
                     value={form.description}
                     onChange={set('description')}
                   />
-                </Field>
-                <Field label="Status">
-                  <div style={{ display: 'flex', gap: 20, alignItems: 'center', paddingTop: 6 }}>
-                    {[{ label: 'Active', value: true }, { label: 'Inactive', value: false }].map(opt => (
-                      <label key={opt.label} style={{ display: 'flex', alignItems: 'center', gap: 7, cursor: 'pointer', fontSize: 14 }}>
-                        <input
-                          type="radio"
-                          name="isActive"
-                          checked={form.isActive === opt.value}
-                          onChange={() => setForm(p => ({ ...p, isActive: opt.value }))}
-                          style={{ accentColor: 'var(--brand)', width: 16, height: 16 }}
-                        />
-                        {opt.label}
-                      </label>
-                    ))}
-                  </div>
                 </Field>
               </div>
             </SectionBlock>

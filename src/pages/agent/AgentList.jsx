@@ -5,11 +5,10 @@ import usePagination from "../../components/usePagination";
 import {
   Table,
   PageHeader,
-  StatusBadge,
   Button,
   EmptyState,
 } from "../../components/UI";
-import { AgentIcon } from "../../icons";
+import { AgentIcon, UploadIcon, SearchIcon } from "../../icons";
 import { OPERATORS } from "./agentData";
 
 const MOCK = OPERATORS.map((a) => ({
@@ -19,19 +18,25 @@ const MOCK = OPERATORS.map((a) => ({
   email: a.email,
   // posLicense: a.posLicense,
   // broker:     a.assignedBroker,
+  agentType: a.agentType,
   status: a.status,
 }));
+
+const AGENT_TYPE_META = {
+  calling: { label: "Calling Operator", color: "#1565d8", bg: "#e7f0fc" },
+  sales: { label: "Sales Operator", color: "#00c851", bg: "#e8f5e9" },
+  "sales-manager": { label: "Sales Manager", color: "#7c3aed", bg: "#f3e8ff" },
+  leader: { label: "Leader", color: "#f57c00", bg: "#fff8e1" },
+};
 
 export default function AgentList() {
   const navigate = useNavigate();
   const [search, setSearch] = useState("");
-  const [statusFilter, setStatus] = useState("");
 
   const filtered = MOCK.filter(
     (a) =>
-      (a.name.toLowerCase().includes(search.toLowerCase()) ||
-        a.mobile.includes(search)) &&
-      (statusFilter ? a.status === statusFilter : true),
+      a.name.toLowerCase().includes(search.toLowerCase()) ||
+      a.mobile.includes(search),
   );
   const pg = usePagination(filtered, 10);
   const handle = (setter) => (v) => {
@@ -47,9 +52,27 @@ export default function AgentList() {
     // { key: 'posLicense', label: 'POS License', style: { fontFamily: 'monospace', fontSize: 12.5 } },
     // { key: 'broker',     label: 'Broker' },
     {
-      key: "status",
-      label: "Status",
-      render: (row) => <StatusBadge status={row.status} />,
+      key: "agentType",
+      label: "Operator Type",
+      render: (row) => {
+        const meta = AGENT_TYPE_META[row.agentType];
+        if (!meta) return <span style={{ color: "var(--text-3)" }}>—</span>;
+        return (
+          <span
+            style={{
+              padding: "3px 10px",
+              borderRadius: 99,
+              fontSize: 11.5,
+              fontWeight: 700,
+              background: meta.bg,
+              color: meta.color,
+              whiteSpace: "nowrap",
+            }}
+          >
+            {meta.label}
+          </span>
+        );
+      },
     },
     {
       key: "actions",
@@ -60,7 +83,7 @@ export default function AgentList() {
           onClick={() => navigate(`/agent/${row.id}/edit`)}
           title="Edit"
           style={{
-            background: "linear-gradient(135deg,#fb7185,#a855f7)",
+            background: "linear-gradient(180deg,#1565d8,#104ea6)",
             border: "none",
             borderRadius: 6,
             cursor: "pointer",
@@ -68,7 +91,7 @@ export default function AgentList() {
             color: "#fff",
             display: "inline-flex",
             alignItems: "center",
-            boxShadow: "0 2px 6px rgba(168,85,247,.30)",
+            boxShadow: "0 2px 6px rgba(21,101,216,.30)",
           }}
         >
           <svg
@@ -90,7 +113,14 @@ export default function AgentList() {
 
   return (
     <div>
-      <PageHeader icon={<AgentIcon />} title="Operators">
+      <PageHeader
+        icon={<AgentIcon />}
+        title="Operators"
+        subtitle="View and manage all operators across your brokerage"
+      >
+        <Button variant="ghost" icon={<UploadIcon size={16} />} onClick={() => {}}>
+          Export
+        </Button>
         <Button
           variant="secondary"
           onClick={() => navigate("/agent/commission")}
@@ -125,48 +155,34 @@ export default function AgentList() {
               >
                 Search
               </label>
-              <input
-                className="field-input filter-search"
-                style={{ width: "100%" }}
-                placeholder="Search by name or mobile…"
-                value={search}
-                onChange={(e) => handle(setSearch)(e.target.value)}
-              />
+              <div style={{ position: "relative" }}>
+                <span
+                  style={{
+                    position: "absolute",
+                    left: 11,
+                    top: "50%",
+                    transform: "translateY(-50%)",
+                    display: "flex",
+                    pointerEvents: "none",
+                  }}
+                >
+                  <SearchIcon size={15} color="var(--text-3)" />
+                </span>
+                <input
+                  className="field-input filter-search"
+                  style={{ width: "100%", paddingLeft: 34 }}
+                  placeholder="Search by name or mobile…"
+                  value={search}
+                  onChange={(e) => handle(setSearch)(e.target.value)}
+                />
+              </div>
             </div>
-            <div style={{ flex: "0 0 160px" }}>
-              <label
-                style={{
-                  display: "block",
-                  fontSize: 11.5,
-                  fontWeight: 700,
-                  color: "#64748b",
-                  marginBottom: 5,
-                  textTransform: "uppercase",
-                  letterSpacing: ".4px",
-                }}
-              >
-                Status
-              </label>
-              <select
-                className="field-select"
-                style={{ width: "100%" }}
-                value={statusFilter}
-                onChange={(e) => handle(setStatus)(e.target.value)}
-              >
-                <option value="">All Status</option>
-                <option>Active</option>
-                <option>Inactive</option>
-              </select>
-            </div>
-            {(search || statusFilter) && (
+            {search && (
               <div style={{ paddingBottom: 1 }}>
                 <Button
                   variant="ghost"
                   size="sm"
-                  onClick={() => {
-                    handle(setSearch)("");
-                    handle(setStatus)("");
-                  }}
+                  onClick={() => handle(setSearch)("")}
                 >
                   Clear
                 </Button>

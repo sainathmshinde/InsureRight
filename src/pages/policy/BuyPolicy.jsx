@@ -5,8 +5,6 @@ import usePagination from "../../components/usePagination";
 import { useAuth } from "../../context/AuthContext";
 import { Field, Input, Select, Textarea } from "../../components/fields";
 import {
-  Stepper,
-  Button,
   StatusBadge,
   CheckboxGroup,
   Toggle,
@@ -14,16 +12,27 @@ import {
 import {
   ShieldCheckIcon,
   PaymentIcon,
-  CustomerIcon,
+  MemberIcon,
 } from "../../icons";
 import { PRODUCTS, PRODUCTS_BY_TYPE, POLICY_TYPE_ICON, PREMIUM_CHART, PRODUCT_DETAILS } from "../product/productData";
 import { OPERATORS as KMD_AGENTS } from "../agent/agentData";
 import { INITIAL_LEADS, CAMPAIGNS } from "../crm/crmData";
 import { POLICY_MOCK } from "./PolicyList";
-import { ASSOCIATIONS } from "../customer/orgAssocData";
+import { ASSOCIATIONS, ORGANISATIONS } from "../member/orgAssocData";
 
-// ── Shared customer data (same source of truth as CustomerList) ────────────
-const CUSTOMERS = [
+// ── Provider colour coding — shared between product cards & policy details ──
+const TYPE_COLORS = {
+  'Base Policy':        '#1d4ed8',
+  'OPD':                '#15803d',
+  'Payment Protection': '#b45309',
+  'Age Band Premium':   '#7c3aed',
+  'Super Top Up':       '#f57c82',
+  'Top Up Policy':      '#4f46e5',
+};
+const fmtSI = v => v >= 100000 ? `₹${(v/100000).toFixed(0)}L` : v >= 1000 ? `₹${(v/1000).toFixed(0)}K` : `₹${v}`;
+
+// ── Shared member data (same source of truth as MemberList) ────────────
+const MEMBERS = [
   {
     id: 1,
     name: "Aarav Sharma",
@@ -33,6 +42,8 @@ const CUSTOMERS = [
     gender: "Male",
     kyc: "Verified",
     policies: 2,
+    organisationId: 1003,
+    associationId: 1007,
     address: "14, Green Valley Apartments, Andheri West, Mumbai",
     familyMembers: [
       { type: "Spouse",  name: "Priya Sharma", dob: "1992-07-22", gender: "Female" },
@@ -49,6 +60,8 @@ const CUSTOMERS = [
     gender: "Male",
     kyc: "Pending",
     policies: 0,
+    organisationId: 1005,
+    associationId: 1033,
     address: "45 MG Road, Pune",
   },
   {
@@ -60,6 +73,8 @@ const CUSTOMERS = [
     gender: "Female",
     kyc: "Verified",
     policies: 3,
+    organisationId: 1006,
+    associationId: 1023,
     address: "7/B Koramangala, Bangalore",
     familyMembers: [
       { type: "Spouse",  name: "Sandeep Nair", dob: "1975-04-10", gender: "Male"   },
@@ -76,6 +91,8 @@ const CUSTOMERS = [
     gender: "Male",
     kyc: "Rejected",
     policies: 0,
+    organisationId: 1005,
+    associationId: 1019,
     address: "23 Shivaji Nagar, Nashik",
   },
   {
@@ -87,6 +104,8 @@ const CUSTOMERS = [
     gender: "Male",
     kyc: "Verified",
     policies: 1,
+    organisationId: 1003,
+    associationId: 1025,
     address: "101 Deccan, Pune",
     familyMembers: [
       { type: "Spouse",  name: "Meena Kumar", dob: "1987-06-12", gender: "Female" },
@@ -102,6 +121,8 @@ const CUSTOMERS = [
     gender: "Male",
     kyc: "Verified",
     policies: 2,
+    organisationId: 1019,
+    associationId: 1021,
     address: "B-5 Sector 18, Noida",
     familyMembers: [
       { type: "Spouse",  name: "Sunita Rao",  dob: "1978-02-14", gender: "Female" },
@@ -118,6 +139,8 @@ const CUSTOMERS = [
     gender: "Female",
     kyc: "Verified",
     policies: 1,
+    organisationId: 1012,
+    associationId: 1058,
     address: "56 Jubilee Hills, Hyderabad",
     familyMembers: [
       { type: "Spouse", name: "Arun Pillai", dob: "1990-05-22", gender: "Male" },
@@ -132,6 +155,8 @@ const CUSTOMERS = [
     gender: "Male",
     kyc: "Verified",
     policies: 0,
+    organisationId: 1003,
+    associationId: 1007,
     address: "8 Andheri West, Mumbai",
     familyMembers: [
       { type: "Spouse",  name: "Neha Singh", dob: "1989-09-30", gender: "Female" },
@@ -147,6 +172,8 @@ const CUSTOMERS = [
     gender: "Female",
     kyc: "Verified",
     policies: 1,
+    organisationId: 1013,
+    associationId: 1027,
     address: "33 Fort Kochi, Kerala",
     familyMembers: [
       { type: "Spouse",  name: "Raj Mehta",  dob: "1989-03-25", gender: "Male"   },
@@ -162,6 +189,8 @@ const CUSTOMERS = [
     gender: "Male",
     kyc: "Verified",
     policies: 1,
+    organisationId: 1008,
+    associationId: 1032,
     address: "C-9 Civil Lines, Delhi",
     familyMembers: [
       { type: "Spouse",  name: "Pooja Gupta",     dob: "1983-11-28", gender: "Female" },
@@ -178,6 +207,8 @@ const CUSTOMERS = [
     gender: "Female",
     kyc: "Pending",
     policies: 0,
+    organisationId: 1015,
+    associationId: 1008,
     address: "12 Raja Park, Jaipur",
   },
   {
@@ -189,16 +220,17 @@ const CUSTOMERS = [
     gender: "Male",
     kyc: "Rejected",
     policies: 0,
+    organisationId: 1012,
+    associationId: 1030,
     address: "4 T Nagar, Chennai",
   },
 ];
 
 
 const STEPS = [
-  "Customer",
+  "Member",
   "Product",
   "Members",
-  "Proposal",
   "Payment",
   "Policy",
 ];
@@ -253,43 +285,54 @@ function Avatar({ name, size = 40, fontSize = 16 }) {
   );
 }
 
-// ── Persistent "policy for" customer strip ─────────────────────────────────
-function CustomerStrip({ customer, onChangeCustomer, canChange = true }) {
-  const kycColor = customer.kyc === "Verified" ? "#4ade80" : customer.kyc === "Pending" ? "#fbbf24" : "#f87171";
+// ── Persistent "policy for" member strip ─────────────────────────────────
+function MemberStrip({ member, onChangeMember, canChange = true }) {
+  const kycColor = member.kyc === "Verified" ? "#4ade80" : member.kyc === "Pending" ? "#fbbf24" : "#f87171";
   return (
     <div className="bp-cust-strip" style={{
       display: "flex", alignItems: "center", gap: 14, flexWrap: "wrap",
       background: "#fff",
-      borderRadius: "var(--r-lg)", padding: "13px 18px", marginBottom: 20,
-      boxShadow: "0 1px 4px rgba(0,0,0,.07), 0 4px 16px rgba(0,0,0,.05)",
-      border: "1px solid var(--border)",
+      borderRadius: 6, padding: "24px", marginBottom: 20,
+      boxShadow: "0 1px 4.5px rgba(193,197,212,.27)",
+      border: "1px solid #dee1e5",
     }}>
       {/* Avatar */}
       <div style={{
         width: 42, height: 42, borderRadius: "50%", flexShrink: 0,
-        background: "linear-gradient(135deg, #fb7185 0%, #a855f7 100%)",
+        background: "linear-gradient(180deg, #1565d8 0%, #104ea6 100%)",
         display: "flex", alignItems: "center", justifyContent: "center",
         fontSize: 15, fontWeight: 800, color: "#fff",
       }}>
-        {customer.name.split(" ").map(w => w[0]).join("").slice(0, 2).toUpperCase()}
+        {member.name.split(" ").map(w => w[0]).join("").slice(0, 2).toUpperCase()}
       </div>
 
       {/* Info */}
       <div style={{ flex: 1, minWidth: 0 }}>
         <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
-          <span style={{ fontWeight: 700, fontSize: 14.5, color: "#1e293b" }}>{customer.name}</span>
+          <span style={{ fontWeight: 600, fontSize: 18, color: "#2f404a", letterSpacing: "-.18px" }}>{member.name}</span>
           <span style={{
             fontSize: 13, fontWeight: 700, padding: "2px 8px", borderRadius: 20,
-            background: customer.kyc === "Verified" ? "#dcfce7" : customer.kyc === "Pending" ? "#fef3c7" : "#fee2e2",
+            background: member.kyc === "Verified" ? "#dcfce7" : member.kyc === "Pending" ? "#fef3c7" : "#fee2e2",
             color: kycColor,
             border: `1px solid ${kycColor}55`,
           }}>
-            {customer.kyc === "Verified" ? "✓" : "●"} {customer.kyc}
+            {member.kyc === "Verified" ? "✓" : "●"} {member.kyc}
           </span>
         </div>
-        <div className="bp-cust-detail" style={{ fontSize: 13, color: "#64748b", marginTop: 3, display: "flex", gap: 10, flexWrap: "wrap" }}>
-          <span>📱 {customer.mobile}</span>
-          <span className="bp-cust-email">✉ {customer.email}</span>
+        <div className="bp-cust-detail" style={{ fontSize: 14, color: "#6d747a", marginTop: 6, display: "flex", gap: 24, flexWrap: "wrap", alignItems: "center" }}>
+          <span style={{ display: "flex", alignItems: "center", gap: 6 }}>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#6d747a" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.362 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.338 1.85.573 2.81.7A2 2 0 0 1 22 16.92z" />
+            </svg>
+            {member.mobile}
+          </span>
+          <span className="bp-cust-email" style={{ display: "flex", alignItems: "center", gap: 6, color: "#204ff7" }}>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#204ff7" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M4 4h16a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z" />
+              <polyline points="22,6 12,13 2,6" />
+            </svg>
+            {member.email}
+          </span>
         </div>
       </div>
 
@@ -297,10 +340,10 @@ function CustomerStrip({ customer, onChangeCustomer, canChange = true }) {
       {canChange && (
         <div className="bp-cust-actions" style={{ flexShrink: 0 }}>
           <button
-            onClick={onChangeCustomer}
+            onClick={onChangeMember}
             style={{
               height: 34, padding: "0 16px", borderRadius: 8, cursor: "pointer",
-              background: "linear-gradient(135deg,#fb7185 0%,#a855f7 100%)", border: "none",
+              background: "linear-gradient(180deg,#1565d8 0%,#104ea6 100%)", border: "none",
               color: "#fff", fontSize: 13, fontWeight: 700, fontFamily: "inherit",
               transition: "opacity .15s",
               boxShadow: "0 2px 8px rgba(168,85,247,.30)",
@@ -308,7 +351,7 @@ function CustomerStrip({ customer, onChangeCustomer, canChange = true }) {
             onMouseEnter={e => e.currentTarget.style.opacity = ".85"}
             onMouseLeave={e => e.currentTarget.style.opacity = "1"}
           >
-            Change Customer
+            Change Member
           </button>
         </div>
       )}
@@ -352,7 +395,7 @@ function KYCWarning({ kyc }) {
         </div>
         <div style={{ fontSize: 13, color: "var(--text-2)" }}>
           {isRejected
-            ? "This customer's KYC has been rejected. Policy issuance may be declined by the insurer. Please update KYC before proceeding."
+            ? "This member's KYC has been rejected. Policy issuance may be declined by the insurer. Please update KYC before proceeding."
             : "KYC verification is pending. The insurer may require completion before activating the policy."}
         </div>
       </div>
@@ -364,46 +407,46 @@ function KYCWarning({ kyc }) {
 export default function BuyPolicy() {
   const navigate = useNavigate();
   const { user } = useAuth();
-  const isCustomer = user?.role === "customer";
+  const isMember = user?.role === "member";
 
-  // Detect sales agent and find their assigned customers from CRM leads
+  // Detect sales agent and find their assigned members from CRM leads
   const myAgentRecord = user?.role === "agent"
     ? KMD_AGENTS.find(a => a.name.toLowerCase().includes(user.name.split(" ")[0].toLowerCase()))
     : null;
   const isSalesAgent = myAgentRecord?.agentType === "sales";
   const myAgentId    = myAgentRecord?.id ?? null;
 
-  const salesAssignedCustomerIds = useMemo(() => {
+  const salesAssignedMemberIds = useMemo(() => {
     if (!isSalesAgent || !myAgentId) return null;
     return new Set(
       INITIAL_LEADS
-        .filter(l => l.salesAssignedTo === myAgentId && l.customerId != null)
-        .map(l => l.customerId)
+        .filter(l => l.salesAssignedTo === myAgentId && l.memberId != null)
+        .map(l => l.memberId)
     );
   }, [isSalesAgent, myAgentId]);
 
   // Products available from agent's campaign assignments
   const agentCampaignProductIds = useMemo(() => {
-    if (!myAgentId || isCustomer) return null; // null = show all
+    if (!myAgentId || isMember) return null; // null = show all
     const myCampaigns = CAMPAIGNS.filter(c => c.assignedAgents.includes(myAgentId));
     return new Set(myCampaigns.flatMap(c => c.productIds ?? []));
-  }, [myAgentId, isCustomer]);
+  }, [myAgentId, isMember]);
 
-  // Base customer pool — sales operators see only their assigned customers
-  const baseCustomers = salesAssignedCustomerIds
-    ? CUSTOMERS.filter(c => salesAssignedCustomerIds.has(c.id))
-    : CUSTOMERS;
+  // Base member pool — sales operators see only their assigned members
+  const baseMembers = salesAssignedMemberIds
+    ? MEMBERS.filter(c => salesAssignedMemberIds.has(c.id))
+    : MEMBERS;
 
-  // For customer login: auto-find and lock in their own record
-  const selfCustomer = isCustomer
-    ? (CUSTOMERS.find((c) => c.email === user.email) ?? null)
+  // For member login: auto-find and lock in their own record
+  const selfMember = isMember
+    ? (MEMBERS.find((c) => c.email === user.email) ?? null)
     : null;
 
-  // Pre-select customer when navigated from customer list via ?customerId=X
+  // Pre-select member when navigated from member list via ?memberId=X
   const [searchParams] = useSearchParams();
-  const preselectedId = searchParams.get("customerId");
-  const preselectedCustomer = (!isCustomer && preselectedId)
-    ? (CUSTOMERS.find((c) => c.id === Number(preselectedId)) ?? null)
+  const preselectedId = searchParams.get("memberId");
+  const preselectedMember = (!isMember && preselectedId)
+    ? (MEMBERS.find((c) => c.id === Number(preselectedId)) ?? null)
     : null;
 
   // Resume pending payment via ?proposalId=PRO-2025-XXXX
@@ -411,11 +454,11 @@ export default function BuyPolicy() {
   const resumePolicy = resumeProposalId
     ? (POLICY_MOCK.find(p => p.proposalId === resumeProposalId) ?? null)
     : null;
-  const resumeCustomer = resumePolicy ? (() => {
-    const found = CUSTOMERS.find(c => c.name === resumePolicy.customerName);
+  const resumeMember = resumePolicy ? (() => {
+    const found = MEMBERS.find(c => c.name === resumePolicy.memberName);
     return {
-      id:      found?.id ?? resumePolicy.customerId,
-      name:    resumePolicy.customerName,
+      id:      found?.id ?? resumePolicy.memberId,
+      name:    resumePolicy.memberName,
       mobile:  resumePolicy.mobile.replace(' ', ''),
       email:   found?.email ?? '',
       address: found?.address ?? '',
@@ -435,23 +478,23 @@ export default function BuyPolicy() {
     ageBandId:  '',
   }] : null;
 
-  // Unified initial customer — self (customer role) OR broker-preselected OR resume OR none
-  const initialCustomer = selfCustomer ?? preselectedCustomer ?? resumeCustomer;
+  // Unified initial member — self (member role) OR broker-preselected OR resume OR none
+  const initialMember = selfMember ?? preselectedMember ?? resumeMember;
 
   // Step state — jump to payment (4) when resuming a pending proposal
-  const [step, setStep] = useState(resumePolicy ? 4 : initialCustomer ? 1 : 0);
+  const [step, setStep] = useState(resumePolicy ? 4 : initialMember ? 1 : 0);
 
-  // Step 0 — customer selection (agent/broker only)
+  // Step 0 — member selection (agent/broker only)
   const [custSearch, setCustSearch] = useState("");
-  const [selectedCustomer, setSelectedCustomer] = useState(initialCustomer);
+  const [selectedMember, setSelectedMember] = useState(initialMember);
 
   // Insurance type — defaulted to Health (type selection step is hidden)
   const [insuranceType, setInsuranceType] = useState(resumePolicy?.type ?? "Health");
 
   // Step 2 — members / vehicle — start with Self only; family added on demand
   const [members, setMembers] = useState(
-    initialCustomer
-      ? [{ type: "Self", name: initialCustomer.name, dob: initialCustomer.dob, gender: initialCustomer.gender }]
+    initialMember
+      ? [{ type: "Self", name: initialMember.name, dob: initialMember.dob, gender: initialMember.gender }]
       : [],
   );
   const [vehicle, setVehicle] = useState({
@@ -468,12 +511,15 @@ export default function BuyPolicy() {
   const [productSels, setProductSels] = useState({});  // per-product {sumInsured,ageBandId,coverage,premium}
   const [viewingProduct, setViewingProduct] = useState(null); // product detail modal
 
-  // Step 4 — proposal — pre-fill from customer record
+  // Step 2 — which product's details are expanded (accordion when >1 product)
+  const [expandedProductId, setExpandedProductId] = useState(null);
+
+  // Step 4 — proposal — pre-fill from member record
   const [proposal, setProposal] = useState({
-    customerName: initialCustomer?.name ?? "",
-    mobile: initialCustomer?.mobile ?? "",
-    email: initialCustomer?.email ?? "",
-    address: initialCustomer?.address ?? "",
+    memberName: initialMember?.name ?? "",
+    mobile: initialMember?.mobile ?? "",
+    email: initialMember?.email ?? "",
+    address: initialMember?.address ?? "",
     medicalHistory: "No",
     preExisting: "",
     nomineeName: "",
@@ -505,9 +551,10 @@ export default function BuyPolicy() {
   const [neftDate,       setNeftDate]       = useState("");
   const [neftPhoto,      setNeftPhoto]      = useState(null);
 
-  // Step 3 — nominees & terms
+  // Step 2 — nominees & terms (moved up from Proposal step)
   const [nominees, setNominees] = useState([{ id: 1, name: '', relation: '', age: '', share: '100' }]);
   const [termsAccepted, setTermsAccepted] = useState(false);
+  const nomineesTotal = nominees.reduce((s, n) => s + (Number(n.share) || 0), 0);
 
   // Step 6 — result
   const [policyResults, setPolicyResults] = useState([]);
@@ -530,7 +577,7 @@ export default function BuyPolicy() {
   const handleNomineeRelation = (e) => {
     const relation = e.target.value;
     const slotTypes = RELATION_TO_SLOT[relation] ?? [];
-    const family = selectedCustomer?.familyMembers ?? [];
+    const family = selectedMember?.familyMembers ?? [];
     const match = slotTypes.reduce((found, t) => found ?? family.find(m => m.type === t), null);
     setProposal((p) => ({
       ...p,
@@ -569,7 +616,7 @@ export default function BuyPolicy() {
   const [nomineeAutoFilled, setNomineeAutoFilled] = useState({});
 
   const updateNomineeRelation = (id, relation) => {
-    const family  = selectedCustomer?.familyMembers ?? [];
+    const family  = selectedMember?.familyMembers ?? [];
     const allData = [...members, ...family];
     let autoName = '';
     let autoAge  = '';
@@ -601,7 +648,7 @@ export default function BuyPolicy() {
 
   const next = () => setStep((s) => Math.min(s + 1, STEPS.length - 1));
   const back = () => {
-    if (step === 1) { navigate(isCustomer ? "/customer-portal" : "/customer"); return; }
+    if (step === 1) { navigate(isMember ? "/member-portal" : "/member"); return; }
     setStep((s) => Math.max(s - 1, 0));
   };
 
@@ -650,7 +697,7 @@ export default function BuyPolicy() {
         .filter(t => !existing.has(t))
         .map(type => {
           const slot  = FAMILY_SLOTS.find(s => s.type === type);
-          const saved = selectedCustomer?.familyMembers?.find(m => m.type === type);
+          const saved = selectedMember?.familyMembers?.find(m => m.type === type);
           return { type, name: saved?.name ?? '', dob: saved?.dob ?? '', gender: saved?.gender ?? slot?.genderDefault ?? '' };
         });
       return additions.length ? [...prev, ...additions] : prev;
@@ -683,30 +730,30 @@ export default function BuyPolicy() {
     return [...pool].sort((a, b) => score(b) - score(a));
   }, [insuranceType, agentCampaignProductIds]);
 
-  // Customer search filter — sales operators already scoped to their assigned customers
-  const filteredCustomers = useMemo(() => {
+  // Member search filter — sales operators already scoped to their assigned members
+  const filteredMembers = useMemo(() => {
     const q = custSearch.trim().toLowerCase();
-    if (!q) return baseCustomers;
-    return baseCustomers.filter(
+    if (!q) return baseMembers;
+    return baseMembers.filter(
       (c) =>
         c.name.toLowerCase().includes(q) ||
         c.mobile.includes(q) ||
         c.email.toLowerCase().includes(q),
     );
-  }, [custSearch, baseCustomers]);
+  }, [custSearch, baseMembers]);
 
-  const custPg = usePagination(filteredCustomers, 12);
+  const custPg = usePagination(filteredMembers, 12);
   const handleCustSearch = (v) => { setCustSearch(v); custPg.reset(); };
 
-  // When customer is selected, pre-fill downstream state (including saved family members)
-  const handleSelectCustomer = (c) => {
-    setSelectedCustomer(c);
+  // When member is selected, pre-fill downstream state (including saved family members)
+  const handleSelectMember = (c) => {
+    setSelectedMember(c);
     setMembers([
       { type: "Self", name: c.name, dob: c.dob, gender: c.gender },
     ]);
     setProposal((p) => ({
       ...p,
-      customerName: c.name,
+      memberName: c.name,
       mobile: c.mobile,
       email: c.email,
       address: c.address,
@@ -715,7 +762,7 @@ export default function BuyPolicy() {
 
   const addMember = (type) => {
     const slot = FAMILY_SLOTS.find((s) => s.type === type);
-    const saved = selectedCustomer?.familyMembers?.find((m) => m.type === type);
+    const saved = selectedMember?.familyMembers?.find((m) => m.type === type);
     setMembers((prev) => [
       ...prev,
       {
@@ -734,7 +781,7 @@ export default function BuyPolicy() {
         return prev.map(m => m.type === type ? { ...m, [field]: val } : m);
       }
       const slot = FAMILY_SLOTS.find(s => s.type === type);
-      const saved = selectedCustomer?.familyMembers?.find(m => m.type === type);
+      const saved = selectedMember?.familyMembers?.find(m => m.type === type);
       return [...prev, { type, name: saved?.name ?? '', dob: saved?.dob ?? '', gender: saved?.gender ?? slot?.genderDefault ?? '', [field]: val }];
     });
 
@@ -747,7 +794,7 @@ export default function BuyPolicy() {
       proposalId:  `PRO-2025-${rand4()}`,
       product:     p.name,
       provider:    p.provider,
-      customer:    selectedCustomer?.name,
+      member:    selectedMember?.name,
       premium:     p.premium,
     })));
     next();
@@ -764,7 +811,7 @@ export default function BuyPolicy() {
           <div>
             <div className="page-title">Buy Insurance Policy</div>
             <div className="page-subtitle">
-              {isCustomer ? "Compare plans and buy a policy for yourself" : "Select a customer, compare plans and issue a policy"}
+              {isMember ? "Compare plans and buy a policy for yourself" : "Select a member, compare plans and issue a policy"}
             </div>
           </div>
         </div>
@@ -775,20 +822,17 @@ export default function BuyPolicy() {
         )}
       </div>
 
-      {/* ── Stepper ─────────────────────────────────────────────────────── */}
-      <Stepper steps={STEPS} current={step} />
-
-      {/* ── Persistent customer strip (steps 1–6) ─────────────────────── */}
-      {selectedCustomer && step > 0 && step < STEPS.length - 1 && (
-        <CustomerStrip
-          customer={selectedCustomer}
-          onChangeCustomer={() => setStep(0)}
+      {/* ── Persistent member strip (steps 1–6) ─────────────────────── */}
+      {selectedMember && step > 0 && step < STEPS.length - 1 && (
+        <MemberStrip
+          member={selectedMember}
+          onChangeMember={() => setStep(0)}
           canChange={false}
         />
       )}
 
       {/* ══════════════════════════════════════════════════════════════════
-          STEP 0 — Select Customer
+          STEP 0 — Select Member
       ══════════════════════════════════════════════════════════════════ */}
       {step === 0 && (
         <div>
@@ -799,27 +843,27 @@ export default function BuyPolicy() {
               <input
                 className="field-input"
                 style={{ paddingLeft: 34 }}
-                placeholder={isSalesAgent ? "Search your assigned customers…" : "Search by name, mobile or email…"}
+                placeholder={isSalesAgent ? "Search your assigned members…" : "Search by name, mobile or email…"}
                 value={custSearch}
                 onChange={(e) => handleCustSearch(e.target.value)}
                 autoFocus
               />
             </div>
             <span style={{ fontSize: 13.5, color: "var(--text-3)", whiteSpace: "nowrap", background: "var(--surface-2)", border: "1px solid var(--border)", borderRadius: 20, padding: "4px 12px" }}>
-              {filteredCustomers.length} customers
+              {filteredMembers.length} members
             </span>
             {!isSalesAgent && (
-              <button className="btn btn-secondary btn-sm" style={{ whiteSpace: "nowrap", flexShrink: 0 }} onClick={() => navigate("/customer/create")}>
-                <CustomerIcon size={14} /> + Add New
+              <button className="btn btn-secondary btn-sm" style={{ whiteSpace: "nowrap", flexShrink: 0 }} onClick={() => navigate("/member/create")}>
+                <MemberIcon size={14} /> + Add New
               </button>
             )}
           </div>
 
-          {/* Customer grid */}
-          {filteredCustomers.length === 0 ? (
+          {/* Member grid */}
+          {filteredMembers.length === 0 ? (
             <div style={{ textAlign: "center", padding: "56px 0", color: "var(--text-3)" }}>
               <div style={{ fontSize: 36, marginBottom: 10 }}>🔍</div>
-              <div style={{ fontWeight: 600, marginBottom: 4 }}>No customers found</div>
+              <div style={{ fontWeight: 600, marginBottom: 4 }}>No members found</div>
               <div style={{ fontSize: 13 }}>Try a different name, mobile or email</div>
             </div>
           ) : (
@@ -830,13 +874,13 @@ export default function BuyPolicy() {
               gap: 8,
             }}>
               {custPg.slice.map((c) => {
-                const isSelected = selectedCustomer?.id === c.id;
+                const isSelected = selectedMember?.id === c.id;
                 const isRejected = c.kyc === "Rejected";
                 return (
                   <button
                     key={c.id}
                     type="button"
-                    onClick={() => handleSelectCustomer(c)}
+                    onClick={() => handleSelectMember(c)}
                     style={{
                       textAlign: "left", cursor: "pointer", fontFamily: "inherit",
                       borderRadius: 14, overflow: "hidden",
@@ -882,26 +926,25 @@ export default function BuyPolicy() {
           {/* Sticky continue bar */}
           <div style={{
             position: "sticky", bottom: 0, zIndex: 20,
-            marginTop: 16, padding: "13px 18px",
-            background: selectedCustomer
-              ? "linear-gradient(135deg, #fb7185 0%, #a855f7 100%)"
-              : "#fff",
-            border: `1.5px solid ${selectedCustomer ? "transparent" : "var(--border)"}`,
-            borderRadius: 12, transition: "all .2s",
-            boxShadow: selectedCustomer
-              ? "0 -4px 24px rgba(168,85,247,.30)"
-              : "0 -2px 12px rgba(0,0,0,.06)",
+            marginTop: 16, padding: "12px 24px",
+            background: "#fff",
+            border: "1px solid #dee1e5",
+            borderRadius: 6, transition: "all .2s",
+            boxShadow: "0 1px 4.5px rgba(193,197,212,.27)",
             display: "flex", alignItems: "center", justifyContent: "flex-end",
           }}>
-            <Button disabled={!selectedCustomer} onClick={next} style={{
-              minWidth: 260,
-              ...(selectedCustomer ? {
-                background: "#fff", color: "#a855f7",
-                boxShadow: "0 2px 8px rgba(0,0,0,.12)",
-              } : {}),
+            <button disabled={!selectedMember} onClick={next} style={{
+              minWidth: 260, height: 40, border: "none", borderRadius: 8,
+              display: "flex", alignItems: "center", justifyContent: "center", gap: 8,
+              cursor: selectedMember ? "pointer" : "not-allowed",
+              fontFamily: "inherit", fontWeight: 600, fontSize: 16, letterSpacing: "-.16px",
+              padding: "10px 18px 10px 24px",
+              background: selectedMember ? "linear-gradient(180deg,#1565d8 0%,#104ea6 100%)" : "#e5e7eb",
+              color: selectedMember ? "#fff" : "#9ca3af",
             }}>
-              Continue with {selectedCustomer ? selectedCustomer.name : "selected customer"} →
-            </Button>
+              Continue with {selectedMember ? selectedMember.name : "selected member"}
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="9 6 15 12 9 18" /></svg>
+            </button>
           </div>
         </div>
       )}
@@ -912,7 +955,7 @@ export default function BuyPolicy() {
       {step === 2 && (
         <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
           <div>
-            <div style={{ fontSize: 20, fontWeight: 800, background: "linear-gradient(135deg,#fb7185,#a855f7)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text" }}>Member Details &amp; Premium</div>
+            <div style={{ fontSize: 20, fontWeight: 800, background: "linear-gradient(180deg,#1565d8,#104ea6)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text" }}>Member Info &amp; Premium</div>
             <div style={{ fontSize: 13.5, color: "var(--text-2)", marginTop: 3, fontWeight: 500 }}>
               Select coverage type for each product — member details will appear based on your selection
             </div>
@@ -926,7 +969,7 @@ export default function BuyPolicy() {
             </div>
           ) : (
             <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-              {cart.map(p => {
+              {cart.map((p, idx) => {
                 const sel       = psel(p.id);
                 const chartRows = PREMIUM_CHART[p.id] ?? [];
                 const uniqueSIs = [...new Set(chartRows.map(r => r.sumInsured))];
@@ -936,125 +979,187 @@ export default function BuyPolicy() {
                   : [];
                 const activeRow   = matchRow(p.id, sel.sumInsured, sel.ageBandId);
                 const covOpts     = coverageOpts(activeRow);
-                const icon        = POLICY_TYPE_ICON[p.policyType] ?? "📋";
                 const neededTypes = COV_MEMBERS[sel.coverage] ?? [];
                 const hasMissingMembers = neededTypes.some(t => {
                   if (t === "Self") return false;
                   const m = members.find(x => x.type === t);
                   return !m?.name || !m?.dob;
                 });
+                const providerColor = TYPE_COLORS[p.policyType] ?? '#33b5e5';
+                const isAccordion = cart.length > 1;
+                const isOpen = !isAccordion || expandedProductId === p.id || (expandedProductId === null && p.id === cart[0]?.id);
 
                 return (
-                  <div key={p.id} style={{ border: "1.5px solid var(--border)", borderRadius: 14, overflow: "hidden", background: "#fff", boxShadow: "0 2px 8px rgba(0,0,0,.05)" }}>
-                    {/* Product header */}
-                    <div style={{ display: "flex", alignItems: "center", gap: 10, padding: "12px 16px", background: "var(--surface-2)", borderBottom: "1px solid var(--border)" }}>
-                      <div style={{ width: 34, height: 34, borderRadius: 8, background: "#fff", border: "1px solid var(--border)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 17, flexShrink: 0 }}>{icon}</div>
-                      <div style={{ flex: 1, minWidth: 0 }}>
-                        <div style={{ fontWeight: 800, fontSize: 13.5, color: "#7c3aed", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{p.name}</div>
-                        <div style={{ fontSize: 13, color: "var(--text-3)" }}>{p.provider} · <span style={{ fontFamily: "monospace" }}>{p.code}</span></div>
+                  <div key={p.id} style={{
+                    borderTop: "1px solid #dee1e5", borderRight: "1px solid #dee1e5", borderBottom: "1px solid #dee1e5",
+                    borderLeft: `4px solid ${providerColor}`,
+                    borderRadius: 6, overflow: "hidden", background: "#fff",
+                    boxShadow: isOpen ? "0 4px 14px rgba(36,48,74,.10)" : "0 1px 4.5px rgba(193,197,212,.27)",
+                  }}>
+                    {/* Product header — Figma product-card style */}
+                    <div
+                      onClick={() => isAccordion && setExpandedProductId(id => id === p.id ? null : p.id)}
+                      style={{ background: isOpen ? `${providerColor}0d` : "#f5f7f9", padding: 16, cursor: isAccordion ? "pointer" : "default" }}
+                    >
+                      <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                        {isAccordion && (
+                          <span style={{
+                            display: "flex", alignItems: "center", justifyContent: "center",
+                            width: 20, height: 20, borderRadius: "50%", flexShrink: 0,
+                            background: providerColor, color: "#fff", fontSize: 11, fontWeight: 700,
+                          }}>{idx + 1}</span>
+                        )}
+                        <span style={{ flex: 1, fontSize: 14, fontWeight: 600, color: providerColor, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{p.provider}</span>
+                        <span style={{ fontSize: 10.5, fontFamily: "monospace", color: "#94a3b8", flexShrink: 0 }}>{p.code}</span>
+                        {isAccordion && (
+                          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#6d747a" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ transform: isOpen ? "rotate(180deg)" : "none", transition: "transform .15s", flexShrink: 0 }}>
+                            <polyline points="6 9 12 15 18 9" />
+                          </svg>
+                        )}
+                      </div>
+                      <div style={{ fontSize: 18, fontWeight: 600, color: "#24304a", letterSpacing: "-.18px", marginTop: 8 }}>{p.name}</div>
+                      <div style={{ display: "flex", gap: 24, marginTop: 12, paddingBottom: 4 }}>
+                        <div>
+                          <div style={{ fontSize: 12, fontWeight: 500, color: "#6d747a", textTransform: "uppercase", letterSpacing: ".6px", marginBottom: 4 }}>Sum Insured</div>
+                          <div style={{ fontSize: 15, fontWeight: 600, color: "#24304a" }}>
+                            {sel.sumInsured ? `₹${Number(sel.sumInsured).toLocaleString("en-IN")}` : uniqueSIs.length > 0 ? `${fmtSI(Math.min(...uniqueSIs))} – ${fmtSI(Math.max(...uniqueSIs))}` : "—"}
+                          </div>
+                        </div>
+                        <div>
+                          <div style={{ fontSize: 12, fontWeight: 500, color: "#6d747a", textTransform: "uppercase", letterSpacing: ".6px", marginBottom: 4 }}>Premium</div>
+                          <div style={{ fontSize: 15, fontWeight: 600, color: "#24304a" }}>
+                            {sel.premium != null ? <>₹{sel.premium.toLocaleString("en-IN")} <span style={{ fontSize: 12, fontWeight: 400, color: "#6d747a" }}>/yr</span></> : "—"}
+                          </div>
+                        </div>
                       </div>
                     </div>
 
-                    <div style={{ padding: "14px 16px", display: "flex", flexDirection: "column", gap: 16 }}>
+                    {isOpen && (
+                    <div style={{ padding: 16, borderTop: "1px solid #dee1e5", display: "flex", flexDirection: "column", gap: 20 }}>
 
-                      {/* SI + Age Band */}
-                      {chartRows.length > 0 && (
-                        <div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
-                          <div style={{ minWidth: 160 }}>
-                            <div style={{ fontSize: 13, color: "var(--text-3)", fontWeight: 600, textTransform: "uppercase", letterSpacing: ".4px", marginBottom: 5 }}>Sum Insured</div>
-                            <select className="field-select" value={sel.sumInsured}
-                              onChange={e => {
-                                const si    = e.target.value;
-                                const bands = hasAB ? [...new Set(chartRows.filter(r => r.sumInsured === Number(si)).map(r => String(r.ageBandId)))] : [];
-                                const band  = bands[0] ?? '';
-                                const row   = matchRow(p.id, si, band);
-                                const cov   = row?.selfOnly != null ? 'selfOnly' : '';
-                                setPsel(p.id, { sumInsured: si, ageBandId: band, coverage: cov, premium: row?.[cov] ?? null });
-                                if (cov) ensureMembersFor(cov);
-                              }}
-                              style={{ fontSize: 13, padding: "6px 10px", width: "100%" }}>
-                              {uniqueSIs.map(si => <option key={si} value={String(si)}>₹{si.toLocaleString("en-IN")}</option>)}
-                            </select>
-                          </div>
-                          {hasAB && rowBands.length > 0 && (
-                            <div style={{ minWidth: 130 }}>
-                              <div style={{ fontSize: 13, color: "var(--text-3)", fontWeight: 600, textTransform: "uppercase", letterSpacing: ".4px", marginBottom: 5 }}>Age Band</div>
-                              <select className="field-select" value={sel.ageBandId}
-                                onChange={e => {
-                                  const band = e.target.value;
-                                  const row  = matchRow(p.id, sel.sumInsured, band);
-                                  const cov  = sel.coverage && row?.[sel.coverage] != null ? sel.coverage : (row?.selfOnly != null ? 'selfOnly' : '');
-                                  setPsel(p.id, { ageBandId: band, coverage: cov, premium: row?.[cov] ?? null });
-                                  if (cov) ensureMembersFor(cov);
-                                }}
-                                style={{ fontSize: 13, padding: "6px 10px", width: "100%" }}>
-                                {rowBands.map(b => <option key={b} value={b}>Band {b}</option>)}
-                              </select>
-                            </div>
-                          )}
-                        </div>
-                      )}
+                      {/* 1. Coverage */}
+                      <div>
+                        <div style={{ fontSize: 15, fontWeight: 700, color: "#24304a", marginBottom: 14 }}>1. Coverage</div>
 
-                      {/* Coverage options */}
-                      {covOpts.length > 0 && (
-                        <div>
-                          <div style={{ fontSize: 13, color: "var(--text-3)", fontWeight: 600, textTransform: "uppercase", letterSpacing: ".4px", marginBottom: 7 }}>Coverage Type</div>
-                          <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
-                            {covOpts.map(opt => {
-                              const active = sel.coverage === opt.key;
-                              return (
-                                <label key={opt.key} style={{
-                                  display: "flex", alignItems: "center", gap: 10,
-                                  padding: "10px 14px", borderRadius: 9, cursor: "pointer",
-                                  background: "#fff",
-                                  border: `1.5px solid ${active ? "var(--brand)" : "var(--border)"}`,
-                                  borderLeft: `4px solid ${active ? "var(--brand)" : "var(--border)"}`,
-                                  transition: "all .15s",
-                                }}>
-                                  <input type="radio" name={`cov2-${p.id}`} checked={active}
-                                    onChange={() => {
-                                      setPsel(p.id, { coverage: opt.key, premium: opt.value });
-                                      ensureMembersFor(opt.key);
+                        {chartRows.length > 0 && (
+                          <div style={{ marginBottom: 16 }}>
+                            <div style={{ fontSize: 12, fontWeight: 500, color: "#6d747a", textTransform: "uppercase", letterSpacing: ".6px", marginBottom: 8 }}>Sum Insured</div>
+                            <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+                              {uniqueSIs.map(si => {
+                                const active = String(si) === String(sel.sumInsured);
+                                return (
+                                  <button key={si} type="button"
+                                    onClick={() => {
+                                      const bands = hasAB ? [...new Set(chartRows.filter(r => r.sumInsured === si).map(r => String(r.ageBandId)))] : [];
+                                      const band  = bands[0] ?? '';
+                                      const row   = matchRow(p.id, String(si), band);
+                                      const cov   = row?.selfOnly != null ? 'selfOnly' : '';
+                                      setPsel(p.id, { sumInsured: String(si), ageBandId: band, coverage: cov, premium: row?.[cov] ?? null });
+                                      if (cov) ensureMembersFor(cov);
                                     }}
-                                    style={{ accentColor: "var(--brand)", width: 15, height: 15, flexShrink: 0 }} />
-                                  <span style={{ flex: 1, fontSize: 13.5, color: "var(--text)", fontWeight: active ? 700 : 400 }}>{opt.label}</span>
-                                  <span style={{ fontWeight: 800, fontSize: 15, color: active ? "var(--brand-dark)" : "var(--text)", flexShrink: 0 }}>₹{opt.value.toLocaleString("en-IN")}</span>
-                                </label>
-                              );
-                            })}
+                                    style={{
+                                      padding: "7px 16px", borderRadius: 8, fontSize: 13.5, fontWeight: 600,
+                                      border: "1.5px solid #1565d8",
+                                      background: active ? "#1565d8" : "#fff",
+                                      color: active ? "#fff" : "#1565d8",
+                                      cursor: "pointer", fontFamily: "inherit", transition: "all .12s",
+                                    }}
+                                  >
+                                    ₹{si.toLocaleString("en-IN")}
+                                  </button>
+                                );
+                              })}
+                            </div>
                           </div>
-                        </div>
-                      )}
+                        )}
 
-                      {/* Insured Members — driven by coverage selection */}
-                      {neededTypes.length > 0 && (
-                        <div style={{ background: "var(--surface-2)", borderRadius: 10, padding: "12px 14px" }}>
-                          <div style={{ fontSize: 13, color: "var(--text-3)", fontWeight: 600, textTransform: "uppercase", letterSpacing: ".5px", marginBottom: 10 }}>
-                            Insured Members
+                        {hasAB && rowBands.length > 0 && (
+                          <div style={{ marginBottom: 16 }}>
+                            <div style={{ fontSize: 12, fontWeight: 500, color: "#6d747a", textTransform: "uppercase", letterSpacing: ".6px", marginBottom: 8 }}>Age Band</div>
+                            <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+                              {rowBands.map(b => {
+                                const active = b === sel.ageBandId;
+                                return (
+                                  <button key={b} type="button"
+                                    onClick={() => {
+                                      const row = matchRow(p.id, sel.sumInsured, b);
+                                      const cov = sel.coverage && row?.[sel.coverage] != null ? sel.coverage : (row?.selfOnly != null ? 'selfOnly' : '');
+                                      setPsel(p.id, { ageBandId: b, coverage: cov, premium: row?.[cov] ?? null });
+                                      if (cov) ensureMembersFor(cov);
+                                    }}
+                                    style={{
+                                      padding: "7px 16px", borderRadius: 8, fontSize: 13.5, fontWeight: 600,
+                                      border: "1.5px solid #1565d8",
+                                      background: active ? "#1565d8" : "#fff",
+                                      color: active ? "#fff" : "#1565d8",
+                                      cursor: "pointer", fontFamily: "inherit", transition: "all .12s",
+                                    }}
+                                  >
+                                    Band {b}
+                                  </button>
+                                );
+                              })}
+                            </div>
                           </div>
-                          <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-                            {neededTypes.map(type => {
+                        )}
+
+                        {covOpts.length > 0 && (
+                          <div>
+                            <div style={{ fontSize: 12, fontWeight: 500, color: "#6d747a", textTransform: "uppercase", letterSpacing: ".6px", marginBottom: 8 }}>Coverage Type</div>
+                            <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
+                              {covOpts.map(opt => {
+                                const active = sel.coverage === opt.key;
+                                return (
+                                  <button key={opt.key} type="button"
+                                    onClick={() => { setPsel(p.id, { coverage: opt.key, premium: opt.value }); ensureMembersFor(opt.key); }}
+                                    style={{
+                                      minWidth: 130, padding: "12px 16px", borderRadius: 8, textAlign: "left",
+                                      border: `1.5px solid ${active ? "#1565d8" : "#dee1e5"}`,
+                                      background: "#fff", cursor: "pointer", fontFamily: "inherit",
+                                      transition: "all .12s",
+                                    }}
+                                  >
+                                    <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 8 }}>
+                                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#6d747a" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" /><circle cx="12" cy="7" r="4" /></svg>
+                                      <span style={{ fontSize: 13, fontWeight: 500, color: "#24304a" }}>{opt.label}</span>
+                                    </div>
+                                    <div style={{ fontSize: 15, fontWeight: 700, color: "#1565d8" }}>₹{opt.value.toLocaleString("en-IN")}</div>
+                                  </button>
+                                );
+                              })}
+                            </div>
+                          </div>
+                        )}
+                      </div>
+
+                      {/* 2. Covered Family Members — driven by coverage selection */}
+                      {neededTypes.length > 0 && (
+                        <div>
+                          <div style={{ fontSize: 15, fontWeight: 700, color: "#24304a", marginBottom: 14 }}>2. Covered Family Members</div>
+                          <div style={{ border: "1px solid #dee1e5", borderRadius: 8, overflow: "hidden" }}>
+                            <div style={{ display: "grid", gridTemplateColumns: "160px 1fr 150px 130px", gap: 12, padding: "10px 14px", background: "#f5f7f9", borderBottom: "1px solid #dee1e5" }}>
+                              {["Member", "Full Name", "Date of Birth", "Gender"].map(h => (
+                                <div key={h} style={{ fontSize: 11.5, fontWeight: 600, color: "#6d747a", textTransform: "uppercase", letterSpacing: ".5px" }}>{h}</div>
+                              ))}
+                            </div>
+                            {neededTypes.map((type, i) => {
                               const m           = members.find(x => x.type === type);
                               const isSelf      = type === "Self";
                               const slot        = FAMILY_SLOTS.find(s => s.type === type);
                               const missingName = !isSelf && !m?.name;
                               const missingDob  = !isSelf && !m?.dob;
-                              const age         = m?.dob ? Math.floor((Date.now() - new Date(m.dob)) / (365.25 * 24 * 3600 * 1000)) : null;
                               return (
                                 <div key={type} style={{
                                   display: "grid",
-                                  gridTemplateColumns: "110px 1fr 150px 110px",
-                                  gap: 8, alignItems: "center",
-                                  padding: "10px 12px", borderRadius: 9, background: "#fff",
-                                  border: `1.5px solid ${(missingName || missingDob) ? "#f59e0b" : "var(--border)"}`,
-                                  transition: "border-color .2s",
+                                  gridTemplateColumns: "160px 1fr 150px 130px",
+                                  gap: 12, alignItems: "center",
+                                  padding: "10px 14px", background: "#fff",
+                                  borderBottom: i < neededTypes.length - 1 ? "1px solid #dee1e5" : "none",
                                 }}>
-                                  <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-                                    <span style={{ fontSize: 17 }}>{slot?.icon}</span>
+                                  <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                                    <span style={{ fontSize: 16 }}>{slot?.icon}</span>
                                     <div>
-                                      <div style={{ fontSize: 13.5, fontWeight: 700, color: "var(--text)", lineHeight: 1.2 }}>{slot?.label}</div>
-                                      {isSelf && <div style={{ fontSize: 10.5, color: "var(--text-3)", fontWeight: 600 }}>Primary</div>}
-                                      {age !== null && <div style={{ fontSize: 10.5, color: "var(--text-3)" }}>{age} yrs</div>}
+                                      <div style={{ fontSize: 13.5, fontWeight: 600, color: "#24304a", lineHeight: 1.2 }}>{isSelf ? "Primary Family Member" : slot?.label}</div>
                                     </div>
                                   </div>
                                   <input
@@ -1097,18 +1202,160 @@ export default function BuyPolicy() {
                           )}
                         </div>
                       )}
-                    </div>
 
-                    {/* Premium footer */}
-                    {sel.premium != null && (
-                      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "10px 16px", background: "var(--surface-2)", borderTop: "1px solid var(--border)" }}>
-                        <span style={{ fontSize: 13, color: "var(--text-3)", fontWeight: 500 }}>Annual Premium</span>
-                        <span style={{ fontSize: 16, fontWeight: 800, color: "var(--brand)" }}>₹{sel.premium.toLocaleString("en-IN")}</span>
+                      {/* 3. Nominees */}
+                      <div>
+                        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 14, flexWrap: "wrap", gap: 8 }}>
+                          <div>
+                            <span style={{ fontSize: 15, fontWeight: 700, color: "#24304a" }}>3. Nominees</span>
+                            <span style={{ fontSize: 13, color: "var(--text-3)", marginLeft: 8 }}>Total share must equal 100%</span>
+                          </div>
+                          {nominees.length < 4 && (
+                            <button type="button" className="btn btn-secondary btn-sm" onClick={addNominee}>
+                              + Add Nominee
+                            </button>
+                          )}
+                        </div>
+
+                        {/* Column headers */}
+                        <div style={{ display: "grid", gridTemplateColumns: "1fr 140px 80px 90px 36px", gap: 8, marginBottom: 6, padding: "0 2px" }}>
+                          {["Nominee Name", "Relationship", "Age", "Share %", ""].map(h => (
+                            <div key={h} style={{ fontSize: 11.5, fontWeight: 600, color: "var(--text-3)", textTransform: "uppercase", letterSpacing: ".4px" }}>{h}</div>
+                          ))}
+                        </div>
+
+                        <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+                          {nominees.map((n) => (
+                            <div key={n.id} style={{
+                              display: "grid", gridTemplateColumns: "1fr 140px 80px 90px 36px",
+                              gap: 8, alignItems: "center",
+                              padding: "10px 10px", borderRadius: 9,
+                              background: "var(--surface-2)", border: "1.5px solid var(--border)",
+                            }}>
+                              <div style={{ position: "relative" }}>
+                                <input className="field-input" placeholder="Full name" value={n.name}
+                                  onChange={e => updateNominee(n.id, "name", e.target.value)}
+                                  style={{
+                                    fontSize: 13.5, padding: "6px 9px", width: "100%",
+                                    transition: "border-color .4s, box-shadow .4s",
+                                    ...(nomineeAutoFilled[n.id] && n.name ? {
+                                      borderColor: "#16a34a",
+                                      boxShadow: "0 0 0 3px rgba(22,163,74,.15)",
+                                    } : {}),
+                                  }} />
+                                {nomineeAutoFilled[n.id] && n.name && (
+                                  <span style={{
+                                    position: "absolute", right: 8, top: "50%", transform: "translateY(-50%)",
+                                    fontSize: 10, color: "#16a34a", fontWeight: 700, pointerEvents: "none",
+                                    animation: "fadeIn .2s ease",
+                                  }}>✓ auto</span>
+                                )}
+                              </div>
+                              <select className="field-select" value={n.relation}
+                                onChange={e => updateNomineeRelation(n.id, e.target.value)}
+                                style={{ fontSize: 13.5, padding: "6px 9px" }}>
+                                <option value="">Relation</option>
+                                {["Spouse", "Son", "Daughter", "Father", "Mother", "Brother", "Sister", "Other"].map(r => (
+                                  <option key={r}>{r}</option>
+                                ))}
+                              </select>
+                              <div style={{ position: "relative" }}>
+                                <input type="number" className="field-input" placeholder="Age" value={n.age} min="1" max="100"
+                                  onChange={e => updateNominee(n.id, "age", e.target.value)}
+                                  style={{
+                                    fontSize: 13.5, padding: "6px 9px", width: "100%",
+                                    transition: "border-color .4s, box-shadow .4s",
+                                    ...(nomineeAutoFilled[n.id] && n.age ? {
+                                      borderColor: "#16a34a",
+                                      boxShadow: "0 0 0 3px rgba(22,163,74,.15)",
+                                    } : {}),
+                                  }} />
+                                {nomineeAutoFilled[n.id] && n.age && (
+                                  <span style={{ position: "absolute", right: 4, top: "50%", transform: "translateY(-50%)", fontSize: 9, color: "#16a34a", fontWeight: 700, pointerEvents: "none" }}>✓</span>
+                                )}
+                              </div>
+                              <div style={{ position: "relative" }}>
+                                <input type="number" className="field-input" placeholder="%" value={n.share} min="1" max="100"
+                                  onChange={e => updateNominee(n.id, "share", e.target.value)}
+                                  style={{ fontSize: 13.5, padding: "6px 28px 6px 9px" }} />
+                                <span style={{ position: "absolute", right: 8, top: "50%", transform: "translateY(-50%)", fontSize: 13, color: "var(--text-3)", pointerEvents: "none" }}>%</span>
+                              </div>
+                              <button type="button" onClick={() => removeNominee(n.id)} disabled={nominees.length === 1}
+                                style={{ width: 32, height: 32, borderRadius: 6, border: "1.5px solid var(--border)", background: nominees.length === 1 ? "var(--surface-2)" : "#fff0f0", color: nominees.length === 1 ? "var(--text-3)" : "var(--red)", cursor: nominees.length === 1 ? "not-allowed" : "pointer", fontSize: 18, display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "inherit", transition: "all .12s" }}>
+                                ×
+                              </button>
+                            </div>
+                          ))}
+                        </div>
+
+                        {/* Share % footer */}
+                        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginTop: 14, flexWrap: "wrap", gap: 10 }}>
+                          <div style={{ fontSize: 13, color: "var(--text-3)" }}>Note: Total share must be equal to 100%</div>
+                          <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
+                            <span style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 13, fontWeight: 700, color: nomineesTotal === 100 ? "var(--green)" : nomineesTotal > 100 ? "var(--red)" : "#d97706" }}>
+                              Total Share: {nomineesTotal}%
+                              <span style={{ width: 8, height: 8, borderRadius: "50%", background: nomineesTotal === 100 ? "var(--green)" : nomineesTotal > 100 ? "var(--red)" : "#d97706" }} />
+                            </span>
+                            <button type="button" className="btn btn-sm" disabled={nomineesTotal !== 100}
+                              style={{
+                                background: nomineesTotal === 100 ? "linear-gradient(180deg,#1565d8 0%,#104ea6 100%)" : "#e5e7eb",
+                                color: nomineesTotal === 100 ? "#fff" : "#9ca3af",
+                                border: "none", cursor: nomineesTotal === 100 ? "pointer" : "not-allowed",
+                              }}
+                            >
+                              Complete
+                            </button>
+                          </div>
+                        </div>
                       </div>
+                    </div>
                     )}
                   </div>
                 );
               })}
+            </div>
+          )}
+
+          {/* 4. Declaration */}
+          {cart.length > 0 && (
+            <div className="card">
+              <div className="card-header">
+                <span style={{ fontWeight: 700, fontSize: 15, color: "#24304a" }}>4. Declaration</span>
+              </div>
+              <div className="card-body" style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+                <label style={{
+                  display: "flex", alignItems: "flex-start", gap: 12, cursor: "pointer",
+                  padding: "13px 14px", borderRadius: 10,
+                  background: proposal.declaration ? "#f5f3ff" : "#fff",
+                  border: `1.5px solid ${proposal.declaration ? "var(--brand)" : "var(--border)"}`,
+                  transition: "all .15s",
+                }}>
+                  <input type="checkbox" checked={proposal.declaration}
+                    onChange={e => setProposal(p => ({ ...p, declaration: e.target.checked }))}
+                    style={{ marginTop: 2, accentColor: "var(--brand)", width: 16, height: 16, flexShrink: 0 }} />
+                  <span style={{ fontSize: 13.5, color: "var(--text-2)", lineHeight: 1.7 }}>
+                    I declare that all information provided is true and correct. I understand that any misrepresentation may result in rejection of claim or cancellation of policy. I consent to sharing this data with the insurer for policy issuance.
+                  </span>
+                </label>
+                <label style={{
+                  display: "flex", alignItems: "flex-start", gap: 12, cursor: "pointer",
+                  padding: "13px 14px", borderRadius: 10,
+                  background: termsAccepted ? "#f5f3ff" : "#fff",
+                  border: `1.5px solid ${termsAccepted ? "var(--brand)" : "var(--border)"}`,
+                  transition: "all .15s",
+                }}>
+                  <input type="checkbox" checked={termsAccepted}
+                    onChange={e => setTermsAccepted(e.target.checked)}
+                    style={{ marginTop: 2, accentColor: "var(--brand)", width: 16, height: 16, flexShrink: 0 }} />
+                  <span style={{ fontSize: 13.5, color: "var(--text-2)", lineHeight: 1.7 }}>
+                    I have read and agree to the{" "}
+                    <span style={{ color: "var(--brand)", fontWeight: 600, textDecoration: "underline", cursor: "pointer" }}>Terms &amp; Conditions</span>
+                    {" "}and{" "}
+                    <span style={{ color: "var(--brand)", fontWeight: 600, textDecoration: "underline", cursor: "pointer" }}>Privacy Policy</span>.
+                    I authorise KM Dastur &amp; Co. to process my application and share necessary details with the insurance company.
+                  </span>
+                </label>
+              </div>
             </div>
           )}
 
@@ -1119,12 +1366,12 @@ export default function BuyPolicy() {
               <div style={{
                 position: "sticky", bottom: 0, zIndex: 20, marginTop: 8,
                 background: hasPremium
-                  ? "linear-gradient(135deg, #fb7185 0%, #a855f7 100%)"
+                  ? "linear-gradient(180deg, #1565d8 0%, #104ea6 100%)"
                   : "#fff",
                 border: `2px solid ${hasPremium ? "transparent" : "var(--border)"}`,
                 borderRadius: 12, padding: "12px 18px",
                 boxShadow: hasPremium
-                  ? "0 -4px 24px rgba(168,85,247,.30)"
+                  ? "0 -4px 24px rgba(21,101,216,.30)"
                   : "0 -2px 12px rgba(0,0,0,.06)",
                 display: "flex", alignItems: "center", gap: 16, flexWrap: "wrap",
                 transition: "all .2s",
@@ -1150,17 +1397,24 @@ export default function BuyPolicy() {
                 )}
                 <button
                   className="btn btn-primary"
-                  disabled={cart.length === 0}
-                  onClick={next}
+                  disabled={cart.length === 0 || nomineesTotal !== 100 || !proposal.declaration || !termsAccepted}
+                  onClick={() => setStep(3)}
+                  title={
+                    nomineesTotal !== 100
+                      ? "Nominee share must total 100% before continuing"
+                      : (!proposal.declaration || !termsAccepted)
+                        ? "Please accept both declarations before continuing"
+                        : undefined
+                  }
                   style={{
                     flexShrink: 0, minWidth: 200,
                     ...(hasPremium ? {
-                      background: "#fff", color: "#a855f7", fontWeight: 700,
+                      background: "#fff", color: "#1565d8", fontWeight: 700,
                       boxShadow: "0 2px 8px rgba(0,0,0,.12)",
                     } : {}),
                   }}
                 >
-                  Continue to Proposal →
+                  Review and make payment
                 </button>
               </div>
             );
@@ -1173,11 +1427,11 @@ export default function BuyPolicy() {
       ══════════════════════════════════════════════════════════════════ */}
       {step === 1 && (
         <div>
-          {selectedCustomer && <KYCWarning kyc={selectedCustomer.kyc} />}
+          {selectedMember && <KYCWarning kyc={selectedMember.kyc} />}
 
           <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 16, flexWrap: "wrap", gap: 8 }}>
             <div>
-              <div style={{ fontSize: 20, fontWeight: 800, background: "linear-gradient(135deg,#fb7185,#a855f7)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text" }}>Select Products</div>
+              <div style={{ fontSize: 20, fontWeight: 800, background: "linear-gradient(180deg,#1565d8,#104ea6)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text" }}>Select Products</div>
               <div style={{ fontSize: 13.5, color: "var(--text-2)", marginTop: 3, fontWeight: 500 }}>Click a card to select, then view full details before continuing</div>
             </div>
             {cart.length > 0 && (
@@ -1194,7 +1448,7 @@ export default function BuyPolicy() {
               <div style={{ fontSize: 13 }}>No products are assigned to your campaigns</div>
             </div>
           ) : (
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(300px, 1fr))", gap: 16 }}>
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(340px, 1fr))", gap: 24 }}>
               {availableProducts.map(p => {
                 const inCart      = !!cart.find(x => x.id === p.id);
                 const chartRows   = PREMIUM_CHART[p.id] ?? [];
@@ -1203,68 +1457,73 @@ export default function BuyPolicy() {
                 const allPremiums = chartRows.flatMap(r => [r.selfOnly, r.selfSpouse, r.selfSpouse2Children].filter(Boolean));
                 const minPremium  = allPremiums.length > 0 ? Math.min(...allPremiums) : null;
                 const covKeys     = ['selfOnly','selfSpouse','selfSpouse2Children'].filter(k => firstRow?.[k] != null);
-                const icon        = POLICY_TYPE_ICON[p.policyType] ?? "📋";
-                const fmtSI = v => v >= 100000 ? `₹${(v/100000).toFixed(0)}L` : v >= 1000 ? `₹${(v/1000).toFixed(0)}K` : `₹${v}`;
-                const TYPE_COLORS = {
-                  'Base Policy':        { color: '#1d4ed8', bg: '#dbeafe', border: '#93c5fd' },
-                  'OPD':                { color: '#15803d', bg: '#dcfce7', border: '#86efac' },
-                  'Payment Protection': { color: '#b45309', bg: '#fef3c7', border: '#fcd34d' },
-                  'Age Band Premium':   { color: '#7c3aed', bg: '#f5f3ff', border: '#c4b5fd' },
-                  'Super Top Up':       { color: '#dc2626', bg: '#fee2e2', border: '#fca5a5' },
-                  'Top Up Policy':      { color: '#4f46e5', bg: '#eef2ff', border: '#a5b4fc' },
-                };
-                const tc = TYPE_COLORS[p.policyType] ?? { color: '#64748b', bg: '#f1f5f9', border: '#cbd5e1' };
+                const providerColor = TYPE_COLORS[p.policyType] ?? '#33b5e5';
                 return (
                   <div key={p.id}
                     onClick={() => toggleCart(p)}
                     style={{
-                      borderRadius: 14, overflow: "hidden", background: "#fff",
-                      border: `2px solid ${inCart ? tc.color : "#e2e8f0"}`,
-                      boxShadow: inCart ? `0 4px 20px ${tc.color}28` : "0 1px 6px rgba(0,0,0,.06)",
+                      borderRadius: 6, overflow: "hidden", background: "#fff",
+                      border: `${inCart ? "2px" : "1px"} solid ${inCart ? "#1565d8" : "#dee1e5"}`,
+                      boxShadow: inCart ? "0 1px 11px rgba(63,151,233,.26)" : "0 1px 4.5px rgba(193,197,212,.27)",
                       transition: "all .15s", cursor: "pointer",
                       display: "flex", flexDirection: "column",
                     }}
                   >
-                    {/* Top accent bar */}
-                    <div style={{ height: 4, background: `linear-gradient(90deg,${tc.color},${tc.color}88)`, flexShrink: 0 }} />
+                    {/* Header strip */}
+                    <div style={{ background: "#f5f7f9", padding: "16px 16px 0" }}>
+                      <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                        <span style={{ flex: 1, fontSize: 18, fontWeight: 700, color: providerColor, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{p.provider}</span>
+                        <div
+                          onClick={e => { e.stopPropagation(); toggleCart(p); }}
+                          style={{
+                            width: 24, height: 24, borderRadius: 6, flexShrink: 0, cursor: "pointer",
+                            display: "flex", alignItems: "center", justifyContent: "center",
+                            background: inCart ? "#1565d8" : "#fff",
+                            border: `1.5px solid ${inCart ? "#1565d8" : "#9ca3af"}`,
+                          }}
+                        >
+                          {inCart && (
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                              <polyline points="20 6 9 17 4 12" />
+                            </svg>
+                          )}
+                        </div>
+                      </div>
+                      <div style={{ display: "flex", alignItems: "center", gap: 6, flexWrap: "wrap", marginTop: 6, paddingBottom: 12 }}>
+                        <span style={{ fontSize: 10.5, fontWeight: 700, color: "#6d747a" }}>{p.policyType}</span>
+                        <span style={{ fontSize: 10.5, fontFamily: "monospace", color: "#94a3b8" }}>· {p.code}</span>
+                      </div>
+                    </div>
 
                     {/* Body */}
-                    <div style={{ padding: "14px 16px", flex: 1, display: "flex", flexDirection: "column", gap: 12 }}>
-
-                      {/* Provider + type row */}
-                      <div style={{ display: "flex", alignItems: "flex-start", gap: 10 }}>
-                        <div style={{ width: 40, height: 40, borderRadius: 10, background: tc.bg, border: `1.5px solid ${tc.border}`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20, flexShrink: 0 }}>{icon}</div>
-                        <div style={{ flex: 1, minWidth: 0 }}>
-                          <div style={{ fontSize: 13, fontWeight: 700, color: tc.color, letterSpacing: ".2px", marginBottom: 4, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{p.provider}</div>
-                          <div style={{ display: "flex", alignItems: "center", gap: 6, flexWrap: "wrap" }}>
-                            <span style={{ fontSize: 10.5, fontWeight: 700, background: tc.bg, color: tc.color, border: `1px solid ${tc.border}`, borderRadius: 4, padding: "1px 7px" }}>{p.policyType}</span>
-                            <span style={{ fontSize: 10.5, fontFamily: "monospace", color: "#94a3b8" }}>{p.code}</span>
-                            <span style={{ fontSize: 10.5, fontWeight: 700, color: "#15803d" }}>● Active</span>
-                          </div>
-                        </div>
-                        {inCart
-                          ? <div style={{ width: 24, height: 24, borderRadius: "50%", background: tc.color, color: "#fff", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, fontWeight: 700, flexShrink: 0 }}>✓</div>
-                          : <input type="checkbox" checked={false} onChange={() => toggleCart(p)} onClick={e => e.stopPropagation()} style={{ width: 17, height: 17, cursor: "pointer", accentColor: tc.color, flexShrink: 0, marginTop: 2 }} />
-                        }
-                      </div>
+                    <div style={{ padding: "16px", flex: 1, display: "flex", flexDirection: "column", gap: 16 }}>
 
                       {/* Product name */}
-                      <div style={{ fontWeight: 800, fontSize: 14, color: "#1e293b", lineHeight: 1.4, letterSpacing: "-.1px" }}>{p.name}</div>
+                      <div style={{ fontWeight: 600, fontSize: 18, color: "#24304a", letterSpacing: "-.18px" }}>{p.name}</div>
 
                       {/* Metrics */}
-                      <div style={{ display: "flex", gap: 8 }}>
+                      <div style={{ display: "flex", gap: 24 }}>
                         {uniqueSIs.length > 0 && (
-                          <div style={{ flex: 1, background: "#f8fafc", borderRadius: 8, padding: "8px 10px", border: "1px solid #e2e8f0" }}>
-                            <div style={{ fontSize: 10, fontWeight: 700, color: "#94a3b8", textTransform: "uppercase", letterSpacing: ".5px", marginBottom: 3 }}>Sum Insured</div>
-                            <div style={{ fontSize: 13, fontWeight: 700, color: "#1e293b" }}>
+                          <div style={{ flex: 1, minWidth: 0 }}>
+                            <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 6 }}>
+                              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#00c851" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12" /></svg>
+                              <span style={{ fontSize: 12, fontWeight: 500, color: "#6d747a", textTransform: "uppercase", letterSpacing: ".6px" }}>Sum Insured</span>
+                            </div>
+                            <div style={{ fontSize: 18, fontWeight: 600, color: "#24304a", letterSpacing: "-.18px" }}>
                               {fmtSI(Math.min(...uniqueSIs))}{uniqueSIs.length > 1 && ` – ${fmtSI(Math.max(...uniqueSIs))}`}
                             </div>
                           </div>
                         )}
                         {minPremium && (
-                          <div style={{ flex: 1, background: tc.bg, borderRadius: 8, padding: "8px 10px", border: `1px solid ${tc.border}` }}>
-                            <div style={{ fontSize: 10, fontWeight: 700, color: tc.color, textTransform: "uppercase", letterSpacing: ".5px", marginBottom: 3, opacity: .8 }}>Starts From</div>
-                            <div style={{ fontSize: 13, fontWeight: 800, color: tc.color }}>₹{minPremium.toLocaleString("en-IN")}<span style={{ fontSize: 10, fontWeight: 600 }}>/yr</span></div>
+                          <div style={{ flex: 1, minWidth: 0 }}>
+                            <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 6 }}>
+                              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#6d747a" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="9" /><path d="M12 7v10M9 9.5c0-1 .9-1.5 2-1.5s2.5.5 2.5 1.7c0 1.9-4.5 1.2-4.5 3.4 0 1.2 1.4 1.9 2.5 1.9s2-.6 2-1.6" /></svg>
+                              <span style={{ fontSize: 12, fontWeight: 500, color: "#6d747a", textTransform: "uppercase", letterSpacing: ".6px" }}>Premium starts</span>
+                            </div>
+                            <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                              <span style={{ fontSize: 18, fontWeight: 600, color: "#24304a", letterSpacing: "-.18px" }}>₹ {minPremium.toLocaleString("en-IN")}</span>
+                              <span style={{ fontSize: 14, color: "#6d747a" }}>/yr</span>
+                            </div>
                           </div>
                         )}
                       </div>
@@ -1272,38 +1531,26 @@ export default function BuyPolicy() {
                       {/* Coverage chips */}
                       {covKeys.length > 0 && (
                         <div style={{ display: "flex", gap: 5, flexWrap: "wrap" }}>
-                          {covKeys.includes('selfOnly')            && <span style={{ fontSize: 13, fontWeight: 600, background: "#fff", border: "1px solid #e2e8f0", borderRadius: 20, padding: "3px 10px", color: "#475569" }}>👤 Self</span>}
-                          {covKeys.includes('selfSpouse')          && <span style={{ fontSize: 13, fontWeight: 600, background: "#fff", border: "1px solid #e2e8f0", borderRadius: 20, padding: "3px 10px", color: "#475569" }}>👫 Self + Spouse</span>}
-                          {covKeys.includes('selfSpouse2Children') && <span style={{ fontSize: 13, fontWeight: 600, background: "#fff", border: "1px solid #e2e8f0", borderRadius: 20, padding: "3px 10px", color: "#475569" }}>👨‍👩‍👧 Family</span>}
+                          {covKeys.includes('selfOnly')            && <span style={{ fontSize: 13, fontWeight: 500, background: "#fff", border: "1px solid #dee1e5", borderRadius: 20, padding: "3px 10px", color: "#6d747a" }}>Self</span>}
+                          {covKeys.includes('selfSpouse')          && <span style={{ fontSize: 13, fontWeight: 500, background: "#fff", border: "1px solid #dee1e5", borderRadius: 20, padding: "3px 10px", color: "#6d747a" }}>Self + Spouse</span>}
+                          {covKeys.includes('selfSpouse2Children') && <span style={{ fontSize: 13, fontWeight: 500, background: "#fff", border: "1px solid #dee1e5", borderRadius: 20, padding: "3px 10px", color: "#6d747a" }}>Family</span>}
                         </div>
                       )}
-                    </div>
 
-                    {/* Footer */}
-                    <div
-                      style={{ padding: "10px 16px", borderTop: "1px solid #f1f5f9", background: "#fafafa", display: "flex", justifyContent: "space-between", alignItems: "center", gap: 8 }}
-                      onClick={e => e.stopPropagation()}
-                    >
-                      <button
-                        type="button"
-                        style={{ fontSize: 13, fontWeight: 600, border: `1.5px solid ${tc.border}`, color: tc.color, background: "#fff", borderRadius: 7, padding: "5px 12px", cursor: "pointer", fontFamily: "inherit" }}
-                        onClick={e => { e.stopPropagation(); setViewingProduct(p); }}
+                      {/* Footer */}
+                      <div
+                        style={{ display: "flex", justifyContent: "flex-end", alignItems: "center", gap: 2, paddingTop: 4, marginTop: "auto" }}
+                        onClick={e => e.stopPropagation()}
                       >
-                        View Details →
-                      </button>
-                      <button
-                        type="button"
-                        onClick={e => { e.stopPropagation(); toggleCart(p); }}
-                        style={{
-                          padding: "5px 16px", borderRadius: 7, cursor: "pointer",
-                          fontFamily: "inherit", fontWeight: 700, fontSize: 13, transition: "all .15s",
-                          background: inCart ? tc.color : "#fff",
-                          color: inCart ? "#fff" : tc.color,
-                          border: `1.5px solid ${tc.color}`,
-                        }}
-                      >
-                        {inCart ? "✓ Selected" : "+ Select"}
-                      </button>
+                        <button
+                          type="button"
+                          style={{ fontSize: 15, fontWeight: 600, border: "none", color: "#3b5bfd", background: "transparent", padding: 0, cursor: "pointer", fontFamily: "inherit", display: "flex", alignItems: "center", gap: 4 }}
+                          onClick={e => { e.stopPropagation(); setViewingProduct(p); }}
+                        >
+                          View Info
+                          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#3b5bfd" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="9 6 15 12 9 18" /></svg>
+                        </button>
+                      </div>
                     </div>
                   </div>
                 );
@@ -1314,31 +1561,30 @@ export default function BuyPolicy() {
           {/* Sticky footer */}
           <div style={{
             position: "sticky", bottom: 0, zIndex: 20, marginTop: 20,
-            display: "flex", alignItems: "center", justifyContent: "space-between",
-            gap: 16, padding: "14px 20px",
-            background: cart.length > 0
-              ? "linear-gradient(135deg, #fb7185 0%, #a855f7 100%)"
-              : "#fff",
-            border: `2px solid ${cart.length > 0 ? "transparent" : "var(--border)"}`,
-            borderRadius: 12, transition: "all .2s",
-            boxShadow: cart.length > 0
-              ? "0 -4px 24px rgba(168,85,247,.30)"
-              : "0 -2px 12px rgba(0,0,0,.06)",
+            display: "flex", alignItems: "center", justifyContent: "flex-end",
+            gap: 24, padding: "12px 24px",
+            background: "#fff",
+            border: "1px solid #dee1e5",
+            borderRadius: 6, transition: "all .2s",
+            boxShadow: "0 1px 4.5px rgba(193,197,212,.27)",
           }}>
-            <div style={{ fontSize: 13.5, color: cart.length > 0 ? "#fff" : "var(--text-3)", fontWeight: 500 }}>
+            <div style={{ fontSize: 14, color: "#6d747a", fontWeight: 400 }}>
               {cart.length === 0
                 ? "Select at least one product to continue"
-                : <><strong style={{ color: "#fff", fontWeight: 800 }}>{cart.length} product{cart.length > 1 ? "s" : ""}</strong> selected — choose premium details on next screen</>
+                : <><strong style={{ color: "#24304a", fontWeight: 700 }}>{cart.length} product{cart.length > 1 ? "s" : ""}</strong> selected — choose premium details on next screen</>
               }
             </div>
-            <button className="btn btn-primary" disabled={cart.length === 0} onClick={next} style={{
-              flexShrink: 0, minWidth: 140,
-              ...(cart.length > 0 ? {
-                background: "#fff", color: "#a855f7", fontWeight: 700,
-                boxShadow: "0 2px 8px rgba(0,0,0,.12)",
-              } : {}),
+            <button disabled={cart.length === 0} onClick={next} style={{
+              flexShrink: 0, minWidth: 140, height: 40, border: "none", borderRadius: 8,
+              display: "flex", alignItems: "center", justifyContent: "center", gap: 8,
+              cursor: cart.length === 0 ? "not-allowed" : "pointer",
+              fontFamily: "inherit", fontWeight: 600, fontSize: 16, letterSpacing: "-.16px",
+              padding: "10px 18px 10px 24px",
+              background: cart.length === 0 ? "#e5e7eb" : "linear-gradient(180deg,#1565d8 0%,#104ea6 100%)",
+              color: cart.length === 0 ? "#9ca3af" : "#fff",
             }}>
-              Continue →
+              Continue
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="9 6 15 12 9 18" /></svg>
             </button>
           </div>
         </div>
@@ -1349,8 +1595,8 @@ export default function BuyPolicy() {
         const p         = viewingProduct;
         const details   = PRODUCT_DETAILS[p.id];
         const chartRows = PREMIUM_CHART[p.id] ?? [];
-        const icon      = POLICY_TYPE_ICON[p.policyType] ?? "📋";
         const inCart    = !!cart.find(x => x.id === p.id);
+        const providerColor = TYPE_COLORS[p.policyType] ?? '#33b5e5';
 
         const sectionHead = (text) => (
           <div style={{ fontSize: 13, fontWeight: 700, color: "#a855f7", textTransform: "uppercase", letterSpacing: ".6px", marginBottom: 10, display: "flex", alignItems: "center", gap: 6 }}>
@@ -1369,44 +1615,58 @@ export default function BuyPolicy() {
               style={{ background: "#fff", borderRadius: 18, width: "100%", maxWidth: 640, maxHeight: "90vh", overflow: "hidden", display: "flex", flexDirection: "column", boxShadow: "0 32px 80px rgba(0,0,0,.25)" }}
               onClick={e => e.stopPropagation()}
             >
-              {/* ── Hero header ── */}
-              <div style={{ background: "linear-gradient(135deg, #fb7185 0%, #a855f7 100%)", padding: "22px 24px 20px", color: "#fff", flexShrink: 0 }}>
-                <div style={{ display: "flex", alignItems: "flex-start", gap: 14 }}>
-                  <div style={{ width: 48, height: 48, borderRadius: 13, background: "rgba(255,255,255,.18)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 24, flexShrink: 0 }}>{icon}</div>
-                  <div style={{ flex: 1, minWidth: 0 }}>
-                    <div style={{ fontWeight: 800, fontSize: 16, lineHeight: 1.3, marginBottom: 3 }}>{p.name}</div>
-                    <div style={{ fontSize: 13.5, color: "rgba(255,255,255,.94)", marginBottom: details ? 8 : 0 }}>{p.provider} &nbsp;·&nbsp; <span style={{ fontFamily: "monospace", background: "rgba(255,255,255,.15)", borderRadius: 4, padding: "1px 6px" }}>{p.code}</span></div>
-                    {details?.tagline && (
-                      <div style={{ fontSize: 13, fontStyle: "italic", opacity: .92, lineHeight: 1.5 }}>"{details.tagline}"</div>
-                    )}
-                  </div>
+              {/* ── Header strip ── */}
+              <div style={{ background: "#f5f7f9", padding: "16px 16px 0", flexShrink: 0 }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                  <span style={{ flex: 1, fontSize: 18, fontWeight: 700, color: providerColor, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                    {p.provider}
+                  </span>
                   <button
                     type="button"
                     onClick={() => setViewingProduct(null)}
-                    style={{ width: 30, height: 30, borderRadius: "50%", border: "1.5px solid rgba(255,255,255,.4)", background: "rgba(255,255,255,.15)", cursor: "pointer", color: "#fff", fontSize: 18, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}
+                    style={{ width: 24, height: 24, borderRadius: 6, border: "1.5px solid #cbd5e1", background: "#fff", cursor: "pointer", color: "#6d747a", fontSize: 14, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}
                   >×</button>
                 </div>
-
-                {/* Highlight chips */}
-                {details?.highlights && (
-                  <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginTop: 16 }}>
-                    {details.highlights.map(h => (
-                      <div key={h.label} style={{ background: "rgba(255,255,255,.15)", border: "1px solid rgba(255,255,255,.25)", borderRadius: 8, padding: "6px 12px", backdropFilter: "blur(4px)" }}>
-                        <div style={{ fontSize: 10, color: "rgba(255,255,255,.82)", textTransform: "uppercase", letterSpacing: ".5px", marginBottom: 1 }}>{h.label}</div>
-                        <div style={{ fontSize: 13, fontWeight: 700 }}>{h.icon} {h.value}</div>
-                      </div>
-                    ))}
-                  </div>
-                )}
+                <div style={{ display: "flex", alignItems: "center", gap: 6, flexWrap: "wrap", marginTop: 6, paddingBottom: 12 }}>
+                  <span style={{ fontSize: 10.5, fontWeight: 700, color: "#6d747a" }}>{p.policyType}</span>
+                  <span style={{ fontSize: 10.5, fontFamily: "monospace", color: "#94a3b8" }}>· {p.code}</span>
+                </div>
               </div>
 
               {/* ── Scrollable body ── */}
               <div style={{ flex: 1, overflowY: "auto", padding: "20px 24px", display: "flex", flexDirection: "column", gap: 20 }}>
 
+                {/* Product name */}
+                <div>
+                  <div style={{ fontWeight: 600, fontSize: 18, color: "#24304a", letterSpacing: "-.18px" }}>{p.name}</div>
+                  {details?.tagline && (
+                    <div style={{ fontSize: 13, fontStyle: "italic", color: "var(--text-2)", marginTop: 4, lineHeight: 1.5 }}>"{details.tagline}"</div>
+                  )}
+                </div>
+
+                {/* Highlight chips */}
+                {details?.highlights && (
+                  <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+                    {details.highlights.map(h => (
+                      <div key={h.label} style={{ background: "#f5f7f9", border: "1px solid #dee1e5", borderRadius: 8, padding: "6px 12px" }}>
+                        <div style={{ fontSize: 10, color: "#6d747a", textTransform: "uppercase", letterSpacing: ".5px", marginBottom: 1 }}>{h.label}</div>
+                        <div style={{ fontSize: 13, fontWeight: 700, color: "#24304a" }}>{h.icon} {h.value}</div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                {/* Jump nav */}
+                <div style={{ display: "flex", gap: 18, borderBottom: "1px solid var(--border)", paddingBottom: 10 }}>
+                  <a href="#about-plan" style={{ fontSize: 13, fontWeight: 600, color: "#3b5bfd", textDecoration: "none" }}>About This Plan</a>
+                  <a href="#whats-covered" style={{ fontSize: 13, fontWeight: 600, color: "#3b5bfd", textDecoration: "none" }}>What's Covered</a>
+                  <a href="#premium-chart" style={{ fontSize: 13, fontWeight: 600, color: "#3b5bfd", textDecoration: "none" }}>Premium Chart</a>
+                </div>
+
                 {details ? (<>
 
                   {/* About */}
-                  <div>
+                  <div id="about-plan">
                     {sectionHead("About This Plan")}
                     <p style={{ margin: 0, fontSize: 13.5, color: "var(--text-2)", lineHeight: 1.75 }}>{details.description}</p>
                   </div>
@@ -1442,7 +1702,7 @@ export default function BuyPolicy() {
                   )}
 
                   {/* Covered / Not covered */}
-                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+                  <div id="whats-covered" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
                     {details.covered?.length > 0 && (
                       <div style={{ background: "#f0fdf4", border: "1px solid #bbf7d0", borderRadius: 10, padding: "12px 14px" }}>
                         <div style={{ fontSize: 13, fontWeight: 700, color: "#15803d", textTransform: "uppercase", letterSpacing: ".5px", marginBottom: 8 }}>✅ What's Covered</div>
@@ -1475,7 +1735,7 @@ export default function BuyPolicy() {
 
                 {/* Premium chart */}
                 {chartRows.length > 0 && (
-                  <div>
+                  <div id="premium-chart">
                     {sectionHead("Premium Chart (Annual, incl. GST)")}
                     <div style={{ overflowX: "auto", borderRadius: 8, border: "1px solid var(--border)" }}>
                       <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13.5 }}>
@@ -1536,255 +1796,9 @@ export default function BuyPolicy() {
       })()}
 
       {/* ══════════════════════════════════════════════════════════════════
-          STEP 3 — Proposal Form
+          STEP 3 — Payment
       ══════════════════════════════════════════════════════════════════ */}
-      {step === 3 && cart.length > 0 && (() => {
-        const nomineesTotal = nominees.reduce((s, n) => s + (Number(n.share) || 0), 0);
-        const canProceed = proposal.declaration && termsAccepted && nomineesTotal === 100;
-        return (
-        <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-
-          {/* Selected Plans Summary */}
-          <div style={{ background: "#fff", borderRadius: 12, padding: "14px 18px", border: "1.5px solid #e5e7eb", borderLeft: "4px solid var(--brand)" }}>
-            <div style={{ fontSize: 13, fontWeight: 700, color: "#6b7280", textTransform: "uppercase", letterSpacing: ".5px", marginBottom: 10 }}>
-              Selected Plans
-            </div>
-            {cart.map((p, i) => (
-              <div key={p.id} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "7px 0", borderBottom: i < cart.length - 1 ? "1px solid #f3f4f6" : "none", fontSize: 13 }}>
-                <div style={{ display: "flex", alignItems: "center", gap: 8, minWidth: 0 }}>
-                  <span style={{ fontSize: 16, flexShrink: 0 }}>{POLICY_TYPE_ICON[p.policyType] ?? "📋"}</span>
-                  <div style={{ minWidth: 0 }}>
-                    <div style={{ fontWeight: 700, color: "#7c3aed", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{p.name}</div>
-                    <div style={{ fontSize: 13, color: "var(--text-3)" }}>
-                      {p.sumInsured ? `₹${Number(p.sumInsured).toLocaleString("en-IN")} SI` : ""}
-                      {p.coverage ? ` · ${COV_LABEL[p.coverage] ?? p.coverage}` : ""}
-                    </div>
-                  </div>
-                </div>
-                <span style={{ fontWeight: 700, color: "#111827", flexShrink: 0, marginLeft: 12 }}>
-                  {p.premium != null ? `₹${p.premium.toLocaleString("en-IN")}` : "—"}
-                </span>
-              </div>
-            ))}
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", paddingTop: 10, marginTop: 2, borderTop: "1.5px solid #e5e7eb" }}>
-              <span style={{ fontSize: 13, fontWeight: 600, color: "#6b7280" }}>Total Premium</span>
-              <span style={{ fontSize: 18, fontWeight: 800, color: "#111827" }}>
-                ₹{cart.reduce((s, x) => s + (x.premium ?? 0), 0).toLocaleString("en-IN")}
-              </span>
-            </div>
-          </div>
-
-          {/* Covered Family Members */}
-          <div className="card">
-            <div className="card-header">
-              <span style={{ fontWeight: 700, fontSize: 14 }}>👨‍👩‍👧 Covered Members</span>
-              <span style={{ fontSize: 13, color: "var(--text-3)", marginLeft: 8 }}>{members.length} member{members.length > 1 ? "s" : ""} covered under this policy</span>
-            </div>
-            <div className="card-body" style={{ padding: "12px 16px" }}>
-              <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-                {members.map(m => {
-                  const slot  = FAMILY_SLOTS.find(s => s.type === m.type);
-                  const isSelf = m.type === "Self";
-                  const age   = m.dob ? Math.floor((Date.now() - new Date(m.dob)) / (365.25 * 24 * 3600 * 1000)) : null;
-                  return (
-                    <div key={m.type} style={{
-                      display: "flex", alignItems: "center", gap: 12, padding: "10px 14px",
-                      borderRadius: 9,
-                      background: "#fff",
-                      border: "1.5px solid #e5e7eb",
-                    }}>
-                      <span style={{ fontSize: 20, flexShrink: 0 }}>{slot?.icon}</span>
-                      <div style={{ flex: 1, minWidth: 0 }}>
-                        <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-                          <span style={{ fontWeight: 700, fontSize: 13, color: "#111827" }}>{slot?.label}</span>
-                          {isSelf && <span style={{ fontSize: 10.5, color: "#fff", fontWeight: 700, background: "linear-gradient(135deg,#fb7185,#a855f7)", borderRadius: 4, padding: "1px 7px" }}>Primary</span>}
-                        </div>
-                        <div style={{ fontSize: 13, color: "var(--text-3)", marginTop: 2 }}>
-                          {m.name || "—"}{age != null ? ` · ${age} yrs` : ""}{m.gender ? ` · ${m.gender}` : ""}
-                        </div>
-                      </div>
-                      {m.dob && (
-                        <div style={{ fontSize: 13, color: "var(--text-3)", flexShrink: 0 }}>
-                          {new Date(m.dob).toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" })}
-                        </div>
-                      )}
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-          </div>
-
-          {/* Nominee Details */}
-          <div className="card">
-            <div className="card-header" style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-              <div>
-                <span style={{ fontWeight: 700, fontSize: 14 }}>📝 Nominee Details</span>
-                <span style={{ fontSize: 13, color: "var(--text-3)", marginLeft: 8 }}>Total share must equal 100%</span>
-              </div>
-              {nominees.length < 4 && (
-                <button type="button" className="btn btn-secondary btn-sm" onClick={addNominee}>
-                  + Add Nominee
-                </button>
-              )}
-            </div>
-            <div className="card-body">
-              {/* Column headers */}
-              <div style={{ display: "grid", gridTemplateColumns: "1fr 140px 80px 90px 36px", gap: 8, marginBottom: 6, padding: "0 2px" }}>
-                {["Full Name", "Relation", "Age", "Share %", ""].map(h => (
-                  <div key={h} style={{ fontSize: 13, fontWeight: 600, color: "var(--text-3)", textTransform: "uppercase", letterSpacing: ".4px" }}>{h}</div>
-                ))}
-              </div>
-
-              <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-                {nominees.map((n) => (
-                  <div key={n.id} style={{
-                    display: "grid", gridTemplateColumns: "1fr 140px 80px 90px 36px",
-                    gap: 8, alignItems: "center",
-                    padding: "10px 10px", borderRadius: 9,
-                    background: "var(--surface-2)", border: "1.5px solid var(--border)",
-                  }}>
-                    <div style={{ position: "relative" }}>
-                      <input className="field-input" placeholder="Full name" value={n.name}
-                        onChange={e => updateNominee(n.id, "name", e.target.value)}
-                        style={{
-                          fontSize: 13.5, padding: "6px 9px", width: "100%",
-                          transition: "border-color .4s, box-shadow .4s",
-                          ...(nomineeAutoFilled[n.id] && n.name ? {
-                            borderColor: "#16a34a",
-                            boxShadow: "0 0 0 3px rgba(22,163,74,.15)",
-                          } : {}),
-                        }} />
-                      {nomineeAutoFilled[n.id] && n.name && (
-                        <span style={{
-                          position: "absolute", right: 8, top: "50%", transform: "translateY(-50%)",
-                          fontSize: 10, color: "#16a34a", fontWeight: 700, pointerEvents: "none",
-                          animation: "fadeIn .2s ease",
-                        }}>✓ auto</span>
-                      )}
-                    </div>
-                    <select className="field-select" value={n.relation}
-                      onChange={e => updateNomineeRelation(n.id, e.target.value)}
-                      style={{ fontSize: 13.5, padding: "6px 9px" }}>
-                      <option value="">Relation</option>
-                      {["Spouse", "Son", "Daughter", "Father", "Mother", "Brother", "Sister", "Other"].map(r => (
-                        <option key={r}>{r}</option>
-                      ))}
-                    </select>
-                    <div style={{ position: "relative" }}>
-                      <input type="number" className="field-input" placeholder="Age" value={n.age} min="1" max="100"
-                        onChange={e => updateNominee(n.id, "age", e.target.value)}
-                        style={{
-                          fontSize: 13.5, padding: "6px 9px", width: "100%",
-                          transition: "border-color .4s, box-shadow .4s",
-                          ...(nomineeAutoFilled[n.id] && n.age ? {
-                            borderColor: "#16a34a",
-                            boxShadow: "0 0 0 3px rgba(22,163,74,.15)",
-                          } : {}),
-                        }} />
-                      {nomineeAutoFilled[n.id] && n.age && (
-                        <span style={{ position: "absolute", right: 4, top: "50%", transform: "translateY(-50%)", fontSize: 9, color: "#16a34a", fontWeight: 700, pointerEvents: "none" }}>✓</span>
-                      )}
-                    </div>
-                    <div style={{ position: "relative" }}>
-                      <input type="number" className="field-input" placeholder="%" value={n.share} min="1" max="100"
-                        onChange={e => updateNominee(n.id, "share", e.target.value)}
-                        style={{ fontSize: 13.5, padding: "6px 28px 6px 9px" }} />
-                      <span style={{ position: "absolute", right: 8, top: "50%", transform: "translateY(-50%)", fontSize: 13, color: "var(--text-3)", pointerEvents: "none" }}>%</span>
-                    </div>
-                    <button type="button" onClick={() => removeNominee(n.id)} disabled={nominees.length === 1}
-                      style={{ width: 32, height: 32, borderRadius: 6, border: "1.5px solid var(--border)", background: nominees.length === 1 ? "var(--surface-2)" : "#fff0f0", color: nominees.length === 1 ? "var(--text-3)" : "var(--red)", cursor: nominees.length === 1 ? "not-allowed" : "pointer", fontSize: 18, display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "inherit", transition: "all .12s" }}>
-                      ×
-                    </button>
-                  </div>
-                ))}
-              </div>
-
-              {/* Share % progress bar */}
-              <div style={{ marginTop: 14 }}>
-                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 5 }}>
-                  <span style={{ fontSize: 13, color: "var(--text-3)", fontWeight: 500 }}>Total Share Allocated</span>
-                  <span style={{ fontSize: 13, fontWeight: 700, color: nomineesTotal === 100 ? "var(--green)" : nomineesTotal > 100 ? "var(--red)" : "#d97706" }}>
-                    {nomineesTotal}%&nbsp;
-                    {nomineesTotal === 100 ? "✓ Complete" : nomineesTotal > 100 ? `— ${nomineesTotal - 100}% over` : `— ${100 - nomineesTotal}% remaining`}
-                  </span>
-                </div>
-                <div style={{ height: 7, borderRadius: 4, background: "var(--border)", overflow: "hidden" }}>
-                  <div style={{
-                    height: "100%", borderRadius: 4, transition: "width .3s ease, background-color .2s",
-                    width: `${Math.min(nomineesTotal, 100)}%`,
-                    background: nomineesTotal === 100 ? "var(--green)" : nomineesTotal > 100 ? "var(--red)" : "var(--brand)",
-                  }} />
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Declaration & Terms */}
-          <div className="card">
-            <div className="card-header">
-              <span style={{ fontWeight: 700, fontSize: 14 }}>📜 Declaration &amp; Acceptance</span>
-            </div>
-            <div className="card-body" style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-              <label style={{
-                display: "flex", alignItems: "flex-start", gap: 12, cursor: "pointer",
-                padding: "13px 14px", borderRadius: 10,
-                background: proposal.declaration ? "#f5f3ff" : "#fff",
-                border: `1.5px solid ${proposal.declaration ? "var(--brand)" : "var(--border)"}`,
-                transition: "all .15s",
-              }}>
-                <input type="checkbox" checked={proposal.declaration}
-                  onChange={e => setProposal(p => ({ ...p, declaration: e.target.checked }))}
-                  style={{ marginTop: 2, accentColor: "var(--brand)", width: 16, height: 16, flexShrink: 0 }} />
-                <span style={{ fontSize: 13.5, color: "var(--text-2)", lineHeight: 1.7 }}>
-                  I declare that all information provided is true and correct. I understand that any misrepresentation may result in rejection of claim or cancellation of policy. I consent to sharing this data with the insurer for policy issuance.
-                </span>
-              </label>
-              <label style={{
-                display: "flex", alignItems: "flex-start", gap: 12, cursor: "pointer",
-                padding: "13px 14px", borderRadius: 10,
-                background: termsAccepted ? "#f5f3ff" : "#fff",
-                border: `1.5px solid ${termsAccepted ? "var(--brand)" : "var(--border)"}`,
-                transition: "all .15s",
-              }}>
-                <input type="checkbox" checked={termsAccepted}
-                  onChange={e => setTermsAccepted(e.target.checked)}
-                  style={{ marginTop: 2, accentColor: "var(--brand)", width: 16, height: 16, flexShrink: 0 }} />
-                <span style={{ fontSize: 13.5, color: "var(--text-2)", lineHeight: 1.7 }}>
-                  I have read and agree to the{" "}
-                  <span style={{ color: "var(--brand)", fontWeight: 600, textDecoration: "underline", cursor: "pointer" }}>Terms &amp; Conditions</span>
-                  {" "}and{" "}
-                  <span style={{ color: "var(--brand)", fontWeight: 600, textDecoration: "underline", cursor: "pointer" }}>Privacy Policy</span>.
-                  I authorise KM Dastur &amp; Co. to process my application and share necessary details with the insurance company.
-                </span>
-              </label>
-            </div>
-          </div>
-
-          <div className="actions-row">
-            <button type="button" className="btn btn-ghost" onClick={back}>← Back</button>
-            <button
-              type="button"
-              className="btn btn-primary"
-              disabled={!canProceed}
-              onClick={next}
-              style={{ minWidth: 220 }}
-            >
-              {nomineesTotal !== 100
-                ? `Nominees: ${nomineesTotal}% / 100%`
-                : !proposal.declaration || !termsAccepted
-                ? "Accept all declarations to proceed"
-                : "Proceed to Payment →"}
-            </button>
-          </div>
-        </div>
-        );
-      })()}
-
-      {/* ══════════════════════════════════════════════════════════════════
-          STEP 4 — Payment
-      ══════════════════════════════════════════════════════════════════ */}
-      {step === 4 && cart.length > 0 && (
+      {step === 3 && cart.length > 0 && (
         <div className="payment-layout">
           {/* Resume banner */}
           {resumePolicy && (
@@ -1799,7 +1813,7 @@ export default function BuyPolicy() {
                 <div style={{ fontWeight: 700, fontSize: 13.5, color: '#92400e' }}>Resuming Pending Payment</div>
                 <div style={{ fontSize: 13.5, color: '#78350f', marginTop: 2 }}>
                   Proposal <span style={{ fontFamily: 'monospace', fontWeight: 700 }}>{resumePolicy.proposalId}</span>
-                  {' · '}{resumePolicy.customerName}{' · '}₹{resumePolicy.premium.toLocaleString()}
+                  {' · '}{resumePolicy.memberName}{' · '}₹{resumePolicy.premium.toLocaleString()}
                 </div>
               </div>
             </div>
@@ -1851,7 +1865,7 @@ export default function BuyPolicy() {
                 ))}
               </div>
 
-              {/* Insured Members */}
+              {/* Insured Family Members */}
               {members.length > 0 && (
                 <div style={{ margin: "4px 0 2px" }}>
                   <div style={{
@@ -1862,7 +1876,7 @@ export default function BuyPolicy() {
                   }}>
                     <span style={{ fontSize: 13 }}>👥</span>
                     <span style={{ fontSize: 13, fontWeight: 700, color: "var(--brand)", textTransform: "uppercase", letterSpacing: ".6px" }}>
-                      Insured Members
+                      Insured Family Members
                     </span>
                     <span style={{ marginLeft: "auto", fontSize: 13, fontWeight: 700, color: "var(--brand)", background: "var(--brand-light)", borderRadius: 10, padding: "1px 8px" }}>
                       {members.length}
@@ -1962,15 +1976,25 @@ export default function BuyPolicy() {
               {/* Summary rows */}
               {[
                 ["Insurance Type", insuranceType],
+                ["Organisation",   ORGANISATIONS.find(o => o.id === selectedMember?.organisationId)?.name ?? "—"],
+                ["Association",    ASSOCIATIONS.find(a => a.id === selectedMember?.associationId)?.name ?? "—"],
                 ["Policy Period",  "1 Year"],
                 ["Plans",          `${cart.length} plan${cart.length > 1 ? "s" : ""}`],
               ].map(([k, v]) => (
                 <div key={k} style={{
-                  display: "flex", justifyContent: "space-between",
+                  display: "flex", justifyContent: "space-between", gap: 12,
                   padding: "7px 0", borderBottom: "1px solid var(--border)", fontSize: 13,
                 }}>
-                  <span style={{ color: "var(--text-2)" }}>{k}</span>
-                  <span style={{ fontWeight: 500 }}>{v}</span>
+                  <span style={{ color: "var(--text-2)", flexShrink: 0 }}>{k}</span>
+                  <span
+                    title={v}
+                    style={{
+                      fontWeight: 500, textAlign: "right", maxWidth: "60%",
+                      overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap",
+                    }}
+                  >
+                    {v}
+                  </span>
                 </div>
               ))}
 
@@ -2045,7 +2069,7 @@ export default function BuyPolicy() {
               {/* ── OFFLINE ── */}
               {payMode === "Offline" && (() => {
                 const totalPremium = cart.reduce((s, x) => s + (x.premium ?? 0), 0);
-                const customerAssoc = ASSOCIATIONS.find(a => a.id === selectedCustomer?.associationId);
+                const memberAssoc = ASSOCIATIONS.find(a => a.id === selectedMember?.associationId);
 
                 return (
                   <div>
@@ -2078,7 +2102,7 @@ export default function BuyPolicy() {
                     {/* ── CHEQUE FORM ── */}
                     {payType === "Cheque" && (
                       <div>
-                        <div className="form-grid">
+                        <div className="form-grid-3">
                           <Field label="Cheque Number" required>
                             <Input placeholder="e.g. 001234" value={chequeNo} onChange={e => setChequeNo(e.target.value)} />
                           </Field>
@@ -2098,17 +2122,17 @@ export default function BuyPolicy() {
                             <Input type="date" value={chequeDate} onChange={e => setChequeDate(e.target.value)} />
                           </Field>
                           <Field label="Association Name">
-                            <Input value={customerAssoc?.name ?? "—"} readOnly style={{ background: "var(--surface-2)", color: "var(--text-2)" }} />
+                            <Input value={memberAssoc?.name ?? "—"} readOnly style={{ background: "var(--surface-2)", color: "var(--text-2)" }} />
                           </Field>
                           <Field label="Association Code">
-                            <Input value={customerAssoc?.associationCode ?? "—"} readOnly style={{ background: "var(--surface-2)", color: "var(--text-2)" }} />
+                            <Input value={memberAssoc?.associationCode ?? "—"} readOnly style={{ background: "var(--surface-2)", color: "var(--text-2)" }} />
                           </Field>
                         </div>
                         <div style={{ marginTop: 4, marginBottom: 16 }}>
                           <div style={{ fontSize: 13, fontWeight: 600, color: "var(--text-3)", textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: 6 }}>In Favour Of</div>
                           <div style={{ fontWeight: 700, fontSize: 14.5, color: "var(--text)" }}>KMD Insurance Brokers Pvt. Ltd.</div>
                         </div>
-                        <div className="form-grid">
+                        <div className="form-grid-3">
                           <Field label="Cheque Deposit Location">
                             <Input placeholder="Branch / location" value={chequeLocation} onChange={e => setChequeLocation(e.target.value)} />
                           </Field>
@@ -2154,7 +2178,7 @@ export default function BuyPolicy() {
                             </div>
                           ))}
                         </div>
-                        <div className="form-grid">
+                        <div className="form-grid-3">
                           <Field label="Bank Name" required>
                             <Input placeholder="Your bank name" value={neftBankName} onChange={e => setNeftBankName(e.target.value)} />
                           </Field>
@@ -2228,16 +2252,16 @@ export default function BuyPolicy() {
       {/* ══════════════════════════════════════════════════════════════════
           STEP 5 — Payment Received
       ══════════════════════════════════════════════════════════════════ */}
-      {step === 5 && policyResults.length > 0 && (
+      {step === 4 && policyResults.length > 0 && (
         <div style={{ maxWidth: 480, margin: "0 auto" }}>
           <div className="card">
             <div className="card-body" style={{ textAlign: "center", padding: "52px 32px 44px" }}>
               <div style={{ fontSize: 64, marginBottom: 20 }}>✅</div>
-              <div style={{ fontWeight: 800, fontSize: 22, background: "linear-gradient(135deg,#fb7185,#a855f7)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text", marginBottom: 10 }}>
+              <div style={{ fontWeight: 800, fontSize: 22, background: "linear-gradient(180deg,#1565d8,#104ea6)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text", marginBottom: 10 }}>
                 Payment Received Successfully
               </div>
               <div style={{ fontSize: 14, color: "var(--text-3)", lineHeight: 1.7, marginBottom: 32 }}>
-                Payment for <strong style={{ color: "var(--text)" }}>{policyResults[0].customer}</strong> has been confirmed.
+                Payment for <strong style={{ color: "var(--text)" }}>{policyResults[0].member}</strong> has been confirmed.
                 Your policy will be issued shortly.
               </div>
               <div style={{ display: "flex", gap: 12, justifyContent: "center" }}>

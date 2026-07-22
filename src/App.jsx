@@ -1,13 +1,13 @@
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider, useAuth } from "./context/AuthContext";
-import { CustomerProvider } from "./context/CustomerContext";
+import { MemberProvider } from "./context/MemberContext";
 import Layout from "./components/Layout";
 import ProtectedRoute from "./components/ProtectedRoute";
 import RoleGuard from "./components/RoleGuard";
 
 // Auth pages
-import SignIn  from "./pages/auth/SignIn";
-import SignUp  from "./pages/auth/SignUp";
+import SignIn           from "./pages/auth/SignIn";
+import MemberRegister from "./pages/auth/MemberRegister";
 
 // Dashboard
 import Dashboard from "./pages/dashboard/Dashboard";
@@ -31,13 +31,13 @@ import AgentEdit       from "./pages/agent/AgentEdit";
 import AgentProfile    from "./pages/agent/AgentProfile";
 import AgentCommission from "./pages/agent/AgentCommission";
 
-// Customer pages
-import CustomerList    from "./pages/customer/CustomerList";
-import CustomerCreate  from "./pages/customer/CustomerCreate";
-import CustomerEdit    from "./pages/customer/CustomerEdit";
-import CustomerProfile from "./pages/customer/CustomerProfile";
-import Customer360     from "./pages/customer/Customer360";
-import KYCReview      from "./pages/customer/KYCReview";
+// Member pages
+import MemberList    from "./pages/member/MemberList";
+import MemberCreate  from "./pages/member/MemberCreate";
+import MemberEdit    from "./pages/member/MemberEdit";
+import MemberProfile from "./pages/member/MemberProfile";
+import Member360     from "./pages/member/Member360";
+import KYCReview      from "./pages/member/KYCReview";
 
 // Product pages
 import ProductList   from "./pages/product/ProductList";
@@ -76,20 +76,20 @@ import { RefundProvider } from "./context/RefundContext";
 // Portals
 import BrokerPortal    from "./pages/portal/BrokerPortal";
 import AgentPortal     from "./pages/portal/AgentPortal";
-import CustomerPortal  from "./pages/portal/CustomerPortal";
+import MemberPortal  from "./pages/portal/MemberPortal";
 import PolicyCatalogue from "./pages/portal/PolicyCatalogue";
 
 function ProfileView() {
   const { user } = useAuth();
   if (user?.role === 'agent')    return <AgentProfile />;
-  if (user?.role === 'customer') return <CustomerProfile />;
+  if (user?.role === 'member') return <MemberProfile />;
   return <BrokerView />;
 }
 
 function ProfileEdit() {
   const { user } = useAuth();
   if (user?.role === 'agent')    return <AgentEdit />;
-  if (user?.role === 'customer') return <CustomerEdit />;
+  if (user?.role === 'member') return <MemberEdit />;
   return <BrokerEdit />;
 }
 
@@ -99,12 +99,12 @@ export default function App() {
       <AuthProvider>
       <OrganisationProvider>
       <AssociationProvider>
-      <CustomerProvider>
+      <MemberProvider>
       <RefundProvider>
         <Routes>
           {/* ── Public auth routes (no sidebar/topbar) ── */}
           <Route path="/login"    element={<SignIn />} />
-          <Route path="/register" element={<SignUp />} />
+          <Route path="/register" element={<MemberRegister />} />
 
           {/* ── Protected routes (require login) ── */}
           <Route element={<ProtectedRoute />}>
@@ -118,8 +118,8 @@ export default function App() {
               <Route element={<RoleGuard roles={['agent']} />}>
                 <Route path="agent-portal" element={<AgentPortal />} />
               </Route>
-              <Route element={<RoleGuard roles={['customer']} />}>
-                <Route path="customer-portal" element={<CustomerPortal />} />
+              <Route element={<RoleGuard roles={['member']} />}>
+                <Route path="member-portal" element={<MemberPortal />} />
                 <Route path="policy-catalogue" element={<PolicyCatalogue />} />
               </Route>
 
@@ -138,13 +138,13 @@ export default function App() {
                 <Route path="buy" element={<BuyPolicy />} />
               </Route>
 
-              {/* ── CUSTOMER (broker + agent only) ── */}
+              {/* ── MEMBER (broker + agent only) ── */}
               <Route element={<RoleGuard roles={['broker', 'agent']} />}>
-                <Route path="customer">
-                  <Route index element={<CustomerList />} />
-                  <Route path="create" element={<CustomerCreate />} />
-                  <Route path=":id/edit" element={<CustomerEdit />} />
-                  <Route path=":id/360" element={<Customer360 />} />
+                <Route path="member">
+                  <Route index element={<MemberList />} />
+                  <Route path="create" element={<MemberCreate />} />
+                  <Route path=":id/edit" element={<MemberEdit />} />
+                  <Route path=":id/360" element={<Member360 />} />
                   <Route path=":id/kyc" element={<KYCReview />} />
                 </Route>
                 <Route path="crm">
@@ -219,7 +219,7 @@ export default function App() {
           <Route path="*" element={<Navigate to="/login" replace />} />
         </Routes>
       </RefundProvider>
-      </CustomerProvider>
+      </MemberProvider>
       </AssociationProvider>
       </OrganisationProvider>
       </AuthProvider>

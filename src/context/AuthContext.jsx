@@ -49,7 +49,7 @@ const MOCK_USERS = {
   },
   "aarav@gmail.com": {
     id: "c1",
-    role: "customer",
+    role: "member",
     password: "cust@123",
     name: "Aarav Sharma",
     phone: "9876543210",
@@ -82,7 +82,7 @@ export function AuthProvider({ children }) {
 
   const logout = () => setUser(null);
 
-  const register = (data) => {
+  const registerMember = (data) => {
     const initials = data.name
       .split(" ")
       .map((w) => w[0])
@@ -90,27 +90,29 @@ export function AuthProvider({ children }) {
       .toUpperCase()
       .slice(0, 2);
     const newUser = {
-      id: `b_${Date.now()}`,
-      role: "broker",
+      id: `c_${Date.now()}`,
+      role: "member",
       name: data.name,
       email: data.email,
-      company: data.companyName,
-      irdaiNo: data.irdaiNo,
       phone: data.mobile,
-      city: data.city,
-      state: data.state,
       avatar: initials,
-      address: data.address1,
-      gst: data.gst,
-      pan: data.pan,
-      type: data.businessType,
     };
+    const key = (data.email || data.mobile).toLowerCase().trim();
+    MOCK_USERS[key] = newUser;
     setUser(newUser);
     return { ok: true, user: newUser };
   };
 
+  const loginByMobile = (mobile) => {
+    const u = Object.values(MOCK_USERS).find((u) => u.phone === mobile);
+    if (!u) return { ok: false, error: "Mobile number not registered." };
+    const { password: _, ...safe } = u;
+    setUser(safe);
+    return { ok: true, user: safe };
+  };
+
   return (
-    <AuthContext.Provider value={{ user, login, logout, register }}>
+    <AuthContext.Provider value={{ user, login, logout, registerMember, loginByMobile }}>
       {children}
     </AuthContext.Provider>
   );

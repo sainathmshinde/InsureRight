@@ -3,9 +3,9 @@ import { useNavigate, useSearchParams } from 'react-router-dom'
 import Pagination from '../../components/Pagination'
 import usePagination from '../../components/usePagination'
 import { Table, PageHeader, KYCBadge, Button, EmptyState } from '../../components/UI'
-import { CustomerIcon, EditIcon } from '../../icons'
+import { MemberIcon, EditIcon, ViewIcon, UploadIcon, SearchIcon } from '../../icons'
 import { useAuth } from '../../context/AuthContext'
-import { useCustomers, INITIAL_CUSTOMERS } from '../../context/CustomerContext'
+import { useMembers, INITIAL_MEMBERS } from '../../context/MemberContext'
 import { ASSOCIATIONS } from './orgAssocData'
 
 const CAMPAIGNS = [
@@ -18,11 +18,11 @@ const CAMPAIGNS = [
   { id: 12, name: 'Standalone campaign' },
 ]
 
-export default function CustomerList() {
+export default function MemberList() {
   const navigate = useNavigate();
   const [searchParams]  = useSearchParams();
   const { user } = useAuth();
-  const { customers } = useCustomers();
+  const { members } = useMembers();
   const [search,          setSearch]          = useState("");
   const [kycFilter,       setKycFilter]       = useState("");
   const [campaignFilter,  setCampaignFilter]  = useState(searchParams.get('campaignId') ?? "");
@@ -30,8 +30,8 @@ export default function CustomerList() {
 
   const scopedData =
     user?.role === "agent"
-      ? customers.filter((c) => c.agentId === user.id)
-      : customers;
+      ? members.filter((c) => c.agentId === user.id)
+      : members;
 
   const filtered = scopedData.filter((c) => {
     if (search && !c.name.toLowerCase().includes(search.toLowerCase()) && !c.mobile.includes(search)) return false
@@ -47,40 +47,27 @@ export default function CustomerList() {
   };
 
   const columns = [
-    { key: 'id',       label: '#',        style: { color: 'var(--text-3)' } },
     { key: 'name',     label: 'Name',     style: { fontWeight: 500 } },
     { key: 'mobile',   label: 'Mobile' },
     { key: 'email',    label: 'Email',    style: { color: 'var(--blue)' } },
     { key: 'gender',   label: 'Gender' },
     { key: 'dob',      label: 'DOB' },
-    { key: 'campaign', label: 'Campaign',
-      render: row => row.campaignName
-        ? <span style={{ fontSize: 13, color: 'var(--text-2)' }}>{row.campaignName}</span>
-        : <span style={{ color: 'var(--text-3)' }}>—</span>
+    { key: 'association', label: 'Association',
+      render: row => {
+        const assoc = ASSOCIATIONS.find(a => a.id === row.associationId)
+        return assoc
+          ? <span title={assoc.name} style={S.truncate}>{assoc.name}</span>
+          : <span style={{ color: 'var(--text-3)' }}>—</span>
+      }
     },
     { key: 'engaged', label: 'Engaged',
       render: row => row.engaged
         ? <span style={{ padding: '2px 9px', borderRadius: 99, fontSize: 11.5, fontWeight: 700, background: '#dcfce7', color: '#15803d' }}>Engaged</span>
         : <span style={{ padding: '2px 9px', borderRadius: 99, fontSize: 11.5, fontWeight: 700, background: '#fffbeb', color: '#b45309' }}>Not Engaged</span>
     },
-    { key: 'association', label: 'Association',
-      render: row => {
-        const assoc = ASSOCIATIONS.find(a => a.id === row.associationId)
-        return assoc
-          ? <span style={{ fontSize: 13, color: 'var(--text-2)' }}>{assoc.name}</span>
-          : <span style={{ color: 'var(--text-3)' }}>—</span>
-      }
-    },
     { key: 'kyc',      label: 'KYC',      render: row => row.kyc === 'Pending'
-        ? <button style={S.pendingBtn} onClick={() => navigate(`/customer/${row.id}/kyc`)}>⏳ Pending</button>
+        ? <button style={S.pendingBtn} onClick={() => navigate(`/member/${row.id}/kyc`)}>⏳ Pending</button>
         : <KYCBadge status={row.kyc} /> },
-    { key: 'policies', label: 'Policies',
-      render: row => (
-        <span >
-          {row.policies} {row.policies === 1 ? 'policy' : 'policies'}
-        </span>
-      ),
-    },
     {
       key: "actions",
       label: "Actions",
@@ -89,23 +76,24 @@ export default function CustomerList() {
           <Button
             variant="primary"
             size="sm"
-            onClick={() => navigate(`/policy/buy?customerId=${row.id}`)}
+            style={S.buyPolicyBtn}
+            onClick={() => navigate(`/policy/buy?memberId=${row.id}`)}
           >
             Buy Policy
           </Button>
-          <Button
-            variant="secondary"
-            size="sm"
-            onClick={() => navigate(`/customer/${row.id}/360`)}
+          <button
+            title="View 360°"
+            onClick={() => navigate(`/member/${row.id}/360`)}
+            style={S.iconBtn}
           >
-            360°
-          </Button>
+            <ViewIcon size={14} color="var(--text-2)" />
+          </button>
           <button
             title="Edit"
-            onClick={() => navigate(`/customer/${row.id}/edit`)}
-            style={S.editIconBtn}
+            onClick={() => navigate(`/member/${row.id}/edit`)}
+            style={S.iconBtn}
           >
-            <EditIcon size={14} color="#fff" />
+            <EditIcon size={14} color="var(--text-2)" />
           </button>
         </div>
       ),
@@ -115,11 +103,15 @@ export default function CustomerList() {
   return (
     <div>
       <PageHeader
-        icon={<CustomerIcon />}
-        title={user?.role === "agent" ? "My Customers" : "Customers"}
+        icon={<MemberIcon />}
+        title={user?.role === "agent" ? "My Members" : "Members"}
+        subtitle="View and manage all members across campaigns and associations"
       >
-        <Button onClick={() => navigate("/customer/create")}>
-          + Add Customer
+        <Button variant="ghost" icon={<UploadIcon size={16} />} onClick={() => {}}>
+          Export
+        </Button>
+        <Button onClick={() => navigate("/member/create")}>
+          + Add Member
         </Button>
       </PageHeader>
 
@@ -128,12 +120,18 @@ export default function CustomerList() {
           <div className="filter-bar" style={{ alignItems: 'flex-end' }}>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
               <label style={S.filterLabel}>Search</label>
-              <input
-                className="field-input filter-search"
-                placeholder="Search by name or mobile…"
-                value={search}
-                onChange={(e) => handle(setSearch)(e.target.value)}
-              />
+              <div style={{ position: 'relative' }}>
+                <span style={S.searchIcon}>
+                  <SearchIcon size={15} color="var(--text-3)" />
+                </span>
+                <input
+                  className="field-input filter-search"
+                  style={{ paddingLeft: 34 }}
+                  placeholder="Search by name, mobile or email…"
+                  value={search}
+                  onChange={(e) => handle(setSearch)(e.target.value)}
+                />
+              </div>
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
               <label style={S.filterLabel}>Campaign</label>
@@ -198,7 +196,7 @@ export default function CustomerList() {
             empty={
               <EmptyState
                 icon="👤"
-                title="No customers found"
+                title="No members found"
                 subtitle="Try adjusting your filters"
               />
             }
@@ -218,18 +216,42 @@ export default function CustomerList() {
 }
 
 const S = {
-  editIconBtn: {
+  buyPolicyBtn: {
+    fontSize: 9,
+    padding: 0,
+    width: 68,
+    height: 30,
+    justifyContent: 'center',
+  },
+  iconBtn: {
     display: 'inline-flex',
     alignItems: 'center',
     justifyContent: 'center',
     width: 30,
     height: 30,
     borderRadius: 8,
-    border: 'none',
+    border: '1px solid var(--border)',
     cursor: 'pointer',
-    background: 'linear-gradient(135deg, #ec4899 0%, #a855f7 100%)',
-    boxShadow: '0 2px 6px rgba(168,85,247,0.35)',
+    background: '#fff',
     flexShrink: 0,
+  },
+  searchIcon: {
+    position: 'absolute',
+    left: 11,
+    top: '50%',
+    transform: 'translateY(-50%)',
+    display: 'flex',
+    pointerEvents: 'none',
+  },
+  truncate: {
+    display: 'inline-block',
+    maxWidth: 160,
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
+    whiteSpace: 'nowrap',
+    verticalAlign: 'bottom',
+    fontSize: 13,
+    color: 'var(--text-2)',
   },
   filterLabel: {
     fontSize: 11,
@@ -254,4 +276,4 @@ const S = {
   },
 };
 
-export { INITIAL_CUSTOMERS as CUSTOMER_MOCK };
+export { INITIAL_MEMBERS as MEMBER_MOCK };

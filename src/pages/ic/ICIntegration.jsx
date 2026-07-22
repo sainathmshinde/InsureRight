@@ -46,7 +46,7 @@ export default function ICIntegration() {
           <form onSubmit={handleSubmit}>
 
             <SectionBlock icon="🗺️" title="API Mapping">
-              <div className="form-grid">
+              <div className="form-grid-3">
                 <Field label="API Mapping ID" required>
                   <Input placeholder="MAP-XXX-001" value={form.apiMappingId} onChange={set('apiMappingId')} required />
                 </Field>
@@ -54,7 +54,7 @@ export default function ICIntegration() {
             </SectionBlock>
 
             <SectionBlock icon="🔗" title="API Endpoints">
-              <div className="form-grid">
+              <div className="form-grid-3">
                 <Field label="Product API Endpoint" required>
                   <Input placeholder="/products/list" value={form.productEndpoint} onChange={set('productEndpoint')} required />
                 </Field>
@@ -71,7 +71,7 @@ export default function ICIntegration() {
             </SectionBlock>
 
             <SectionBlock icon="⚙️" title="Timeout & Retry Config">
-              <div className="form-grid">
+              <div className="form-grid-3">
                 <Field label="Timeout (seconds)" required>
                   <Input type="number" min="5" max="120" placeholder="30" value={form.timeout} onChange={set('timeout')} required />
                 </Field>

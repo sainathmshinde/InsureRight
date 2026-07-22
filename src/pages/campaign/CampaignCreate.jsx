@@ -16,7 +16,7 @@ import {
 import { Tabs } from "../../components/ui/Tabs";
 import { CampaignIcon } from "../../icons";
 import { PRODUCTS, POLICY_TYPE_ICON } from "../product/productData";
-import { ASSOCIATIONS } from "../customer/orgAssocData";
+import { ASSOCIATIONS } from "../member/orgAssocData";
 
 const PTYPE_META = {
   "Base Policy": { color: "#2563eb", bg: "#dbeafe", border: "#bfdbfe" },
@@ -69,7 +69,7 @@ const MOCK_USERS = [
     gender: "Male",
     marital: "Married",
     segment: "Active Policyholders",
-    type: "Customer",
+    type: "Member",
     state: "Maharashtra",
   },
   {
@@ -79,7 +79,7 @@ const MOCK_USERS = [
     gender: "Female",
     marital: "Single",
     segment: "New Registrations",
-    type: "Customer",
+    type: "Member",
     state: "Gujarat",
   },
   {
@@ -89,7 +89,7 @@ const MOCK_USERS = [
     gender: "Male",
     marital: "Married",
     segment: "Renewal Due (30 days)",
-    type: "Customer",
+    type: "Member",
     state: "Delhi",
   },
   {
@@ -98,8 +98,8 @@ const MOCK_USERS = [
     age: 41,
     gender: "Female",
     marital: "Divorced",
-    segment: "High Value Customers",
-    type: "Customer",
+    segment: "High Value Members",
+    type: "Member",
     state: "Karnataka",
   },
   {
@@ -109,7 +109,7 @@ const MOCK_USERS = [
     gender: "Male",
     marital: "Single",
     segment: "New Registrations",
-    type: "Customer",
+    type: "Member",
     state: "Gujarat",
   },
   {
@@ -119,7 +119,7 @@ const MOCK_USERS = [
     gender: "Female",
     marital: "Married",
     segment: "Active Policyholders",
-    type: "Customer",
+    type: "Member",
     state: "Kerala",
   },
   {
@@ -129,7 +129,7 @@ const MOCK_USERS = [
     gender: "Male",
     marital: "Widowed",
     segment: "Renewal Due (30 days)",
-    type: "Customer",
+    type: "Member",
     state: "Punjab",
   },
   {
@@ -138,8 +138,8 @@ const MOCK_USERS = [
     age: 45,
     gender: "Female",
     marital: "Married",
-    segment: "Lapsed Customers",
-    type: "Customer",
+    segment: "Lapsed Members",
+    type: "Member",
     state: "Rajasthan",
   },
   {
@@ -149,7 +149,7 @@ const MOCK_USERS = [
     gender: "Male",
     marital: "Single",
     segment: "Active Policyholders",
-    type: "Customer",
+    type: "Member",
     state: "Telangana",
   },
   {
@@ -159,7 +159,7 @@ const MOCK_USERS = [
     gender: "Female",
     marital: "Married",
     segment: "New Registrations",
-    type: "Customer",
+    type: "Member",
     state: "Maharashtra",
   },
   {
@@ -168,8 +168,8 @@ const MOCK_USERS = [
     age: 48,
     gender: "Male",
     marital: "Married",
-    segment: "High Value Customers",
-    type: "Customer",
+    segment: "High Value Members",
+    type: "Member",
     state: "Uttar Pradesh",
   },
   {
@@ -179,7 +179,7 @@ const MOCK_USERS = [
     gender: "Female",
     marital: "Single",
     segment: "Active Policyholders",
-    type: "Customer",
+    type: "Member",
     state: "Telangana",
   },
   {
@@ -189,7 +189,7 @@ const MOCK_USERS = [
     gender: "Male",
     marital: "Married",
     segment: "Renewal Due (30 days)",
-    type: "Customer",
+    type: "Member",
     state: "Tamil Nadu",
   },
   {
@@ -199,7 +199,7 @@ const MOCK_USERS = [
     gender: "Female",
     marital: "Single",
     segment: "New Registrations",
-    type: "Customer",
+    type: "Member",
     state: "Kerala",
   },
   {
@@ -208,8 +208,8 @@ const MOCK_USERS = [
     age: 39,
     gender: "Male",
     marital: "Divorced",
-    segment: "Lapsed Customers",
-    type: "Customer",
+    segment: "Lapsed Members",
+    type: "Member",
     state: "Delhi",
   },
   {
@@ -219,7 +219,7 @@ const MOCK_USERS = [
     gender: "Female",
     marital: "Married",
     segment: "Active Policyholders",
-    type: "Customer",
+    type: "Member",
     state: "Madhya Pradesh",
   },
   {
@@ -228,8 +228,8 @@ const MOCK_USERS = [
     age: 57,
     gender: "Male",
     marital: "Married",
-    segment: "High Value Customers",
-    type: "Customer",
+    segment: "High Value Members",
+    type: "Member",
     state: "Uttar Pradesh",
   },
   {
@@ -239,7 +239,7 @@ const MOCK_USERS = [
     gender: "Female",
     marital: "Single",
     segment: "New Registrations",
-    type: "Customer",
+    type: "Member",
     state: "Haryana",
   },
   {
@@ -249,7 +249,7 @@ const MOCK_USERS = [
     gender: "Male",
     marital: "Married",
     segment: "Active Policyholders",
-    type: "Customer",
+    type: "Member",
     state: "Bihar",
   },
   {
@@ -258,8 +258,8 @@ const MOCK_USERS = [
     age: 50,
     gender: "Female",
     marital: "Widowed",
-    segment: "Lapsed Customers",
-    type: "Customer",
+    segment: "Lapsed Members",
+    type: "Member",
     state: "Rajasthan",
   },
   {
@@ -288,7 +288,7 @@ const MOCK_USERS = [
     age: 47,
     gender: "Male",
     marital: "Married",
-    segment: "High Value Customers",
+    segment: "High Value Members",
     type: "Operator",
     state: "Delhi",
   },
@@ -328,7 +328,7 @@ const MOCK_USERS = [
     age: 40,
     gender: "Male",
     marital: "Married",
-    segment: "Lapsed Customers",
+    segment: "Lapsed Members",
     type: "Operator",
     state: "Madhya Pradesh",
   },
@@ -348,7 +348,7 @@ const MOCK_USERS = [
     age: 58,
     gender: "Male",
     marital: "Widowed",
-    segment: "High Value Customers",
+    segment: "High Value Members",
     type: "Operator",
     state: "Karnataka",
   },
@@ -442,7 +442,7 @@ const INITIAL = {
   startDate: "",
   endDate: "",
   extendOption: false,
-  targetType: "Customer",
+  targetType: "Member",
   segment: "",
   ageMin: "",
   ageMax: "",
@@ -657,7 +657,7 @@ export default function CampaignCreate() {
           <form onSubmit={handleSubmit}>
             {/* ── 1. Campaign Info ──────────────────────── */}
             <SectionBlock icon="📢" title="Campaign Information">
-              <div className="form-grid">
+              <div className="form-grid-3">
                 <Field label="Campaign Name" required>
                   <Input
                     placeholder="e.g. Summer Health Drive 2025"
@@ -849,7 +849,7 @@ export default function CampaignCreate() {
                   })}
                 </div>
               </div>
-              <div className="form-grid" style={{ marginTop: 18 }}>
+              <div className="form-grid-3" style={{ marginTop: 18 }}>
                 <Field label="Discount">
                   <Select value={form.offerType} onChange={set("offerType")}>
                     <option value="Flat">Flat (₹)</option>
@@ -869,7 +869,7 @@ export default function CampaignCreate() {
                     onChange={set("offerValue")}
                   />
                 </Field>
-                <Field label="Discount Rules" className="col-span-2">
+                <Field label="Discount Rules" className="col-span-3">
                   <Textarea
                     placeholder="Describe applicable discount conditions…"
                     value={form.discountRules}
@@ -884,20 +884,20 @@ export default function CampaignCreate() {
               <Tabs
                 tabs={[
                   { key: "filter", label: "Filter for User" },
-                  { key: "upload", label: "Upload Customer List" },
+                  { key: "upload", label: "Upload Member List" },
                 ]}
                 active={audienceTab}
                 onChange={setAudienceTab}
               />
               {audienceTab === "filter" && (
-                <div className="form-grid" style={{ marginTop: 16 }}>
+                <div className="form-grid-3" style={{ marginTop: 16 }}>
                   <Field label="Target Type" required>
                     <Select
                       value={form.targetType}
                       onChange={set("targetType")}
                       required
                     >
-                      <option>Customer</option>
+                      <option>Member</option>
                       <option>Operator</option>
                     </Select>
                   </Field>
@@ -906,9 +906,9 @@ export default function CampaignCreate() {
                       <option value="">All {form.targetType}s</option>
                       <option>Active Policyholders</option>
                       <option>Renewal Due (30 days)</option>
-                      <option>Lapsed Customers</option>
+                      <option>Lapsed Members</option>
                       <option>New Registrations</option>
-                      <option>High Value Customers</option>
+                      <option>High Value Members</option>
                       <option>Corporate</option>
                     </Select>
                   </Field>
@@ -967,7 +967,7 @@ export default function CampaignCreate() {
                       ))}
                     </Select>
                   </Field>
-                  <Field label="Association" className="col-span-2">
+                  <Field label="Association" className="col-span-3">
                     <div>
                       {form.selectedAssociations.length > 0 && (
                         <div
@@ -1344,13 +1344,13 @@ export default function CampaignCreate() {
 
             {/* ── 5. Content ───────────────────────────── */}
             <SectionBlock icon="✍️" title="Message Content">
-              <div className="form-grid">
+              <div className="form-grid-3">
                 <Field
                   label="Message Template"
                   required={form.channels.length > 0}
                 >
                   <Textarea
-                    placeholder="Hi {customer_name}, your health cover from {ic_name} is due for renewal…"
+                    placeholder="Hi {member_name}, your health cover from {ic_name} is due for renewal…"
                     value={form.messageTemplate}
                     onChange={set("messageTemplate")}
                     style={{ minHeight: 100 }}

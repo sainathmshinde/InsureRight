@@ -1,5 +1,6 @@
 /* @import url("https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap"); */
 @import url("https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700&display=swap");
 
 *,
 *::before,
@@ -17,21 +18,22 @@
    ═══════════════════════════════════════════════════════════════════ */
 :root {
   /* ── Brand palette ────────────────────────────────────────────── */
-  --brand: #7c3aed; /* primary accent */
-  --brand-hover: #6d28d9; /* primary hover */
-  --brand-light: #ede9fe; /* subtle tint */
-  --brand-mid: #a78bfa; /* medium */
-  --brand-dark: #4c1d95; /* deep shade */
+  --brand: #1565d8; /* primary accent */
+  --brand-hover: #104ea6; /* primary hover */
+  --brand-light: #e7f0fc; /* subtle tint */
+  --brand-mid: #5b9be0; /* medium */
+  --brand-dark: #0d3a72; /* deep shade */
+  --accent-green: #00c851; /* section/heading accent bar */
 
   /* ── Layout ───────────────────────────────────────────────────── */
   --sidebar-w: 230px;
   --topbar-h: 58px;
 
   /* ── Surfaces ─────────────────────────────────────────────────── */
-  --bg: #f1f5f9; /* page background */
+  --bg: #f5f6fa; /* page background */
   --surface: #ffffff; /* card / panel */
   --surface-2: #f8fafc; /* recessed row / header */
-  --border: #e2e8f0; /* dividers */
+  --border: #dee1e5; /* dividers */
 
   /* ── Text ─────────────────────────────────────────────────────── */
   --text: #0f172a; /* primary text */
@@ -106,7 +108,7 @@
   --btn-neutral-border: #e5e7eb;
 
   /* ── Banner / dark strips ────────────────────────────────────────
-     Used in: CustomerStrip, sticky payment bars, Dashboard banner */
+     Used in: MemberStrip, sticky payment bars, Dashboard banner */
   --banner-bg: var(--grad-purple);
   --banner-shadow: 0 4px 16px rgba(124, 58, 237, 0.28);
   --banner-text: #ffffff;
@@ -129,25 +131,23 @@
   --stat-sub-text: var(--text-3);
 
   /* ── Section headings ─────────────────────────────────────────── */
-  --section-head-bg: var(--surface-2);
-  --section-head-text: var(--brand);
-  --section-icon-bg: var(--brand-light);
+  --section-head-text: #24304a;
 
   /* ── Table hover ──────────────────────────────────────────────── */
-  --table-row-hover: #f5f3ff;
+  --table-row-hover: #eef5ff;
 
   /* ── Focus ring ───────────────────────────────────────────────── */
-  --focus-ring: rgba(124, 58, 237, 0.12);
+  --focus-ring: rgba(21, 101, 216, 0.12);
 
   /* ── Gradients ────────────────────────────────────────────────── */
   --grad-coral: linear-gradient(135deg, #f97316 0%, #f472b6 100%);
-  --grad-purple: linear-gradient(135deg, #fb7185 0%, #a855f7 100%);
+  --grad-purple: linear-gradient(180deg, #1565d8 0%, #104ea6 100%);
   --grad-blue: linear-gradient(135deg, #3b82f6 0%, #6366f1 100%);
   --grad-teal: linear-gradient(135deg, #10b981 0%, #14b8a6 100%);
 }
 
 body {
-  font-family: "Space Grotesk", sans-serif;
+  font-family: "Hanken Grotesk", sans-serif;
   background: var(--bg);
   color: var(--text);
   font-size: 15px;
@@ -183,25 +183,21 @@ body {
 }
 .page-title-row {
   display: flex;
-  align-items: center;
-  gap: 12px;
+  align-items: flex-start;
+  gap: 10px;
 }
-.page-icon {
-  width: 44px;
-  height: 44px;
-  border-radius: var(--r-md);
-  background: var(--grad-purple);
-  color: #fff;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 22px;
+.page-bar {
+  width: 4px;
+  height: 26px;
+  margin-top: 3px;
+  border-radius: 99px;
+  background: var(--accent-green);
   flex-shrink: 0;
-  box-shadow: 0 4px 12px rgba(168, 85, 247, 0.3);
 }
 .page-title {
   font-size: 23px;
-  font-weight: 600;
+  font-weight: 700;
+  color: var(--section-head-text);
 }
 .page-subtitle {
   font-size: 15px;
@@ -249,31 +245,21 @@ body {
   display: flex;
   align-items: center;
   gap: 10px;
-  padding: 13px 20px;
-  background: var(--section-head-bg);
-  border-bottom: 1.5px solid var(--border);
-  font-size: 14px;
+  padding: 24px 24px 0;
+  font-size: 20px;
   font-weight: 700;
   color: var(--section-head-text);
-  text-transform: uppercase;
-  letter-spacing: 0.7px;
+  letter-spacing: -0.2px;
 }
-.section-icon {
-  width: 30px;
-  height: 30px;
-  border-radius: var(--r-sm);
-  background: #fff;
-  color: #111827;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 15px;
+.section-bar {
+  width: 4px;
+  height: 22px;
+  border-radius: 99px;
+  background: var(--accent-green);
   flex-shrink: 0;
-  border: 1.5px solid var(--border);
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.07);
 }
 .section-body {
-  padding: 22px 22px 20px;
+  padding: 24px;
 }
 
 /* Outer .card that wraps only a form of section-blocks becomes a transparent shell */
@@ -441,7 +427,7 @@ label {
 }
 .btn-primary:hover {
   filter: brightness(1.08);
-  box-shadow: 0 4px 12px rgba(147, 51, 234, 0.4);
+  box-shadow: 0 4px 12px rgba(21, 101, 216, 0.4);
 }
 
 .btn-secondary {
@@ -543,7 +529,7 @@ label {
 }
 
 /* ─── Banner (dark gradient strip) ──────── */
-/* Use .banner-dark for any full-width gradient strip (CustomerStrip, sticky bars, Dashboard header) */
+/* Use .banner-dark for any full-width gradient strip (MemberStrip, sticky bars, Dashboard header) */
 .banner-dark {
   background: var(--banner-bg);
   box-shadow: var(--banner-shadow);
@@ -565,7 +551,6 @@ label {
 .icon-on-dark {
   color: var(--icon-on-dark);
 }
-/* .page-icon already handles: brand bg + white icon */
 
 /* ─── Chip / tag ─────────────────────────── */
 /* Neutral tag for SI, coverage, band labels etc. */
@@ -674,6 +659,9 @@ label {
 /* ─── Table ─────────────────────────────── */
 .table-wrap {
   overflow-x: auto;
+  overflow-y: hidden;
+  border: 1px solid var(--border);
+  border-radius: 10px;
 }
 table {
   width: 100%;
@@ -694,6 +682,9 @@ thead th {
 tbody tr {
   border-bottom: 1px solid var(--border);
   transition: background 0.1s;
+}
+tbody tr:nth-child(even) {
+  background: var(--surface-2);
 }
 tbody tr:last-child {
   border-bottom: none;
@@ -962,7 +953,7 @@ tbody td {
     position: static !important;
   }
 
-  /* ── Buy Policy stepper & customer strip ── */
+  /* ── Buy Policy stepper & member strip ── */
   .stepper-mobile {
     display: block !important;
   }
@@ -1023,7 +1014,7 @@ tbody td {
     margin-bottom: 0 !important;
   }
 
-  /* ── Customer Portal responsive ── */
+  /* ── Member Portal responsive ── */
   .cp-hero {
     padding: 20px 16px 24px !important;
     border-radius: 12px !important;
@@ -1148,16 +1139,9 @@ tbody td {
   }
 
   /* ── Login page ── */
-  .login-page {
-    flex-direction: column !important;
-  }
   .login-card {
     width: 100% !important;
     padding: 32px 22px 28px !important;
-    box-shadow: none !important;
-  }
-  .login-panel {
-    display: none !important;
   }
 
   /* ── Broker dashboard ── */
@@ -1198,11 +1182,6 @@ tbody td {
   .page-title {
     font-size: 17px;
   }
-  .page-icon {
-    width: 34px;
-    height: 34px;
-    font-size: 15px;
-  }
   .badge {
     font-size: 12px;
     padding: 2px 7px;
@@ -1213,7 +1192,7 @@ tbody td {
     font-size: 13px;
   }
 
-  /* Customer portal — very small phones */
+  /* Member portal — very small phones */
   .cp-cats {
     grid-template-columns: repeat(4, 1fr) !important;
   }

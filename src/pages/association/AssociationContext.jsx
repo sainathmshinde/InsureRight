@@ -1,5 +1,5 @@
 import { createContext, useContext, useState } from 'react'
-import { ASSOCIATIONS } from '../customer/orgAssocData'
+import { ASSOCIATIONS } from '../member/orgAssocData'
 
 const AssociationContext = createContext(null)
 

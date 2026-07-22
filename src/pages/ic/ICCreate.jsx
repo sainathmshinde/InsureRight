@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Field, Input, Select, SectionBlock } from "../../components/Field";
-import { InsuranceCompanyIcon } from "../../icons";
 
 const INITIAL = {
   icName: "",
@@ -31,9 +30,7 @@ export default function ICCreate() {
     <div>
       <div className="page-header">
         <div className="page-title-row">
-          <div className="page-icon">
-            <InsuranceCompanyIcon />
-          </div>
+          <span className="page-bar" />
           <div>
             <div className="page-title">Add Insurance Company</div>
             <div className="page-subtitle">
@@ -50,7 +47,7 @@ export default function ICCreate() {
         <div className="card-body">
           <form onSubmit={handleSubmit}>
             <SectionBlock icon="🏦" title="IC Master Information">
-              <div className="form-grid">
+              <div className="form-grid-3">
                 <Field label="IC Name" required>
                   <Input
                     placeholder="e.g. Star Health Insurance"

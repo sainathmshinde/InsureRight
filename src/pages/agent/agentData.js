@@ -95,6 +95,7 @@ export const OPERATORS = [
     ifsc: "SBIN0003456",
     assignedBroker: "K.M. Dastur & Co.",
     reportingManager: "K.M. Dastur",
+    agentType: "leader",
     status: "Inactive",
   },
   {
@@ -126,6 +127,7 @@ export const OPERATORS = [
     ifsc: "UTIB0004567",
     assignedBroker: "K.M. Dastur & Co.",
     reportingManager: "K.M. Dastur",
+    agentType: "sales-manager",
     status: "Active",
   },
   {
@@ -157,6 +159,7 @@ export const OPERATORS = [
     ifsc: "KKBK0005678",
     assignedBroker: "K.M. Dastur & Co.",
     reportingManager: "Sunil Mehta",
+    agentType: "sales",
     status: "Active",
   },
   {
@@ -188,6 +191,7 @@ export const OPERATORS = [
     ifsc: "PUNB0006789",
     assignedBroker: "K.M. Dastur & Co.",
     reportingManager: "K.M. Dastur",
+    agentType: "calling",
     status: "Active",
   },
   {
@@ -219,6 +223,7 @@ export const OPERATORS = [
     ifsc: "CNRB0007890",
     assignedBroker: "K.M. Dastur & Co.",
     reportingManager: "K.M. Dastur",
+    agentType: "sales",
     status: "Inactive",
   },
   {
@@ -250,6 +255,7 @@ export const OPERATORS = [
     ifsc: "BARB0008901",
     assignedBroker: "K.M. Dastur & Co.",
     reportingManager: "K.M. Dastur",
+    agentType: "sales-manager",
     status: "Active",
   },
   {
@@ -281,6 +287,7 @@ export const OPERATORS = [
     ifsc: "FDRL0009012",
     assignedBroker: "K.M. Dastur & Co.",
     reportingManager: "K.M. Dastur",
+    agentType: "calling",
     status: "Active",
   },
   {
@@ -312,6 +319,7 @@ export const OPERATORS = [
     ifsc: "YESB0001012",
     assignedBroker: "K.M. Dastur & Co.",
     reportingManager: "K.M. Dastur",
+    agentType: "leader",
     status: "Active",
   },
   {
@@ -343,6 +351,7 @@ export const OPERATORS = [
     ifsc: "UBIN0001123",
     assignedBroker: "K.M. Dastur & Co.",
     reportingManager: "Sunil Mehta",
+    agentType: "sales",
     status: "Active",
   },
   {
@@ -374,6 +383,7 @@ export const OPERATORS = [
     ifsc: "IDIB0001234",
     assignedBroker: "K.M. Dastur & Co.",
     reportingManager: "K.M. Dastur",
+    agentType: "calling",
     status: "Inactive",
   },
 ];

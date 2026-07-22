@@ -11,7 +11,9 @@ import { CheckboxGroup, FormActions } from "../../components/UI";
 import { DocumentViewerModal } from "../../components/fields/DocumentViewerModal";
 import policyWordingsPdf from "../../assets/StarHealthAssureInsurancePolicy-Policy-wording.pdf";
 import brochurePdf from "../../assets/Brochure_Star_Comprehensive_Insurance_Policy_V_15_Web_633bcfcaaf.pdf";
-import { PREMIUM_CHART } from "./productData";
+import { PREMIUM_CHART, PRODUCTS } from "./productData";
+
+const TOPUP_POLICIES = PRODUCTS.filter(p => p.policyType === "Top Up Policy" || p.policyType === "Super Top Up");
 
 const IC_LIST = [
   "Star Health Insurance",
@@ -38,20 +40,6 @@ const ADDONS = [
   "Global Cover",
 ];
 const TENURES = ["1 Year", "2 Years", "3 Years", "5 Years"];
-const STATES = [
-  "All India",
-  "Maharashtra",
-  "Delhi",
-  "Karnataka",
-  "Tamil Nadu",
-  "Gujarat",
-  "Rajasthan",
-  "Uttar Pradesh",
-  "West Bengal",
-  "Telangana",
-  "Kerala",
-];
-
 const POLICY_TOC = [
   {
     id: "CIS",
@@ -184,16 +172,6 @@ const BROCHURE_TOC = [
   },
 ];
 
-const BASE_POLICIES = [
-  { id: 1,  name: "Star Comprehensive Health",     code: "SHI-HC-001" },
-  { id: 2,  name: "HDFC ERGO Optima Secure",       code: "HER-HS-002" },
-  { id: 3,  name: "ICICI Lombard Complete Health", code: "ICL-HC-003" },
-  { id: 6,  name: "LIC Jeevan Anand",              code: "LIC-LA-006" },
-  { id: 7,  name: "HDFC Life Sanchay Plus",        code: "HDFC-LSP-007" },
-  { id: 9,  name: "Star Senior Health",            code: "SHI-SH-009" },
-  { id: 11, name: "Bajaj Allianz Health Guard",    code: "BAJ-HG-011" },
-];
-
 const COVERED_MEMBERS = [
   "Self",
   "Spouse",
@@ -260,11 +238,17 @@ export default function ProductForm({
   const [childHandicaps, setChildHandicaps] = useState([]);
   const [sumInsuredList, setSumInsuredList] = useState(() => {
     const rows = PREMIUM_CHART[productId] ?? [];
-    if (rows.length === 0) return [{ id: Date.now(), value: '', gst: '0' }];
-    return rows.map((r, i) => ({ id: i + 1, value: String(r.sumInsured), gst: '0' }));
+    if (rows.length === 0) return [{ id: Date.now(), value: '' }];
+    return rows.map((r, i) => ({ id: i + 1, value: String(r.sumInsured) }));
   });
+  const [gst, setGst] = useState('0');
   const [premiumMatrix, setPremiumMatrix] = useState({});
   const [removedCombos, setRemovedCombos] = useState(new Set());
+  const [linkBasePolicy, setLinkBasePolicy] = useState(false);
+  const [basePolicyDiscount, setBasePolicyDiscount] = useState('');
+  const [ageBands, setAgeBands] = useState(() => [{ id: Date.now(), from: '', to: '' }]);
+  const [activeAgeBandId, setActiveAgeBandId] = useState(null);
+
   const [docState, setDocState] = useState({
     policyWordingsFile: {
       status: "uploaded",
@@ -298,16 +282,14 @@ export default function ProductForm({
     ),
   ];
 
-  // All power-set combinations with Self always first
-  const nonSelfMembers = selectedMembers.filter(m => m !== 'Self');
+  // All power-set combinations of selected members
   const allCombos = (() => {
-    if (!selectedMembers.includes('Self')) return selectedMembers.map(m => m);
+    const n = selectedMembers.length;
     const result = [];
-    const n = nonSelfMembers.length;
-    for (let mask = 0; mask < (1 << n); mask++) {
-      const combo = ['Self'];
+    for (let mask = 1; mask < (1 << n); mask++) {
+      const combo = [];
       for (let i = 0; i < n; i++) {
-        if (mask & (1 << i)) combo.push(nonSelfMembers[i]);
+        if (mask & (1 << i)) combo.push(selectedMembers[i]);
       }
       result.push(combo.join('+'));
     }
@@ -315,10 +297,15 @@ export default function ProductForm({
   })();
   const visibleCombos = allCombos.filter(c => !removedCombos.has(c));
 
-  const updateCellPremium = (label, siId, value) =>
+  const currentAgeBandId = ageBands.some(b => b.id === activeAgeBandId) ? activeAgeBandId : ageBands[0]?.id;
+
+  const updateCellPremium = (ageBandId, label, siId, value) =>
     setPremiumMatrix(prev => ({
       ...prev,
-      [label]: { ...(prev[label] ?? {}), [siId]: value },
+      [ageBandId]: {
+        ...(prev[ageBandId] ?? {}),
+        [label]: { ...(prev[ageBandId]?.[label] ?? {}), [siId]: value },
+      },
     }));
 
   const replaceDoc = (field) =>
@@ -361,23 +348,7 @@ export default function ProductForm({
     <form onSubmit={onSubmit}>
       {/* ── 1. Basic Information ──────────────────── */}
       <SectionBlock icon="📦" title="Basic Information">
-        <div className="form-grid">
-          <Field label="Insurance Type" required style={{ gridColumn: '1 / -1' }}>
-            <Select
-              value={form.insuranceType}
-              onChange={set("insuranceType")}
-              required
-            >
-              <option value="">Select type</option>
-              <option>Health</option>
-              <option>Motor</option>
-              <option>Life</option>
-              <option>Travel</option>
-              <option>Home</option>
-              <option>Fire</option>
-              <option>Marine</option>
-            </Select>
-          </Field>
+        <div className="form-grid-3">
           <Field label="Product Name" required>
             <Input
               placeholder="e.g. Star Comprehensive Health"
@@ -424,15 +395,49 @@ export default function ProductForm({
               <option>Comprehensive</option>
             </Select>
           </Field>
-          {(form.policyType === "Top-up" || form.policyType === "Super Top-up") && (
-            <Field label="Link to Base Policy">
-              <Select value={form.basePolicyId} onChange={set("basePolicyId")}>
-                <option value="">Select base policy</option>
-                {BASE_POLICIES.map(p => (
-                  <option key={p.id} value={p.id}>{p.name} ({p.code})</option>
-                ))}
-              </Select>
-            </Field>
+          {form.policyType === "Base" && (
+            <>
+              <Field label=" " style={{ gridColumn: '1 / -1' }}>
+                <label style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 13.5, fontWeight: 500, color: 'var(--text)', cursor: 'pointer' }}>
+                  <input
+                    type="checkbox"
+                    checked={linkBasePolicy}
+                    onChange={e => {
+                      const checked = e.target.checked;
+                      setLinkBasePolicy(checked);
+                      if (!checked) {
+                        set("basePolicyId")({ target: { value: "" } });
+                      }
+                    }}
+                  />
+                  Do you want to link with Topup policy?
+                </label>
+              </Field>
+              <Field label="Link to Topup Policy">
+                <Select
+                  value={form.basePolicyId}
+                  onChange={set("basePolicyId")}
+                  disabled={!linkBasePolicy}
+                >
+                  <option value="">Select Topup policy</option>
+                  {TOPUP_POLICIES.map(p => (
+                    <option key={p.id} value={p.id}>{p.name} ({p.code})</option>
+                  ))}
+                </Select>
+              </Field>
+              <Field label="Discount % on base policy premium">
+                <Input
+                  type="number"
+                  min="0"
+                  max="100"
+                  placeholder="e.g. 10"
+                  value={basePolicyDiscount}
+                  onChange={e => setBasePolicyDiscount(e.target.value)}
+                  disabled={!linkBasePolicy}
+                  style={{ maxWidth: 160 }}
+                />
+              </Field>
+            </>
           )}
         </div>
       </SectionBlock>
@@ -449,18 +454,8 @@ export default function ProductForm({
                 placeholder="e.g. 500000"
                 value={si.value}
                 onChange={e => setSumInsuredList(prev => prev.map(s => s.id === si.id ? { ...s, value: e.target.value } : s))}
-                style={{ maxWidth: 160 }}
+                style={{ maxWidth: 160, textAlign: 'right' }}
               />
-              <Select
-                value={si.gst}
-                onChange={e => setSumInsuredList(prev => prev.map(s => s.id === si.id ? { ...s, gst: e.target.value } : s))}
-                style={{ maxWidth: 110 }}
-              >
-                <option value="0">0% GST</option>
-                <option value="5">5% GST</option>
-                <option value="12">12% GST</option>
-                <option value="18">18% GST</option>
-              </Select>
               <button
                 type="button"
                 onClick={() => setSumInsuredList(prev => prev.filter(s => s.id !== si.id))}
@@ -474,15 +469,57 @@ export default function ProductForm({
               type="button"
               className="btn btn-ghost"
               style={{ fontSize: 13, padding: '5px 14px', marginTop: 4 }}
-              onClick={() => setSumInsuredList(prev => [...prev, { id: Date.now(), value: '', gst: '0' }])}
+              onClick={() => setSumInsuredList(prev => [...prev, { id: Date.now(), value: '' }])}
             >+ Add Sum Assured</button>
           </div>
         </div>
       </SectionBlock>
 
-      {/* ── 3. Configuration ─────────────────────── */}
-      <SectionBlock icon="⚙️" title="Configuration">
-        <Field label="Covered Members">
+      {/* ── 4. Age Band ───────────────────────────── */}
+      <SectionBlock icon="🎂" title="Age Band">
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+          {ageBands.map((ab, i) => (
+            <div key={ab.id} style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+              <span style={{ fontSize: 12, color: 'var(--text-3)', minWidth: 22, textAlign: 'right' }}>#{i + 1}</span>
+              <Input
+                type="number"
+                min="0"
+                placeholder="From"
+                value={ab.from}
+                onChange={e => setAgeBands(prev => prev.map(a => a.id === ab.id ? { ...a, from: e.target.value } : a))}
+                style={{ maxWidth: 120 }}
+              />
+              <span style={{ fontSize: 13, color: 'var(--text-3)' }}>to</span>
+              <Input
+                type="number"
+                min="0"
+                placeholder="To"
+                value={ab.to}
+                onChange={e => setAgeBands(prev => prev.map(a => a.id === ab.id ? { ...a, to: e.target.value } : a))}
+                style={{ maxWidth: 120 }}
+              />
+              <button
+                type="button"
+                onClick={() => setAgeBands(prev => prev.filter(a => a.id !== ab.id))}
+                disabled={ageBands.length === 1}
+                style={{ background: 'none', border: 'none', cursor: ageBands.length === 1 ? 'not-allowed' : 'pointer', fontSize: 18, color: ageBands.length === 1 ? 'var(--border)' : 'var(--text-3)', lineHeight: 1, padding: '2px 4px' }}
+              >×</button>
+            </div>
+          ))}
+          <div>
+            <button
+              type="button"
+              className="btn btn-ghost"
+              style={{ fontSize: 13, padding: '5px 14px', marginTop: 4 }}
+              onClick={() => setAgeBands(prev => [...prev, { id: Date.now(), from: '', to: '' }])}
+            >+ Add Age Band</button>
+          </div>
+        </div>
+      </SectionBlock>
+
+      {/* ── 5. Family ─────────────────────── */}
+      <SectionBlock icon="⚙️" title="Family">
+        <Field label="Covered Family Members">
           <div
             style={{
               display: "flex",
@@ -500,6 +537,7 @@ export default function ProductForm({
                       type="checkbox"
                       checked={isChecked}
                       onChange={() => toggleMember(member)}
+                      style={{ width: 18, height: 18, accentColor: "var(--brand)", cursor: "pointer" }}
                     />
                     {member}
                   </label>
@@ -539,7 +577,7 @@ export default function ProductForm({
                       style={{
                         display: "flex", alignItems: "center", gap: 4,
                         cursor: "pointer", fontSize: 13,
-                        background: childHandicaps[i] ? "#ede9fe" : "var(--surface-2)",
+                        background: childHandicaps[i] ? "var(--brand-light)" : "var(--surface-2)",
                         color: childHandicaps[i] ? "var(--brand)" : "var(--text-3)",
                         border: `1px solid ${childHandicaps[i] ? "var(--brand)" : "var(--border)"}`,
                         borderRadius: 99, padding: "3px 10px", transition: "all .12s",
@@ -561,11 +599,11 @@ export default function ProductForm({
         </Field>
       </SectionBlock>
 
-      {/* ── 4. Financial Details ──────────────────── */}
-      <SectionBlock icon="💰" title="Financial Details">
+      {/* ── 4. Premium Chart ──────────────────── */}
+      <SectionBlock icon="💰" title="Premium Chart">
         {selectedMembers.length === 0 ? (
           <p style={{ fontSize: 13, color: 'var(--text-3)', margin: 0 }}>
-            Select covered members in the Configuration section to build the premium table.
+            Select covered members in the Family section to build the premium table.
           </p>
         ) : sumInsuredList.every(s => !s.value) ? (
           <p style={{ fontSize: 13, color: 'var(--text-3)', margin: 0 }}>
@@ -573,6 +611,37 @@ export default function ProductForm({
           </p>
         ) : (
           <>
+          {ageBands.length > 0 && (
+            <div style={{ marginBottom: 14 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
+                <span style={{ fontSize: 12.5, fontWeight: 600, color: 'var(--text-3)', textTransform: 'uppercase', letterSpacing: '.4px' }}>Age Band</span>
+                {ageBands.map((ab, i) => {
+                  const active = currentAgeBandId === ab.id;
+                  const rangeLabel = ab.from || ab.to ? `${ab.from || '0'}–${ab.to || '∞'}` : `Band ${i + 1}`;
+                  return (
+                    <button
+                      key={ab.id}
+                      type="button"
+                      onClick={() => setActiveAgeBandId(ab.id)}
+                      style={{
+                        padding: '5px 12px', borderRadius: 20, fontSize: 12.5, fontWeight: 600,
+                        cursor: 'pointer', fontFamily: 'inherit',
+                        border: `1.5px solid ${active ? 'var(--brand)' : 'var(--border)'}`,
+                        background: active ? 'var(--brand-light)' : '#fff',
+                        color: active ? 'var(--brand)' : 'var(--text-2)',
+                      }}
+                    >{rangeLabel}</button>
+                  );
+                })}
+              </div>
+              {ageBands.length > 1 && (
+                <div style={{ fontSize: 12, color: 'var(--text-3)', marginTop: 6, display: 'flex', alignItems: 'center', gap: 5 }}>
+                  <span>ℹ️</span>
+                  Click a different age band above to switch and enter premiums for that band — each band's values are saved separately.
+                </div>
+              )}
+            </div>
+          )}
           <div className="table-wrap" style={{ maxHeight: 450, overflowY: 'auto' }}>
             <table style={{ fontSize: 13 }}>
               <thead>
@@ -581,7 +650,6 @@ export default function ProductForm({
                   {sumInsuredList.map((si, i) => (
                     <th key={si.id} style={{ minWidth: 150, textAlign: 'center' }}>
                       <div style={{ fontWeight: 700 }}>₹{si.value ? Number(si.value).toLocaleString('en-IN') : `SI ${i + 1}`}</div>
-                      <div style={{ fontSize: 11, fontWeight: 400, color: 'var(--text-3)', marginTop: 2 }}>GST {si.gst}%</div>
                     </th>
                   ))}
                   <th style={{ width: 40 }}></th>
@@ -601,8 +669,9 @@ export default function ProductForm({
                             type="number"
                             min="0"
                             placeholder="0"
-                            value={premiumMatrix[label]?.[si.id] ?? ''}
-                            onChange={e => updateCellPremium(label, si.id, e.target.value)}
+                            value={premiumMatrix[currentAgeBandId]?.[label]?.[si.id] ?? ''}
+                            onChange={e => updateCellPremium(currentAgeBandId, label, si.id, e.target.value)}
+                            style={{ textAlign: 'right' }}
                           />
                         </td>
                       ))}
@@ -634,7 +703,128 @@ export default function ProductForm({
         )}
       </SectionBlock>
 
-      {/* ── 3. Documents ─────────────────────────── */}
+      {/* ── Policy Details ─────────────────────── */}
+      <SectionBlock icon="📋" title="Policy Info">
+        <div style={{ marginBottom: 18 }}>
+          <Field label="About this Policy">
+            <Textarea
+              placeholder="A brief overview of what this policy is and what it offers…"
+              value={form.aboutPolicy}
+              onChange={set("aboutPolicy")}
+              style={{ minHeight: 100 }}
+            />
+          </Field>
+        </div>
+        <div style={{ marginBottom: 18 }}>
+          <Field label="Who should Buy">
+            <Textarea
+              placeholder="e.g. Individuals and families looking for comprehensive health coverage…"
+              value={form.whoShouldBuy}
+              onChange={set("whoShouldBuy")}
+              style={{ minHeight: 100 }}
+            />
+          </Field>
+        </div>
+        <div style={{ marginBottom: 18 }}>
+          <Field label="Key Benefits">
+            <Textarea
+              placeholder="e.g. Cashless treatment at 10,000+ hospitals, No claim bonus, Lifetime renewability…"
+              value={form.keyBenefits}
+              onChange={set("keyBenefits")}
+              style={{ minHeight: 100 }}
+            />
+          </Field>
+        </div>
+        <div style={{ marginBottom: 18 }}>
+          <Field label="Eligibility Criteria" required>
+            <Textarea
+              placeholder="e.g. Persons between 18–65 years. Dependent children up to 25 years…"
+              value={form.eligibilityCriteria}
+              onChange={set("eligibilityCriteria")}
+              required
+            />
+          </Field>
+        </div>
+        <div style={{ marginBottom: 18 }}>
+          <Field label="Tenure Options">
+            <div style={{ paddingTop: 8 }}>
+              <CheckboxGroup
+                options={TENURES}
+                selected={form.tenureOptions}
+                onChange={setArr("tenureOptions")}
+              />
+            </div>
+          </Field>
+        </div>
+        <div className="form-grid-3">
+          <Field label="Waiting Period (days)" required>
+            <Input
+              type="number"
+              min="0"
+              placeholder="e.g. 30"
+              value={form.waitingPeriod}
+              onChange={set("waitingPeriod")}
+              required
+            />
+          </Field>
+          <Field label="Room Rent Limit">
+            <Select value={form.roomRentLimit} onChange={set("roomRentLimit")}>
+              <option value="">Select limit</option>
+              <option>No Limit</option>
+              <option>1% of Sum Insured per day</option>
+              <option>2% of Sum Insured per day</option>
+              <option>₹3,000 per day</option>
+              <option>₹5,000 per day</option>
+              <option>₹10,000 per day</option>
+              <option>Single AC Room</option>
+            </Select>
+          </Field>
+          <Field label="Waiting Period For Disease" className="col-span-3">
+            <Textarea
+              placeholder="e.g. Pre-existing diseases covered after 36 months, Maternity after 2 years…"
+              value={form.diseaseRestrictions}
+              onChange={set("diseaseRestrictions")}
+            />
+          </Field>
+        </div>
+      </SectionBlock>
+
+      {/* ── 4. Coverage ───────────────────────────── */}
+      <SectionBlock icon="🛡️" title="Coverage Info">
+        <div style={{ marginBottom: 18 }}>
+          <Field label="What's covered">
+            <Textarea
+              placeholder="Describe key coverage points, in-patient hospitalisation, pre & post hospitalisation, day care procedures…"
+              value={form.coverageDetails}
+              onChange={set("coverageDetails")}
+              style={{ minHeight: 120 }}
+            />
+          </Field>
+        </div>
+        <div style={{ marginBottom: 18 }}>
+          <Field label="What's not covered">
+            <Textarea
+              placeholder="e.g. Cosmetic surgery, self-inflicted injuries, war-related injuries…"
+              value={form.exclusions}
+              onChange={set("exclusions")}
+              style={{ minHeight: 120 }}
+            />
+          </Field>
+        </div>
+        <div style={{ marginBottom: 18 }}>
+          <Field label="Add-ons / Riders">
+            <div style={{ paddingTop: 8 }}>
+              <CheckboxGroup
+                options={ADDONS}
+                selected={form.addOns}
+                onChange={setArr("addOns")}
+              />
+            </div>
+          </Field>
+        </div>
+      </SectionBlock>
+
+      {/* ── Documents ─────────────────────────── */}
       <SectionBlock icon="📄" title="Documents">
         <div className="pf-doc-grid" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 24, alignItems: "start" }}>
 
@@ -808,131 +998,16 @@ export default function ProductForm({
         )}
       </SectionBlock>
 
-      {/* ── 4. Coverage ───────────────────────────── */}
-      <SectionBlock icon="🛡️" title="Coverage Details">
-        <div style={{ marginBottom: 18 }}>
-          <Field label="Coverage Highlights">
-            <Textarea
-              placeholder="Describe key coverage points, in-patient hospitalisation, pre & post hospitalisation, day care procedures…"
-              value={form.coverageDetails}
-              onChange={set("coverageDetails")}
-              style={{ minHeight: 120 }}
-            />
-          </Field>
-        </div>
-        <div style={{ marginBottom: 18 }}>
-          <Field label="Add-ons / Riders">
-            <div style={{ paddingTop: 8 }}>
-              <CheckboxGroup
-                options={ADDONS}
-                selected={form.addOns}
-                onChange={setArr("addOns")}
-              />
-            </div>
-          </Field>
-        </div>
-      </SectionBlock>
-
-      {/* ── 5. Policy Details ─────────────────────── */}
-      <SectionBlock icon="📋" title="Policy Details">
-        <div style={{ marginBottom: 18 }}>
-          <Field label="Tenure Options">
-            <div style={{ paddingTop: 8 }}>
-              <CheckboxGroup
-                options={TENURES}
-                selected={form.tenureOptions}
-                onChange={setArr("tenureOptions")}
-              />
-            </div>
-          </Field>
-        </div>
-        <div className="form-grid">
-          <Field label="Waiting Period (days)" required>
-            <Input
-              type="number"
-              min="0"
-              placeholder="e.g. 30"
-              value={form.waitingPeriod}
-              onChange={set("waitingPeriod")}
-              required
-            />
-          </Field>
-          <Field label="Room Rent Limit">
-            <Select value={form.roomRentLimit} onChange={set("roomRentLimit")}>
-              <option value="">Select limit</option>
-              <option>No Limit</option>
-              <option>1% of Sum Insured per day</option>
-              <option>2% of Sum Insured per day</option>
-              <option>₹3,000 per day</option>
-              <option>₹5,000 per day</option>
-              <option>₹10,000 per day</option>
-              <option>Single AC Room</option>
-            </Select>
-          </Field>
-          <Field label="Waiting Period For Disease" className="col-span-2">
-            <Textarea
-              placeholder="e.g. Pre-existing diseases covered after 36 months, Maternity after 2 years…"
-              value={form.diseaseRestrictions}
-              onChange={set("diseaseRestrictions")}
-            />
-          </Field>
-        </div>
-      </SectionBlock>
-
-      {/* ── 6. Terms & Conditions ────────────────── */}
-      <SectionBlock >
-        <div className="form-grid">
-          <Field label="Eligibility Criteria" required>
-            <Textarea
-              placeholder="e.g. Persons between 18–65 years. Dependent children up to 25 years…"
-              value={form.eligibilityCriteria}
-              onChange={set("eligibilityCriteria")}
-              required
-            />
-          </Field>
-          <Field label="Exclusions">
-            <Textarea
-              placeholder="e.g. Cosmetic surgery, self-inflicted injuries, war-related injuries…"
-              value={form.exclusions}
-              onChange={set("exclusions")}
-            />
-          </Field>
-          <Field label="Min Age (years)">
-            <Input
-              type="number"
-              min="0"
-              max="100"
-              placeholder="18"
-              value={form.ageMin}
-              onChange={set("ageMin")}
-            />
-          </Field>
-          <Field label="Max Age (years)">
-            <Input
-              type="number"
-              min="0"
-              max="100"
-              placeholder="65"
-              value={form.ageMax}
-              onChange={set("ageMax")}
-            />
-          </Field>
-          <Field label="Geography">
-            <Select value={form.geography} onChange={set("geography")}>
-              <option value="">Select geography</option>
-              {STATES.map((s) => (
-                <option key={s}>{s}</option>
-              ))}
-            </Select>
-          </Field>
-          <Field label="Additional Notes">
-            <Textarea
-              placeholder="Any additional terms, conditions or notes…"
-              value={form.notes}
-              onChange={set("notes")}
-            />
-          </Field>
-        </div>
+      {/* ── GST ───────────────────────────────── */}
+      <SectionBlock icon="🧾" title="GST">
+        <Field label="GST %">
+          <Select value={gst} onChange={e => setGst(e.target.value)} style={{ maxWidth: 200 }}>
+            <option value="0">0% GST</option>
+            <option value="5">5% GST</option>
+            <option value="12">12% GST</option>
+            <option value="18">18% GST</option>
+          </Select>
+        </Field>
       </SectionBlock>
 
       <FormActions onCancel={onCancel} submitLabel={submitLabel} />

@@ -3,7 +3,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { Field, Input, Select, SectionBlock, UploadBox } from "../../components/Field";
 import { EditIcon } from "../../icons";
 import { useAuth } from "../../context/AuthContext";
-import { useCustomers } from "../../context/CustomerContext";
+import { useMembers } from "../../context/MemberContext";
 import FamilyMembersSection from "./FamilyMembersSection";
 import { ORGANISATIONS, ASSOCIATIONS } from "./orgAssocData";
 
@@ -160,12 +160,12 @@ const MOCK_DATA = {
   },
 };
 
-function authUserToCustomer(u) {
+function authUserToMember(u) {
   if (!u) return {};
   return { name: u.name, mobile: u.phone || '', email: u.email };
 }
 
-export default function CustomerEdit() {
+export default function MemberEdit() {
   const { id } = useParams();
   const navigate = useNavigate();
   const { user } = useAuth();
@@ -175,7 +175,7 @@ export default function CustomerEdit() {
     ? (Object.values(MOCK_DATA).find(m => m.email === user?.email) ?? Object.values(MOCK_DATA)[0] ?? {})
     : {};
   const rawInitial = isProfile
-    ? { ...profileData, ...authUserToCustomer(user) }
+    ? { ...profileData, ...authUserToMember(user) }
     : (MOCK_DATA[id] ?? {});
   const splitName = (raw) => {
     const parts = (raw.name || "").trim().split(" ");
@@ -186,11 +186,11 @@ export default function CustomerEdit() {
     ...(!rawInitial.firstName ? splitName(rawInitial) : {}),
     empId: rawInitial.empId || "",
   };
-  const { customers, updateKycStatus } = useCustomers();
-  // Resolve the context customer for both id-based edit and profile (email) mode
-  const contextCustomer = isProfile
-    ? customers.find(c => c.email === user?.email)
-    : customers.find(c => c.id === Number(id));
+  const { members: allMembers, updateKycStatus } = useMembers();
+  // Resolve the context member for both id-based edit and profile (email) mode
+  const contextMember = isProfile
+    ? allMembers.find(c => c.email === user?.email)
+    : allMembers.find(c => c.id === Number(id));
 
   const [form, setForm] = useState(initial);
   const [members, setMembers] = useState(initial.familyMembers ?? []);
@@ -210,10 +210,10 @@ export default function CustomerEdit() {
     if (form.photoFile == null) setPhotoPreview(null)
   }, [form.photoFile])
 
-  const liveKyc = contextCustomer?.kyc ?? form.kycStatus ?? 'Pending';
+  const liveKyc = contextMember?.kyc ?? form.kycStatus ?? 'Pending';
 
   const handleResubmit = () => {
-    if (contextCustomer?.id) updateKycStatus(contextCustomer.id, 'Pending');
+    if (contextMember?.id) updateKycStatus(contextMember.id, 'Pending');
     setResubmitted(true);
   };
 
@@ -248,8 +248,8 @@ export default function CustomerEdit() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log(isProfile ? "Update customer profile:" : "Update customer:", form);
-    navigate(isProfile ? "/profile" : "/customer");
+    console.log(isProfile ? "Update member profile:" : "Update member:", form);
+    navigate(isProfile ? "/profile" : "/member");
   };
 
   return (
@@ -258,15 +258,15 @@ export default function CustomerEdit() {
         <div className="page-title-row">
           <div className="page-icon"><EditIcon /></div>
           <div>
-            <div className="page-title">{isProfile ? "Edit My Profile" : "Edit Customer"}</div>
-            <div className="page-subtitle">{isProfile ? "Update your contact details" : "Update customer profile"}</div>
+            <div className="page-title">{isProfile ? "Edit My Profile" : "Edit Member"}</div>
+            <div className="page-subtitle">{isProfile ? "Update your contact details" : "Update member profile"}</div>
           </div>
         </div>
         <div style={{ display: "flex", gap: 10 }}>
           {!isProfile && (
             <button
               className="btn btn-secondary"
-              onClick={() => navigate(`/customer/${id}/360`)}
+              onClick={() => navigate(`/member/${id}/360`)}
             >
               360° View
             </button>
@@ -276,7 +276,7 @@ export default function CustomerEdit() {
           )}
           <button
             className="btn btn-ghost"
-            onClick={() => navigate(isProfile ? "/dashboard" : "/customer")}
+            onClick={() => navigate(isProfile ? "/dashboard" : "/member")}
           >
             {isProfile ? "← Dashboard" : "← Back"}
           </button>
@@ -294,7 +294,7 @@ export default function CustomerEdit() {
                   padding: '10px 14px', marginBottom: 16, display: 'flex', alignItems: 'center', gap: 8,
                   fontSize: 13.5, color: '#166534',
                 }}>
-                  ✅ Details auto-filled from {kycFetched === 'aadhaar' ? 'Aadhaar' : 'PAN'} — please review and confirm below.
+                  ✅ Info auto-filled from {kycFetched === 'aadhaar' ? 'Aadhaar' : 'PAN'} — please review and confirm below.
                 </div>
               )}
               {/* KYC Status Banner */}
@@ -333,7 +333,7 @@ export default function CustomerEdit() {
                   </div>
                 </div>
               )}
-              <div className="form-grid">
+              <div className="form-grid-3">
                 <Field label="Aadhaar Number">
                   <Input
                     placeholder="XXXX XXXX XXXX"
@@ -365,7 +365,7 @@ export default function CustomerEdit() {
                       onClick={() => fetchFromDoc('aadhaar')}
                       disabled={kycFetching !== null}
                     >
-                      {kycFetching === 'aadhaar' ? '⏳ Fetching details…' : '🔍 Get Details from Aadhaar'}
+                      {kycFetching === 'aadhaar' ? '⏳ Fetching info…' : '🔍 Get Info from Aadhaar'}
                     </button>
                   )}
                 </Field>
@@ -384,7 +384,7 @@ export default function CustomerEdit() {
                       onClick={() => fetchFromDoc('pan')}
                       disabled={kycFetching !== null}
                     >
-                      {kycFetching === 'pan' ? '⏳ Fetching details…' : '🔍 Get Details from PAN'}
+                      {kycFetching === 'pan' ? '⏳ Fetching info…' : '🔍 Get Info from PAN'}
                     </button>
                   )}
                 </Field>
@@ -416,7 +416,7 @@ export default function CustomerEdit() {
                   display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden',
                 }}>
                   {photoPreview
-                    ? <img src={photoPreview} alt="Customer" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                    ? <img src={photoPreview} alt="Member" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                     : <span style={{ fontSize: 38, lineHeight: 1 }}>👤</span>
                   }
                 </div>
@@ -437,7 +437,7 @@ export default function CustomerEdit() {
                   <div style={{ fontSize: 12, color: 'var(--text-3)', marginTop: 6 }}>JPG or PNG · Max 2 MB</div>
                 </div>
               </div>
-              <div className="form-grid">
+              <div className="form-grid-3">
                 <Field label="First Name" required>
                   <Input
                     placeholder="First name"
@@ -517,7 +517,7 @@ export default function CustomerEdit() {
 
             {/* Address */}
             <SectionBlock icon="📍" title="Address">
-              <div className="form-grid">
+              <div className="form-grid-3">
                 <Field label="Address">
                   <Input value={form.address || ""} onChange={set("address")} />
                 </Field>
@@ -552,12 +552,12 @@ export default function CustomerEdit() {
             </SectionBlock>
 
             {/* Family Details */}
-            <SectionBlock icon="👨‍👩‍👧" title="Family Details">
+            <SectionBlock icon="👨‍👩‍👧" title="Family Info">
               <FamilyMembersSection members={members} onChange={setMembers} />
             </SectionBlock>
 
             {/* Nominee Details */}
-            <SectionBlock icon="📝" title="Nominee Details">
+            <SectionBlock icon="📝" title="Nominee Info">
               <div className="form-grid-3">
                 <Field label="Nominee Name">
                   <Input
@@ -594,12 +594,12 @@ export default function CustomerEdit() {
               <button
                 type="button"
                 className="btn btn-ghost"
-                onClick={() => navigate(isProfile ? "/profile" : "/customer")}
+                onClick={() => navigate(isProfile ? "/profile" : "/member")}
               >
                 Cancel
               </button>
               <button type="submit" className="btn btn-primary">
-                {isProfile ? "Save Profile" : "Update Customer"}
+                {isProfile ? "Save Profile" : "Update Member"}
               </button>
             </div>
           </form>

@@ -1,8 +1,8 @@
 import { useState } from "react";
-import { PageHeader } from "../../components/UI";
+import { PageHeader, Button } from "../../components/UI";
 import Pagination from "../../components/Pagination";
 import usePagination from "../../components/usePagination";
-import { ChequeIcon } from "../../icons";
+import { ChequeIcon, UploadIcon, SearchIcon } from "../../icons";
 import { PAYMENT_STATUS_SHORT_LABEL } from "../../constants/paymentStatus";
 
 const CAMPAIGNS = [
@@ -18,7 +18,7 @@ const CAMPAIGNS = [
 const MOCK_CHEQUES = [
   {
     id: "CHQ-2026-001", proposalId: "PRO-2025-1001",
-    customerName: "Aarav Sharma",
+    memberName: "Aarav Sharma",
     mobileNo: "9876543210",
     policyNo: null,
     product: "Star Comprehensive Health",
@@ -36,7 +36,7 @@ const MOCK_CHEQUES = [
   },
   {
     id: "CHQ-2026-002", proposalId: "PRO-2025-1002",
-    customerName: "Priya Mehta",
+    memberName: "Priya Mehta",
     mobileNo: "9823456789",
     policyNo: null,
     product: "HDFC ERGO Optima Secure",
@@ -54,7 +54,7 @@ const MOCK_CHEQUES = [
   },
   {
     id: "CHQ-2026-003", proposalId: "PRO-2025-1003",
-    customerName: "Rohan Verma",
+    memberName: "Rohan Verma",
     mobileNo: "9812345678",
     policyNo: null,
     product: "Bajaj Allianz Health Guard",
@@ -72,7 +72,7 @@ const MOCK_CHEQUES = [
   },
   {
     id: "CHQ-2026-004", proposalId: "PRO-2025-1004",
-    customerName: "Sneha Iyer",
+    memberName: "Sneha Iyer",
     mobileNo: "9801234567",
     policyNo: null,
     product: "Star Comprehensive Health",
@@ -90,7 +90,7 @@ const MOCK_CHEQUES = [
   },
   {
     id: "CHQ-2026-005", proposalId: "PRO-2025-1005",
-    customerName: "Kavita Pillai",
+    memberName: "Kavita Pillai",
     mobileNo: "9790123456",
     policyNo: null,
     product: "HDFC ERGO Optima Secure",
@@ -108,7 +108,7 @@ const MOCK_CHEQUES = [
   },
   {
     id: "CHQ-2026-006", proposalId: "PRO-2025-1006",
-    customerName: "Arjun Singh",
+    memberName: "Arjun Singh",
     mobileNo: "9712345678",
     policyNo: null,
     product: "HDFC ERGO Optima Secure",
@@ -126,7 +126,7 @@ const MOCK_CHEQUES = [
   },
   {
     id: "CHQ-2026-007", proposalId: "PRO-2025-1007",
-    customerName: "Meera Joshi",
+    memberName: "Meera Joshi",
     mobileNo: "9698765432",
     policyNo: null,
     product: "Star Comprehensive Health",
@@ -144,7 +144,7 @@ const MOCK_CHEQUES = [
   },
   {
     id: "CHQ-2026-008", proposalId: "PRO-2025-1008",
-    customerName: "Vikram Rao",
+    memberName: "Vikram Rao",
     mobileNo: "9687654321",
     policyNo: null,
     product: "Bajaj Allianz Comprehensive",
@@ -162,7 +162,7 @@ const MOCK_CHEQUES = [
   },
   {
     id: "CHQ-2026-009", proposalId: "PRO-2025-1009",
-    customerName: "Deepika Kulkarni",
+    memberName: "Deepika Kulkarni",
     mobileNo: "9654321098",
     policyNo: null,
     product: "Star Comprehensive Health",
@@ -180,7 +180,7 @@ const MOCK_CHEQUES = [
   },
   {
     id: "CHQ-2026-010", proposalId: "PRO-2025-1010",
-    customerName: "Suresh Patil",
+    memberName: "Suresh Patil",
     mobileNo: "9643210987",
     policyNo: null,
     product: "HDFC ERGO Optima Secure",
@@ -198,7 +198,7 @@ const MOCK_CHEQUES = [
   },
   {
     id: "CHQ-2026-011", proposalId: "PRO-2025-1011",
-    customerName: "Anjali Deshmukh",
+    memberName: "Anjali Deshmukh",
     mobileNo: "9632109876",
     policyNo: null,
     product: "Bajaj Allianz Health Guard",
@@ -216,7 +216,7 @@ const MOCK_CHEQUES = [
   },
   {
     id: "CHQ-2026-012", proposalId: "PRO-2025-1012",
-    customerName: "Rajesh Nair",
+    memberName: "Rajesh Nair",
     mobileNo: "9621098765",
     policyNo: null,
     product: "Star Comprehensive Health",
@@ -234,7 +234,7 @@ const MOCK_CHEQUES = [
   },
   {
     id: "CHQ-2026-013", proposalId: "PRO-2025-1013",
-    customerName: "Nandini Reddy",
+    memberName: "Nandini Reddy",
     mobileNo: "9610987654",
     policyNo: null,
     product: "HDFC ERGO Optima Secure",
@@ -252,7 +252,7 @@ const MOCK_CHEQUES = [
   },
   {
     id: "CHQ-2026-014", proposalId: "PRO-2025-1014",
-    customerName: "Prakash Gupta",
+    memberName: "Prakash Gupta",
     mobileNo: "9509876543",
     policyNo: null,
     product: "Bajaj Allianz Comprehensive",
@@ -270,7 +270,7 @@ const MOCK_CHEQUES = [
   },
   {
     id: "CHQ-2026-015", proposalId: "PRO-2025-1015",
-    customerName: "Shalini Bose",
+    memberName: "Shalini Bose",
     mobileNo: "9498765432",
     policyNo: null,
     product: "Star Comprehensive Health",
@@ -288,7 +288,7 @@ const MOCK_CHEQUES = [
   },
   {
     id: "CHQ-2026-016", proposalId: "PRO-2025-1016",
-    customerName: "Manoj Tiwari",
+    memberName: "Manoj Tiwari",
     mobileNo: "9487654321",
     policyNo: null,
     product: "HDFC ERGO Optima Secure",
@@ -306,7 +306,7 @@ const MOCK_CHEQUES = [
   },
   {
     id: "CHQ-2026-017", proposalId: "PRO-2025-1017",
-    customerName: "Poornima Hegde",
+    memberName: "Poornima Hegde",
     mobileNo: "9476543210",
     policyNo: null,
     product: "Bajaj Allianz Health Guard",
@@ -324,7 +324,7 @@ const MOCK_CHEQUES = [
   },
   {
     id: "CHQ-2026-018", proposalId: "PRO-2025-1018",
-    customerName: "Aditya Bhatt",
+    memberName: "Aditya Bhatt",
     mobileNo: "9465432109",
     policyNo: null,
     product: "Star Comprehensive Health",
@@ -342,7 +342,7 @@ const MOCK_CHEQUES = [
   },
   {
     id: "CHQ-2026-019", proposalId: "PRO-2025-1019",
-    customerName: "Lakshmi Menon",
+    memberName: "Lakshmi Menon",
     mobileNo: "9454321098",
     policyNo: null,
     product: "HDFC ERGO Optima Secure",
@@ -360,7 +360,7 @@ const MOCK_CHEQUES = [
   },
   {
     id: "CHQ-2026-020", proposalId: "PRO-2025-1020",
-    customerName: "Sameer Jain",
+    memberName: "Sameer Jain",
     mobileNo: "9443210987",
     policyNo: null,
     product: "Bajaj Allianz Comprehensive",
@@ -404,7 +404,7 @@ function DetailRow({ label, value }) {
 }
 
 function ChequePreview({ cheque }) {
-  const initials = cheque.customerName
+  const initials = cheque.memberName
     .split(" ")
     .map((w) => w[0])
     .join("")
@@ -514,7 +514,7 @@ function ChequePreview({ cheque }) {
                 fontWeight: 700,
               }}
             >
-              {cheque.customerName}
+              {cheque.memberName}
             </span>
           </div>
           <div
@@ -690,13 +690,13 @@ function ChequeDetailModal({ cheque, onClose, onAccept, onReject }) {
                 marginBottom: 4,
               }}
             >
-              Cheque Payment Details
+              Cheque Payment Info
             </div>
             <div style={{ fontSize: 18, fontWeight: 800, color: "#1a1628" }}>
               {cheque.proposalId}
             </div>
             <div style={{ fontSize: 13, color: "#64748b", marginTop: 2 }}>
-              {cheque.customerName}{cheque.policyNo ? ` · ${cheque.policyNo}` : ""}
+              {cheque.memberName}{cheque.policyNo ? ` · ${cheque.policyNo}` : ""}
             </div>
           </div>
           <div
@@ -809,7 +809,7 @@ function ChequeDetailModal({ cheque, onClose, onAccept, onReject }) {
               marginBottom: 20,
             }}
           >
-            <DetailRow label="Customer Name" value={cheque.customerName} />
+            <DetailRow label="Member Name" value={cheque.memberName} />
             <DetailRow label="Mobile Number" value={cheque.mobileNo} />
             <DetailRow label="Policy Number" value={cheque.policyNo} />
             <DetailRow label="Product" value={cheque.product} />
@@ -921,7 +921,7 @@ function ChequeDetailModal({ cheque, onClose, onAccept, onReject }) {
                 </div>
                 <div style={{ fontSize: 13, color: "#166534" }}>
                   Cheque payment of <strong>{fmt(cheque.amount)}</strong> from{" "}
-                  <strong>{cheque.customerName}</strong> (Cheque No:{" "}
+                  <strong>{cheque.memberName}</strong> (Cheque No:{" "}
                   {cheque.chequeNo}) has been verified and received. Policy{" "}
                   <strong>{cheque.policyNo}</strong> will now be activated.
                 </div>
@@ -955,7 +955,7 @@ function ChequeDetailModal({ cheque, onClose, onAccept, onReject }) {
                 </div>
                 <div style={{ fontSize: 13, color: "#7f1d1d" }}>
                   Cheque payment of <strong>{fmt(cheque.amount)}</strong> has
-                  been rejected. Reason: <strong>{reason}</strong>. The customer
+                  been rejected. Reason: <strong>{reason}</strong>. The member
                   will be notified to re-submit the payment.
                 </div>
               </div>
@@ -1147,7 +1147,7 @@ export default function AcceptCheque() {
     const q = search.toLowerCase();
     const matchQ =
       !q ||
-      c.customerName.toLowerCase().includes(q) ||
+      c.memberName.toLowerCase().includes(q) ||
       c.mobileNo.includes(q);
     const matchCampaign =
       campaignFilter === "" || c.campaignId === Number(campaignFilter);
@@ -1181,8 +1181,12 @@ export default function AcceptCheque() {
       <PageHeader
         icon={<ChequeIcon />}
         title="Receive Cheque"
-        subtitle="Review cheques customers have submitted offline, verify the details, and accept or reject each one"
-      />
+        subtitle="Review cheques members have submitted offline, verify the details, and accept or reject each one"
+      >
+        <Button variant="ghost" icon={<UploadIcon size={16} />} onClick={() => {}}>
+          Export
+        </Button>
+      </PageHeader>
 
       <div className="card">
         <div className="card-body">
@@ -1198,13 +1202,18 @@ export default function AcceptCheque() {
           >
             <div style={{ flex: "1 1 260px" }}>
               <label style={TOP_LABEL}>Search by Name or Mobile</label>
-              <input
-                className="field-input filter-search"
-                placeholder="Search by customer name or mobile number..."
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                style={{ width: "100%", marginTop: 5 }}
-              />
+              <div style={{ position: "relative", marginTop: 5 }}>
+                <span style={{ position: "absolute", left: 11, top: "50%", transform: "translateY(-50%)", display: "flex", pointerEvents: "none" }}>
+                  <SearchIcon size={15} color="var(--text-3)" />
+                </span>
+                <input
+                  className="field-input filter-search"
+                  placeholder="Search by member name or mobile number..."
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
+                  style={{ width: "100%", paddingLeft: 34 }}
+                />
+              </div>
             </div>
             <div style={{ flex: "0 0 260px" }}>
               <label style={TOP_LABEL}>Campaign</label>
@@ -1244,15 +1253,15 @@ export default function AcceptCheque() {
             <table style={{ fontSize: 13, borderCollapse: "separate", borderSpacing: 0 }}>
               <thead>
                 <tr>
-                  <th style={{ position: "sticky", top: 0, zIndex: 2, background: "var(--card-bg, #fff)", borderBottom: "2px solid var(--border)" }}>Order ID</th>
-                  <th style={{ position: "sticky", top: 0, zIndex: 2, background: "var(--card-bg, #fff)", borderBottom: "2px solid var(--border)" }}>Customer</th>
-                  <th style={{ position: "sticky", top: 0, zIndex: 2, background: "var(--card-bg, #fff)", borderBottom: "2px solid var(--border)" }}>Mobile No.</th>
-                  <th style={{ position: "sticky", top: 0, zIndex: 2, background: "var(--card-bg, #fff)", borderBottom: "2px solid var(--border)" }}>Cheque No.</th>
-                  <th style={{ position: "sticky", top: 0, zIndex: 2, background: "var(--card-bg, #fff)", borderBottom: "2px solid var(--border)" }}>Bank</th>
-                  <th style={{ position: "sticky", top: 0, zIndex: 2, background: "var(--card-bg, #fff)", borderBottom: "2px solid var(--border)" }}>Amount</th>
-                  <th style={{ position: "sticky", top: 0, zIndex: 2, background: "var(--card-bg, #fff)", borderBottom: "2px solid var(--border)" }}>Submitted Date</th>
-                  <th style={{ position: "sticky", top: 0, zIndex: 2, background: "var(--card-bg, #fff)", borderBottom: "2px solid var(--border)" }}>Payment Status</th>
-                  <th style={{ position: "sticky", top: 0, zIndex: 2, background: "var(--card-bg, #fff)", borderBottom: "2px solid var(--border)" }}>Action</th>
+                  <th style={{ position: "sticky", top: 0, zIndex: 2, background: "var(--surface-2)", borderBottom: "2px solid var(--border)" }}>Order ID</th>
+                  <th style={{ position: "sticky", top: 0, zIndex: 2, background: "var(--surface-2)", borderBottom: "2px solid var(--border)" }}>Member</th>
+                  <th style={{ position: "sticky", top: 0, zIndex: 2, background: "var(--surface-2)", borderBottom: "2px solid var(--border)" }}>Mobile No.</th>
+                  <th style={{ position: "sticky", top: 0, zIndex: 2, background: "var(--surface-2)", borderBottom: "2px solid var(--border)" }}>Cheque No.</th>
+                  <th style={{ position: "sticky", top: 0, zIndex: 2, background: "var(--surface-2)", borderBottom: "2px solid var(--border)" }}>Bank</th>
+                  <th style={{ position: "sticky", top: 0, zIndex: 2, background: "var(--surface-2)", borderBottom: "2px solid var(--border)" }}>Amount</th>
+                  <th style={{ position: "sticky", top: 0, zIndex: 2, background: "var(--surface-2)", borderBottom: "2px solid var(--border)" }}>Submitted Date</th>
+                  <th style={{ position: "sticky", top: 0, zIndex: 2, background: "var(--surface-2)", borderBottom: "2px solid var(--border)" }}>Payment Status</th>
+                  <th style={{ position: "sticky", top: 0, zIndex: 2, background: "var(--surface-2)", borderBottom: "2px solid var(--border)" }}>Action</th>
                 </tr>
               </thead>
               <tbody>
@@ -1281,7 +1290,7 @@ export default function AcceptCheque() {
                       >
                         {c.proposalId}
                       </td>
-                      <td style={{ fontWeight: 500 }}>{c.customerName}</td>
+                      <td style={{ fontWeight: 500 }}>{c.memberName}</td>
                       <td style={{ color: "#64748b", fontSize: 12 }}>
                         {c.mobileNo}
                       </td>

@@ -36,7 +36,7 @@ export default function ICEdit() {
         <div className="card-body">
           <form onSubmit={handleSubmit}>
             <SectionBlock icon="🏦" title="IC Master Information">
-              <div className="form-grid">
+              <div className="form-grid-3">
                 <Field label="IC Name" required>
                   <Input placeholder="IC Name" value={form.icName || ''} onChange={set('icName')} required />
                 </Field>
@@ -65,7 +65,7 @@ export default function ICEdit() {
             </SectionBlock>
 
             <SectionBlock icon="🔌" title="API Credentials">
-              <div className="form-grid">
+              <div className="form-grid-3">
                 <Field label="API Base URL" required>
                   <Input type="url" placeholder="https://api.example.com/v1" value={form.apiBaseUrl || ''} onChange={set('apiBaseUrl')} required />
                 </Field>

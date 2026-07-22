@@ -1,13 +1,7 @@
 import { useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
-import { TYPE_ICON } from './FamilyMembersSection'
-import { CustomerIcon } from '../../icons'
+import { MemberIcon } from '../../icons'
 import { ORGANISATIONS, ASSOCIATIONS } from './orgAssocData'
-
-function calcAge(dob) {
-  if (!dob) return null
-  return Math.floor((Date.now() - new Date(dob)) / (365.25 * 24 * 3600 * 1000))
-}
 
 export const MOCK = {
   1: {
@@ -27,9 +21,9 @@ export const MOCK = {
       { date: '2025-05-18', amount: 4800, mode: 'NEFT', txnId: 'TXN8765433', status: 'Success' },
     ],
     interactions: [
-      { date: '2025-04-18', type: 'Call',  note: 'Policy issued after CRM lead conversion. Customer very satisfied.' },
+      { date: '2025-04-18', type: 'Call',  note: 'Policy issued after CRM lead conversion. Member very satisfied.' },
       { date: '2025-04-10', type: 'Email', note: 'Policy documents sent to registered email.' },
-      { date: '2025-03-20', type: 'Call',  note: 'Discussed plan options. Customer agreed on Star Comprehensive Health.' },
+      { date: '2025-03-20', type: 'Call',  note: 'Discussed plan options. Member agreed on Star Comprehensive Health.' },
     ],
   },
   2: {
@@ -85,7 +79,7 @@ export const MOCK = {
       { date: '2025-04-20', amount: 10030, mode: 'Card', txnId: 'TXN9988001', status: 'Success' },
     ],
     interactions: [
-      { date: '2025-04-18', type: 'Call',  note: 'Customer interested in family health plan. Assigned to Ravi.' },
+      { date: '2025-04-18', type: 'Call',  note: 'Member interested in family health plan. Assigned to Ravi.' },
       { date: '2025-04-14', type: 'Email', note: 'Sent premium comparison for family floater plans.' },
     ],
   },
@@ -123,7 +117,7 @@ export const MOCK = {
       { date: '2024-04-28', amount: 5664, mode: 'Card', txnId: 'TXN8991122', status: 'Success' },
     ],
     interactions: [
-      { date: '2025-04-21', type: 'Call',  note: 'Renewal reminder sent. Customer confirmed she will renew shortly.' },
+      { date: '2025-04-21', type: 'Call',  note: 'Renewal reminder sent. Member confirmed she will renew shortly.' },
       { date: '2025-04-10', type: 'Email', note: 'Sent renewal notice for Bajaj Allianz Motor policy.' },
     ],
   },
@@ -174,7 +168,7 @@ export const MOCK = {
       { date: '2025-03-22', amount: 10030, mode: 'Card', txnId: 'TXN9966778', status: 'Success' },
     ],
     interactions: [
-      { date: '2025-03-22', type: 'Call',  note: 'Policy issued. Customer very satisfied with quick process.' },
+      { date: '2025-03-22', type: 'Call',  note: 'Policy issued. Member very satisfied with quick process.' },
       { date: '2025-03-20', type: 'Email', note: 'Proposal documents sent for review and signature.' },
       { date: '2025-03-16', type: 'Call',  note: 'First contact from CRM campaign. Very receptive to health plan.' },
     ],
@@ -186,7 +180,7 @@ export const MOCK = {
     policies: [],
     payments: [],
     interactions: [
-      { date: '2025-04-12', type: 'Call', note: 'KYC verification pending. Customer to submit Aadhaar copy.' },
+      { date: '2025-04-12', type: 'Call', note: 'KYC verification pending. Member to submit Aadhaar copy.' },
     ],
   },
   12: {
@@ -201,7 +195,7 @@ export const MOCK = {
   },
 }
 
-// Documents mock — Aadhaar + PAN per customer
+// Documents mock — Aadhaar + PAN per member
 export const DOCS = {
   1:  { aadhaar: { number: '2345 6789 0123', name: 'Aarav Sharma',  dob: '15/03/1990', gender: 'Male',   address: '14, Green Valley Apts, Andheri West, Mumbai – 400058', status: 'Verified' }, pan: { number: 'AABPS1234C', name: 'AARAV SHARMA',  fatherName: 'SURESH SHARMA',   dob: '15/03/1990', status: 'Verified' } },
   2:  { aadhaar: { number: '3456 7890 1234', name: 'Rohit Sharma',  dob: '20/11/1990', gender: 'Male',   address: '45 MG Road, Pune – 411001', status: 'Pending'  }, pan: { number: 'BBRPS2345D', name: 'ROHIT SHARMA',  fatherName: 'MOHAN SHARMA',    dob: '20/11/1990', status: 'Pending'  } },
@@ -234,7 +228,7 @@ export const PERSONAL = {
 
 const STATUS_COLOR = { Verified: { bg: '#dcfce7', border: '#86efac', text: '#15803d' }, Pending: { bg: '#fef3c7', border: '#fcd34d', text: '#92400e' }, Rejected: { bg: '#fee2e2', border: '#fca5a5', text: '#b91c1c' } }
 
-export function DocCard({ type, data, customerName }) {
+export function DocCard({ type, data, memberName }) {
   const isAadhaar = type === 'aadhaar'
   const sc = STATUS_COLOR[data.status] ?? STATUS_COLOR.Pending
   return (
@@ -310,9 +304,9 @@ export function DocCard({ type, data, customerName }) {
   )
 }
 
-const TABS = ['Personal', 'Family', 'Documents', 'Policies', 'Payments', 'Interactions']
+const TABS = ['Personal', 'Documents', 'Policies', 'Payments', 'Interactions']
 
-export default function Customer360() {
+export default function Member360() {
   const { id } = useParams()
   const navigate = useNavigate()
   const [tab, setTab] = useState(0)
@@ -321,8 +315,8 @@ export default function Customer360() {
   if (!c) return (
     <div className="empty-state">
       <div className="empty-state-icon">🔍</div>
-      <div>Customer not found</div>
-      <button className="btn btn-primary" style={{ marginTop: 16 }} onClick={() => navigate('/customer')}>Back</button>
+      <div>Member not found</div>
+      <button className="btn btn-primary" style={{ marginTop: 16 }} onClick={() => navigate('/member')}>Back</button>
     </div>
   )
 
@@ -331,15 +325,15 @@ export default function Customer360() {
       {/* Header */}
       <div className="page-header">
         <div className="page-title-row">
-          <div className="page-icon"><CustomerIcon /></div>
+          <div className="page-icon"><MemberIcon /></div>
           <div>
             <div className="page-title">{c.name}</div>
             <div className="page-subtitle">{c.mobile} · {c.email}</div>
           </div>
         </div>
         <div style={{ display: 'flex', gap: 10 }}>
-          <button className="btn btn-sm" onClick={() => navigate(`/customer/${id}/edit`)} style={{ color: '#6d28d9', border: '1.5px solid #7c3aed', background: '#faf5ff', fontWeight: 700 }}><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ marginRight: 5 }}><path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"/></svg>Edit</button>
-          <button className="btn btn-ghost"     onClick={() => navigate('/customer')}>← Back</button>
+          <button className="btn btn-sm" onClick={() => navigate(`/member/${id}/edit`)} style={{ color: '#6d28d9', border: '1.5px solid #7c3aed', background: '#faf5ff', fontWeight: 700 }}><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ marginRight: 5 }}><path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"/></svg>Edit</button>
+          <button className="btn btn-ghost"     onClick={() => navigate('/member')}>← Back</button>
         </div>
       </div>
 
@@ -395,7 +389,7 @@ export default function Customer360() {
           })()}
 
           {/* Policies */}
-          {tab === 3 && (
+          {tab === 2 && (
             <div className="table-wrap">
               <table>
                 <thead>
@@ -418,7 +412,7 @@ export default function Customer360() {
           )}
 
           {/* Payments */}
-          {tab === 4 && (
+          {tab === 3 && (
             <div className="table-wrap">
               <table>
                 <thead>
@@ -440,7 +434,7 @@ export default function Customer360() {
           )}
 
           {/* Interaction history */}
-          {tab === 5 && (
+          {tab === 4 && (
             <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
               {c.interactions.map((i, idx) => (
                 <div key={idx} style={{ display: 'flex', gap: 14, padding: '14px 0', borderBottom: idx < c.interactions.length - 1 ? '1px solid var(--border)' : 'none' }}>
@@ -460,7 +454,7 @@ export default function Customer360() {
           )}
 
           {/* Documents */}
-          {tab === 2 && (() => {
+          {tab === 1 && (() => {
             const docs = DOCS[id]
             if (!docs) return <div style={{ padding: '32px 0', textAlign: 'center', color: 'var(--text-3)' }}>No documents found.</div>
             return (
@@ -468,7 +462,7 @@ export default function Customer360() {
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(340px, 1fr))', gap: 20 }}>
                   {/* Aadhaar */}
                   {docs.aadhaar
-                    ? <DocCard type="aadhaar" data={docs.aadhaar} customerName={c.name} />
+                    ? <DocCard type="aadhaar" data={docs.aadhaar} memberName={c.name} />
                     : (
                       <div style={{ border: '1.5px dashed var(--border)', borderRadius: 'var(--r-lg)', padding: '40px 24px', textAlign: 'center', color: 'var(--text-3)' }}>
                         <div style={{ fontSize: 36, marginBottom: 10 }}>🪪</div>
@@ -479,7 +473,7 @@ export default function Customer360() {
                   }
                   {/* PAN */}
                   {docs.pan
-                    ? <DocCard type="pan" data={docs.pan} customerName={c.name} />
+                    ? <DocCard type="pan" data={docs.pan} memberName={c.name} />
                     : (
                       <div style={{ border: '1.5px dashed var(--border)', borderRadius: 'var(--r-lg)', padding: '40px 24px', textAlign: 'center', color: 'var(--text-3)' }}>
                         <div style={{ fontSize: 36, marginBottom: 10 }}>💳</div>
@@ -493,7 +487,7 @@ export default function Customer360() {
                 {c.kyc === 'Rejected' && (
                   <div style={{ marginTop: 18, display: 'flex', gap: 10, padding: '12px 16px', background: '#fee2e2', border: '1px solid #fca5a5', borderRadius: 'var(--r-md)' }}>
                     <span>🚫</span>
-                    <div style={{ fontSize: 13, color: '#b91c1c' }}>One or more documents have been rejected. Please request the customer to resubmit correct documents to complete KYC.</div>
+                    <div style={{ fontSize: 13, color: '#b91c1c' }}>One or more documents have been rejected. Please request the member to resubmit correct documents to complete KYC.</div>
                   </div>
                 )}
                 {c.kyc === 'Pending' && (
@@ -505,34 +499,6 @@ export default function Customer360() {
               </div>
             )
           })()}
-
-          {/* Family Members */}
-          {tab === 1 && (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-              {c.familyMembers?.length > 0 ? c.familyMembers.map(m => {
-                const age = calcAge(m.dob)
-                return (
-                  <div key={m.id} style={{ display: 'flex', alignItems: 'center', gap: 14, padding: '12px 16px', border: '1px solid var(--border)', borderRadius: 'var(--r-md)', background: '#fff' }}>
-                    <div style={{ width: 42, height: 42, display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#f5f3ff', borderRadius: 10, fontSize: 22, flexShrink: 0 }}>
-                      {TYPE_ICON[m.type] ?? '👤'}
-                    </div>
-                    <div style={{ flex: 1, minWidth: 0 }}>
-                      <div style={{ fontWeight: 600, fontSize: 13.5, color: 'var(--text)' }}>{m.name}</div>
-                      <div style={{ fontSize: 12, color: 'var(--text-3)', marginTop: 2 }}>
-                        {m.type}{m.gender ? ` · ${m.gender}` : ''}{age !== null ? ` · Age: ${age} yrs` : ''}{m.dob ? ` (${m.dob})` : ''}
-                        {m.preExisting ? <span style={{ color: '#d97706', marginLeft: 6 }}>⚠ {m.preExisting}</span> : null}
-                      </div>
-                    </div>
-                    <span className="badge badge-purple" style={{ flexShrink: 0 }}>{m.type}</span>
-                  </div>
-                )
-              }) : (
-                <div style={{ padding: '32px 0', textAlign: 'center', color: 'var(--text-3)', fontSize: 13.5 }}>
-                  No family members recorded for this customer.
-                </div>
-              )}
-            </div>
-          )}
         </div>
       </div>
     </div>

@@ -1,14 +1,14 @@
 ﻿import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import { OPERATORS } from "../agent/agentData";
-import { CUSTOMER_MOCK } from "../customer/CustomerList";
+import { MEMBER_MOCK } from "../member/MemberList";
 import { POLICY_MOCK } from "../policy/PolicyList";
 import { PRODUCT_MOCK } from "../product/ProductList";
 
 export default function Dashboard() {
   const { user } = useAuth();
   if (user?.role === "agent") return <AgentDashboard user={user} />;
-  if (user?.role === "customer") return <CustomerDashboard user={user} />;
+  if (user?.role === "member") return <MemberDashboard user={user} />;
   return <BrokerDashboard user={user} />;
 }
 
@@ -18,8 +18,8 @@ export default function Dashboard() {
 const BROKER_QUICK = [
   { label: "Add Operator", path: "/agent/create", icon: "👤", color: "#7c3aed" },
   {
-    label: "Add Customer",
-    path: "/customer/create",
+    label: "Add Member",
+    path: "/member/create",
     icon: "🧑",
     color: "#1d4ed8",
   },
@@ -39,7 +39,7 @@ const BROKER_QUICK = [
 ];
 const BROKER_ACTIVITY = [
   { time: "2 hrs ago", icon: "👤", text: "Operator Ravi Kulkarni onboarded" },
-  { time: "5 hrs ago", icon: "🧑", text: "Customer Suresh Kumar KYC verified" },
+  { time: "5 hrs ago", icon: "🧑", text: "Member Suresh Kumar KYC verified" },
   { time: "Yesterday", icon: "📋", text: "Policy SHI/2025/008901 issued" },
   { time: "Yesterday", icon: "💰", text: "Commission credited ₹12,400" },
   { time: "2 days ago", icon: "📦", text: "Star Senior Health product added" },
@@ -64,7 +64,7 @@ function BrokerDashboard({ user }) {
       icon: "👤",
     },
     {
-      label: "Total Customers",
+      label: "Total Members",
       value: "8,800",
       sub: "+14 this month",
       color: "#2563eb",
@@ -204,8 +204,8 @@ function BrokerDashboard({ user }) {
 ═══════════════════════════════════════════════════════ */
 const AGENT_QUICK = [
   {
-    label: "Add Customer",
-    path: "/customer/create",
+    label: "Add Member",
+    path: "/member/create",
     icon: "🧑",
     color: "#1d4ed8",
   },
@@ -216,7 +216,7 @@ const AGENT_QUICK = [
     icon: "💰",
     color: "#b45309",
   },
-  { label: "All Customers", path: "/customer", icon: "👥", color: "#7c3aed" },
+  { label: "All Members", path: "/member", icon: "👥", color: "#7c3aed" },
 ];
 
 function AgentDashboard({ user }) {
@@ -225,7 +225,7 @@ function AgentDashboard({ user }) {
   const greet =
     hour < 12 ? "Good morning" : hour < 17 ? "Good afternoon" : "Good evening";
 
-  const myCustomers = CUSTOMER_MOCK.filter((c) => c.agentId === user.id);
+  const myMembers = MEMBER_MOCK.filter((c) => c.agentId === user.id);
   const myPolicies = POLICY_MOCK.filter((p) => p.agentId === user.id);
   const myActivePolicies = myPolicies.filter(
     (p) => p.status === "Active",
@@ -236,9 +236,9 @@ function AgentDashboard({ user }) {
 
   const agentStats = [
     {
-      label: "My Customers",
-      value: myCustomers.length,
-      sub: `${myCustomers.filter((c) => c.kyc === "Verified").length} KYC verified`,
+      label: "My Members",
+      value: myMembers.length,
+      sub: `${myMembers.filter((c) => c.kyc === "Verified").length} KYC verified`,
       gradient: "var(--grad-purple)",
       icon: "🧑‍🤝‍🧑",
     },
@@ -379,12 +379,12 @@ function AgentDashboard({ user }) {
               marginBottom: 14,
             }}
           >
-            <div style={S.cardTitle}>My Customers</div>
-            <button style={S.linkBtn} onClick={() => navigate("/customer")}>
+            <div style={S.cardTitle}>My Members</div>
+            <button style={S.linkBtn} onClick={() => navigate("/member")}>
               View all →
             </button>
           </div>
-          {myCustomers.slice(0, 5).map((c, i) => (
+          {myMembers.slice(0, 5).map((c, i) => (
             <div key={i} style={S.actRow}>
               <div
                 style={{
@@ -426,10 +426,10 @@ function AgentDashboard({ user }) {
               </span>
             </div>
           ))}
-          {myCustomers.length > 5 && (
+          {myMembers.length > 5 && (
             <div style={{ textAlign: "center", marginTop: 10 }}>
-              <button style={S.linkBtn} onClick={() => navigate("/customer")}>
-                +{myCustomers.length - 5} more →
+              <button style={S.linkBtn} onClick={() => navigate("/member")}>
+                +{myMembers.length - 5} more →
               </button>
             </div>
           )}
@@ -440,7 +440,7 @@ function AgentDashboard({ user }) {
 }
 
 /* ═══════════════════════════════════════════════════════
-   CUSTOMER DASHBOARD
+   MEMBER DASHBOARD
 ═══════════════════════════════════════════════════════ */
 const CUST_QUICK = [
   {
@@ -598,10 +598,10 @@ function CoverageScore({ score }) {
   );
 }
 
-function CustomerDashboard({ user }) {
+function MemberDashboard({ user }) {
   const navigate = useNavigate();
 
-  const myPolicies = POLICY_MOCK.filter((p) => p.customerId === user.id);
+  const myPolicies = POLICY_MOCK.filter((p) => p.memberId === user.id);
   const activePols = myPolicies.filter((p) => p.status === "Active");
   const nextRenewal = [...activePols].sort((a, b) =>
     a.endDate.localeCompare(b.endDate),
@@ -677,7 +677,7 @@ function CustomerDashboard({ user }) {
               marginBottom: 6,
             }}
           >
-            Customer Portal
+            Member Portal
           </div>
           <div
             style={{
@@ -1340,10 +1340,10 @@ function CustomerDashboard({ user }) {
               }}
             >
               {[
-                { label: "Personal Details", done: true },
+                { label: "Personal Info", done: true },
                 { label: "KYC — PAN", done: true },
                 { label: "Aadhaar Verified", done: false },
-                { label: "Bank Details", done: false },
+                { label: "Bank Info", done: false },
               ].map((i) => (
                 <div
                   key={i.label}
@@ -1494,7 +1494,7 @@ function CustomerDashboard({ user }) {
 const S = {
   page: { display: "flex", flexDirection: "column", gap: 20 },
   banner: {
-    background: "linear-gradient(135deg,#fb7185 0%,#a855f7 100%)",
+    background: "linear-gradient(180deg,#1565d8 0%,#104ea6 100%)",
     borderRadius: 14,
     padding: "24px 28px",
     display: "flex",

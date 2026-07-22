@@ -15,7 +15,7 @@ export default function Topbar({ onMenuClick }) {
   }, [])
 
   const initials = user?.avatar || user?.name?.split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2) || 'U'
-  const roleName = { broker: 'Broker', agent: 'Operator', customer: 'Customer' }[user?.role] || 'User'
+  const roleName = { broker: 'Broker', agent: 'Operator', member: 'Member' }[user?.role] || 'User'
 
   const handleLogout = () => {
     setOpen(false)
@@ -121,23 +121,23 @@ function MailIcon() {
 }
 
 const S = {
-  bar:        { height: 'var(--topbar-h,58px)', background: '#fff', borderBottom: '1.5px solid #e8e4f0', display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 16px', gap: 10, flexShrink: 0, position: 'sticky', top: 0, zIndex: 10 },
-  hamburger:  { display: 'none', width: 36, height: 36, borderRadius: 6, border: '1.5px solid #e8e4f0', background: '#faf9fc', cursor: 'pointer', alignItems: 'center', justifyContent: 'center', flexShrink: 0 },
+  bar:        { height: 'var(--topbar-h,58px)', background: '#fff', borderBottom: '1.5px solid #dee1e5', display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 16px', gap: 10, flexShrink: 0, position: 'sticky', top: 0, zIndex: 10 },
+  hamburger:  { display: 'none', width: 36, height: 36, borderRadius: 6, border: '1.5px solid #dee1e5', background: '#f5f6fa', cursor: 'pointer', alignItems: 'center', justifyContent: 'center', flexShrink: 0 },
   left:       { display: 'flex', alignItems: 'center', flex: 1 },
-  searchBox:  { display: 'flex', alignItems: 'center', gap: 8, background: '#faf9fc', border: '1.5px solid #e8e4f0', borderRadius: 6, padding: '0 12px', width: 280, height: 36 },
+  searchBox:  { display: 'flex', alignItems: 'center', gap: 8, background: '#f5f6fa', border: '1.5px solid #dee1e5', borderRadius: 6, padding: '0 12px', width: 280, height: 36 },
   searchInput:{ border: 'none', background: 'transparent', outline: 'none', fontSize: 14.5, color: '#1a1628', width: '100%', fontFamily: 'inherit' },
   right:      { display: 'flex', alignItems: 'center', gap: 8 },
-  iconBtn:    { width: 36, height: 36, borderRadius: 6, border: '1.5px solid #e8e4f0', background: '#faf9fc', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative' },
+  iconBtn:    { width: 36, height: 36, borderRadius: 6, border: '1.5px solid #dee1e5', background: '#f5f6fa', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative' },
   dot:        { position: 'absolute', top: 4, right: 4, width: 7, height: 7, borderRadius: '50%', border: '1.5px solid #fff' },
-  userPill:   { display: 'flex', alignItems: 'center', gap: 10, padding: '4px 10px 4px 4px', border: '1.5px solid #e8e4f0', borderRadius: 10, background: '#faf9fc', cursor: 'pointer', marginLeft: 4, userSelect: 'none' },
-  avatar:     { width: 32, height: 32, borderRadius: 6, background: '#a855f7', color: '#fff', fontSize: 12, fontWeight: 600, display: 'flex', alignItems: 'center', justifyContent: 'center' },
+  userPill:   { display: 'flex', alignItems: 'center', gap: 10, padding: '4px 10px 4px 4px', border: '1.5px solid #dee1e5', borderRadius: 10, background: '#f5f6fa', cursor: 'pointer', marginLeft: 4, userSelect: 'none' },
+  avatar:     { width: 32, height: 32, borderRadius: 6, background: 'var(--grad-purple)', color: '#fff', fontSize: 12, fontWeight: 600, display: 'flex', alignItems: 'center', justifyContent: 'center' },
   userInfo:   { display: 'flex', flexDirection: 'column', lineHeight: 1.2 },
   userName:   { fontSize: 14, fontWeight: 500, color: '#1a1628' },
   userRole:   { fontSize: 12, color: 'var(--text-3)', maxWidth: 180, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' },
   chevron:    { fontSize: 11, color: 'var(--text-3)', transition: 'transform .15s' },
-  dropdown:   { position: 'absolute', top: 'calc(100% + 8px)', right: 0, minWidth: 230, background: '#fff', border: '1.5px solid #e8e4f0', borderRadius: 12, boxShadow: '0 8px 28px rgba(100,80,160,.13),0 2px 8px rgba(0,0,0,.06)', zIndex: 100, overflow: 'hidden' },
+  dropdown:   { position: 'absolute', top: 'calc(100% + 8px)', right: 0, minWidth: 230, background: '#fff', border: '1.5px solid #dee1e5', borderRadius: 12, boxShadow: '0 8px 28px rgba(21,101,216,.13),0 2px 8px rgba(0,0,0,.06)', zIndex: 100, overflow: 'hidden' },
   dropHeader: { display: 'flex', alignItems: 'center', gap: 11, padding: '14px 16px' },
-  dropDivider:{ height: 1, background: '#f0edf8', margin: '2px 0' },
+  dropDivider:{ height: 1, background: '#eef1f5', margin: '2px 0' },
   dropItem:   { display: 'flex', alignItems: 'center', gap: 10, width: '100%', padding: '10px 16px', border: 'none', background: 'transparent', cursor: 'pointer', fontSize: 14.5, color: '#1a1628', fontFamily: 'inherit', textAlign: 'left', transition: 'background .1s' },
   dropIcon:   { fontSize: 16, width: 20, textAlign: 'center' },
 }
