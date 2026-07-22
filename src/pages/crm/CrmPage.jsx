@@ -137,7 +137,7 @@ export default function CrmPage() {
                 </div>
                 {showAssignedTo && (
                   <div>
-                    <div style={{ fontSize: 10.5, color: 'var(--text-3)' }}>Sales Operator</div>
+                    <div style={{ fontSize: 10.5, color: 'var(--text-3)' }}>Sales Employee</div>
                     <div style={{ fontSize: 13.5, fontWeight: 600 }}>{KMD_AGENTS.find(a => a.id === lead.salesAssignedTo)?.name ?? '—'}</div>
                   </div>
                 )}
@@ -164,7 +164,7 @@ export default function CrmPage() {
               <th>Enrollment</th>
               <th>Enrollment Date</th>
               <th>Purchase Status</th>
-              {showAssignedTo && <th>Sales Operator</th>}
+              {showAssignedTo && <th>Sales Employee</th>}
               <th>Action</th>
             </tr>
           </thead>
@@ -211,7 +211,7 @@ export default function CrmPage() {
 
   return (
     <div>
-      <PageHeader icon={<CRMIcon />} title="CRM" subtitle="K.M. Dastur & Co. — Campaign lead tracking & operator performance" />
+      <PageHeader icon={<CRMIcon />} title="CRM" subtitle="K.M. Dastur & Co. — Campaign lead tracking & employee performance" />
 
       {/* ══════════════════════════════════════════════════════════════════════
           CALLING AGENT VIEW
@@ -226,7 +226,7 @@ export default function CrmPage() {
                 <div style={{ width: 40, height: 40, borderRadius: 10, background: '#0a7ea4', color: '#fff', fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 15 }}>CA</div>
                 <div>
                   <div style={{ fontWeight: 700, fontSize: 14 }}>{user?.name}</div>
-                  <div style={{ fontSize: 13, color: '#0a7ea4', fontWeight: 500 }}>Calling Operator · {myAgentRecord?.posLicense}</div>
+                  <div style={{ fontSize: 13, color: '#0a7ea4', fontWeight: 500 }}>Calling Employee · {myAgentRecord?.posLicense}</div>
                 </div>
               </div>
               <div className="form-grid-3">
@@ -287,7 +287,7 @@ export default function CrmPage() {
               <div style={{ width: 40, height: 40, borderRadius: 10, background: '#2d7d46', color: '#fff', fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 15 }}>SA</div>
               <div>
                 <div style={{ fontWeight: 700, fontSize: 14 }}>{user?.name}</div>
-                <div style={{ fontSize: 13, color: '#2d7d46', fontWeight: 500 }}>Sales Operator · {myAgentRecord?.posLicense}</div>
+                <div style={{ fontSize: 13, color: '#2d7d46', fontWeight: 500 }}>Sales Employee · {myAgentRecord?.posLicense}</div>
               </div>
             </div>
 
@@ -326,7 +326,7 @@ export default function CrmPage() {
         <div className="card">
           <div className="card-body">
             <div className="form-grid-3" style={{ marginBottom: 24 }}>
-              <Field label="Operator">
+              <Field label="Employee">
                 <Select value={selectedAgentId} onChange={handleAgentChange}>
                   {KMD_AGENTS.map(a => (
                     <option key={a.id} value={a.id}>{a.name} · {a.agentType === 'calling' ? 'Calling' : 'Sales'}</option>
@@ -395,12 +395,12 @@ export default function CrmPage() {
               {/* Assign to Sales Agent */}
               {isCallingAgent && draft.purchaseStatus === 'Interested' && (
                 <section style={{ background: '#e6f4ea', border: '1px solid #a8d5b5', borderRadius: 10, padding: '16px 18px' }}>
-                  <div style={{ fontWeight: 600, fontSize: 13.5, marginBottom: 12, color: '#2d7d46' }}>🎯 Assign to Sales Operator</div>
+                  <div style={{ fontWeight: 600, fontSize: 13.5, marginBottom: 12, color: '#2d7d46' }}>🎯 Assign to Sales Employee</div>
                   <div className="crm-assign-row" style={{ display: 'flex', gap: 10, alignItems: 'flex-end' }}>
                     <div style={{ flex: 1 }}>
-                      <Field label="Select Sales Operator">
+                      <Field label="Select Sales Employee">
                         <Select value={salesAssignId} onChange={e => setSalesAssignId(e.target.value)}>
-                          <option value="">Select operator</option>
+                          <option value="">Select employee</option>
                           {SALES_AGENTS.map(a => <option key={a.id} value={a.id}>{a.name} ({a.posLicense})</option>)}
                         </Select>
                       </Field>

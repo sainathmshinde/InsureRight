@@ -2,6 +2,13 @@ import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../../context/AuthContext'
 import { AgentIcon } from '../../icons'
 
+const AGENT_TYPE_LABELS = {
+  manager: 'Manager',
+  'team-lead': 'Team Lead',
+  sales: 'Sales operator',
+  calling: 'Calling operator',
+}
+
 function Row({ label, value }) {
   return (
     <div style={{ display: 'flex', padding: '10px 0', borderBottom: '1px solid var(--border)' }}>
@@ -35,7 +42,7 @@ export default function AgentProfile() {
 
       <div style={{ display: 'flex', gap: 10, marginBottom: 20 }}>
         <span className="badge badge-green">Active</span>
-        <span className="badge badge-purple">Operator</span>
+        <span className="badge badge-purple">Employee</span>
       </div>
 
       <div className="card">
@@ -43,7 +50,7 @@ export default function AgentProfile() {
           <Row label="Full Name"       value={user.name} />
           <Row label="Email"           value={user.email} />
           <Row label="Mobile"          value={user.phone} />
-          <Row label="Operator Type"      value={user.agentType ? user.agentType.charAt(0).toUpperCase() + user.agentType.slice(1) : null} />
+          <Row label="Designation"      value={AGENT_TYPE_LABELS[user.agentType] ?? null} />
 
         </div>
       </div>

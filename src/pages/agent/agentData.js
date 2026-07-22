@@ -95,7 +95,7 @@ export const OPERATORS = [
     ifsc: "SBIN0003456",
     assignedBroker: "K.M. Dastur & Co.",
     reportingManager: "K.M. Dastur",
-    agentType: "leader",
+    agentType: "team-lead",
     status: "Inactive",
   },
   {
@@ -127,7 +127,7 @@ export const OPERATORS = [
     ifsc: "UTIB0004567",
     assignedBroker: "K.M. Dastur & Co.",
     reportingManager: "K.M. Dastur",
-    agentType: "sales-manager",
+    agentType: "manager",
     status: "Active",
   },
   {
@@ -255,7 +255,7 @@ export const OPERATORS = [
     ifsc: "BARB0008901",
     assignedBroker: "K.M. Dastur & Co.",
     reportingManager: "K.M. Dastur",
-    agentType: "sales-manager",
+    agentType: "manager",
     status: "Active",
   },
   {
@@ -319,7 +319,7 @@ export const OPERATORS = [
     ifsc: "YESB0001012",
     assignedBroker: "K.M. Dastur & Co.",
     reportingManager: "K.M. Dastur",
-    agentType: "leader",
+    agentType: "team-lead",
     status: "Active",
   },
   {

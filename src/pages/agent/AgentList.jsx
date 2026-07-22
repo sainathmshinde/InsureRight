@@ -23,10 +23,10 @@ const MOCK = OPERATORS.map((a) => ({
 }));
 
 const AGENT_TYPE_META = {
-  calling: { label: "Calling Operator", color: "#1565d8", bg: "#e7f0fc" },
-  sales: { label: "Sales Operator", color: "#00c851", bg: "#e8f5e9" },
-  "sales-manager": { label: "Sales Manager", color: "#7c3aed", bg: "#f3e8ff" },
-  leader: { label: "Leader", color: "#f57c00", bg: "#fff8e1" },
+  manager: { label: "Manager", color: "#7c3aed", bg: "#f3e8ff" },
+  "team-lead": { label: "Team Lead", color: "#f57c00", bg: "#fff8e1" },
+  sales: { label: "Sales operator", color: "#00c851", bg: "#e8f5e9" },
+  calling: { label: "Calling operator", color: "#1565d8", bg: "#e7f0fc" },
 };
 
 export default function AgentList() {
@@ -53,7 +53,7 @@ export default function AgentList() {
     // { key: 'broker',     label: 'Broker' },
     {
       key: "agentType",
-      label: "Operator Type",
+      label: "Designation",
       render: (row) => {
         const meta = AGENT_TYPE_META[row.agentType];
         if (!meta) return <span style={{ color: "var(--text-3)" }}>—</span>;
@@ -115,8 +115,8 @@ export default function AgentList() {
     <div>
       <PageHeader
         icon={<AgentIcon />}
-        title="Operators"
-        subtitle="View and manage all operators across your brokerage"
+        title="Employees"
+        subtitle="View and manage all employees across your brokerage"
       >
         <Button variant="ghost" icon={<UploadIcon size={16} />} onClick={() => {}}>
           Export
@@ -127,7 +127,7 @@ export default function AgentList() {
         >
           Commission Rules
         </Button>
-        <Button onClick={() => navigate("/agent/create")}>+ Add Operator</Button>
+        <Button onClick={() => navigate("/agent/create")}>+ Add Employee</Button>
       </PageHeader>
 
       <div className="card">
@@ -197,7 +197,7 @@ export default function AgentList() {
             empty={
               <EmptyState
                 icon="👤"
-                title="No operators found"
+                title="No employees found"
                 subtitle="Try adjusting your filters"
               />
             }

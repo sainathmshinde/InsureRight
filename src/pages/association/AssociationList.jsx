@@ -13,10 +13,12 @@ export default function AssociationList() {
   const [search, setSearch]     = useState('')
   const [orgFilter, setOrgFilter] = useState('')
 
+  const getCity = a => a.city ?? a.branches?.[0]?.city ?? ''
+
   const filtered = associations.filter(a => {
     const matchSearch = a.name.toLowerCase().includes(search.toLowerCase()) ||
       (a.associationCode ?? '').toLowerCase().includes(search.toLowerCase()) ||
-      a.city.toLowerCase().includes(search.toLowerCase())
+      getCity(a).toLowerCase().includes(search.toLowerCase())
     const orgIds      = a.organisationIds?.length ? a.organisationIds : (a.orgId ? [a.orgId] : [])
     const matchOrg    = orgFilter ? orgIds.includes(Number(orgFilter)) : true
     return matchSearch && matchOrg
@@ -47,7 +49,9 @@ export default function AssociationList() {
         ? <span style={{ fontFamily: 'monospace', fontSize: 13, color: 'var(--brand)' }}>{row.associationCode}</span>
         : <span style={{ color: 'var(--text-3)' }}>—</span>
     },
-    { key: 'city',     label: 'City',   style: { fontSize: 13, color: 'var(--text-2)' } },
+    { key: 'city',     label: 'City',   style: { fontSize: 13, color: 'var(--text-2)' },
+      render: row => getCity(row) || <span style={{ color: 'var(--text-3)' }}>—</span>
+    },
     { key: 'actions', label: 'Actions',
       render: row => (
         <button type="button" onClick={() => navigate(`/association/${row.id}/edit`)} title="Edit" style={{ background: 'linear-gradient(180deg,#1565d8,#104ea6)', border: 'none', borderRadius: 6, cursor: 'pointer', padding: '5px 6px', color: '#fff', display: 'inline-flex', alignItems: 'center', boxShadow: '0 2px 6px rgba(21,101,216,.30)' }}><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"/></svg></button>

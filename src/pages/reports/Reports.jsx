@@ -103,7 +103,7 @@ export default function Reports() {
           <span className="page-bar" />
           <div>
             <div className="page-title">Reports</div>
-            <div className="page-subtitle">Operator performance and campaign analytics</div>
+            <div className="page-subtitle">Employee performance and campaign analytics</div>
           </div>
         </div>
       </div>
@@ -143,7 +143,7 @@ export default function Reports() {
             {/* Summary KPIs */}
             <div className="rp-kpi-grid" style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 14, marginBottom: 22 }}>
               {[
-                { label: "Total Calling Operators", value: CALLING_AGENTS.length,                              color: "#7c3aed", bg: "#f5f3ff" },
+                { label: "Total Calling Employees", value: CALLING_AGENTS.length,                              color: "#7c3aed", bg: "#f5f3ff" },
                 { label: "Total Leads Assigned", value: CALLING_AGENTS.reduce((s,a)=>s+a.leadsAssigned,0), color: "#0a7ea4", bg: "#e0f4fb" },
                 { label: "Total Converted",      value: CALLING_AGENTS.reduce((s,a)=>s+a.converted,0),     color: "#2d7d46", bg: "#e6f4ea" },
                 { label: "Avg Conversion Rate",  value: Math.round(CALLING_AGENTS.reduce((s,a)=>s+a.convRate,0)/CALLING_AGENTS.length) + "%", color: "#a05c00", bg: "#fff3e0" },
@@ -179,7 +179,7 @@ export default function Reports() {
                 <thead>
                   <tr>
                     <th>#</th>
-                    <th>Operator Name</th>
+                    <th>Employee Name</th>
                     <th>Campaigns</th>
                     <th>Leads Assigned</th>
                     <th>Converted</th>
@@ -218,7 +218,7 @@ export default function Reports() {
             {/* Summary KPIs */}
             <div className="rp-kpi-grid" style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 14, marginBottom: 22 }}>
               {[
-                { label: "Total Sales Operators",     value: SALES_AGENTS.length,                                                                                     color: "#7c3aed", bg: "#f5f3ff" },
+                { label: "Total Sales Employees",     value: SALES_AGENTS.length,                                                                                     color: "#7c3aed", bg: "#f5f3ff" },
                 { label: "Total Members",        value: SALES_AGENTS.reduce((s,a)=>s+a.members,0),                                                             color: "#0a7ea4", bg: "#e0f4fb" },
                 { label: "Policies Issued",        value: SALES_AGENTS.reduce((s,a)=>s+a.policiesIssued,0),                                                        color: "#2d7d46", bg: "#e6f4ea" },
                 { label: "Total Premium (₹)",      value: "₹" + SALES_AGENTS.reduce((s,a)=>s+a.premiumCollected,0).toLocaleString("en-IN"),                        color: "#a05c00", bg: "#fff3e0" },
@@ -254,7 +254,7 @@ export default function Reports() {
                 <thead>
                   <tr>
                     <th>#</th>
-                    <th>Operator Name</th>
+                    <th>Employee Name</th>
                     <th>Campaigns</th>
                     <th>Members</th>
                     <th>Policies Issued</th>
@@ -339,8 +339,8 @@ export default function Reports() {
                     <th>Campaign Name</th>
                     <th>Type</th>
                     <th>Status</th>
-                    <th>Calling Operators</th>
-                    <th>Sales Operators</th>
+                    <th>Calling Employees</th>
+                    <th>Sales Employees</th>
                     <th>Leads</th>
                     <th>Converted</th>
                     <th>Policies Sold</th>

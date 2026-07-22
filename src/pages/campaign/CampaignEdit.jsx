@@ -58,16 +58,16 @@ const MOCK_USERS = [
   { id: 18, name: "Ritu Bhatia",    age: 22, gender: "Female", marital: "Single",   segment: "New Registrations",       type: "Member", state: "Haryana" },
   { id: 19, name: "Deepak Mishra",  age: 36, gender: "Male",   marital: "Married",  segment: "Active Policyholders",    type: "Member", state: "Bihar" },
   { id: 20, name: "Nisha Chauhan",  age: 50, gender: "Female", marital: "Widowed",  segment: "Lapsed Members",        type: "Member", state: "Rajasthan" },
-  { id: 21, name: "Rajesh Agarwal", age: 43, gender: "Male",   marital: "Married",  segment: "Renewal Due (30 days)",   type: "Operator",    state: "Maharashtra" },
-  { id: 22, name: "Sunita Yadav",   age: 30, gender: "Female", marital: "Single",   segment: "Active Policyholders",    type: "Operator",    state: "Uttar Pradesh" },
-  { id: 23, name: "Manoj Tomar",    age: 47, gender: "Male",   marital: "Married",  segment: "High Value Members",    type: "Operator",    state: "Delhi" },
-  { id: 24, name: "Geeta Rawat",    age: 35, gender: "Female", marital: "Divorced", segment: "Active Policyholders",    type: "Operator",    state: "Uttarakhand" },
-  { id: 25, name: "Sanjay Kapoor",  age: 53, gender: "Male",   marital: "Married",  segment: "Renewal Due (30 days)",   type: "Operator",    state: "Punjab" },
-  { id: 26, name: "Lakshmi Menon",  age: 27, gender: "Female", marital: "Single",   segment: "New Registrations",       type: "Operator",    state: "Tamil Nadu" },
-  { id: 27, name: "Vivek Pandey",   age: 40, gender: "Male",   marital: "Married",  segment: "Lapsed Members",        type: "Operator",    state: "Madhya Pradesh" },
-  { id: 28, name: "Anita Soni",     age: 32, gender: "Female", marital: "Married",  segment: "Active Policyholders",    type: "Operator",    state: "Gujarat" },
-  { id: 29, name: "Harish Dubey",   age: 58, gender: "Male",   marital: "Widowed",  segment: "High Value Members",    type: "Operator",    state: "Karnataka" },
-  { id: 30, name: "Rekha Malhotra", age: 24, gender: "Female", marital: "Single",   segment: "New Registrations",       type: "Operator",    state: "West Bengal" },
+  { id: 21, name: "Rajesh Agarwal", age: 43, gender: "Male",   marital: "Married",  segment: "Renewal Due (30 days)",   type: "Employee",    state: "Maharashtra" },
+  { id: 22, name: "Sunita Yadav",   age: 30, gender: "Female", marital: "Single",   segment: "Active Policyholders",    type: "Employee",    state: "Uttar Pradesh" },
+  { id: 23, name: "Manoj Tomar",    age: 47, gender: "Male",   marital: "Married",  segment: "High Value Members",    type: "Employee",    state: "Delhi" },
+  { id: 24, name: "Geeta Rawat",    age: 35, gender: "Female", marital: "Divorced", segment: "Active Policyholders",    type: "Employee",    state: "Uttarakhand" },
+  { id: 25, name: "Sanjay Kapoor",  age: 53, gender: "Male",   marital: "Married",  segment: "Renewal Due (30 days)",   type: "Employee",    state: "Punjab" },
+  { id: 26, name: "Lakshmi Menon",  age: 27, gender: "Female", marital: "Single",   segment: "New Registrations",       type: "Employee",    state: "Tamil Nadu" },
+  { id: 27, name: "Vivek Pandey",   age: 40, gender: "Male",   marital: "Married",  segment: "Lapsed Members",        type: "Employee",    state: "Madhya Pradesh" },
+  { id: 28, name: "Anita Soni",     age: 32, gender: "Female", marital: "Married",  segment: "Active Policyholders",    type: "Employee",    state: "Gujarat" },
+  { id: 29, name: "Harish Dubey",   age: 58, gender: "Male",   marital: "Widowed",  segment: "High Value Members",    type: "Employee",    state: "Karnataka" },
+  { id: 30, name: "Rekha Malhotra", age: 24, gender: "Female", marital: "Single",   segment: "New Registrations",       type: "Employee",    state: "West Bengal" },
 ];
 
 const PAGE_SIZE = 10;
@@ -392,7 +392,7 @@ export default function CampaignEdit() {
                   <Field label="Target Type" required>
                     <Select value={form.targetType} onChange={set("targetType")} required>
                       <option>Member</option>
-                      <option>Operator</option>
+                      <option>Employee</option>
                     </Select>
                   </Field>
                   <Field label="Select Segment">
@@ -583,14 +583,14 @@ export default function CampaignEdit() {
               </div>
             </SectionBlock>
 
-            {/* ── 6. Assign Operators ── */}
-            <SectionBlock icon="👤" title="Assign Operators">
+            {/* ── 6. Assign Employees ── */}
+            <SectionBlock icon="👤" title="Assign Employees">
               <div style={{ display: "flex", flexDirection: "column", gap: 24 }}>
 
-                {/* Calling Operators */}
+                {/* Calling Employees */}
                 <div>
                   <div style={{ fontSize: 13, fontWeight: 600, color: "var(--text-2)", marginBottom: 10, display: "flex", alignItems: "center", gap: 7 }}>
-                    <span style={{ background: "#e0f2fe", color: "#0369a1", borderRadius: 6, padding: "2px 9px", fontSize: 12 }}>📞 Calling Operators</span>
+                    <span style={{ background: "#e0f2fe", color: "#0369a1", borderRadius: 6, padding: "2px 9px", fontSize: 12 }}>📞 Calling Employees</span>
                   </div>
                   {assignedCalling.size > 0 && (
                     <div style={{ display: "flex", flexWrap: "wrap", gap: 8, marginBottom: 10 }}>
@@ -604,7 +604,7 @@ export default function CampaignEdit() {
                   )}
                   <div style={{ position: "relative" }}>
                     <div style={{ display: "flex", alignItems: "center", gap: 8, border: "1px solid var(--border)", borderRadius: "var(--r-md)", padding: "8px 12px", background: "var(--surface)", cursor: "text" }} onClick={() => setCallingOpen(true)}>
-                      <input type="text" placeholder="Search calling operators…" value={callingSearch} onChange={(e) => { setCallingSearch(e.target.value); setCallingOpen(true); }} onFocus={() => setCallingOpen(true)} style={{ flex: 1, border: "none", outline: "none", background: "transparent", fontSize: 13 }} />
+                      <input type="text" placeholder="Search calling employees…" value={callingSearch} onChange={(e) => { setCallingSearch(e.target.value); setCallingOpen(true); }} onFocus={() => setCallingOpen(true)} style={{ flex: 1, border: "none", outline: "none", background: "transparent", fontSize: 13 }} />
                       <span style={{ fontSize: 13, color: "var(--text-3)" }}>{assignedCalling.size > 0 ? `${assignedCalling.size} selected` : ""}</span>
                       <span style={{ color: "var(--text-3)", fontSize: 13 }}>{callingOpen ? "▲" : "▼"}</span>
                     </div>
@@ -613,7 +613,7 @@ export default function CampaignEdit() {
                         <div style={{ position: "fixed", inset: 0, zIndex: 10 }} onClick={() => { setCallingOpen(false); setCallingSearch(""); }} />
                         <div style={{ position: "absolute", top: "calc(100% + 4px)", left: 0, right: 0, zIndex: 11, background: "var(--surface)", border: "1px solid var(--border)", borderRadius: "var(--r-md)", boxShadow: "0 4px 16px rgba(0,0,0,.1)", maxHeight: 220, overflowY: "auto" }}>
                           {filteredCalling.length === 0 ? (
-                            <div style={{ padding: "14px 16px", fontSize: 13, color: "var(--text-3)" }}>No operators found.</div>
+                            <div style={{ padding: "14px 16px", fontSize: 13, color: "var(--text-3)" }}>No employees found.</div>
                           ) : (
                             filteredCalling.map((a) => (
                               <label key={a.id} style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 16px", cursor: "pointer", fontSize: 13, background: assignedCalling.has(a.id) ? "#e0f2fe" : "transparent", borderBottom: "1px solid var(--border)" }}>
@@ -631,10 +631,10 @@ export default function CampaignEdit() {
                   </div>
                 </div>
 
-                {/* Sales Operators */}
+                {/* Sales Employees */}
                 <div>
                   <div style={{ fontSize: 13, fontWeight: 600, color: "var(--text-2)", marginBottom: 10, display: "flex", alignItems: "center", gap: 7 }}>
-                    <span style={{ background: "var(--brand-light)", color: "var(--brand)", borderRadius: 6, padding: "2px 9px", fontSize: 12 }}>💼 Sales Operators</span>
+                    <span style={{ background: "var(--brand-light)", color: "var(--brand)", borderRadius: 6, padding: "2px 9px", fontSize: 12 }}>💼 Sales Employees</span>
                   </div>
                   {assignedSales.size > 0 && (
                     <div style={{ display: "flex", flexWrap: "wrap", gap: 8, marginBottom: 10 }}>
@@ -648,7 +648,7 @@ export default function CampaignEdit() {
                   )}
                   <div style={{ position: "relative" }}>
                     <div style={{ display: "flex", alignItems: "center", gap: 8, border: "1px solid var(--border)", borderRadius: "var(--r-md)", padding: "8px 12px", background: "var(--surface)", cursor: "text" }} onClick={() => setSalesOpen(true)}>
-                      <input type="text" placeholder="Search sales operators…" value={salesSearch} onChange={(e) => { setSalesSearch(e.target.value); setSalesOpen(true); }} onFocus={() => setSalesOpen(true)} style={{ flex: 1, border: "none", outline: "none", background: "transparent", fontSize: 13 }} />
+                      <input type="text" placeholder="Search sales employees…" value={salesSearch} onChange={(e) => { setSalesSearch(e.target.value); setSalesOpen(true); }} onFocus={() => setSalesOpen(true)} style={{ flex: 1, border: "none", outline: "none", background: "transparent", fontSize: 13 }} />
                       <span style={{ fontSize: 13, color: "var(--text-3)" }}>{assignedSales.size > 0 ? `${assignedSales.size} selected` : ""}</span>
                       <span style={{ color: "var(--text-3)", fontSize: 13 }}>{salesOpen ? "▲" : "▼"}</span>
                     </div>
@@ -657,7 +657,7 @@ export default function CampaignEdit() {
                         <div style={{ position: "fixed", inset: 0, zIndex: 10 }} onClick={() => { setSalesOpen(false); setSalesSearch(""); }} />
                         <div style={{ position: "absolute", top: "calc(100% + 4px)", left: 0, right: 0, zIndex: 11, background: "var(--surface)", border: "1px solid var(--border)", borderRadius: "var(--r-md)", boxShadow: "0 4px 16px rgba(0,0,0,.1)", maxHeight: 220, overflowY: "auto" }}>
                           {filteredSales.length === 0 ? (
-                            <div style={{ padding: "14px 16px", fontSize: 13, color: "var(--text-3)" }}>No operators found.</div>
+                            <div style={{ padding: "14px 16px", fontSize: 13, color: "var(--text-3)" }}>No employees found.</div>
                           ) : (
                             filteredSales.map((a) => (
                               <label key={a.id} style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 16px", cursor: "pointer", fontSize: 13, background: assignedSales.has(a.id) ? "var(--brand-light)" : "transparent", borderBottom: "1px solid var(--border)" }}>

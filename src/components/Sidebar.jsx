@@ -64,11 +64,11 @@ const BROKER_NAV = [
   },
   {
     key: "agent",
-    label: "Operators",
+    label: "Employees",
     icon: AgentIcon,
     children: [
-      { label: "All Operators", path: "/agent" },
-      { label: "Add Operator", path: "/agent/create" },
+      { label: "All Employees", path: "/agent" },
+      { label: "Add Employee", path: "/agent/create" },
     ],
   },
   {

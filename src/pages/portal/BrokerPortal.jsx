@@ -50,7 +50,7 @@ const ACTIVE_CAMPAIGNS = [
 
 const QUICK_ACTIONS = [
   {
-    label: "Add Operator",
+    label: "Add Employee",
     path: "/agent/create",
     color: "#3b0764",
     bg: "#ede9fe",
@@ -834,7 +834,7 @@ export default function BrokerPortal() {
         className="bd-two-col"
         style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 20 }}
       >
-        {/* Recent Operators */}
+        {/* Recent Employees */}
         <div className="card">
           <div className="card-body">
             <div
@@ -857,7 +857,7 @@ export default function BrokerPortal() {
                 <div
                   style={{ fontWeight: 800, fontSize: 15, color: "#1e293b" }}
                 >
-                  Operators
+                  Employees
                 </div>
               </div>
               <button

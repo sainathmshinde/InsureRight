@@ -16,7 +16,7 @@ export default function Dashboard() {
    BROKER DASHBOARD
 ═══════════════════════════════════════════════════════ */
 const BROKER_QUICK = [
-  { label: "Add Operator", path: "/agent/create", icon: "👤", color: "#7c3aed" },
+  { label: "Add Employee", path: "/agent/create", icon: "👤", color: "#7c3aed" },
   {
     label: "Add Member",
     path: "/member/create",
@@ -38,7 +38,7 @@ const BROKER_QUICK = [
   },
 ];
 const BROKER_ACTIVITY = [
-  { time: "2 hrs ago", icon: "👤", text: "Operator Ravi Kulkarni onboarded" },
+  { time: "2 hrs ago", icon: "👤", text: "Employee Ravi Kulkarni onboarded" },
   { time: "5 hrs ago", icon: "🧑", text: "Member Suresh Kumar KYC verified" },
   { time: "Yesterday", icon: "📋", text: "Policy SHI/2025/008901 issued" },
   { time: "Yesterday", icon: "💰", text: "Commission credited ₹12,400" },
@@ -57,7 +57,7 @@ function BrokerDashboard({ user }) {
 
   const brokerStats = [
     {
-      label: "Total Operators",
+      label: "Total Employees",
       value: totalAgents,
       sub: `${activeAgents} active`,
       color: "#7c3aed",
@@ -272,7 +272,7 @@ function AgentDashboard({ user }) {
           <div style={S.greetTxt}>
             {greet}, {user?.name?.split(" ")[0]} 👋
           </div>
-          <div style={S.companytxt}>Operator · {user?.company}</div>
+          <div style={S.companytxt}>Employee · {user?.company}</div>
           <div style={S.irdaiTxt}>
             Reporting to K.M. Dastur & Co. Insurance Brokers
           </div>

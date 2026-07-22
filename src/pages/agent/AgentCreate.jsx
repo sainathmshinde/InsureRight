@@ -8,6 +8,7 @@ import {
   SectionBlock,
 } from "../../components/Field";
 import { AgentIcon } from "../../icons";
+import { STATES } from "../member/orgAssocData";
 
 const INITIAL = {
   // Basic
@@ -19,6 +20,13 @@ const INITIAL = {
   dob: "",
   gender: "",
   agentType: "",
+  // Address
+  address1: "",
+  address2: "",
+  city: "",
+  stateId: "",
+  pinCode: "",
+  country: "India",
   // KYC
   pan: "",
   aadhaar: "",
@@ -61,8 +69,8 @@ export default function AgentCreate() {
         <div className="page-title-row">
           <span className="page-bar" />
           <div>
-            <div className="page-title">Add Operator</div>
-            <div className="page-subtitle">Register a new operator</div>
+            <div className="page-title">Add Employee</div>
+            <div className="page-subtitle">Register a new employee</div>
           </div>
         </div>
         <button className="btn btn-ghost" onClick={() => navigate("/agent")}>
@@ -112,7 +120,7 @@ export default function AgentCreate() {
                 <Field label="Email" required>
                   <Input
                     type="email"
-                    placeholder="operator@email.com"
+                    placeholder="employee@email.com"
                     value={form.email}
                     onChange={set("email")}
                     required
@@ -136,17 +144,66 @@ export default function AgentCreate() {
                     <option>Other</option>
                   </Select>
                 </Field>
-                <Field label="Operator Type" required>
+                <Field label="Designation" required>
                   <Select
                     value={form.agentType}
                     onChange={set("agentType")}
                     required
                   >
-                    <option value="">Select operator type</option>
-                    <option value="calling">Calling Operator</option>
-                    <option value="sales">Sales Operator</option>
-                    <option value="sales-manager">Sales Manager</option>
-                    <option value="leader">Leader</option>
+                    <option value="">Select designation</option>
+                    <option value="manager">Manager</option>
+                    <option value="team-lead">Team Lead</option>
+                    <option value="sales">Sales operator</option>
+                    <option value="calling">Calling operator</option>
+                  </Select>
+                </Field>
+              </div>
+            </SectionBlock>
+
+            <SectionBlock icon="📍" title="Address">
+              <div className="form-grid-3" style={{ marginBottom: 18 }}>
+                <Field label="Address Line 1">
+                  <Input
+                    placeholder="Street / Building"
+                    value={form.address1}
+                    onChange={set("address1")}
+                  />
+                </Field>
+                <Field label="Address Line 2">
+                  <Input
+                    placeholder="Area / Locality"
+                    value={form.address2}
+                    onChange={set("address2")}
+                  />
+                </Field>
+                <Field label="City">
+                  <Input
+                    placeholder="City"
+                    value={form.city}
+                    onChange={set("city")}
+                  />
+                </Field>
+              </div>
+              <div className="form-grid-3">
+                <Field label="State">
+                  <Select value={form.stateId} onChange={set("stateId")}>
+                    <option value="">Select state</option>
+                    {STATES.map((s) => (
+                      <option key={s.id} value={s.id}>{s.name}</option>
+                    ))}
+                  </Select>
+                </Field>
+                <Field label="PIN Code">
+                  <Input
+                    placeholder="400001"
+                    maxLength={6}
+                    value={form.pinCode}
+                    onChange={set("pinCode")}
+                  />
+                </Field>
+                <Field label="Country">
+                  <Select value={form.country} onChange={set("country")}>
+                    <option>India</option>
                   </Select>
                 </Field>
               </div>
@@ -257,7 +314,7 @@ export default function AgentCreate() {
                 Cancel
               </button>
               <button type="submit" className="btn btn-primary">
-                Create Operator
+                Create Employee
               </button>
             </div>
           </form>

@@ -269,7 +269,7 @@ const MOCK_USERS = [
     gender: "Male",
     marital: "Married",
     segment: "Renewal Due (30 days)",
-    type: "Operator",
+    type: "Employee",
     state: "Maharashtra",
   },
   {
@@ -279,7 +279,7 @@ const MOCK_USERS = [
     gender: "Female",
     marital: "Single",
     segment: "Active Policyholders",
-    type: "Operator",
+    type: "Employee",
     state: "Uttar Pradesh",
   },
   {
@@ -289,7 +289,7 @@ const MOCK_USERS = [
     gender: "Male",
     marital: "Married",
     segment: "High Value Members",
-    type: "Operator",
+    type: "Employee",
     state: "Delhi",
   },
   {
@@ -299,7 +299,7 @@ const MOCK_USERS = [
     gender: "Female",
     marital: "Divorced",
     segment: "Active Policyholders",
-    type: "Operator",
+    type: "Employee",
     state: "Uttarakhand",
   },
   {
@@ -309,7 +309,7 @@ const MOCK_USERS = [
     gender: "Male",
     marital: "Married",
     segment: "Renewal Due (30 days)",
-    type: "Operator",
+    type: "Employee",
     state: "Punjab",
   },
   {
@@ -319,7 +319,7 @@ const MOCK_USERS = [
     gender: "Female",
     marital: "Single",
     segment: "New Registrations",
-    type: "Operator",
+    type: "Employee",
     state: "Tamil Nadu",
   },
   {
@@ -329,7 +329,7 @@ const MOCK_USERS = [
     gender: "Male",
     marital: "Married",
     segment: "Lapsed Members",
-    type: "Operator",
+    type: "Employee",
     state: "Madhya Pradesh",
   },
   {
@@ -339,7 +339,7 @@ const MOCK_USERS = [
     gender: "Female",
     marital: "Married",
     segment: "Active Policyholders",
-    type: "Operator",
+    type: "Employee",
     state: "Gujarat",
   },
   {
@@ -349,7 +349,7 @@ const MOCK_USERS = [
     gender: "Male",
     marital: "Widowed",
     segment: "High Value Members",
-    type: "Operator",
+    type: "Employee",
     state: "Karnataka",
   },
   {
@@ -359,7 +359,7 @@ const MOCK_USERS = [
     gender: "Female",
     marital: "Single",
     segment: "New Registrations",
-    type: "Operator",
+    type: "Employee",
     state: "West Bengal",
   },
 ];
@@ -898,7 +898,7 @@ export default function CampaignCreate() {
                       required
                     >
                       <option>Member</option>
-                      <option>Operator</option>
+                      <option>Employee</option>
                     </Select>
                   </Field>
                   <Field label="Select Segment">
@@ -1367,12 +1367,12 @@ export default function CampaignCreate() {
               </div>
             </SectionBlock>
 
-            {/* ── 6. Assign Operators ─────────────────────── */}
-            <SectionBlock icon="👤" title="Assign Operators">
+            {/* ── 6. Assign Employees ─────────────────────── */}
+            <SectionBlock icon="👤" title="Assign Employees">
               <div
                 style={{ display: "flex", flexDirection: "column", gap: 24 }}
               >
-                {/* ── Calling Operators ── */}
+                {/* ── Calling Employees ── */}
                 <div>
                   <div
                     style={{
@@ -1394,7 +1394,7 @@ export default function CampaignCreate() {
                         fontSize: 13,
                       }}
                     >
-                      📞 Calling Operators
+                      📞 Calling Employees
                     </span>
                   </div>
 
@@ -1462,7 +1462,7 @@ export default function CampaignCreate() {
                     >
                       <input
                         type="text"
-                        placeholder="Search calling operators…"
+                        placeholder="Search calling employees…"
                         value={callingSearch}
                         onChange={(e) => {
                           setCallingSearch(e.target.value);
@@ -1518,7 +1518,7 @@ export default function CampaignCreate() {
                                 color: "var(--text-3)",
                               }}
                             >
-                              No operators found.
+                              No employees found.
                             </div>
                           ) : (
                             filteredCalling.map((a) => (
@@ -1564,7 +1564,7 @@ export default function CampaignCreate() {
                   </div>
                 </div>
 
-                {/* ── Sales Operators ── */}
+                {/* ── Sales Employees ── */}
                 <div>
                   <div
                     style={{
@@ -1586,7 +1586,7 @@ export default function CampaignCreate() {
                         fontSize: 13,
                       }}
                     >
-                      💼 Sales Operators
+                      💼 Sales Employees
                     </span>
                   </div>
 
@@ -1654,7 +1654,7 @@ export default function CampaignCreate() {
                     >
                       <input
                         type="text"
-                        placeholder="Search sales operators…"
+                        placeholder="Search sales employees…"
                         value={salesSearch}
                         onChange={(e) => {
                           setSalesSearch(e.target.value);
@@ -1710,7 +1710,7 @@ export default function CampaignCreate() {
                                 color: "var(--text-3)",
                               }}
                             >
-                              No operators found.
+                              No employees found.
                             </div>
                           ) : (
                             filteredSales.map((a) => (
