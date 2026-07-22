@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   Field,
@@ -8,50 +8,52 @@ import {
   SectionBlock,
 } from "../../components/Field";
 import { AgentIcon } from "../../icons";
-import { STATES } from "../member/orgAssocData";
+
+const DESIGNATIONS = [
+  { value: "manager", label: "Manager" },
+  { value: "team-lead", label: "Team Lead" },
+  { value: "sales-operator", label: "Sales Operator" },
+  { value: "calling-operator", label: "Calling Operator" },
+];
 
 const INITIAL = {
-  // Basic
   firstName: "",
   middleName: "",
   lastName: "",
-  mobile: "",
-  email: "",
   dob: "",
   gender: "",
-  agentType: "",
-  // Address
-  address1: "",
-  address2: "",
-  city: "",
-  stateId: "",
-  pinCode: "",
-  country: "India",
-  // KYC
+  designation: "",
   pan: "",
   aadhaar: "",
   photo: null,
   panFile: null,
   aadhaarFile: null,
-  // Professional
-  posLicense: "",
-  qualification: "",
-  experience: "",
-  // Bank
-  accountNumber: "",
-  ifsc: "",
-  // Mapping
-  assignedBroker: "",
-  reportingManager: "",
-  status: "Active",
+  mobile: "",
+  email: "",
+  address1: "",
+  address2: "",
+  city: "",
+  state: "",
+  pincode: "",
+  country: "India",
 };
 
 export default function AgentCreate() {
   const navigate = useNavigate();
   const [form, setForm] = useState(INITIAL);
+  const [photoPreview, setPhotoPreview] = useState(null);
   const set = (f) => (e) => setForm((p) => ({ ...p, [f]: e.target.value }));
   const setF = (f) => (e) =>
     setForm((p) => ({ ...p, [f]: e.target.files[0] ?? null }));
+
+  useEffect(() => {
+    if (form.photo instanceof File) {
+      const url = URL.createObjectURL(form.photo);
+      setPhotoPreview(url);
+      return () => URL.revokeObjectURL(url);
+    }
+    setPhotoPreview(null);
+  }, [form.photo]);
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -59,7 +61,7 @@ export default function AgentCreate() {
       .map((s) => s.trim())
       .filter(Boolean)
       .join(" ");
-    console.log("Create agent:", { ...form, name });
+    console.log("Create employee:", { ...form, name });
     navigate("/agent");
   };
 
@@ -70,7 +72,7 @@ export default function AgentCreate() {
           <span className="page-bar" />
           <div>
             <div className="page-title">Add Employee</div>
-            <div className="page-subtitle">Register a new employee</div>
+            <div className="page-subtitle">Register a new employee with KYC and contact details</div>
           </div>
         </div>
         <button className="btn btn-ghost" onClick={() => navigate("/agent")}>
@@ -81,60 +83,53 @@ export default function AgentCreate() {
       <div className="card">
         <div className="card-body">
           <form onSubmit={handleSubmit}>
-            <SectionBlock icon={<AgentIcon />} title="Basic Information">
+
+            <SectionBlock icon={<AgentIcon />} title="Employee KYC">
+              {/* Profile photo */}
+              <div style={{ display: 'flex', alignItems: 'center', gap: 20, paddingBottom: 18, borderBottom: '1px solid var(--border)', marginBottom: 18 }}>
+                <div style={{
+                  width: 90, height: 90, borderRadius: '50%', flexShrink: 0,
+                  background: 'var(--brand-light)', border: '2.5px dashed var(--brand)',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden',
+                }}>
+                  {photoPreview
+                    ? <img src={photoPreview} alt="Employee" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                    : <span style={{ fontSize: 38, lineHeight: 1 }}>👤</span>
+                  }
+                </div>
+                <div>
+                  <label style={{ cursor: 'pointer', display: 'inline-block' }}>
+                    <input type="file" accept="image/*" style={{ display: 'none' }}
+                      onChange={e => setForm(p => ({ ...p, photo: e.target.files[0] ?? null }))} />
+                    <span className="btn btn-secondary" style={{ pointerEvents: 'none' }}>
+                      {photoPreview ? '🔄 Change Photo' : '📷 Upload Photo'}
+                    </span>
+                  </label>
+                  {form.photo && (
+                    <button type="button" className="btn btn-ghost" style={{ marginLeft: 8 }}
+                      onClick={() => setForm(p => ({ ...p, photo: null }))}>
+                      Remove
+                    </button>
+                  )}
+                  <div style={{ fontSize: 12, color: 'var(--text-3)', marginTop: 6 }}>JPG or PNG · Max 2 MB</div>
+                </div>
+              </div>
+
               <div className="form-grid-3" style={{ marginBottom: 18 }}>
                 <Field label="First Name" required>
-                  <Input
-                    placeholder="Enter first name"
-                    value={form.firstName}
-                    onChange={set("firstName")}
-                    required
-                  />
+                  <Input placeholder="Enter first name" value={form.firstName} onChange={set("firstName")} required />
                 </Field>
                 <Field label="Middle Name">
-                  <Input
-                    placeholder="Enter middle name"
-                    value={form.middleName}
-                    onChange={set("middleName")}
-                  />
+                  <Input placeholder="Enter middle name" value={form.middleName} onChange={set("middleName")} />
                 </Field>
                 <Field label="Last Name" required>
-                  <Input
-                    placeholder="Enter last name"
-                    value={form.lastName}
-                    onChange={set("lastName")}
-                    required
-                  />
+                  <Input placeholder="Enter last name" value={form.lastName} onChange={set("lastName")} required />
                 </Field>
               </div>
+
               <div className="form-grid-3" style={{ marginBottom: 18 }}>
-                <Field label="Mobile" required>
-                  <Input
-                    type="tel"
-                    placeholder="+91 XXXXX XXXXX"
-                    value={form.mobile}
-                    onChange={set("mobile")}
-                    required
-                  />
-                </Field>
-                <Field label="Email" required>
-                  <Input
-                    type="email"
-                    placeholder="employee@email.com"
-                    value={form.email}
-                    onChange={set("email")}
-                    required
-                  />
-                </Field>
-              </div>
-              <div className="form-grid-3">
                 <Field label="Date of Birth" required>
-                  <Input
-                    type="date"
-                    value={form.dob}
-                    onChange={set("dob")}
-                    required
-                  />
+                  <Input type="date" value={form.dob} onChange={set("dob")} required />
                 </Field>
                 <Field label="Gender">
                   <Select value={form.gender} onChange={set("gender")}>
@@ -144,62 +139,66 @@ export default function AgentCreate() {
                     <option>Other</option>
                   </Select>
                 </Field>
-                <Field label="Designation" required>
-                  <Select
-                    value={form.agentType}
-                    onChange={set("agentType")}
-                    required
-                  >
+                <Field label="Designation / Role" required>
+                  <Select value={form.designation} onChange={set("designation")} required>
                     <option value="">Select designation</option>
-                    <option value="manager">Manager</option>
-                    <option value="team-lead">Team Lead</option>
-                    <option value="sales">Sales operator</option>
-                    <option value="calling">Calling operator</option>
+                    {DESIGNATIONS.map((d) => (
+                      <option key={d.value} value={d.value}>{d.label}</option>
+                    ))}
                   </Select>
+                </Field>
+              </div>
+
+              <div className="form-grid-3" style={{ marginBottom: 18 }}>
+                <Field label="PAN Number" required>
+                  <Input placeholder="ABCDE1234F" value={form.pan} onChange={set("pan")} maxLength={10} required />
+                </Field>
+                <Field label="Aadhaar Number" required>
+                  <Input placeholder="XXXX XXXX XXXX" value={form.aadhaar} onChange={set("aadhaar")} maxLength={14} required />
+                </Field>
+              </div>
+
+              <div className="form-grid-3">
+                <Field label="Upload PAN Card">
+                  <UploadBox label="Upload PAN card" hint="JPG, PNG or PDF" onChange={setF("panFile")} />
+                </Field>
+                <Field label="Upload Aadhaar">
+                  <UploadBox label="Upload Aadhaar" hint="JPG, PNG or PDF" onChange={setF("aadhaarFile")} />
                 </Field>
               </div>
             </SectionBlock>
 
-            <SectionBlock icon="📍" title="Address">
+            <SectionBlock icon="📞" title="Contact Details">
               <div className="form-grid-3" style={{ marginBottom: 18 }}>
-                <Field label="Address Line 1">
-                  <Input
-                    placeholder="Street / Building"
-                    value={form.address1}
-                    onChange={set("address1")}
-                  />
+                <Field label="Mobile" required>
+                  <Input type="tel" placeholder="+91 XXXXX XXXXX" value={form.mobile} onChange={set("mobile")} required />
+                </Field>
+                <Field label="Email" required>
+                  <Input type="email" placeholder="employee@email.com" value={form.email} onChange={set("email")} required />
+                </Field>
+              </div>
+              <div className="form-grid-3" style={{ marginBottom: 18 }}>
+                <Field label="Address Line 1" required>
+                  <Input placeholder="Street / Building" value={form.address1} onChange={set("address1")} required />
                 </Field>
                 <Field label="Address Line 2">
-                  <Input
-                    placeholder="Area / Locality"
-                    value={form.address2}
-                    onChange={set("address2")}
-                  />
+                  <Input placeholder="Area / Locality" value={form.address2} onChange={set("address2")} />
                 </Field>
-                <Field label="City">
-                  <Input
-                    placeholder="City"
-                    value={form.city}
-                    onChange={set("city")}
-                  />
+                <Field label="City" required>
+                  <Input placeholder="City" value={form.city} onChange={set("city")} required />
                 </Field>
               </div>
               <div className="form-grid-3">
-                <Field label="State">
-                  <Select value={form.stateId} onChange={set("stateId")}>
+                <Field label="State" required>
+                  <Select value={form.state} onChange={set("state")} required>
                     <option value="">Select state</option>
-                    {STATES.map((s) => (
-                      <option key={s.id} value={s.id}>{s.name}</option>
+                    {["Maharashtra", "Delhi", "Karnataka", "Tamil Nadu", "Gujarat", "Rajasthan", "Uttar Pradesh", "West Bengal"].map(s => (
+                      <option key={s}>{s}</option>
                     ))}
                   </Select>
                 </Field>
-                <Field label="PIN Code">
-                  <Input
-                    placeholder="400001"
-                    maxLength={6}
-                    value={form.pinCode}
-                    onChange={set("pinCode")}
-                  />
+                <Field label="PIN Code" required>
+                  <Input placeholder="400001" maxLength={6} value={form.pincode} onChange={set("pincode")} required />
                 </Field>
                 <Field label="Country">
                   <Select value={form.country} onChange={set("country")}>
@@ -209,114 +208,15 @@ export default function AgentCreate() {
               </div>
             </SectionBlock>
 
-            {/* <SectionBlock icon="🪪" title="KYC Documents">
-              <div className="form-grid">
-                <Field label="PAN Number" required>
-                  <Input
-                    placeholder="ABCDE1234F"
-                    value={form.pan}
-                    onChange={set("pan")}
-                    required
-                  />
-                </Field>
-                <Field label="Aadhaar Number" required>
-                  <Input
-                    placeholder="XXXX XXXX XXXX"
-                    value={form.aadhaar}
-                    onChange={set("aadhaar")}
-                    required
-                  />
-                </Field>
-                <Field label="Upload PAN">
-                  <UploadBox
-                    label="Upload PAN card"
-                    hint="JPG, PNG or PDF"
-                    onChange={setF("panFile")}
-                  />
-                </Field>
-                <Field label="Upload Aadhaar">
-                  <UploadBox
-                    label="Upload Aadhaar"
-                    hint="JPG, PNG or PDF"
-                    onChange={setF("aadhaarFile")}
-                  />
-                </Field>
-                <Field label="Photo Upload">
-                  <UploadBox
-                    label="Upload passport photo"
-                    hint="JPG or PNG, max 2MB"
-                    onChange={setF("photo")}
-                  />
-                </Field>
-              </div>
-            </SectionBlock>
-
-            <SectionBlock icon="💼" title="Professional Info">
-              <div className="form-grid">
-                <Field label="POS License Number">
-                  <Input
-                    placeholder="POS-XXXX-XXX"
-                    value={form.posLicense}
-                    onChange={set("posLicense")}
-                  />
-                </Field>
-                <Field label="Qualification">
-                  <Select
-                    value={form.qualification}
-                    onChange={set("qualification")}
-                  >
-                    <option value="">Select qualification</option>
-                    <option>10th Pass</option>
-                    <option>12th Pass</option>
-                    <option>Graduate</option>
-                    <option>Post Graduate</option>
-                  </Select>
-                </Field>
-                <Field label="Experience (Years)">
-                  <Input
-                    type="number"
-                    min="0"
-                    max="50"
-                    placeholder="0"
-                    value={form.experience}
-                    onChange={set("experience")}
-                  />
-                </Field>
-              </div>
-            </SectionBlock>
-
-            <SectionBlock icon="🏦" title="Bank Info">
-              <div className="form-grid">
-                <Field label="Account Number">
-                  <Input
-                    placeholder="Enter account number"
-                    value={form.accountNumber}
-                    onChange={set("accountNumber")}
-                  />
-                </Field>
-                <Field label="IFSC Code" required>
-                  <Input
-                    placeholder="HDFC0001234"
-                    value={form.ifsc}
-                    onChange={set("ifsc")}
-                    required
-                  />
-                </Field>
-              </div>
-            </SectionBlock> */}
-
             <div className="actions-row">
-              <button
-                type="button"
-                className="btn btn-ghost"
-                onClick={() => navigate("/agent")}
-              >
+              <button type="button" className="btn btn-ghost" onClick={() => navigate("/agent")}>
                 Cancel
               </button>
               <button type="submit" className="btn btn-primary">
-                Create Employee
+                Add Employee
               </button>
             </div>
+
           </form>
         </div>
       </div>

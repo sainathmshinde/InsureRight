@@ -1,4 +1,4 @@
-﻿import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect } from "react";
 import { NavLink, useLocation, useNavigate } from "react-router-dom";
 import kmdLogo from "../assets/kmd-logo.svg";
 import {
@@ -67,8 +67,9 @@ const BROKER_NAV = [
     label: "Employees",
     icon: AgentIcon,
     children: [
-      { label: "All Employees", path: "/agent" },
-      { label: "Add Employee", path: "/agent/create" },
+      { label: "All Employees",      path: "/agent" },
+      { label: "Add Employee",       path: "/agent/create" },
+      { label: "Employee Hierarchy", path: "/agent/hierarchy" },
     ],
   },
   {
@@ -286,7 +287,7 @@ export default function Sidebar({ mobileOpen = false, onMobileClose }) {
         className={`sidebar-root${mobileOpen ? " mobile-open" : ""}`}
         style={{ ...S.aside, width: collapsed ? COLLAPSED_W : EXPANDED_W }}
       >
-        {/* â”€â”€ Logo â”€â”€ */}
+        {/* ── Logo ── */}
         <div
           style={{
             ...S.logoRow,
@@ -306,7 +307,7 @@ export default function Sidebar({ mobileOpen = false, onMobileClose }) {
               }}
             />
           )}
-          {/* Desktop collapse toggle; on mobile show a close Ã— instead */}
+          {/* Desktop collapse toggle; on mobile show a close × instead */}
           {mobileOpen ? (
             <button
               className="sb-toggle"
@@ -328,7 +329,7 @@ export default function Sidebar({ mobileOpen = false, onMobileClose }) {
           )}
         </div>
 
-        {/* â”€â”€ Nav â”€â”€ */}
+        {/* ── Nav ── */}
         <nav style={{ ...S.nav, alignItems: collapsed ? "center" : "stretch" }}>
           {activeNav.map((item) => {
             const Icon = item.icon;
@@ -437,7 +438,7 @@ export default function Sidebar({ mobileOpen = false, onMobileClose }) {
           })}
         </nav>
 
-        {/* â”€â”€ Logout button â”€â”€ */}
+        {/* ── Logout button ── */}
         <div style={S.logoutWrap}>
           <button
             className="sb-logout"

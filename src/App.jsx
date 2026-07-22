@@ -30,6 +30,8 @@ import AgentCreate     from "./pages/agent/AgentCreate";
 import AgentEdit       from "./pages/agent/AgentEdit";
 import AgentProfile    from "./pages/agent/AgentProfile";
 import AgentCommission from "./pages/agent/AgentCommission";
+import AgentHierarchy     from "./pages/agent/AgentHierarchy";
+import AgentHierarchyForm from "./pages/agent/AgentHierarchyForm";
 
 // Member pages
 import MemberList    from "./pages/member/MemberList";
@@ -162,6 +164,9 @@ export default function App() {
                 <Route path="agent">
                   <Route index element={<AgentList />} />
                   <Route path="create" element={<AgentCreate />} />
+                  <Route path="hierarchy" element={<AgentHierarchy />} />
+                  <Route path="hierarchy/new" element={<AgentHierarchyForm />} />
+                  <Route path="hierarchy/:ruleId/edit" element={<AgentHierarchyForm />} />
                   <Route path=":id/edit" element={<AgentEdit />} />
                 </Route>
 

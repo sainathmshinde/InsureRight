@@ -2,81 +2,190 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Pagination from "../../components/Pagination";
 import usePagination from "../../components/usePagination";
-import {
-  Table,
-  PageHeader,
-  Button,
-  EmptyState,
-} from "../../components/UI";
+import { Table, PageHeader, Button, EmptyState } from "../../components/UI";
 import { AgentIcon, UploadIcon, SearchIcon } from "../../icons";
 import { OPERATORS } from "./agentData";
 
 const MOCK = OPERATORS.map((a) => ({
-  id: a.id,
-  name: a.name,
-  mobile: a.mobile,
-  email: a.email,
-  // posLicense: a.posLicense,
-  // broker:     a.assignedBroker,
+  id:        a.id,
+  name:      a.name,
+  mobile:    a.mobile,
+  email:     a.email,
   agentType: a.agentType,
-  status: a.status,
+  status:    a.status,
 }));
 
 const AGENT_TYPE_META = {
-  manager: { label: "Manager", color: "#7c3aed", bg: "#f3e8ff" },
-  "team-lead": { label: "Team Lead", color: "#f57c00", bg: "#fff8e1" },
-  sales: { label: "Sales operator", color: "#00c851", bg: "#e8f5e9" },
-  calling: { label: "Calling operator", color: "#1565d8", bg: "#e7f0fc" },
+  calling:            { label: "Calling Operator", color: "#1565d8", bg: "#e7f0fc" },
+  "calling-operator": { label: "Calling Operator", color: "#1565d8", bg: "#e7f0fc" },
+  sales:              { label: "Sales Operator",   color: "#15803d", bg: "#dcfce7" },
+  "sales-operator":   { label: "Sales Operator",   color: "#15803d", bg: "#dcfce7" },
+  "sales-manager":    { label: "Manager",          color: "#7c3aed", bg: "#f3e8ff" },
+  manager:            { label: "Manager",          color: "#7c3aed", bg: "#f3e8ff" },
+  "team-lead":        { label: "Team Lead",        color: "#b45309", bg: "#fffbeb" },
+  leader:             { label: "Team Lead",        color: "#b45309", bg: "#fffbeb" },
 };
+
+// Designation filter groups — covers both old and new agentType key names
+const DESIG_GROUPS = {
+  Manager:            ["manager", "sales-manager"],
+  "Team Lead":        ["team-lead", "leader"],
+  "Sales Operator":   ["sales-operator", "sales"],
+  "Calling Operator": ["calling-operator", "calling"],
+};
+
+const S = {
+  filterLabel: {
+    fontSize: 11.5, fontWeight: 700, color: "#64748b",
+    textTransform: "uppercase", letterSpacing: ".4px",
+  },
+  searchIcon: {
+    position: "absolute", left: 11, top: "50%",
+    transform: "translateY(-50%)", display: "flex", pointerEvents: "none",
+  },
+  statusPill: (active) => ({
+    display: "inline-block", padding: "2px 10px", borderRadius: 99,
+    fontSize: 11.5, fontWeight: 700, whiteSpace: "nowrap",
+    background: active ? "#dcfce7" : "#f1f5f9",
+    color:      active ? "#15803d" : "#64748b",
+    border: `1.5px solid ${active ? "#86efac" : "#e2e8f0"}`,
+  }),
+};
+
+// Clickable sort header button rendered inside <th>
+function SortTh({ label, colKey, sortKey, sortDir, onSort }) {
+  const active = sortKey === colKey;
+  return (
+    <button
+      type="button"
+      onClick={() => onSort(colKey)}
+      style={{
+        background: "none", border: "none", padding: 0, cursor: "pointer",
+        display: "inline-flex", alignItems: "center", gap: 4,
+        fontSize: "inherit", fontWeight: "inherit",
+        color: active ? "var(--brand)" : "inherit", fontFamily: "inherit",
+      }}
+    >
+      {label}
+      <span style={{ fontSize: 10, opacity: active ? 1 : 0.4 }}>
+        {active ? (sortDir === "asc" ? "↑" : "↓") : "↕"}
+      </span>
+    </button>
+  );
+}
 
 export default function AgentList() {
   const navigate = useNavigate();
-  const [search, setSearch] = useState("");
 
-  const filtered = MOCK.filter(
-    (a) =>
-      a.name.toLowerCase().includes(search.toLowerCase()) ||
-      a.mobile.includes(search),
-  );
-  const pg = usePagination(filtered, 10);
-  const handle = (setter) => (v) => {
-    setter(v);
+  const [search,       setSearch]       = useState("");
+  const [desigFilter,  setDesigFilter]  = useState("");
+  const [statusFilter, setStatusFilter] = useState("");
+  const [sortKey,      setSortKey]      = useState("name");
+  const [sortDir,      setSortDir]      = useState("asc");
+
+  // 1. Filter
+  const filtered = MOCK.filter((a) => {
+    if (search) {
+      const q = search.toLowerCase();
+      const hit = a.name.toLowerCase().includes(q)
+        || a.mobile.includes(search)
+        || a.email.toLowerCase().includes(q);
+      if (!hit) return false;
+    }
+    if (desigFilter) {
+      const group = DESIG_GROUPS[desigFilter] ?? [desigFilter];
+      if (!group.includes(a.agentType)) return false;
+    }
+    if (statusFilter && a.status !== statusFilter) return false;
+    return true;
+  });
+
+  // 2. Sort
+  const sorted = [...filtered].sort((a, b) => {
+    let av = sortKey === "agentType"
+      ? (AGENT_TYPE_META[a.agentType]?.label ?? "")
+      : (a[sortKey] ?? "");
+    let bv = sortKey === "agentType"
+      ? (AGENT_TYPE_META[b.agentType]?.label ?? "")
+      : (b[sortKey] ?? "");
+    const cmp = String(av).localeCompare(String(bv));
+    return sortDir === "asc" ? cmp : -cmp;
+  });
+
+  // 3. Paginate
+  const pg = usePagination(sorted, 10);
+
+  const handle = (setter) => (v) => { setter(v); pg.reset(); };
+
+  const toggleSort = (key) => {
+    if (key === sortKey) setSortDir(d => d === "asc" ? "desc" : "asc");
+    else { setSortKey(key); setSortDir("asc"); }
     pg.reset();
   };
 
+  const hasFilter = search || desigFilter || statusFilter;
+  const clearAll = () => {
+    handle(setSearch)("");
+    handle(setDesigFilter)("");
+    handle(setStatusFilter)("");
+  };
+
+  const th = (label, key) => (
+    <SortTh label={label} colKey={key} sortKey={sortKey} sortDir={sortDir} onSort={toggleSort} />
+  );
+
   const columns = [
-    { key: "id", label: "#", style: { color: "var(--text-3)" } },
-    { key: "name", label: "Name", style: { fontWeight: 500 } },
-    { key: "mobile", label: "Mobile" },
-    { key: "email", label: "Email", style: { color: "var(--blue)" } },
-    // { key: 'posLicense', label: 'POS License', style: { fontFamily: 'monospace', fontSize: 12.5 } },
-    // { key: 'broker',     label: 'Broker' },
+    {
+      key: "id",
+      label: "#",
+      width: 40,
+      style: { color: "var(--text-3)", fontWeight: 500 },
+    },
+    {
+      key: "name",
+      label: th("Name", "name"),
+      style: { fontWeight: 500 },
+    },
+    {
+      key: "mobile",
+      label: th("Mobile", "mobile"),
+    },
+    {
+      key: "email",
+      label: th("Email", "email"),
+      style: { color: "var(--blue)" },
+    },
     {
       key: "agentType",
-      label: "Designation",
+      label: th("Designation", "agentType"),
       render: (row) => {
-        const meta = AGENT_TYPE_META[row.agentType];
-        if (!meta) return <span style={{ color: "var(--text-3)" }}>—</span>;
+        const m = AGENT_TYPE_META[row.agentType];
+        if (!m) return <span style={{ color: "var(--text-3)" }}>—</span>;
         return (
-          <span
-            style={{
-              padding: "3px 10px",
-              borderRadius: 99,
-              fontSize: 11.5,
-              fontWeight: 700,
-              background: meta.bg,
-              color: meta.color,
-              whiteSpace: "nowrap",
-            }}
-          >
-            {meta.label}
+          <span style={{
+            padding: "3px 10px", borderRadius: 99,
+            fontSize: 11.5, fontWeight: 700, whiteSpace: "nowrap",
+            background: m.bg, color: m.color,
+          }}>
+            {m.label}
           </span>
         );
       },
     },
     {
+      key: "status",
+      label: th("Status", "status"),
+      render: (row) => (
+        <span style={S.statusPill(row.status === "Active")}>
+          {row.status}
+        </span>
+      ),
+    },
+    {
       key: "actions",
       label: "Actions",
+      headerStyle: { textAlign: "right" },
+      style: { textAlign: "right" },
       render: (row) => (
         <button
           type="button"
@@ -84,26 +193,14 @@ export default function AgentList() {
           title="Edit"
           style={{
             background: "linear-gradient(180deg,#1565d8,#104ea6)",
-            border: "none",
-            borderRadius: 6,
-            cursor: "pointer",
-            padding: "5px 6px",
-            color: "#fff",
-            display: "inline-flex",
-            alignItems: "center",
+            border: "none", borderRadius: 6, cursor: "pointer",
+            padding: "5px 6px", color: "#fff",
+            display: "inline-flex", alignItems: "center",
             boxShadow: "0 2px 6px rgba(21,101,216,.30)",
           }}
         >
-          <svg
-            width="16"
-            height="16"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2.5"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          >
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
             <path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z" />
           </svg>
         </button>
@@ -121,10 +218,7 @@ export default function AgentList() {
         <Button variant="ghost" icon={<UploadIcon size={16} />} onClick={() => {}}>
           Export
         </Button>
-        <Button
-          variant="secondary"
-          onClick={() => navigate("/agent/commission")}
-        >
+        <Button variant="secondary" onClick={() => navigate("/agent/commission")}>
           Commission Rules
         </Button>
         <Button onClick={() => navigate("/agent/create")}>+ Add Employee</Button>
@@ -132,73 +226,83 @@ export default function AgentList() {
 
       <div className="card">
         <div className="card-body">
-          <div
-            style={{
-              display: "flex",
-              gap: 14,
-              alignItems: "flex-end",
-              marginBottom: 18,
-              flexWrap: "wrap",
-            }}
-          >
-            <div style={{ flex: "1 1 220px" }}>
-              <label
-                style={{
-                  display: "block",
-                  fontSize: 11.5,
-                  fontWeight: 700,
-                  color: "#64748b",
-                  marginBottom: 5,
-                  textTransform: "uppercase",
-                  letterSpacing: ".4px",
-                }}
-              >
-                Search
-              </label>
+
+          {/* Filter bar */}
+          <div className="filter-bar" style={{ alignItems: "flex-end", marginBottom: 18 }}>
+
+            {/* Search */}
+            <div style={{ display: "flex", flexDirection: "column", gap: 4, flex: "1 1 200px" }}>
+              <label style={S.filterLabel}>Search</label>
               <div style={{ position: "relative" }}>
-                <span
-                  style={{
-                    position: "absolute",
-                    left: 11,
-                    top: "50%",
-                    transform: "translateY(-50%)",
-                    display: "flex",
-                    pointerEvents: "none",
-                  }}
-                >
+                <span style={S.searchIcon}>
                   <SearchIcon size={15} color="var(--text-3)" />
                 </span>
                 <input
                   className="field-input filter-search"
-                  style={{ width: "100%", paddingLeft: 34 }}
-                  placeholder="Search by name or mobile…"
+                  style={{ paddingLeft: 34, width: "100%" }}
+                  placeholder="Name, mobile or email…"
                   value={search}
                   onChange={(e) => handle(setSearch)(e.target.value)}
                 />
               </div>
             </div>
-            {search && (
-              <div style={{ paddingBottom: 1 }}>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => handle(setSearch)("")}
-                >
-                  Clear
-                </Button>
-              </div>
+
+            {/* Designation filter */}
+            <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
+              <label style={S.filterLabel}>Designation</label>
+              <select
+                className="field-select"
+                style={{ width: 170 }}
+                value={desigFilter}
+                onChange={(e) => handle(setDesigFilter)(e.target.value)}
+              >
+                <option value="">All Designations</option>
+                {Object.keys(DESIG_GROUPS).map(g => (
+                  <option key={g} value={g}>{g}</option>
+                ))}
+              </select>
+            </div>
+
+            {/* Status filter */}
+            <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
+              <label style={S.filterLabel}>Status</label>
+              <select
+                className="field-select"
+                style={{ width: 130 }}
+                value={statusFilter}
+                onChange={(e) => handle(setStatusFilter)(e.target.value)}
+              >
+                <option value="">All Status</option>
+                <option value="Active">Active</option>
+                <option value="Inactive">Inactive</option>
+              </select>
+            </div>
+
+            {/* Clear */}
+            {hasFilter && (
+              <Button variant="ghost" size="sm" onClick={clearAll}>
+                Clear
+              </Button>
             )}
           </div>
+
+          {/* Result count */}
+          {hasFilter && (
+            <div style={{ fontSize: 13, color: "var(--text-3)", marginBottom: 10 }}>
+              {sorted.length} employee{sorted.length !== 1 ? "s" : ""} found
+            </div>
+          )}
 
           <Table
             columns={columns}
             rows={pg.slice}
+            rowKey="id"
             stickyHeader
             empty={
               <EmptyState
                 icon="👤"
                 title="No employees found"
-                subtitle="Try adjusting your filters"
+                subtitle="Try adjusting your search or filters"
               />
             }
           />
