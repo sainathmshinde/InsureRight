@@ -313,8 +313,8 @@ function DonutChart({ title, segments, note, style, hidePercent }) {
         }}
       >
         <svg
-          width="100"
-          height="100"
+          width="180"
+          height="180"
           viewBox="0 0 100 100"
           style={{ flexShrink: 0 }}
         >

@@ -17,6 +17,8 @@ import { Tabs } from "../../components/ui/Tabs";
 import { CampaignIcon, SearchIcon } from "../../icons";
 import { PRODUCTS, POLICY_TYPE_ICON, PREMIUM_CHART, PRODUCT_DETAILS } from "../product/productData";
 import { ASSOCIATIONS } from "../member/orgAssocData";
+import policyWordingsPdf from "../../assets/StarHealthAssureInsurancePolicy-Policy-wording.pdf";
+import brochurePdf from "../../assets/Brochure_Star_Comprehensive_Insurance_Policy_V_15_Web_633bcfcaaf.pdf";
 
 const TYPE_COLORS = {
   "Base Policy":        "#1d4ed8",
@@ -406,16 +408,12 @@ const POLICY_TYPES_LIST = [...new Set(PRODUCTS.map(p => p.policyType))];
 
 function ProductDetailModal({ product, onClose }) {
   const details       = PRODUCT_DETAILS[product.id];
-  const chartRows     = PREMIUM_CHART[product.id] ?? [];
   const providerColor = TYPE_COLORS[product.policyType] ?? "#33b5e5";
   const linkedBase    = product.linkedBaseId ? PRODUCTS.find(p => p.id === product.linkedBaseId) : null;
 
   const sectionHead = (text) => (
-    <div style={{ fontSize: 13, fontWeight: 700, color: "#a855f7", textTransform: "uppercase",
-      letterSpacing: ".6px", marginBottom: 10, display: "flex", alignItems: "center", gap: 6 }}>
-      <div style={{ flex: 1, height: 1, background: "var(--border)" }} />
-      <span>{text}</span>
-      <div style={{ flex: 1, height: 1, background: "var(--border)" }} />
+    <div style={{ fontSize: 16, fontWeight: 700, color: "#24304a", marginBottom: 10, textAlign: "left" }}>
+      {text}
     </div>
   );
 
@@ -504,61 +502,85 @@ function ProductDetailModal({ product, onClose }) {
           )}
 
           {/* Jump nav */}
-          <div style={{ display: "flex", gap: 18, borderBottom: "1px solid var(--border)", paddingBottom: 10 }}>
-            <a href="#d-about"   style={{ fontSize: 13, fontWeight: 600, color: "#3b5bfd", textDecoration: "none" }}>About This Plan</a>
-            <a href="#d-covered" style={{ fontSize: 13, fontWeight: 600, color: "#3b5bfd", textDecoration: "none" }}>What's Covered</a>
-            <a href="#d-chart"   style={{ fontSize: 13, fontWeight: 600, color: "#3b5bfd", textDecoration: "none" }}>Premium Chart</a>
+          <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", rowGap: 8, columnGap: 10, borderBottom: "1px solid var(--border)", paddingBottom: 10 }}>
+            {[
+              ["#d-about", "About this Policy"],
+              ["#d-who-should-buy", "Who Should Buy"],
+              ["#d-key-benefits", "Key Benefits"],
+              ["#d-eligibility-criteria", "Eligibility Criteria"],
+              ["#d-waiting-periods", "Waiting Periods"],
+              ["#d-copayment", "Copayment"],
+              ["#d-maternity-benefits", "Maternity Benefit(s)"],
+              ["#d-covered", "What's Covered"],
+              ["#d-not-covered", "What's Not Covered"],
+              ["#d-policy-documents", "Policy Documents"],
+            ].map(([href, label], i) => (
+              <div key={href} style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                {i > 0 && <span style={{ color: "var(--border)" }}>|</span>}
+                <a href={href} style={{ fontSize: 13, fontWeight: 600, color: "#3b5bfd", textDecoration: "none" }}>{label}</a>
+              </div>
+            ))}
           </div>
 
           {details ? (<>
             <div id="d-about">
-              {sectionHead("About This Plan")}
+              {sectionHead("About this Policy")}
               <p style={{ margin: 0, fontSize: 13.5, color: "var(--text-2)", lineHeight: 1.75 }}>{details.description}</p>
             </div>
 
             {details.target?.length > 0 && (
-              <div>
+              <div id="d-who-should-buy">
                 {sectionHead("Who Should Buy")}
-                <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
-                  {details.target.map((t, i) => (
-                    <div key={i} style={{ display: "flex", alignItems: "flex-start", gap: 8, fontSize: 13, color: "var(--text-2)" }}>
-                      <span style={{ color: "#a855f7", fontWeight: 700, flexShrink: 0, marginTop: 1 }}>→</span>
-                      <span>{t}</span>
-                    </div>
-                  ))}
-                </div>
+                <p style={{ margin: 0, fontSize: 13.5, color: "var(--text-2)", lineHeight: 1.75 }}>{details.target.join(', ')}</p>
               </div>
             )}
 
             {details.benefits?.length > 0 && (
-              <div>
+              <div id="d-key-benefits">
                 {sectionHead("Key Benefits")}
-                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "7px 14px" }}>
-                  {details.benefits.map((b, i) => (
-                    <div key={i} style={{ display: "flex", alignItems: "flex-start", gap: 7, fontSize: 13, color: "var(--text-2)" }}>
-                      <span style={{ color: "#16a34a", fontWeight: 800, flexShrink: 0, marginTop: 1 }}>✓</span>
-                      <span style={{ lineHeight: 1.5 }}>{b}</span>
-                    </div>
-                  ))}
-                </div>
+                <p style={{ margin: 0, fontSize: 13.5, color: "var(--text-2)", lineHeight: 1.75 }}>{details.benefits.join(', ')}</p>
               </div>
             )}
 
-            <div id="d-covered" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+            {details.eligibilityCriteria && (
+              <div id="d-eligibility-criteria">
+                {sectionHead("Eligibility Criteria")}
+                <p style={{ margin: 0, fontSize: 13.5, color: "var(--text-2)", lineHeight: 1.75 }}>{details.eligibilityCriteria}</p>
+              </div>
+            )}
+
+            {details.waitingPeriods && (
+              <div id="d-waiting-periods">
+                {sectionHead("Waiting Periods")}
+                <p style={{ margin: 0, fontSize: 13.5, color: "var(--text-2)", lineHeight: 1.75 }}>{details.waitingPeriods}</p>
+              </div>
+            )}
+
+            {details.copayment && (
+              <div id="d-copayment">
+                {sectionHead("Copayment")}
+                <p style={{ margin: 0, fontSize: 13.5, color: "var(--text-2)", lineHeight: 1.75 }}>{details.copayment}</p>
+              </div>
+            )}
+
+            {details.maternityBenefits && (
+              <div id="d-maternity-benefits">
+                {sectionHead("Maternity Benefit(s)")}
+                <p style={{ margin: 0, fontSize: 13.5, color: "var(--text-2)", lineHeight: 1.75 }}>{details.maternityBenefits}</p>
+              </div>
+            )}
+
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
               {details.covered?.length > 0 && (
-                <div style={{ background: "#f0fdf4", border: "1px solid #bbf7d0", borderRadius: 10, padding: "12px 14px" }}>
-                  <div style={{ fontSize: 13, fontWeight: 700, color: "#15803d", textTransform: "uppercase", letterSpacing: ".5px", marginBottom: 8 }}>✅ What's Covered</div>
-                  {details.covered.map((c, i) => (
-                    <div key={i} style={{ fontSize: 13.5, color: "#166534", lineHeight: 1.6, paddingLeft: 8, borderLeft: "2px solid #86efac", marginBottom: 4 }}>{c}</div>
-                  ))}
+                <div id="d-covered" style={{ border: "1px solid var(--border)", borderRadius: 10, padding: "12px 14px" }}>
+                  {sectionHead("What's Covered")}
+                  <p style={{ margin: 0, fontSize: 13.5, color: "var(--text-2)", lineHeight: 1.75 }}>{details.covered.join(', ')}</p>
                 </div>
               )}
               {details.notCovered?.length > 0 && (
-                <div style={{ background: "#fff7ed", border: "1px solid #fed7aa", borderRadius: 10, padding: "12px 14px" }}>
-                  <div style={{ fontSize: 13, fontWeight: 700, color: "#c2410c", textTransform: "uppercase", letterSpacing: ".5px", marginBottom: 8 }}>⚠ Not Covered</div>
-                  {details.notCovered.map((c, i) => (
-                    <div key={i} style={{ fontSize: 13.5, color: "#9a3412", lineHeight: 1.6, paddingLeft: 8, borderLeft: "2px solid #fdba74", marginBottom: 4 }}>{c}</div>
-                  ))}
+                <div id="d-not-covered" style={{ border: "1px solid var(--border)", borderRadius: 10, padding: "12px 14px" }}>
+                  {sectionHead("What's Not Covered")}
+                  <p style={{ margin: 0, fontSize: 13.5, color: "var(--text-2)", lineHeight: 1.75 }}>{details.notCovered.join(', ')}</p>
                 </div>
               )}
             </div>
@@ -573,45 +595,39 @@ function ProductDetailModal({ product, onClose }) {
             </div>
           )}
 
-          {/* Premium chart */}
-          {chartRows.length > 0 && (
-            <div id="d-chart">
-              {sectionHead("Premium Chart (Annual, incl. GST)")}
-              {product.bundleDiscount && (
-                <div style={{ fontSize: 12.5, color: "#15803d", background: "#f0fdf4", border: "1px solid #bbf7d0",
-                  borderRadius: 6, padding: "7px 12px", marginBottom: 10, fontWeight: 500 }}>
-                  🏷️ Prices shown are standard rates. Campaign bundle discount of{" "}
-                  <strong>{product.bundleDiscount.type === "Percent"
-                    ? `${product.bundleDiscount.value}%`
-                    : `₹${product.bundleDiscount.value}`}</strong> applies when {linkedBase?.name ?? "linked base policy"} is also in the campaign.
-                </div>
-              )}
-              <div style={{ overflowX: "auto", borderRadius: 8, border: "1px solid var(--border)" }}>
-                <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13.5 }}>
-                  <thead>
-                    <tr style={{ background: "var(--surface-2,#f8fafc)", borderBottom: "1.5px solid var(--border)" }}>
-                      <th style={{ padding: "8px 12px", textAlign: "left", fontWeight: 600, color: "var(--text-3)", whiteSpace: "nowrap" }}>Sum Insured</th>
-                      {chartRows[0]?.ageBandId != null && <th style={{ padding: "8px 12px", textAlign: "left", fontWeight: 600, color: "var(--text-3)" }}>Age Band</th>}
-                      {chartRows[0]?.selfOnly != null && <th style={{ padding: "8px 12px", textAlign: "right", fontWeight: 600, color: "var(--text-3)" }}>Self</th>}
-                      {chartRows.some(r => r.selfSpouse != null) && <th style={{ padding: "8px 12px", textAlign: "right", fontWeight: 600, color: "var(--text-3)" }}>Self + Spouse</th>}
-                      {chartRows.some(r => r.selfSpouse2Children != null) && <th style={{ padding: "8px 12px", textAlign: "right", fontWeight: 600, color: "var(--text-3)" }}>Family</th>}
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {chartRows.map((r, i) => (
-                      <tr key={i} style={{ borderBottom: "1px solid var(--border)", background: i % 2 === 0 ? "#fff" : "var(--surface-2,#f8fafc)" }}>
-                        <td style={{ padding: "8px 12px", fontWeight: 600, whiteSpace: "nowrap" }}>₹{r.sumInsured.toLocaleString("en-IN")}</td>
-                        {r.ageBandId != null && <td style={{ padding: "8px 12px", color: "var(--text-2)" }}>Band {r.ageBandId}</td>}
-                        {chartRows[0]?.selfOnly != null && <td style={{ padding: "8px 12px", textAlign: "right" }}>{r.selfOnly != null ? `₹${r.selfOnly.toLocaleString("en-IN")}` : "—"}</td>}
-                        {chartRows.some(x => x.selfSpouse != null) && <td style={{ padding: "8px 12px", textAlign: "right" }}>{r.selfSpouse != null ? `₹${r.selfSpouse.toLocaleString("en-IN")}` : "—"}</td>}
-                        {chartRows.some(x => x.selfSpouse2Children != null) && <td style={{ padding: "8px 12px", textAlign: "right" }}>{r.selfSpouse2Children != null ? `₹${r.selfSpouse2Children.toLocaleString("en-IN")}` : "—"}</td>}
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
+          {/* Policy Documents */}
+          <div id="d-policy-documents">
+            {sectionHead("Policy Documents")}
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+              {[
+                { label: "Policy Wordings", href: policyWordingsPdf, filename: `${product.code}_Policy_Wordings.pdf` },
+                { label: "Brochure", href: brochurePdf, filename: `${product.code}_Brochure.pdf` },
+              ].map(doc => (
+                <a
+                  key={doc.label}
+                  href={doc.href}
+                  download={doc.filename}
+                  style={{
+                    display: "flex", alignItems: "center", justifyContent: "space-between",
+                    padding: "14px 16px", textDecoration: "none",
+                    border: "1px solid var(--border)", borderRadius: 10,
+                  }}
+                >
+                  <span style={{ fontSize: 15, fontWeight: 700, color: "#24304a" }}>{doc.label}</span>
+                  <span style={{
+                    width: 36, height: 36, borderRadius: "50%", background: "#dcfce7",
+                    display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0,
+                  }}>
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#16a34a" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M12 3v12" />
+                      <path d="M6 11l6 6 6-6" />
+                      <path d="M5 21h14" />
+                    </svg>
+                  </span>
+                </a>
+              ))}
             </div>
-          )}
+          </div>
 
           {product.disclaimer && (
             <div style={{ background: "#fffbeb", border: "1px solid #f59e0b", borderRadius: 8, padding: "12px 14px", fontSize: 13, color: "#78350f", lineHeight: 1.7 }}>

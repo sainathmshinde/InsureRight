@@ -7,7 +7,7 @@ import {
   UploadBox,
   SectionBlock,
 } from "../../components/Field";
-import { CheckboxGroup, FormActions } from "../../components/UI";
+import { FormActions } from "../../components/UI";
 import { DocumentViewerModal } from "../../components/fields/DocumentViewerModal";
 import policyWordingsPdf from "../../assets/StarHealthAssureInsurancePolicy-Policy-wording.pdf";
 import brochurePdf from "../../assets/Brochure_Star_Comprehensive_Insurance_Policy_V_15_Web_633bcfcaaf.pdf";
@@ -27,19 +27,6 @@ const IC_LIST = [
   "Reliance General",
   "Tata AIG",
 ];
-const ADDONS = [
-  "Critical Illness Rider",
-  "Personal Accident Cover",
-  "OPD Cover",
-  "Maternity Cover",
-  "Dental Cover",
-  "Vision Cover",
-  "Home Nursing",
-  "Air Ambulance",
-  "No Claim Bonus",
-  "Global Cover",
-];
-const TENURES = ["1 Year", "2 Years", "3 Years", "5 Years"];
 const POLICY_TOC = [
   {
     id: "CIS",
@@ -99,79 +86,6 @@ const POLICY_TOC = [
   },
 ];
 
-const BROCHURE_TOC = [
-  {
-    id: "B-KEY",
-    icon: "🔑",
-    title: "Key Features",
-    content:
-      "Comprehensive health insurance for individual & family floater. Covers in-patient, day care, OPD, dental, ophthalmic. Accidental death & PTD lump-sum benefit included. Wellness benefits and loyalty discounts up to 10%. Available for ages 18–65 (children from 91 days).",
-  },
-  {
-    id: "B-ENTRY",
-    icon: "👤",
-    title: "Entry Age & Sum Insured",
-    content:
-      "Adults: 18–65 years; lifetime renewal. Dependent children: 91 days–25 years. Sum insured: ₹5L to ₹1Cr (individual & family floater). Minimum 2 family members required for floater plan. No maximum entry age for renewal.",
-  },
-  {
-    id: "B-DISC",
-    icon: "🏷️",
-    title: "Discounts",
-    content:
-      "Online purchase: 5%. Long-term policy — 2 years: 7.5%; 3 years: 10%. Loyalty renewal discount up to 10% based on claim-free years. Zone-based pricing: Zone I (metros) higher, Zone II (others) lower. Staff discount available for IC employees.",
-  },
-  {
-    id: "B-CORE",
-    icon: "🏥",
-    title: "Core Coverages",
-    content:
-      "In-patient hospitalisation (room rent, ICU, surgeon, blood, medicines). Day care — all listed procedures. Pre-hospitalisation: 60 days. Post-hospitalisation: 180 days. Ambulance: road & air. Domiciliary hospitalisation. AYUSH at empanelled hospitals. Organ donor expenses covered.",
-  },
-  {
-    id: "B-BONUS",
-    icon: "📈",
-    title: "Cumulative Bonus & Restoration",
-    content:
-      "Cumulative Bonus: 25% SI increase per claim-free year; accumulates up to 100% of base SI. Restoration: 100% SI reinstated once per policy year for unrelated illness. Cumulative bonus resets on a major claim at renewal.",
-  },
-  {
-    id: "B-MAT",
-    icon: "🍼",
-    title: "Delivery & New Born",
-    content:
-      "Maternity cover (normal & caesarean delivery) after 24-month waiting period. New born baby covered from day 1 of birth for medical expenses up to 10% of SI. Vaccination of new born covered up to age 1. In Utero Fetal surgery covered under in-patient hospitalisation.",
-  },
-  {
-    id: "B-OPD",
-    icon: "👁️",
-    title: "OPD / Dental / Ophthalmic",
-    content:
-      "OPD consultations: up to ₹500 per visit, max 10 visits per year. Dental (non-accidental): ₹5,000 per year after 2-year waiting period. Ophthalmic — spectacles/contacts: ₹2,500 per year after 2-year waiting period. All OPD sub-limits subject to SI slab.",
-  },
-  {
-    id: "B-ACC",
-    icon: "🛡️",
-    title: "Accidental Death & PTD",
-    content:
-      "Accidental death benefit: 100% SI paid as lump sum to nominee. Permanent Total Disability (PTD): 100% SI. Permanent Partial Disability (PPD): % of SI per schedule. No waiting period for accident claims. Benefit available from policy inception date.",
-  },
-  {
-    id: "B-WAIT",
-    icon: "⏳",
-    title: "Waiting Periods & Optional Cover",
-    content:
-      "Initial waiting: 30 days (accidents exempt). PED: 48 months (36 months with portability credit). Specified diseases: 24 months. Maternity: 24 months. Optional add-ons: Critical Illness, Personal Accident top-up, OPD booster, international cover (requires min ₹25L SI).",
-  },
-  {
-    id: "B-EXCL",
-    icon: "🚫",
-    title: "Key Exclusions",
-    content:
-      "Cosmetic/plastic surgery. Routine dental. Infertility & assisted reproduction. Self-inflicted injury. Substance/alcohol abuse. Hazardous activities & adventure sports. War/nuclear events. Unproven treatments. Obesity/weight-loss surgery. STDs. Refractive error correction (LASIK below ₹7.5 dioptres unless covered by add-on).",
-  },
-];
-
 const COVERED_MEMBERS = [
   "Self",
   "Spouse",
@@ -226,10 +140,8 @@ export default function ProductForm({
   submitLabel = "Save Product",
 }) {
   const [activeToc, setActiveToc] = useState(null);
-  const [activeTocDoc, setActiveTocDoc] = useState("policyWordings");
   const [viewingDoc, setViewingDoc] = useState(null);
   const [policyToc, setPolicyToc] = useState(POLICY_TOC);
-  const [brochureToc, setBrochureToc] = useState(BROCHURE_TOC);
   const [editingTocId, setEditingTocId] = useState(null);
   const [tocDraft, setTocDraft] = useState({ title: '', content: '' });
   const [coveredMembers, setCoveredMembers] = useState(() => new Set(initialMembers?.length ? initialMembers : ["Self"]));
@@ -318,9 +230,8 @@ export default function ProductForm({
     setEditingTocId(item.id);
     setTocDraft({ title: item.title, content: item.content });
   };
-  const saveEditToc = (docKey) => {
-    const setter = docKey === 'policyWordings' ? setPolicyToc : setBrochureToc;
-    setter(prev => prev.map(i => i.id === editingTocId ? { ...i, ...tocDraft } : i));
+  const saveEditToc = () => {
+    setPolicyToc(prev => prev.map(i => i.id === editingTocId ? { ...i, ...tocDraft } : i));
     setEditingTocId(null);
   };
   const cancelEditToc = () => setEditingTocId(null);
@@ -746,44 +657,29 @@ export default function ProductForm({
           </Field>
         </div>
         <div style={{ marginBottom: 18 }}>
-          <Field label="Tenure Options">
-            <div style={{ paddingTop: 8 }}>
-              <CheckboxGroup
-                options={TENURES}
-                selected={form.tenureOptions}
-                onChange={setArr("tenureOptions")}
-              />
-            </div>
-          </Field>
-        </div>
-        <div className="form-grid-3">
-          <Field label="Waiting Period (days)" required>
-            <Input
-              type="number"
-              min="0"
-              placeholder="e.g. 30"
-              value={form.waitingPeriod}
-              onChange={set("waitingPeriod")}
-              required
-            />
-          </Field>
-          <Field label="Room Rent Limit">
-            <Select value={form.roomRentLimit} onChange={set("roomRentLimit")}>
-              <option value="">Select limit</option>
-              <option>No Limit</option>
-              <option>1% of Sum Insured per day</option>
-              <option>2% of Sum Insured per day</option>
-              <option>₹3,000 per day</option>
-              <option>₹5,000 per day</option>
-              <option>₹10,000 per day</option>
-              <option>Single AC Room</option>
-            </Select>
-          </Field>
-          <Field label="Waiting Period For Disease" className="col-span-3">
+          <Field label="Waiting Periods">
             <Textarea
               placeholder="e.g. Pre-existing diseases covered after 36 months, Maternity after 2 years…"
-              value={form.diseaseRestrictions}
-              onChange={set("diseaseRestrictions")}
+              value={form.waitingPeriods}
+              onChange={set("waitingPeriods")}
+            />
+          </Field>
+        </div>
+        <div style={{ marginBottom: 18 }}>
+          <Field label="Copayment">
+            <Textarea
+              placeholder="e.g. 10% copay above age 60, 20% for non-network hospitals…"
+              value={form.copayment}
+              onChange={set("copayment")}
+            />
+          </Field>
+        </div>
+        <div style={{ marginBottom: 18 }}>
+          <Field label="Maternity Benefit(s)">
+            <Textarea
+              placeholder="e.g. Covered after 2 years waiting period, up to ₹50,000 for normal delivery…"
+              value={form.maternityBenefits}
+              onChange={set("maternityBenefits")}
             />
           </Field>
         </div>
@@ -811,25 +707,14 @@ export default function ProductForm({
             />
           </Field>
         </div>
-        <div style={{ marginBottom: 18 }}>
-          <Field label="Add-ons / Riders">
-            <div style={{ paddingTop: 8 }}>
-              <CheckboxGroup
-                options={ADDONS}
-                selected={form.addOns}
-                onChange={setArr("addOns")}
-              />
-            </div>
-          </Field>
-        </div>
       </SectionBlock>
 
       {/* ── Documents ─────────────────────────── */}
       <SectionBlock icon="📄" title="Documents">
-        <div className="pf-doc-grid" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 24, alignItems: "start" }}>
+        <div style={{ display: "flex", flexDirection: "column", gap: 24 }}>
 
-          {/* Left — file cards */}
-          <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+          {/* Top row — file cards side by side */}
+          <div className="pf-doc-grid" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 24, alignItems: "start" }}>
             {[
               { field: "policyWordingsFile", label: "Policy Wordings Document", hint: "PDF only, max 20MB" },
               { field: "brochureFile", label: "Brochure / Sales Material", hint: "PDF, JPG or PNG" },
@@ -877,7 +762,7 @@ export default function ProductForm({
             })}
           </div>
 
-          {/* Right — TOC panel */}
+          {/* Table of Contents — below, full width */}
           <div style={{ border: "1px solid var(--border)", borderRadius: "var(--r-md)", overflow: "hidden" }}>
             {/* Header */}
             <div style={{ padding: "11px 16px", background: "var(--surface-2)", borderBottom: "1px solid var(--border)", display: "flex", alignItems: "center", gap: 8 }}>
@@ -885,35 +770,9 @@ export default function ProductForm({
               <span style={{ fontWeight: 600, fontSize: 13.5 }}>Table of Contents</span>
             </div>
 
-            {/* Tabs */}
-            <div style={{ display: "flex", borderBottom: "1px solid var(--border)" }}>
-              {[
-                { key: "policyWordings", label: "Policy Wordings" },
-                { key: "brochure", label: "Brochure" },
-              ].map(({ key, label }) => (
-                <button
-                  key={key}
-                  type="button"
-                  onClick={() => { setActiveTocDoc(key); setActiveToc(null); }}
-                  style={{
-                    flex: 1, padding: "9px 12px", border: "none", cursor: "pointer",
-                    background: activeTocDoc === key ? "white" : "var(--surface-2)",
-                    borderBottom: activeTocDoc === key ? "2px solid var(--brand)" : "2px solid transparent",
-                    color: activeTocDoc === key ? "var(--brand)" : "var(--text-3)",
-                    fontWeight: activeTocDoc === key ? 600 : 400,
-                    fontSize: 13.5, fontFamily: "inherit",
-                    marginBottom: activeTocDoc === key ? -1 : 0,
-                    transition: "all .12s",
-                  }}
-                >
-                  {label}
-                </button>
-              ))}
-            </div>
-
             {/* Accordion */}
             <div style={{ maxHeight: 400, overflowY: "auto" }}>
-              {(activeTocDoc === "policyWordings" ? policyToc : brochureToc).map((item) => {
+              {policyToc.map((item) => {
                 const isOpen    = activeToc === item.id;
                 const isEditing = editingTocId === item.id;
                 return (
@@ -962,7 +821,7 @@ export default function ProductForm({
                             </div>
                             <div style={{ display: "flex", gap: 8 }}>
                               <button type="button" className="btn btn-ghost btn-sm" onClick={cancelEditToc}>Cancel</button>
-                              <button type="button" className="btn btn-primary btn-sm" onClick={() => saveEditToc(activeTocDoc)}>Save</button>
+                              <button type="button" className="btn btn-primary btn-sm" onClick={saveEditToc}>Save</button>
                             </div>
                           </div>
                         ) : (

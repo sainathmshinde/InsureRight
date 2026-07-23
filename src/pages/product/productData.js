@@ -483,6 +483,10 @@ export const PREMIUM_CHART = {
 export const PRODUCT_DETAILS = {
   3: {
     tagline: 'Extra Coverage When Your Base Policy Runs Out',
+    eligibilityCriteria: 'Available to individuals aged 18–65 years who hold an existing base health insurance policy or corporate group cover. Dependent children can be added between 91 days and 25 years.',
+    waitingPeriods: 'Initial waiting period of 30 days (waived for accidents). Pre-existing diseases covered after 24 months. Specific illnesses such as cataract and hernia covered after 12 months.',
+    copayment: 'No mandatory copayment for members below 60 years. 10% copay applies for members aged 60 years and above.',
+    maternityBenefits: 'Maternity expenses are not covered under this Super Top Up policy.',
     description: 'Go Digit\'s Super Top Up Policy kicks in once you\'ve exhausted your base health plan, giving you ₹1L–₹10L of additional hospitalisation coverage. It\'s the most cost-effective way to achieve high total cover — perfect as a top-up over any existing corporate or individual health plan.',
     target: ['Employees with corporate health insurance', 'Individuals with an existing base health plan', 'Families wanting ₹10L+ total coverage affordably'],
     benefits: [
@@ -504,6 +508,10 @@ export const PRODUCT_DETAILS = {
   },
   7: {
     tagline: 'Everyday Healthcare Costs — Finally Covered',
+    eligibilityCriteria: 'Open to individuals and family members aged 91 days to 65 years. Can be purchased as a standalone OPD cover or alongside a base hospitalisation policy.',
+    waitingPeriods: '30-day initial waiting period for all OPD claims. Dental and vision OPD sub-limits apply after a 90-day waiting period.',
+    copayment: 'No copayment applicable — the full OPD limit is reimbursed as per policy sub-limits.',
+    maternityBenefits: 'Maternity-related consultations are not covered under this OPD policy.',
     description: 'Go Digit\'s Out-Patient Care Insurance Policy covers the day-to-day medical expenses that standard hospitalisation policies ignore: doctor visits, diagnostics, pharmacy bills, and preventive check-ups. The perfect add-on for anyone whose base plan leaves OPD uncovered.',
     target: ['Salaried professionals with hospitalisation-only cover', 'Families with frequent doctor visits', 'Anyone wanting to cover routine medical spending'],
     benefits: [
@@ -525,6 +533,10 @@ export const PRODUCT_DETAILS = {
   },
   8: {
     tagline: 'Your EMIs Stay Covered Even When You Can\'t Work',
+    eligibilityCriteria: 'Available to salaried and self-employed individuals aged 21–60 years with an active loan or EMI obligation.',
+    waitingPeriods: 'No waiting period for accidental hospitalisation or disability claims. A 90-day waiting period applies for illness-related claims where covered.',
+    copayment: 'No copayment applicable on approved claims.',
+    maternityBenefits: 'Not applicable — this is an income/EMI protection policy, not a health policy.',
     description: 'Go Digit\'s Payment Protection Policy ensures your financial obligations are protected in the event of accidental hospitalisation or disability. It pays out a benefit to cover your loan EMIs or daily expenses while you recover — giving you peace of mind during tough times.',
     target: ['Loan and EMI payers', 'Self-employed professionals', 'Anyone with outstanding financial liabilities'],
     benefits: [
@@ -546,6 +558,10 @@ export const PRODUCT_DETAILS = {
   },
   9: {
     tagline: 'Comprehensive Group Health for BPP Employees',
+    eligibilityCriteria: 'Available to BPP employees aged 18–65 years and their dependents (spouse and up to 2 children). New joiners are covered from date of enrolment.',
+    waitingPeriods: 'Initial waiting period of 30 days (waived for accidents). Pre-existing diseases covered after 12 months under group continuity. Specific illnesses covered after 90 days.',
+    copayment: 'No copayment for members below 60 years. 10% copay applies for dependents aged 60 years and above.',
+    maternityBenefits: 'Available as an optional rider — normal delivery covered up to ₹25,000 and caesarean up to ₹35,000, after a 9-month waiting period.',
     description: 'MAGMA\'s Group Health Insurance for BPP provides full hospitalisation coverage for employees and their families. With 11 age bands ensuring fair premiums and sum insured from ₹3L to ₹10L, it is the preferred choice for BPP workforce health protection.',
     target: ['BPP employees and their families', 'HR teams enrolling group cover', 'Employees aged 18 – 65 across all age groups'],
     benefits: [
@@ -568,6 +584,10 @@ export const PRODUCT_DETAILS = {
   },
   10: {
     tagline: 'Amplify Your BPP Coverage with a Cost-Effective Top-Up',
+    eligibilityCriteria: 'Available to BPP employees aged 18–65 years with an existing base health policy. Spouse and up to 2 children can be covered.',
+    waitingPeriods: 'Initial waiting period of 30 days (waived for accidents). Pre-existing diseases covered after 24 months.',
+    copayment: 'No copayment for members below 60 years. 10% copay for members aged 60 years and above.',
+    maternityBenefits: 'Maternity expenses are not covered under this top-up policy.',
     description: 'MAGMA\'s Standalone Super Top Up for BPP employees extends your protection beyond the base policy limit. With 11 age bands and sum insured options from ₹3L to ₹10L, it fills the coverage gap at a significantly lower premium than upgrading your base plan.',
     target: ['BPP employees with an existing base health cover', 'Employees aged 30+ seeking higher sum insured', 'Families wanting ₹13L+ combined protection'],
     benefits: [
@@ -589,6 +609,10 @@ export const PRODUCT_DETAILS = {
   },
   11: {
     tagline: 'Oriental Insurance — Trusted Group Health for BPP',
+    eligibilityCriteria: 'Available to BPP employee groups of 7 or more members, aged 18–65 years, along with spouse and dependent children.',
+    waitingPeriods: 'Initial waiting period of 30 days (waived for accidents). Pre-existing diseases covered after 12 months under group continuity.',
+    copayment: 'No copayment for members below 60 years. 10% copay applies for dependents aged 60 and above.',
+    maternityBenefits: 'Available as an optional rider — covers normal and caesarean delivery up to ₹30,000 after a 9-month waiting period.',
     description: 'Oriental Insurance Company\'s Group Health Policy for BPP employees offers comprehensive in-patient coverage backed by one of India\'s oldest public sector insurers. Age-banded pricing with sum insured from ₹3L to ₹10L ensures affordable protection for all age groups.',
     target: ['BPP employees and family members', 'Groups of 7+ members seeking corporate cover', 'Employees aged 18 – 65'],
     benefits: [
@@ -611,6 +635,10 @@ export const PRODUCT_DETAILS = {
   },
   12: {
     tagline: 'Top Up Your Oriental BPP Cover — Smarter, Cheaper',
+    eligibilityCriteria: 'Available to BPP employees aged 18–65 years with existing Oriental base cover. Spouse and up to 2 children can be included.',
+    waitingPeriods: 'Initial waiting period of 30 days (waived for accidents). Pre-existing diseases covered after 24 months.',
+    copayment: 'No copayment for members below 60 years. 10% copay for members aged 60 years and above.',
+    maternityBenefits: 'Maternity expenses are not covered under this super top-up policy.',
     description: 'Oriental Insurance\'s Super Top Up for BPP gives you extended hospitalisation coverage once your base plan limit is reached. With 4 age bands and sum insured from ₹3L to ₹10L, it\'s a smart, affordable way to achieve higher combined protection.',
     target: ['BPP employees with existing Oriental base cover', 'Employees seeking higher total coverage', 'Families wanting ₹13L+ combined sum insured'],
     benefits: [
@@ -632,6 +660,10 @@ export const PRODUCT_DETAILS = {
   },
   38: {
     tagline: 'SBI Super Top Up — Enhanced Cover from ₹3L Threshold',
+    eligibilityCriteria: 'Available to policyholders aged 18–65 years holding an existing base health policy with a ₹3L sum insured.',
+    waitingPeriods: 'Initial waiting period of 30 days (waived for accidents). Pre-existing diseases covered after 24 months.',
+    copayment: 'No copayment for members below 60 years. 10% copay for members aged 60 years and above.',
+    maternityBenefits: 'Maternity expenses are not covered under this Super Top Up policy.',
     description: 'SBI General\'s Super Top Up Policy (₹3L threshold) covers all hospitalisation expenses beyond your ₹3L base plan. The most accessible entry point into SBI\'s Super Top Up range — ideal for those with a ₹3L group or individual base cover.',
     target: ['Policyholders with ₹3L base health cover', 'Individuals wanting to extend to ₹10L total', 'Budget-conscious families seeking high cover'],
     benefits: [
@@ -654,6 +686,10 @@ export const PRODUCT_DETAILS = {
   },
   39: {
     tagline: 'SBI Super Top Up — Seamless Extension from ₹4L Base',
+    eligibilityCriteria: 'Available to policyholders aged 18–65 years holding an existing base health policy with a ₹4L sum insured.',
+    waitingPeriods: 'Initial waiting period of 30 days (waived for accidents). Pre-existing diseases covered after 24 months.',
+    copayment: 'No copayment for members below 60 years. 10% copay for members aged 60 years and above.',
+    maternityBenefits: 'Maternity expenses are not covered under this Super Top Up policy.',
     description: 'SBI General\'s Super Top Up with ₹4L threshold perfectly complements a ₹4L base policy. Once your base plan is exhausted, this policy takes over — covering hospitalisation up to ₹11L total at a fraction of the cost of a standalone high-SI plan.',
     target: ['Policyholders with ₹4L base health cover', 'Those wanting up to ₹11L total protection', 'Families needing affordable high-value cover'],
     benefits: [
@@ -675,6 +711,10 @@ export const PRODUCT_DETAILS = {
   },
   40: {
     tagline: 'SBI Super Top Up — Maximum Value from ₹5L Base Plan',
+    eligibilityCriteria: 'Available to policyholders aged 18–65 years holding an existing base health policy with a ₹5L sum insured.',
+    waitingPeriods: 'Initial waiting period of 30 days (waived for accidents). Pre-existing diseases covered after 24 months.',
+    copayment: 'No copayment for members below 60 years. 10% copay for members aged 60 years and above.',
+    maternityBenefits: 'Maternity expenses are not covered under this Super Top Up policy.',
     description: 'SBI General\'s Super Top Up with ₹5L threshold is the most cost-effective option in the range for those with a ₹5L base policy. Achieve total health coverage up to ₹12L while paying only a minimal additional premium.',
     target: ['Policyholders with ₹5L base health cover', 'Cost-conscious buyers seeking high total SI', 'Families wanting ₹12L total coverage cheaply'],
     benefits: [
@@ -696,6 +736,10 @@ export const PRODUCT_DETAILS = {
   },
   42: {
     tagline: 'SBI Base Policy — A Trusted Foundation for Your Health',
+    eligibilityCriteria: 'Available to individuals and family members aged 18–65 years. Dependent children can be covered from 91 days to 25 years. Lifetime renewability guaranteed.',
+    waitingPeriods: 'Initial waiting period of 30 days (waived for accidents). Pre-existing diseases covered after 24 months. Specific illnesses such as cataract, hernia and joint replacement covered after 12 months.',
+    copayment: 'No copayment for members below 60 years. 10% copay applies for members aged 60 years and above.',
+    maternityBenefits: 'Not covered as standard — can be added as an optional rider covering normal and caesarean delivery after a 9-month waiting period.',
     description: 'SBI General\'s Base Health Policy offers solid ₹5 lakh hospitalisation coverage backed by one of India\'s largest public sector banks. With access to 6,000+ cashless hospitals, an annual health check-up benefit, and no-claim bonus, it\'s the right foundation to build your health cover on.',
     target: ['Individuals and families aged 18 – 65', 'First-time health insurance buyers', 'Those wanting PSU-backed insurance reliability'],
     benefits: [
@@ -718,6 +762,10 @@ export const PRODUCT_DETAILS = {
   },
   43: {
     tagline: 'SBI OPD 2025-26 — Your Everyday Health Bills Covered',
+    eligibilityCriteria: 'Available to individuals and family members aged 91 days to 65 years, either standalone or alongside a hospitalisation policy.',
+    waitingPeriods: '30-day initial waiting period applies to all OPD claims.',
+    copayment: 'No copayment applicable — OPD expenses are reimbursed as per policy sub-limits.',
+    maternityBenefits: 'Maternity-related consultations are not covered under this OPD policy.',
     description: 'SBI General\'s OPD Policy for 2025-26 covers the routine medical expenses that standard hospitalisation plans miss — consultations, diagnostics, pharmacy, and preventive health checks. A must-have complement to any hospitalisation-only policy.',
     target: ['Working professionals with frequent OPD needs', 'Families with children requiring routine check-ups', 'Anyone with a hospitalisation plan lacking OPD cover'],
     benefits: [
@@ -739,6 +787,10 @@ export const PRODUCT_DETAILS = {
   },
   44: {
     tagline: 'SBI Group Health for BPP — 2026-27 Policy Year',
+    eligibilityCriteria: 'Available to BPP employees aged 18–65 years enrolling for the 2026-27 policy year, along with spouse and up to 2 children.',
+    waitingPeriods: 'Initial waiting period of 30 days (waived for accidents). Pre-existing diseases covered after 12 months under group continuity.',
+    copayment: 'No copayment for members below 60 years. 10% copay applies for dependents aged 60 and above.',
+    maternityBenefits: 'Available as an optional add-on — covers normal and caesarean delivery up to ₹30,000 after a 9-month waiting period.',
     description: 'SBI General\'s Group Health Insurance for BPP employees for the 2026-27 policy year. Comprehensive in-patient coverage with 11 age bands, sum insured from ₹3L to ₹10L, and cashless access across SBI\'s extensive 6,000+ hospital network.',
     target: ['BPP employees enrolling for 2026-27', 'Employee families — spouse and up to 2 children', 'New joiners requiring immediate health coverage'],
     benefits: [
@@ -762,6 +814,10 @@ export const PRODUCT_DETAILS = {
   },
   48: {
     tagline: 'Smart Top-Up — 15% Bundle Savings with SBI Base Policy',
+    eligibilityCriteria: 'Available to existing SBI Base Policy (KMD-042) holders aged 18–65 years. Spouse and up to 2 children can be included.',
+    waitingPeriods: 'Initial waiting period of 30 days (waived for accidents). Pre-existing diseases covered after 24 months.',
+    copayment: 'No copayment for members below 60 years. 10% copay for members aged 60 years and above.',
+    maternityBenefits: 'Maternity expenses are not covered under this top-up policy.',
     description: 'SBI Arogya Plus is a dedicated Top Up Health Plan engineered to pair with the SBI Base Policy (KMD-042). Once your base plan limit is exhausted, it kicks in seamlessly — adding ₹5L to ₹20L of hospitalisation coverage at a fraction of the standalone cost. Campaigns that include both this plan and the SBI Base Policy automatically unlock a 15% bundle discount on the top-up premium.',
     target: [
       'SBI Base Policy holders wanting higher total coverage',
@@ -805,6 +861,10 @@ export const PRODUCT_DETAILS = {
   },
   45: {
     tagline: 'SBI Super Top Up BPP 2026-27 — Go Beyond Your Base Cover',
+    eligibilityCriteria: 'Available to BPP employees aged 18–65 years with the 2026-27 base group cover. Spouse and up to 2 children can be included.',
+    waitingPeriods: 'Initial waiting period of 30 days (waived for accidents). Pre-existing diseases covered after 24 months.',
+    copayment: 'No copayment for members below 60 years. 10% copay for members aged 60 years and above.',
+    maternityBenefits: 'Maternity expenses are not covered under this super top-up policy.',
     description: 'SBI General\'s Super Top Up for BPP employees in 2026-27 extends your group health coverage beyond the base plan limit. With 4 age bands and sum insured from ₹3L to ₹10L, it\'s designed to give BPP employees meaningful higher protection at an affordable additional premium.',
     target: ['BPP employees with the 2026-27 base group cover', 'Employees wanting total coverage of ₹13L+', 'Families seeking higher combined protection'],
     benefits: [
