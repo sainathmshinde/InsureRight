@@ -3,6 +3,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import {
   Field,
   Input,
+  DateInput,
   Select,
   UploadBox,
   SectionBlock,
@@ -153,8 +154,7 @@ export default function AgentEdit() {
               </div>
               <div className="form-grid-3">
                 <Field label="Date of Birth">
-                  <Input
-                    type="date"
+                  <DateInput
                     value={form.dob || ""}
                     onChange={set("dob")}
                   />

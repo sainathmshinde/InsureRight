@@ -92,8 +92,6 @@ const ALL_PRODUCTS = [
     provider: 'SBI General Insurance Company Limited',
     policyTypeId: 6,
     disclaimer: null,
-    linkedBaseId: 42,
-    bundleDiscount: { type: 'Percent', value: 10 },
   },
   {
     id: 39,
@@ -101,8 +99,6 @@ const ALL_PRODUCTS = [
     provider: 'SBI General Insurance Co. Ltd.',
     policyTypeId: 6,
     disclaimer: null,
-    linkedBaseId: 42,
-    bundleDiscount: { type: 'Percent', value: 8 },
   },
   {
     id: 40,
@@ -110,8 +106,6 @@ const ALL_PRODUCTS = [
     provider: 'SBI General Insurance Co. Ltd.',
     policyTypeId: 6,
     disclaimer: null,
-    linkedBaseId: 42,
-    bundleDiscount: { type: 'Percent', value: 5 },
   },
   {
     id: 42,
@@ -164,6 +158,24 @@ const ALL_PRODUCTS = [
     linkedBaseId: 42,
     bundleDiscount: { type: 'Percent', value: 15 },
   },
+  {
+    id: 49,
+    name: 'LIC Health Shield Top Up',
+    provider: 'LIC',
+    policyTypeId: 2,
+    disclaimer: null,
+    linkedBaseId: 6,
+    bundleDiscount: { type: 'Percent', value: 12 },
+  },
+  {
+    id: 50,
+    name: 'SBI Super Saver Top Up',
+    provider: 'SBI General Insurance Company Limited',
+    policyTypeId: 2,
+    disclaimer: null,
+    linkedBaseId: 42,
+    bundleDiscount: { type: 'Flat', value: 500 },
+  },
 ]
 
 // Enrich each product with derived display fields
@@ -181,6 +193,16 @@ export const PRODUCTS_BY_TYPE = PRODUCTS.reduce((acc, p) => {
   acc[type].push(p)
   return acc
 }, {})
+
+// Base ↔ top-up bundle linkage for a product: the base it's linked to (if it's a
+// top-up) and any top-ups that link to it (if it's a base), each carrying its own
+// bundleDiscount off the base policy premium.
+export function getProductLinks(productId) {
+  const product = PRODUCTS.find(p => p.id === productId)
+  const linkedBase = product?.linkedBaseId ? PRODUCTS.find(p => p.id === product.linkedBaseId) : null
+  const topups = PRODUCTS.filter(p => p.linkedBaseId === productId)
+  return { linkedBase, topups }
+}
 
 // Premium chart keyed by productId.
 // Fields: sumInsured, selfOnly, selfSpouse, selfSpouse2Children (omitted when 0), ageBandId (omitted when 0).
@@ -813,12 +835,12 @@ export const PRODUCT_DETAILS = {
     ],
   },
   48: {
-    tagline: 'Smart Top-Up — 15% Bundle Savings with SBI Base Policy',
+    tagline: 'Smart Top-Up — Pairs with SBI Base Policy',
     eligibilityCriteria: 'Available to existing SBI Base Policy (KMD-042) holders aged 18–65 years. Spouse and up to 2 children can be included.',
     waitingPeriods: 'Initial waiting period of 30 days (waived for accidents). Pre-existing diseases covered after 24 months.',
     copayment: 'No copayment for members below 60 years. 10% copay for members aged 60 years and above.',
     maternityBenefits: 'Maternity expenses are not covered under this top-up policy.',
-    description: 'SBI Arogya Plus is a dedicated Top Up Health Plan engineered to pair with the SBI Base Policy (KMD-042). Once your base plan limit is exhausted, it kicks in seamlessly — adding ₹5L to ₹20L of hospitalisation coverage at a fraction of the standalone cost. Campaigns that include both this plan and the SBI Base Policy automatically unlock a 15% bundle discount on the top-up premium.',
+    description: 'SBI Arogya Plus is a dedicated Top Up Health Plan engineered to pair with the SBI Base Policy (KMD-042). Once your base plan limit is exhausted, it kicks in seamlessly — adding ₹5L to ₹20L of hospitalisation coverage at a fraction of the standalone cost.',
     target: [
       'SBI Base Policy holders wanting higher total coverage',
       'Members seeking ₹10L – ₹25L combined hospitalisation cover',
@@ -827,7 +849,6 @@ export const PRODUCT_DETAILS = {
     ],
     benefits: [
       'Activates only after SBI Base Policy (KMD-042) is exhausted',
-      '15% bundle discount when paired with SBI Base Policy in campaign',
       'Sum insured options: ₹5L, ₹10L, ₹15L and ₹20L',
       'Covers self, spouse, and up to 2 children',
       'In-patient and day care hospitalisation covered',
@@ -855,7 +876,6 @@ export const PRODUCT_DETAILS = {
     highlights: [
       { label: 'Sum Insured',    value: '₹5L – ₹20L', icon: '🛡️' },
       { label: 'Premium From',   value: '₹4,250/yr',   icon: '💰' },
-      { label: 'Bundle Discount',value: '15% off',      icon: '🏷️' },
       { label: 'Pairs With',     value: 'KMD-042',      icon: '🔗' },
     ],
   },

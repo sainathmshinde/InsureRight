@@ -9,13 +9,6 @@ export const DESIGNATIONS = [
 
 export const DESIG_LABEL = Object.fromEntries(DESIGNATIONS.map(d => [d.value, d.label]));
 
-export const DESIG_META = {
-  "manager":          { color: "#7c3aed", bg: "#f3e8ff", border: "#c4b5fd" },
-  "team-lead":        { color: "#b45309", bg: "#fffbeb", border: "#fcd34d" },
-  "sales-operator":   { color: "#15803d", bg: "#dcfce7", border: "#86efac" },
-  "calling-operator": { color: "#1565d8", bg: "#e7f0fc", border: "#7dd3fc" },
-};
-
 // Maps every agentType value used in agentData.js → unified designation key
 const TYPE_TO_DESIG = {
   "manager":       "manager",
@@ -68,41 +61,31 @@ export const hierarchyRules = [
   // Manager → Team Leads
   {
     id: 1,
-    reportingDesig: "manager",
     reportingEmpId: 4,           // Kavita Sharma
-    reporteeDesig:  "team-lead",
     reporteeEmpIds: [3, 10],     // Suresh Nair, Neha Gupta
   },
   // Manager → Sales Operators (Priya's direct reports)
   {
     id: 2,
-    reportingDesig: "manager",
     reportingEmpId: 8,           // Priya Menon
-    reporteeDesig:  "sales-operator",
     reporteeEmpIds: [7, 11],     // Rahul Singh, Ajay Tiwari
   },
   // Team Lead → Sales Operators
   {
     id: 3,
-    reportingDesig: "team-lead",
     reportingEmpId: 3,           // Suresh Nair
-    reporteeDesig:  "sales-operator",
     reporteeEmpIds: [1, 5],      // Ravi Kulkarni, Amit Verma
   },
   // Team Lead → Calling Operators
   {
     id: 4,
-    reportingDesig: "team-lead",
     reportingEmpId: 10,          // Neha Gupta
-    reporteeDesig:  "calling-operator",
     reporteeEmpIds: [9, 12],     // Kiran Reddy, Divya Iyer
   },
   // Sales Operator → Calling Operators
   {
     id: 5,
-    reportingDesig: "sales-operator",
     reportingEmpId: 1,           // Ravi Kulkarni
-    reporteeDesig:  "calling-operator",
     reporteeEmpIds: [2, 6],      // Pooja Desai, Sneha Patil
   },
 ];

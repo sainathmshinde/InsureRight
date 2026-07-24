@@ -239,7 +239,9 @@ body {
   border-radius: var(--r-lg);
   box-shadow: var(--shadow-md);
   margin-bottom: 16px;
-  overflow: hidden;
+  /* No overflow:hidden — children (heading/body) are already inset by padding,
+     and clipping here cuts off dropdowns (association/employee pickers, etc.)
+     that open near the bottom of a section. */
 }
 .section-heading {
   display: flex;
@@ -312,6 +314,11 @@ label {
   color: var(--red);
   margin-left: 2px;
 }
+.field-error-text {
+  margin-top: 6px;
+  font-size: 12.5px;
+  color: var(--red);
+}
 
 .field-input,
 .field-select,
@@ -358,6 +365,42 @@ label {
   background: #f3f4f6;
   color: #6b7280;
   cursor: not-allowed;
+}
+
+/* ─── Date Input (DD/MMM/YYYY display) ───── */
+.date-field-wrap {
+  position: relative;
+  width: 100%;
+}
+.date-field-wrap .date-field-display {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  padding: 0 12px;
+  border-radius: var(--r-sm);
+  background: #fff;
+  color: var(--text);
+  font-size: 15px;
+  font-family: inherit;
+  pointer-events: none;
+  z-index: 0;
+}
+.date-field-wrap .date-field-placeholder {
+  color: var(--text-3);
+}
+.date-field-wrap .date-field-native {
+  position: relative;
+  z-index: 1;
+  background: transparent;
+  color: transparent;
+}
+.date-field-wrap .date-field-native:disabled {
+  color: transparent;
+}
+.date-field-wrap .date-field-native:disabled ~ .date-field-display {
+  background: #f3f4f6;
+  color: #6b7280;
 }
 
 /* ─── Upload Box ─────────────────────────── */

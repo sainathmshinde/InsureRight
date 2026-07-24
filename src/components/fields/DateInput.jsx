@@ -1,4 +1,17 @@
-const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+const MONTHS = [
+  "Jan",
+  "Feb",
+  "Mar",
+  "Apr",
+  "May",
+  "Jun",
+  "Jul",
+  "Aug",
+  "Sep",
+  "Oct",
+  "Nov",
+  "Dec",
+];
 
 function formatDDMMMYYYY(iso) {
   if (!iso) return "";
@@ -8,7 +21,13 @@ function formatDDMMMYYYY(iso) {
   return `${d}-${MONTHS[mi]}-${y}`;
 }
 
-export function DateInput({ value, onChange, required, className = "", ...props }) {
+export function DateInput({
+  value,
+  onChange,
+  required,
+  className = "",
+  ...props
+}) {
   return (
     <div className="date-field-wrap">
       <input
@@ -20,7 +39,11 @@ export function DateInput({ value, onChange, required, className = "", ...props 
         {...props}
       />
       <span className="date-field-display">
-        {value ? formatDDMMMYYYY(value) : <span className="date-field-placeholder">dd-mmm-yyyy</span>}
+        {value ? (
+          formatDDMMMYYYY(value)
+        ) : (
+          <span className="date-field-placeholder">dd-mmm-yyyy</span>
+        )}
       </span>
     </div>
   );

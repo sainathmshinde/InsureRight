@@ -4,7 +4,7 @@ import Pagination from '../../components/Pagination'
 import usePagination from '../../components/usePagination'
 import { PageHeader, Button, EmptyState } from '../../components/UI'
 import { ProductIcon } from '../../icons'
-import { PRODUCTS, POLICY_TYPES, PREMIUM_CHART, POLICY_TYPE_ICON } from './productData'
+import { PRODUCTS, POLICY_TYPES, PREMIUM_CHART, POLICY_TYPE_ICON, getProductLinks } from './productData'
 
 const TYPE_COLORS = {
   'Base Policy':        { color: '#1d4ed8', bg: '#dbeafe', border: '#93c5fd' },
@@ -83,6 +83,7 @@ export default function ProductList() {
                 const allPremiums = chartRows.flatMap(r => [r.selfOnly, r.selfSpouse, r.selfSpouse2Children].filter(Boolean))
                 const minPremium  = allPremiums.length > 0 ? Math.min(...allPremiums) : null
                 const covKeys     = ['selfOnly', 'selfSpouse', 'selfSpouse2Children'].filter(k => firstRow?.[k] != null)
+                const { linkedBase, topups } = getProductLinks(p.id)
 
                 return (
                   <div key={p.id} style={{
@@ -146,6 +147,30 @@ export default function ProductList() {
                           {covKeys.includes('selfOnly')            && <span style={{ fontSize: 13, fontWeight: 500, background: '#fff', border: '1px solid #dee1e5', borderRadius: 20, padding: '3px 10px', color: '#6d747a' }}>Self</span>}
                           {covKeys.includes('selfSpouse')          && <span style={{ fontSize: 13, fontWeight: 500, background: '#fff', border: '1px solid #dee1e5', borderRadius: 20, padding: '3px 10px', color: '#6d747a' }}>Self + Spouse</span>}
                           {covKeys.includes('selfSpouse2Children') && <span style={{ fontSize: 13, fontWeight: 500, background: '#fff', border: '1px solid #dee1e5', borderRadius: 20, padding: '3px 10px', color: '#6d747a' }}>Family</span>}
+                        </div>
+                      )}
+
+                      {/* Base ↔ top-up linkage */}
+                      {linkedBase && (
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap' }}>
+                          <span style={{ fontSize: 11.5, fontWeight: 600, color: '#6d747a' }}>🔗 Linked to:</span>
+                          <span style={{ fontSize: 11.5, fontWeight: 700, background: '#eff6ff', color: '#1565d8', border: '1px solid #bfdbfe', borderRadius: 99, padding: '2px 8px' }}>
+                            {linkedBase.name}
+                          </span>
+                        </div>
+                      )}
+                      {topups.length > 0 && (
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: 5 }}>
+                          <span style={{ fontSize: 11.5, fontWeight: 600, color: '#6d747a' }}>
+                            🔗 {topups.length} Top-up{topups.length !== 1 ? 's' : ''} linked
+                          </span>
+                          <div style={{ display: 'flex', gap: 4, flexWrap: 'wrap' }}>
+                            {topups.map(t => (
+                              <span key={t.id} style={{ fontSize: 11, fontWeight: 600, background: '#eff6ff', color: '#1565d8', border: '1px solid #bfdbfe', borderRadius: 99, padding: '2px 8px' }}>
+                                {t.name}
+                              </span>
+                            ))}
+                          </div>
                         </div>
                       )}
 
