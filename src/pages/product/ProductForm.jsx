@@ -156,8 +156,7 @@ export default function ProductForm({
   const [gst, setGst] = useState('0');
   const [premiumMatrix, setPremiumMatrix] = useState({});
   const [removedCombos, setRemovedCombos] = useState(new Set());
-  const [linkBasePolicy, setLinkBasePolicy] = useState(false);
-  const [basePolicyDiscount, setBasePolicyDiscount] = useState('');
+  const [linkBasePolicy, setLinkBasePolicy] = useState(!!form.basePolicyId);
   const [ageBands, setAgeBands] = useState(() => [{ id: Date.now(), from: '', to: '' }]);
   const [activeAgeBandId, setActiveAgeBandId] = useState(null);
 
@@ -318,6 +317,7 @@ export default function ProductForm({
                       setLinkBasePolicy(checked);
                       if (!checked) {
                         set("basePolicyId")({ target: { value: "" } });
+                        set("basePolicyDiscount")({ target: { value: "" } });
                       }
                     }}
                   />
@@ -342,8 +342,8 @@ export default function ProductForm({
                   min="0"
                   max="100"
                   placeholder="e.g. 10"
-                  value={basePolicyDiscount}
-                  onChange={e => setBasePolicyDiscount(e.target.value)}
+                  value={form.basePolicyDiscount}
+                  onChange={set("basePolicyDiscount")}
                   disabled={!linkBasePolicy}
                   style={{ maxWidth: 160 }}
                 />

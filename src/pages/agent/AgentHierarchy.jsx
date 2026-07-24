@@ -4,22 +4,10 @@ import { PageHeader, Button, Table, EmptyState } from "../../components/UI";
 import { GroupIcon, SearchIcon } from "../../icons";
 import {
   hierarchyRules, deleteHierarchyRule,
-  DESIGNATIONS, DESIG_META, DESIG_LABEL, EMP_MAP,
+  DESIGNATIONS, DESIG_LABEL, EMP_MAP,
 } from "./agentHierarchyData";
 
-function DesigBadge({ value }) {
-  const m = DESIG_META[value];
-  if (!m) return null;
-  return (
-    <span style={{
-      display: "inline-block", padding: "3px 11px", borderRadius: 99,
-      fontSize: 11.5, fontWeight: 700, whiteSpace: "nowrap",
-      background: m.bg, color: m.color, border: `1.5px solid ${m.border}`,
-    }}>
-      {DESIG_LABEL[value]}
-    </span>
-  );
-}
+const empLabel = (emp) => emp ? `${emp.name} (${DESIG_LABEL[emp.designation] ?? emp.designation})` : "";
 
 function SortTh({ label, colKey, sortKey, sortDir, onSort }) {
   const active = sortKey === colKey;
@@ -71,7 +59,13 @@ export default function AgentHierarchy() {
   const allRows = hierarchyRules.map((r) => {
     const reportingEmp = EMP_MAP[r.reportingEmpId];
     const reporteeEmps = r.reporteeEmpIds.map(id => EMP_MAP[id]).filter(Boolean);
-    return { ...r, _reportingName: reportingEmp?.name ?? "", _reporteeNames: reporteeEmps.map(e => e.name) };
+    return {
+      ...r,
+      _reportingName: reportingEmp?.name ?? "",
+      _reportingDesig: reportingEmp?.designation ?? "",
+      _reporteeNames: reporteeEmps.map(e => e.name),
+      _reporteeDesigs: reporteeEmps.map(e => e.designation),
+    };
   });
 
   // 1. Filter
@@ -82,21 +76,19 @@ export default function AgentHierarchy() {
         || r._reporteeNames.some(n => n.toLowerCase().includes(q));
       if (!hit) return false;
     }
-    if (reportingFilter && r.reportingDesig !== reportingFilter) return false;
-    if (reporteeFilter  && r.reporteeDesig  !== reporteeFilter)  return false;
+    if (reportingFilter && r._reportingDesig !== reportingFilter) return false;
+    if (reporteeFilter  && !r._reporteeDesigs.includes(reporteeFilter)) return false;
     return true;
   });
 
   // 2. Sort
   const sorted = sortKey
     ? [...filtered].sort((a, b) => {
-        let av = sortKey === "reportingDesig" ? DESIG_LABEL[a.reportingDesig]
-               : sortKey === "reporteeDesig"  ? DESIG_LABEL[a.reporteeDesig]
+        let av = sortKey === "reportingDesig" ? DESIG_LABEL[a._reportingDesig]
                : sortKey === "reportingEmp"   ? a._reportingName
                : sortKey === "reporteeCount"  ? a.reporteeEmpIds.length
                : "";
-        let bv = sortKey === "reportingDesig" ? DESIG_LABEL[b.reportingDesig]
-               : sortKey === "reporteeDesig"  ? DESIG_LABEL[b.reporteeDesig]
+        let bv = sortKey === "reportingDesig" ? DESIG_LABEL[b._reportingDesig]
                : sortKey === "reportingEmp"   ? b._reportingName
                : sortKey === "reporteeCount"  ? b.reporteeEmpIds.length
                : "";
@@ -133,12 +125,9 @@ export default function AgentHierarchy() {
       label: th("Reporting", "reportingEmp"),
       render: (row) => {
         const emp = EMP_MAP[row.reportingEmpId];
-        return (
-          <div>
-            <DesigBadge value={row.reportingDesig} />
-            {emp && <div style={{ marginTop: 5, fontWeight: 600, fontSize: 14 }}>{emp.name}</div>}
-          </div>
-        );
+        return emp
+          ? <div style={{ fontWeight: 600, fontSize: 14 }}>{empLabel(emp)}</div>
+          : <span style={{ fontSize: 13, color: "var(--text-3)" }}>—</span>;
       },
     },
     {
@@ -150,25 +139,22 @@ export default function AgentHierarchy() {
     },
     {
       key: "reportee",
-      label: th("Reportee", "reporteeDesig"),
+      label: "Reportee",
       render: (row) => {
         const reportees = row.reporteeEmpIds.map(id => EMP_MAP[id]).filter(Boolean);
-        return (
-          <div>
-            <DesigBadge value={row.reporteeDesig} />
-            <div style={{ marginTop: 6, display: "flex", flexWrap: "wrap", gap: 4 }}>
-              {reportees.length > 0 ? reportees.map(emp => (
-                <span key={emp.id} style={{
-                  fontSize: 12, padding: "2px 9px", borderRadius: 6, fontWeight: 500,
-                  background: "var(--bg-subtle, #f1f5f9)",
-                  color: "var(--text-2)", border: "1px solid var(--border)",
-                }}>
-                  {emp.name}
-                </span>
-              )) : <span style={{ fontSize: 13, color: "var(--text-3)" }}>—</span>}
-            </div>
+        return reportees.length > 0 ? (
+          <div style={{ display: "flex", flexWrap: "wrap", gap: 4 }}>
+            {reportees.map(emp => (
+              <span key={emp.id} style={{
+                fontSize: 12, padding: "2px 9px", borderRadius: 6, fontWeight: 500,
+                background: "var(--bg-subtle, #f1f5f9)",
+                color: "var(--text-2)", border: "1px solid var(--border)",
+              }}>
+                {empLabel(emp)}
+              </span>
+            ))}
           </div>
-        );
+        ) : <span style={{ fontSize: 13, color: "var(--text-3)" }}>—</span>;
       },
     },
     {

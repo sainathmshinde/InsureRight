@@ -1,25 +1,13 @@
 import { useState, useEffect, useRef } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { Field, Select, SectionBlock } from "../../components/Field";
+import { Field, SearchableSelect } from "../../components/Field";
 import { GroupIcon } from "../../icons";
 import {
-  DESIGNATIONS, DESIG_META, DESIG_LABEL, EMPLOYEES, EMP_MAP,
+  DESIG_LABEL, EMPLOYEES, EMP_MAP,
   getHierarchyRule, addHierarchyRule, updateHierarchyRule,
 } from "./agentHierarchyData";
 
-function DesigBadge({ value }) {
-  const m = DESIG_META[value];
-  if (!m) return null;
-  return (
-    <span style={{
-      display: "inline-block", padding: "3px 11px", borderRadius: 99,
-      fontSize: 12, fontWeight: 700, background: m.bg, color: m.color,
-      border: `1.5px solid ${m.border}`, whiteSpace: "nowrap",
-    }}>
-      {DESIG_LABEL[value]}
-    </span>
-  );
-}
+const empLabel = (emp) => emp ? `${emp.name} (${DESIG_LABEL[emp.designation] ?? emp.designation})` : "";
 
 // Dropdown renders in a portal-like fixed layer — never clipped by card overflow
 function MultiSelectDropdown({ options, selectedIds, onChange, disabled, placeholder }) {
@@ -80,7 +68,7 @@ function MultiSelectDropdown({ options, selectedIds, onChange, disabled, placeho
   const filtered = options.filter(o => o.name.toLowerCase().includes(search.toLowerCase()));
 
   let label = placeholder ?? "Select employees…";
-  if (selectedIds.length === 1) label = EMP_MAP[selectedIds[0]]?.name ?? "1 selected";
+  if (selectedIds.length === 1) label = empLabel(EMP_MAP[selectedIds[0]]) || "1 selected";
   else if (selectedIds.length > 1) label = `${selectedIds.length} employees selected`;
 
   return (
@@ -167,7 +155,7 @@ function MultiSelectDropdown({ options, selectedIds, onChange, disabled, placeho
                 }}>
                   <input type="checkbox" checked={checked} onChange={() => toggle(emp.id)}
                     style={{ accentColor: "var(--brand)", width: 15, height: 15, flexShrink: 0, cursor: "pointer" }} />
-                  <span style={{ fontSize: 14, fontWeight: checked ? 600 : 400 }}>{emp.name}</span>
+                  <span style={{ fontSize: 14, fontWeight: checked ? 600 : 400 }}>{empLabel(emp)}</span>
                 </label>
               );
             })}
@@ -193,7 +181,7 @@ function MultiSelectDropdown({ options, selectedIds, onChange, disabled, placeho
                 padding: "3px 8px 3px 10px", borderRadius: 99, fontSize: 12, fontWeight: 600,
                 background: "var(--brand-light,#eff6ff)", color: "var(--brand)", border: "1.5px solid var(--brand)",
               }}>
-                {emp.name}
+                {empLabel(emp)}
                 <button type="button" onClick={() => toggle(id)}
                   style={{ background: "none", border: "none", cursor: "pointer", color: "var(--brand)", fontSize: 14, lineHeight: 1, padding: "0 1px", display: "flex", alignItems: "center" }}>
                   ×
@@ -207,7 +195,7 @@ function MultiSelectDropdown({ options, selectedIds, onChange, disabled, placeho
   );
 }
 
-const EMPTY_FORM = { reportingDesig: "", reportingEmpId: "", reporteeDesig: "", reporteeEmpIds: [] };
+const EMPTY_FORM = { reportingEmpId: "", reporteeEmpIds: [] };
 
 export default function AgentHierarchyForm() {
   const navigate   = useNavigate();
@@ -217,17 +205,13 @@ export default function AgentHierarchyForm() {
 
   const [form, setForm] = useState(() =>
     existing
-      ? { reportingDesig: existing.reportingDesig, reportingEmpId: existing.reportingEmpId,
-          reporteeDesig: existing.reporteeDesig, reporteeEmpIds: [...existing.reporteeEmpIds] }
+      ? { reportingEmpId: existing.reportingEmpId, reporteeEmpIds: [...existing.reporteeEmpIds] }
       : EMPTY_FORM
   );
 
-  const reportingEmps  = EMPLOYEES.filter(e => e.designation === form.reportingDesig);
-  const reporteeEmps   = EMPLOYEES.filter(e => e.designation === form.reporteeDesig);
-  const reporteeDesigs = DESIGNATIONS.filter(d => d.value !== form.reportingDesig);
+  const reporteeOptions = EMPLOYEES.filter(e => e.id !== form.reportingEmpId);
 
-  const isValid = form.reportingDesig && form.reportingEmpId &&
-                  form.reporteeDesig  && form.reporteeEmpIds.length > 0;
+  const isValid = form.reportingEmpId && form.reporteeEmpIds.length > 0;
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -246,7 +230,7 @@ export default function AgentHierarchyForm() {
             <div className="page-subtitle">
               {isEdit
                 ? "Update the reporting relationship between employees"
-                : "Define who manages whom by designation and employee"}
+                : "Define who manages whom"}
             </div>
           </div>
         </div>
@@ -292,38 +276,21 @@ export default function AgentHierarchyForm() {
                   Reporting (Manager)
                 </div>
 
-                <Field label="Designation" required>
-                  <Select
-                    value={form.reportingDesig}
-                    onChange={e => setForm(p => ({
-                      ...p,
-                      reportingDesig: e.target.value,
-                      reportingEmpId: "",
-                      reporteeDesig:  p.reporteeDesig === e.target.value ? "" : p.reporteeDesig,
-                      reporteeEmpIds: p.reporteeDesig === e.target.value ? [] : p.reporteeEmpIds,
-                    }))}
-                  >
-                    <option value="">Select designation</option>
-                    {DESIGNATIONS.map(d => <option key={d.value} value={d.value}>{d.label}</option>)}
-                  </Select>
-                </Field>
-
-                <Field label="Employee" required>
-                  <Select
+                <Field label="Select the Reporting Manager" required>
+                  <SearchableSelect
                     value={form.reportingEmpId}
-                    onChange={e => setForm(p => ({ ...p, reportingEmpId: Number(e.target.value) }))}
-                    disabled={!form.reportingDesig}
-                  >
-                    <option value="">
-                      {form.reportingDesig ? "Select employee" : "Select designation first"}
-                    </option>
-                    {reportingEmps.map(e => <option key={e.id} value={e.id}>{e.name}</option>)}
-                  </Select>
-                  {form.reportingDesig && reportingEmps.length === 0 && (
-                    <div style={{ fontSize: 12, color: "#dc2626", marginTop: 5 }}>
-                      No employees with this designation
-                    </div>
-                  )}
+                    onChange={(val) => {
+                      const empId = val ? Number(val) : "";
+                      setForm(p => ({
+                        ...p,
+                        reportingEmpId: empId,
+                        reporteeEmpIds: p.reporteeEmpIds.filter(id => id !== empId),
+                      }));
+                    }}
+                    options={EMPLOYEES.map(e => ({ value: e.id, label: empLabel(e) }))}
+                    placeholder="Select employee"
+                    required
+                  />
                 </Field>
 
                 {form.reportingEmpId && (
@@ -339,9 +306,8 @@ export default function AgentHierarchyForm() {
                     }}>
                       <GroupIcon size={18} />
                     </div>
-                    <div>
-                      <div style={{ fontWeight: 700, fontSize: 14 }}>{EMP_MAP[form.reportingEmpId]?.name}</div>
-                      <DesigBadge value={form.reportingDesig} />
+                    <div style={{ fontWeight: 700, fontSize: 14 }}>
+                      {empLabel(EMP_MAP[form.reportingEmpId])}
                     </div>
                   </div>
                 )}
@@ -372,33 +338,18 @@ export default function AgentHierarchyForm() {
                   Reportee (Team)
                 </div>
 
-                <Field label="Designation" required>
-                  <Select
-                    value={form.reporteeDesig}
-                    onChange={e => setForm(p => ({ ...p, reporteeDesig: e.target.value, reporteeEmpIds: [] }))}
-                  >
-                    <option value="">Select designation</option>
-                    {reporteeDesigs.map(d => <option key={d.value} value={d.value}>{d.label}</option>)}
-                  </Select>
-                </Field>
-
                 <Field label={
                   form.reporteeEmpIds.length > 0
-                    ? `Employees (${form.reporteeEmpIds.length} selected)`
-                    : "Employees"
+                    ? `Select Reportees (${form.reporteeEmpIds.length} selected)`
+                    : "Select Reportees"
                 } required>
                   <MultiSelectDropdown
-                    options={reporteeEmps}
+                    options={reporteeOptions}
                     selectedIds={form.reporteeEmpIds}
                     onChange={ids => setForm(p => ({ ...p, reporteeEmpIds: ids }))}
-                    disabled={!form.reporteeDesig}
-                    placeholder={form.reporteeDesig ? "Select employees…" : "Select designation first"}
+                    disabled={!form.reportingEmpId}
+                    placeholder={form.reportingEmpId ? "Select employees…" : "Select the reporting manager first"}
                   />
-                  {form.reporteeDesig && reporteeEmps.length === 0 && (
-                    <div style={{ fontSize: 12, color: "#dc2626", marginTop: 5 }}>
-                      No employees with this designation
-                    </div>
-                  )}
                 </Field>
               </div>
             </div>

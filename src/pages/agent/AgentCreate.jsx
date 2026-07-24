@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import {
   Field,
   Input,
+  DateInput,
   Select,
   UploadBox,
   SectionBlock,
@@ -129,7 +130,7 @@ export default function AgentCreate() {
 
               <div className="form-grid-3" style={{ marginBottom: 18 }}>
                 <Field label="Date of Birth" required>
-                  <Input type="date" value={form.dob} onChange={set("dob")} required />
+                  <DateInput value={form.dob} onChange={set("dob")} required />
                 </Field>
                 <Field label="Gender">
                   <Select value={form.gender} onChange={set("gender")}>
