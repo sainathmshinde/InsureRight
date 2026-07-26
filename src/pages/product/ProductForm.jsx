@@ -13,6 +13,11 @@ import policyWordingsPdf from "../../assets/StarHealthAssureInsurancePolicy-Poli
 import brochurePdf from "../../assets/Brochure_Star_Comprehensive_Insurance_Policy_V_15_Web_633bcfcaaf.pdf";
 import { PREMIUM_CHART, PRODUCTS } from "./productData";
 
+const MOCK_DOC_META = {
+  policyWordingsFile: { url: policyWordingsPdf, name: "StarHealthAssure_PolicyWordings_V2_2022.pdf", size: "2.4 MB", pages: 20 },
+  brochureFile: { url: brochurePdf, name: "Brochure_StarComprehensive_V18_2025.pdf", size: "1.1 MB", pages: 13 },
+};
+
 const TOPUP_POLICIES = PRODUCTS.filter(p => p.policyType === "Top Up Policy" || p.policyType === "Super Top Up");
 
 const IC_LIST = [
@@ -162,16 +167,8 @@ export default function ProductForm({
   const [activeAgeBandId, setActiveAgeBandId] = useState(null);
 
   const [docState, setDocState] = useState({
-    policyWordingsFile: {
-      status: "uploaded",
-      url: policyWordingsPdf,
-      meta: { name: "StarHealthAssure_PolicyWordings_V2_2022.pdf", size: "2.4 MB", pages: 20, date: "15 Mar 2025" },
-    },
-    brochureFile: {
-      status: "uploaded",
-      url: brochurePdf,
-      meta: { name: "Brochure_StarComprehensive_V18_2025.pdf", size: "1.1 MB", pages: 13, date: "15 Mar 2025" },
-    },
+    policyWordingsFile: { status: "empty" },
+    brochureFile: { status: "empty" },
   });
 
   const toggleMember = (name) =>
@@ -239,15 +236,16 @@ export default function ProductForm({
   const handleFileUpload = (field) => (e) => {
     const file = e.target.files?.[0];
     if (!file) return;
+    const mock = MOCK_DOC_META[field];
     setDocState((prev) => ({
       ...prev,
       [field]: {
         status: "uploaded",
-        file,
+        url: mock.url,
         meta: {
-          name: file.name,
-          size: `${(file.size / 1024 / 1024).toFixed(1)} MB`,
-          pages: "—",
+          name: mock.name,
+          size: mock.size,
+          pages: mock.pages,
           date: new Date().toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" }),
         },
       },
@@ -266,6 +264,13 @@ export default function ProductForm({
               value={form.productName}
               onChange={set("productName")}
               required
+            />
+          </Field>
+          <Field label="Product Description">
+            <Input
+              placeholder="Brief one-line description of the product"
+              value={form.productDescription}
+              onChange={set("productDescription")}
             />
           </Field>
           <Field label="Product Code" required>
@@ -647,12 +652,11 @@ export default function ProductForm({
           </Field>
         </div>
         <div style={{ marginBottom: 18 }}>
-          <Field label="Eligibility Criteria" required>
+          <Field label="Eligibility Criteria">
             <Textarea
               placeholder="e.g. Persons between 18–65 years. Dependent children up to 25 years…"
               value={form.eligibilityCriteria}
               onChange={set("eligibilityCriteria")}
-              required
             />
           </Field>
         </div>
@@ -751,10 +755,12 @@ export default function ProductForm({
                     </div>
                   ) : (
                     <div>
-                      <UploadBox label={`Upload new ${label}`} hint={hint} onChange={handleFileUpload(field)} />
-                      <button type="button" className="btn btn-ghost" style={{ fontSize: 13, marginTop: 6 }} onClick={() => cancelReplace(field)}>
-                        Cancel
-                      </button>
+                      <UploadBox label={doc.status === "replacing" ? `Upload new ${label}` : `Upload ${label}`} hint={hint} onChange={handleFileUpload(field)} />
+                      {doc.status === "replacing" && (
+                        <button type="button" className="btn btn-ghost" style={{ fontSize: 13, marginTop: 6 }} onClick={() => cancelReplace(field)}>
+                          Cancel
+                        </button>
+                      )}
                     </div>
                   )}
                 </Field>

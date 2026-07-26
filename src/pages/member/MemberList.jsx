@@ -3,7 +3,7 @@ import { useNavigate, useSearchParams } from 'react-router-dom'
 import Pagination from '../../components/Pagination'
 import usePagination from '../../components/usePagination'
 import { Table, PageHeader, KYCBadge, Button, EmptyState } from '../../components/UI'
-import { MemberIcon, EditIcon, ViewIcon, UploadIcon, SearchIcon } from '../../icons'
+import { MemberIcon, EditIcon, ViewIcon, CartIcon, UploadIcon, SearchIcon } from '../../icons'
 import { useAuth } from '../../context/AuthContext'
 import { useMembers, INITIAL_MEMBERS } from '../../context/MemberContext'
 import { ASSOCIATIONS } from './orgAssocData'
@@ -73,14 +73,13 @@ export default function MemberList() {
       label: "Actions",
       render: (row) => (
         <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
-          <Button
-            variant="primary"
-            size="sm"
-            style={S.buyPolicyBtn}
+          <button
+            title="Buy Policy"
             onClick={() => navigate(`/policy/buy?memberId=${row.id}`)}
+            style={S.iconBtn}
           >
-            Buy Policy
-          </Button>
+            <CartIcon size={14} color="var(--text-2)" />
+          </button>
           <button
             title="View 360°"
             onClick={() => navigate(`/member/${row.id}/360`)}
@@ -216,13 +215,6 @@ export default function MemberList() {
 }
 
 const S = {
-  buyPolicyBtn: {
-    fontSize: 9,
-    padding: 0,
-    width: 68,
-    height: 30,
-    justifyContent: 'center',
-  },
   iconBtn: {
     display: 'inline-flex',
     alignItems: 'center',

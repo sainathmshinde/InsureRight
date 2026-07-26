@@ -111,8 +111,29 @@ export function AuthProvider({ children }) {
     return { ok: true, user: safe };
   };
 
+  const findUser = (identifier) => {
+    const key = (identifier || "").toLowerCase().trim();
+    return (
+      MOCK_USERS[key] ??
+      Object.values(MOCK_USERS).find((u) => u.phone === key)
+    );
+  };
+
+  const requestPasswordReset = (identifier) => {
+    const u = findUser(identifier);
+    if (!u) return { ok: false, error: "No account found with that email or mobile number." };
+    return { ok: true };
+  };
+
+  const resetPassword = (identifier, newPassword) => {
+    const u = findUser(identifier);
+    if (!u) return { ok: false, error: "No account found with that email or mobile number." };
+    u.password = newPassword;
+    return { ok: true };
+  };
+
   return (
-    <AuthContext.Provider value={{ user, login, logout, registerMember, loginByMobile }}>
+    <AuthContext.Provider value={{ user, login, logout, registerMember, loginByMobile, requestPasswordReset, resetPassword }}>
       {children}
     </AuthContext.Provider>
   );

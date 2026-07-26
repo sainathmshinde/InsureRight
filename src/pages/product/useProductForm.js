@@ -2,6 +2,7 @@ import { useState } from 'react'
 
 const INITIAL = {
   productName: '',
+  productDescription: '',
   productCode: '',
   insuranceType: '',
   icName: '',

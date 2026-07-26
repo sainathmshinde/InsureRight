@@ -100,8 +100,16 @@ function OtpInput({ value, onChange }) {
 
 // ── Sign-in page ──────────────────────────────────────────────────────────────
 export default function SignIn() {
-  const { login, loginByMobile } = useAuth();
+  const { login, loginByMobile, requestPasswordReset, resetPassword } = useAuth();
   const navigate  = useNavigate();
+
+  const [view, setView] = useState("login"); // "login" | "forgot"
+  const [forgotStep, setForgotStep] = useState("identifier"); // "identifier" | "otp" | "reset" | "done"
+  const [forgotIdentifier, setForgotIdentifier] = useState("");
+  const [forgotOtp, setForgotOtp] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [showNewPass, setShowNewPass] = useState(false);
 
   const [loginMode, setLoginMode] = useState("mobile"); // "mobile" | "userid"
 
@@ -173,6 +181,54 @@ export default function SignIn() {
     }, 500);
   };
 
+  const openForgotPassword = () => {
+    setView("forgot");
+    setForgotStep("identifier");
+    setForgotIdentifier(identifier || "");
+    setForgotOtp("");
+    setNewPassword("");
+    setConfirmPassword("");
+    setError("");
+  };
+
+  const backToLogin = () => {
+    setView("login");
+    setError("");
+  };
+
+  const handleSendResetOtp = (e) => {
+    e.preventDefault();
+    setLoading(true);
+    setError("");
+    setTimeout(() => {
+      const r = requestPasswordReset(forgotIdentifier);
+      setLoading(false);
+      if (r.ok) { setForgotOtp(""); setForgotStep("otp"); }
+      else setError(r.error);
+    }, 500);
+  };
+
+  const handleVerifyResetOtp = (e) => {
+    e.preventDefault();
+    if (forgotOtp.length < 4) { setError("Enter the OTP."); return; }
+    setError("");
+    setForgotStep("reset");
+  };
+
+  const handleResetPassword = (e) => {
+    e.preventDefault();
+    if (newPassword.length < 6) { setError("Password must be at least 6 characters."); return; }
+    if (newPassword !== confirmPassword) { setError("Passwords do not match."); return; }
+    setLoading(true);
+    setError("");
+    setTimeout(() => {
+      const r = resetPassword(forgotIdentifier, newPassword);
+      setLoading(false);
+      if (r.ok) setForgotStep("done");
+      else setError(r.error);
+    }, 500);
+  };
+
   return (
     <div className="login-page" style={S.page}>
       <div style={S.glowOverlay} />
@@ -186,6 +242,7 @@ export default function SignIn() {
           <div style={S.brandName}>K M Dastur</div>
         </div>
 
+        {view === "login" && (<>
         <h1 style={S.title}>Login</h1>
 
         {/* Mode toggle */}
@@ -294,7 +351,7 @@ export default function SignIn() {
                   {showPass ? <IconEyeOff /> : <IconEye />}
                 </button>
               </div>
-              <div style={S.forgotRow}>Forgot password</div>
+              <button type="button" onClick={openForgotPassword} style={S.forgotBtn}>Forgot password?</button>
             </div>
             <button type="submit" style={{ ...S.btn, opacity: loading ? 0.75 : 1 }} disabled={loading}>
               {loading ? "Signing in…" : "Login"}
@@ -322,6 +379,100 @@ export default function SignIn() {
             ))}
           </div>
         </div>
+        </>)}
+
+        {/* ── Forgot password flow ─────────────────────────────────────── */}
+        {view === "forgot" && (<>
+          {forgotStep === "identifier" && (<>
+            <h1 style={S.title}>Reset Password</h1>
+            <p style={S.subText}>Enter your registered email or mobile number and we'll send you a verification code.</p>
+            {error && <div style={S.err}>{error}</div>}
+            <form onSubmit={handleSendResetOtp} style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+              <div>
+                <label style={S.lbl}>Email or Mobile Number</label>
+                <input
+                  type="text" required autoFocus
+                  style={S.inp} placeholder="Enter email or mobile number"
+                  value={forgotIdentifier}
+                  onChange={e => { setForgotIdentifier(e.target.value); setError(""); }}
+                />
+              </div>
+              <button type="submit" style={{ ...S.btn, opacity: loading ? 0.75 : 1 }} disabled={loading}>
+                {loading ? "Sending…" : "Send OTP"}
+              </button>
+            </form>
+            <button type="button" onClick={backToLogin} style={S.backLink}>← Back to Login</button>
+          </>)}
+
+          {forgotStep === "otp" && (
+            <form onSubmit={handleVerifyResetOtp} style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+              <h1 style={S.title}>Verify OTP</h1>
+              <p style={S.subText}>We've sent a 4-digit verification code to {forgotIdentifier}.</p>
+              {error && <div style={S.err}>{error}</div>}
+              <div>
+                <label style={S.lbl}>Enter OTP</label>
+                <OtpInput value={forgotOtp} onChange={v => { setForgotOtp(v); setError(""); }} />
+                <div style={{ fontSize: 13, color: "#6d747a", marginTop: 8 }}>
+                  <button
+                    type="button"
+                    onClick={() => { setForgotStep("identifier"); setForgotOtp(""); setError(""); }}
+                    style={{ background: "none", border: "none", color: "#006aff", cursor: "pointer", fontSize: 13, padding: 0, fontFamily: "inherit" }}
+                  >
+                    Change email / mobile number
+                  </button>
+                </div>
+              </div>
+              <button type="submit" style={{ ...S.btn, opacity: forgotOtp.length < 4 ? 0.5 : 1 }} disabled={forgotOtp.length < 4}>
+                Verify OTP
+              </button>
+              <button type="button" onClick={backToLogin} style={S.backLink}>← Back to Login</button>
+            </form>
+          )}
+
+          {forgotStep === "reset" && (
+            <form onSubmit={handleResetPassword} style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+              <h1 style={S.title}>Set New Password</h1>
+              <p style={S.subText}>Choose a new password for your account.</p>
+              {error && <div style={S.err}>{error}</div>}
+              <div>
+                <div style={{ position: "relative" }}>
+                  <label style={S.lbl}>New Password</label>
+                  <input
+                    type={showNewPass ? "text" : "password"} required autoFocus
+                    style={S.inp} placeholder="Enter new password"
+                    value={newPassword}
+                    onChange={e => { setNewPassword(e.target.value); setError(""); }}
+                  />
+                  <button type="button" style={S.eyeBtn} onClick={() => setShowNewPass(v => !v)}>
+                    {showNewPass ? <IconEyeOff /> : <IconEye />}
+                  </button>
+                </div>
+              </div>
+              <div>
+                <label style={S.lbl}>Confirm Password</label>
+                <input
+                  type={showNewPass ? "text" : "password"} required
+                  style={S.inp} placeholder="Re-enter new password"
+                  value={confirmPassword}
+                  onChange={e => { setConfirmPassword(e.target.value); setError(""); }}
+                />
+              </div>
+              <button type="submit" style={{ ...S.btn, opacity: loading ? 0.75 : 1 }} disabled={loading}>
+                {loading ? "Resetting…" : "Reset Password"}
+              </button>
+              <button type="button" onClick={backToLogin} style={S.backLink}>← Back to Login</button>
+            </form>
+          )}
+
+          {forgotStep === "done" && (
+            <div style={{ textAlign: "center" }}>
+              <div style={{ fontSize: 44, marginBottom: 10 }}>✅</div>
+              <h1 style={{ ...S.title, marginBottom: 10 }}>Password Reset!</h1>
+              <p style={{ ...S.subText, marginBottom: 24 }}>Your password has been reset successfully. You can now log in with your new password.</p>
+              <button type="button" onClick={backToLogin} style={{ ...S.btn, width: "100%" }}>Back to Login</button>
+            </div>
+          )}
+        </>)}
       </div>
     </div>
   );
@@ -408,9 +559,18 @@ const S = {
     position: "absolute", right: 12, bottom: 10, background: "none",
     border: "none", cursor: "pointer", padding: 0, display: "flex", lineHeight: 1,
   },
-  forgotRow: {
-    display: "flex", justifyContent: "flex-end", marginTop: 8,
-    fontSize: 14, color: "#006aff",
+  forgotBtn: {
+    display: "flex", justifyContent: "flex-end", marginTop: 8, marginLeft: "auto",
+    fontSize: 14, color: "#006aff", background: "none", border: "none",
+    cursor: "pointer", fontFamily: "inherit", padding: 0,
+  },
+  subText: {
+    fontSize: 14, color: "#6d747a", marginTop: -10, marginBottom: 20, lineHeight: 1.5,
+  },
+  backLink: {
+    background: "none", border: "none", color: "#006aff", cursor: "pointer",
+    fontFamily: "inherit", fontSize: 14, fontWeight: 600, padding: 0,
+    marginTop: 4, textAlign: "center",
   },
   btn: {
     backgroundImage: "linear-gradient(180deg, #1565d8 0%, #104ea6 100%)", color: "#fff",

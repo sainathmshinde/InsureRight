@@ -105,7 +105,7 @@ export default function ProductCreate() {
     return (
       <div>
         <PageHeader icon={<ProductIcon />} title="Add Product" subtitle="Register a new insurance product in the catalogue">
-          <button className="btn btn-ghost" onClick={() => setMode(null)}>← Back</button>
+          <button className="btn btn-ghost" onClick={() => navigate('/product')}>← Back</button>
         </PageHeader>
         <div className="card">
           <div className="card-body">

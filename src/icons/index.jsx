@@ -487,6 +487,14 @@ export const ViewIcon = (p) => (
   </I>
 );
 
+export const CartIcon = (p) => (
+  <I {...p}>
+    <circle cx="9" cy="21" r="1" />
+    <circle cx="20" cy="21" r="1" />
+    <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6" />
+  </I>
+);
+
 export const UploadIcon = (p) => (
   <I {...p}>
     <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
