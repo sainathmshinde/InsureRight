@@ -1,5 +1,6 @@
 import { useState, useRef } from "react";
 import { PageHeader } from "../../components/UI";
+import { DateInput } from "../../components/Field";
 import { DocumentIcon, SearchIcon } from "../../icons";
 import { POLICY_MOCK } from "../policy/PolicyList";
 import { ASSOCIATIONS } from "../member/orgAssocData";
@@ -227,7 +228,7 @@ function PendingPickerModal({
                   </>}
                   {isNeft && <>
                     <td style={{ ...refCellStyle, fontFamily: "monospace", fontWeight: 600 }}>{up.transactionId ?? "—"}</td>
-                    <td style={refCellStyle}>{up.neftDate ?? "—"}</td>
+                    <td style={refCellStyle}>{up.neftDate ? formatDate(up.neftDate) : "—"}</td>
                   </>}
                   <td style={{ ...refCellStyle, fontWeight: 700 }}>{fmt(up.premium)}</td>
                 </tr>
@@ -249,11 +250,11 @@ function PendingPickerModal({
             </div>
             <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
               <label style={LABEL}>From Date</label>
-              <input type="date" className="field-input" value={dateFrom} onChange={(e) => onDateFrom(e.target.value)} />
+              <DateInput value={dateFrom} onChange={(e) => onDateFrom(e.target.value)} />
             </div>
             <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
               <label style={LABEL}>To Date</label>
-              <input type="date" className="field-input" value={dateTo} onChange={(e) => onDateTo(e.target.value)} />
+              <DateInput value={dateTo} onChange={(e) => onDateTo(e.target.value)} />
             </div>
             {hasFilters && (
               <button type="button" className="btn btn-ghost btn-sm" onClick={() => { onSearch(""); onDateFrom(""); onDateTo(""); }}>
@@ -308,7 +309,7 @@ function PendingPickerModal({
                           </>}
                           {isNeft && <>
                             <td style={{ fontFamily: "monospace", fontWeight: 600, color: txnMatch ? "#15803d" : "#0369a1" }}>{p.transactionId ?? "—"}{txnMatch && <span style={{ marginLeft: 4 }} title="Transaction number matches uploaded record">✓</span>}</td>
-                            <td style={{ whiteSpace: "nowrap" }}>{p.neftDate ?? "—"}</td>
+                            <td style={{ whiteSpace: "nowrap" }}>{p.neftDate ? formatDate(p.neftDate) : "—"}</td>
                           </>}
                           <td style={{ fontWeight: 700, whiteSpace: "nowrap" }}>{fmt(p.premium)}</td>
                           <td style={{ fontSize: 16, color: "#a78bfa", textAlign: "center" }}>→</td>
@@ -369,7 +370,7 @@ function MatchComparisonModal({
                 </>}
                 {isNeft && <>
                   <TxnDetailRow label="Transaction ID" value={pr.transactionId} />
-                  <TxnDetailRow label="NEFT Date" value={pr.neftDate} />
+                  <TxnDetailRow label="NEFT Date" value={formatDate(pr.neftDate)} />
                 </>}
                 <TxnDetailRow label="Amount" value={fmt(pr.premium)} />
               </div>
@@ -383,7 +384,7 @@ function MatchComparisonModal({
                 </>}
                 {isNeft && <>
                   <TxnDetailRow label="Transaction ID" value={up.transactionId} mismatch={(up.transactionId ?? "") !== (pr.transactionId ?? "")} />
-                  <TxnDetailRow label="NEFT Date" value={up.neftDate} mismatch={(up.neftDate ?? "") !== (pr.neftDate ?? "")} />
+                  <TxnDetailRow label="NEFT Date" value={formatDate(up.neftDate)} mismatch={(up.neftDate ?? "") !== (pr.neftDate ?? "")} />
                 </>}
                 <TxnDetailRow label="Amount" value={fmt(up.premium)} mismatch={up.premium !== pr.premium} />
               </div>
@@ -480,7 +481,7 @@ function TransactionDetailModal({ system: rec, uploaded: up, onClose }) {
             </>}
             {!isCheque && <>
               <TxnDetailRow label="Transaction ID" value={rec.transactionId} />
-              <TxnDetailRow label="NEFT Date" value={rec.neftDate} />
+              <TxnDetailRow label="NEFT Date" value={formatDate(rec.neftDate)} />
               <TxnDetailRow label="Account Number" value={rec.accountNumber} />
               <TxnDetailRow label="Account Name" value={rec.accountName} />
               <TxnDetailRow label="Branch" value={rec.branchName} />
@@ -502,7 +503,7 @@ function TransactionDetailModal({ system: rec, uploaded: up, onClose }) {
             </>}
             {!isCheque && <>
               <TxnDetailRow label="Transaction ID" value={up.transactionId} mismatch={up.transactionId !== rec.transactionId} />
-              <TxnDetailRow label="NEFT Date" value={up.neftDate} mismatch={up.neftDate !== rec.neftDate} />
+              <TxnDetailRow label="NEFT Date" value={formatDate(up.neftDate)} mismatch={up.neftDate !== rec.neftDate} />
             </>}
           </div>
 
@@ -977,11 +978,7 @@ export default function Reconciliation() {
               }}
             >
               {file?.name} ·{" "}
-              {new Date().toLocaleDateString("en-IN", {
-                day: "2-digit",
-                month: "short",
-                year: "numeric",
-              })}
+              {formatDate(new Date().toLocaleDateString("en-CA"))}
             </div>
             <div
               style={{
@@ -1176,7 +1173,7 @@ export default function Reconciliation() {
                         </>}
                         {payTypeFilter === "NEFT" && <>
                           <td style={{ fontFamily: "monospace", fontWeight: 600, color: "#0369a1" }}>{rec.transactionId ?? "—"}</td>
-                          <td style={{ whiteSpace: "nowrap" }}>{rec.neftDate ?? "—"}</td>
+                          <td style={{ whiteSpace: "nowrap" }}>{rec.neftDate ? formatDate(rec.neftDate) : "—"}</td>
                         </>}
                         <td style={{ fontWeight: 600 }}>{fmt(rec.premium)}</td>
                         <td><StatusPill status={rec.paymentStatus} /></td>
@@ -1308,13 +1305,13 @@ export default function Reconciliation() {
                           <td style={{ fontFamily: "monospace", fontSize: 11.5, color: "#7c3aed" }}>{rec.proposalId}</td>
                           <td style={{ fontWeight: 500 }}>{rec.memberName}</td>
                           <td style={{ background: "#f0f7ff", fontFamily: "monospace", fontWeight: 600, color: "#0369a1" }}>{rec.transactionId}</td>
-                          <td style={{ background: "#f0f7ff", whiteSpace: "nowrap" }}>{rec.neftDate}</td>
+                          <td style={{ background: "#f0f7ff", whiteSpace: "nowrap" }}>{formatDate(rec.neftDate)}</td>
                           <td style={{ background: "#f0f7ff", fontWeight: 600 }}>{fmt(rec.premium)}</td>
                           <td style={{ background: "#fffef0", fontFamily: "monospace", fontWeight: 600, color: up.transactionId !== rec.transactionId ? "#dc2626" : "#0369a1" }}>
                             {up.transactionId ?? "—"}{up.transactionId !== rec.transactionId && <span title="Mismatch" style={{ marginLeft: 4 }}>⚠</span>}
                           </td>
                           <td style={{ background: "#fffef0", whiteSpace: "nowrap", color: up.neftDate !== rec.neftDate ? "#dc2626" : "inherit" }}>
-                            {up.neftDate ?? "—"}{up.neftDate !== rec.neftDate && <span title="Mismatch" style={{ marginLeft: 4 }}>⚠</span>}
+                            {up.neftDate ? formatDate(up.neftDate) : "—"}{up.neftDate !== rec.neftDate && <span title="Mismatch" style={{ marginLeft: 4 }}>⚠</span>}
                           </td>
                           <td style={{ background: "#fffef0", fontWeight: 600, color: up.premium !== rec.premium ? "#dc2626" : "inherit" }}>
                             {fmt(up.premium)}{up.premium !== rec.premium && <span title="Mismatch" style={{ marginLeft: 4 }}>⚠</span>}
@@ -1395,7 +1392,7 @@ export default function Reconciliation() {
                             </>}
                             {isNeft && <>
                               <td style={{ fontFamily: "monospace", fontWeight: 600, color: "#0369a1" }}>{up.transactionId ?? "—"}</td>
-                              <td style={{ whiteSpace: "nowrap" }}>{up.neftDate ?? "—"}</td>
+                              <td style={{ whiteSpace: "nowrap" }}>{up.neftDate ? formatDate(up.neftDate) : "—"}</td>
                             </>}
                             <td style={{ fontWeight: 600 }}>{fmt(up.premium)}</td>
                             <td><StatusPill status={up.uploadedStatus} /></td>
@@ -1441,7 +1438,7 @@ export default function Reconciliation() {
                               </>}
                               {isNeft && <>
                                 <td style={{ fontFamily: "monospace", fontWeight: 600, color: "#1e40af", fontSize: 11.5 }}>{matchedPendingRec.transactionId ?? "—"}</td>
-                                <td style={{ whiteSpace: "nowrap", color: "#1e40af", fontSize: 11.5 }}>{matchedPendingRec.neftDate ?? "—"}</td>
+                                <td style={{ whiteSpace: "nowrap", color: "#1e40af", fontSize: 11.5 }}>{matchedPendingRec.neftDate ? formatDate(matchedPendingRec.neftDate) : "—"}</td>
                               </>}
                               <td style={{ fontWeight: 600, color: "#1e40af", fontSize: 11.5 }}>{fmt(matchedPendingRec.premium)}</td>
                               <td style={{ fontSize: 13, color: "#1e40af" }}>Pending (System)</td>
@@ -1947,7 +1944,7 @@ export default function Reconciliation() {
                         <td style={{ fontWeight: 500 }}>{p.accountName ?? "—"}</td>
                         <td style={{ fontFamily: "monospace", fontSize: 12 }}>{p.ifscCode ?? "—"}</td>
                         <td style={{ fontFamily: "monospace", fontSize: 13, color: "#0369a1" }}>{p.transactionId ?? "—"}</td>
-                        <td style={{ whiteSpace: "nowrap" }}>{p.neftDate ?? "—"}</td>
+                        <td style={{ whiteSpace: "nowrap" }}>{p.neftDate ? formatDate(p.neftDate) : "—"}</td>
                         <td style={{ fontSize: 13, color: "#7c3aed", maxWidth: 160, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
                           {p.neftReceiptDocumentName ?? "—"}
                         </td>

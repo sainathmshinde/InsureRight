@@ -4,6 +4,7 @@ import { OPERATORS } from "../agent/agentData";
 import { MEMBER_MOCK } from "../member/MemberList";
 import { POLICY_MOCK } from "../policy/PolicyList";
 import { PRODUCT_MOCK } from "../product/ProductList";
+import { formatDate } from "../../utils/date";
 
 export default function Dashboard() {
   const { user } = useAuth();
@@ -541,12 +542,6 @@ const CLAIM_STEPS = [
   { step: 4, label: "Settlement", icon: "💰", done: false },
 ];
 
-function fmtDate(iso) {
-  if (!iso) return "—";
-  const [y, m, d] = iso.split("-");
-  return `${d} ${["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"][Number(m) - 1]} ${y}`;
-}
-
 function daysUntil(iso) {
   if (!iso) return null;
   const diff = new Date(iso) - new Date();
@@ -639,7 +634,7 @@ function MemberDashboard({ user }) {
       value: nextRenewal
         ? `${Math.max(0, daysUntil(nextRenewal.endDate))} days`
         : "—",
-      sub: nextRenewal ? fmtDate(nextRenewal.endDate) : "No active policy",
+      sub: nextRenewal ? formatDate(nextRenewal.endDate) : "No active policy",
       gradient: "var(--grad-teal)",
       icon: "🗓️",
     },
@@ -750,7 +745,7 @@ function MemberDashboard({ user }) {
             Next Renewal
           </div>
           <div style={{ fontSize: 14, fontWeight: 700, color: "#fff" }}>
-            {nextRenewal ? fmtDate(nextRenewal.endDate) : "No active policy"}
+            {nextRenewal ? formatDate(nextRenewal.endDate) : "No active policy"}
           </div>
           {nextRenewal && (
             <div style={{ fontSize: 13, color: "#a7f3d0", marginTop: 4 }}>
@@ -1103,8 +1098,8 @@ function MemberDashboard({ user }) {
                     {[
                       ["Sum Insured", p.sumInsured],
                       ["Premium", `₹${p.premium?.toLocaleString()}/yr`],
-                      ["Start", fmtDate(p.startDate)],
-                      ["Renews", fmtDate(p.endDate)],
+                      ["Start", formatDate(p.startDate)],
+                      ["Renews", formatDate(p.endDate)],
                     ].map(([k, v]) => (
                       <div key={k}>
                         <div

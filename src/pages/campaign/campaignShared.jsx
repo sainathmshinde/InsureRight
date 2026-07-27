@@ -741,7 +741,7 @@ export function ProductMappingSection({ form, toggleProduct }) {
                         padding: "8px 10px", marginTop: 2 }}>
                         <span style={{ fontSize: 15, flexShrink: 0 }}>🏷️</span>
                         <span style={{ fontSize: 12, color: "#166534", lineHeight: 1.5 }}>
-                          Buying this with <strong>{linkedBase.name}</strong> gets{" "}
+                          Buying this along with <strong>{linkedBase.name}</strong> gets{" "}
                           <strong>
                             {p.bundleDiscount.type === "Percent" ? `${p.bundleDiscount.value}%` : `₹${p.bundleDiscount.value}`}
                           </strong>{" "}
@@ -841,6 +841,12 @@ export function AudienceSection({ form, setForm }) {
         ? prev.selectedAssociations.filter((x) => x !== id)
         : [...prev.selectedAssociations, id],
     }));
+  const allAssocSelected = ASSOCIATIONS.length > 0 && ASSOCIATIONS.every((a) => form.selectedAssociations.includes(a.id));
+  const toggleAllAssoc = () =>
+    setForm((prev) => ({
+      ...prev,
+      selectedAssociations: allAssocSelected ? [] : ASSOCIATIONS.map((a) => a.id),
+    }));
 
   const [filteredUsers, setFilteredUsers] = useState([]);
   const [userPage, setUserPage] = useState(1);
@@ -902,6 +908,8 @@ export function AudienceSection({ form, setForm }) {
   const allPageSelected = pagedUsers.length > 0 && pagedUsers.every((u) => selectedUserIds.has(u.id));
   const somePageSelected = pagedUsers.some((u) => selectedUserIds.has(u.id)) && !allPageSelected;
 
+  const allFilteredSelected = filteredUsers.length > 0 && filteredUsers.every((u) => selectedUserIds.has(u.id));
+
   const toggleUser = (id) =>
     setSelectedUserIds((prev) => {
       const next = new Set(prev);
@@ -916,6 +924,8 @@ export function AudienceSection({ form, setForm }) {
       return next;
     });
   };
+  const selectAllFiltered = () => setSelectedUserIds(new Set(filteredUsers.map((u) => u.id)));
+  const clearAllSelected = () => setSelectedUserIds(new Set());
 
   return (
     <SectionBlock icon="🎯" title="Audience">
@@ -1009,6 +1019,10 @@ export function AudienceSection({ form, setForm }) {
                     <>
                       <div style={{ position: "fixed", inset: 0, zIndex: 10 }} onClick={() => { setAssocOpen(false); setAssocSearch(""); }} />
                       <div style={{ position: "absolute", top: "calc(100% + 4px)", left: 0, right: 0, zIndex: 11, background: "var(--surface)", border: "1px solid var(--border)", borderRadius: "var(--r-md)", boxShadow: "0 4px 16px rgba(0,0,0,.1)", maxHeight: 200, overflowY: "auto" }}>
+                        <label style={{ display: "flex", alignItems: "center", gap: 10, padding: "9px 16px", cursor: "pointer", fontSize: 13, fontWeight: 600, color: "var(--brand)", background: allAssocSelected ? "var(--brand-light)" : "transparent", borderBottom: "1px solid var(--border)" }}>
+                          <input type="checkbox" checked={allAssocSelected} onChange={toggleAllAssoc} />
+                          Select All Associations
+                        </label>
                         {filteredAssoc.length === 0 ? (
                           <div style={{ padding: "12px 16px", fontSize: 13, color: "var(--text-3)" }}>No associations found.</div>
                         ) : (
@@ -1045,6 +1059,15 @@ export function AudienceSection({ form, setForm }) {
                       {selectedUserIds.size} selected
                     </span>
                   )}
+                  {totalPages > 1 && (
+                    <button
+                      type="button"
+                      onClick={allFilteredSelected ? clearAllSelected : selectAllFiltered}
+                      style={{ background: "none", border: "none", cursor: "pointer", color: "var(--brand)", fontWeight: 600, fontSize: 13, padding: 0, textDecoration: "underline" }}
+                    >
+                      {allFilteredSelected ? "Clear selection" : `Select all ${filteredUsers.length} users`}
+                    </button>
+                  )}
                 </div>
                 <button type="button" className="btn btn-ghost" style={{ fontSize: 13 }} onClick={handleExportUsers}>
                   ⬇ Export {selectedUserIds.size > 0 ? "Selected" : "All"}
@@ -1057,6 +1080,14 @@ export function AudienceSection({ form, setForm }) {
                 </div>
               ) : (
                 <>
+                  {totalPages > 1 && allPageSelected && !allFilteredSelected && (
+                    <div style={{ display: "flex", justifyContent: "center", alignItems: "center", gap: 6, padding: "8px 0", fontSize: 13, background: "var(--brand-light)", borderRadius: "var(--r-sm)", marginBottom: 8 }}>
+                      <span>All {pagedUsers.length} users on this page are selected.</span>
+                      <button type="button" onClick={selectAllFiltered} style={{ background: "none", border: "none", cursor: "pointer", color: "var(--brand)", fontWeight: 600, fontSize: 13, padding: 0, textDecoration: "underline" }}>
+                        Select all {filteredUsers.length} users matching this filter
+                      </button>
+                    </div>
+                  )}
                   <div className="table-wrap">
                     <table>
                       <thead>

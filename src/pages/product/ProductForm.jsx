@@ -12,6 +12,7 @@ import { DocumentViewerModal } from "../../components/fields/DocumentViewerModal
 import policyWordingsPdf from "../../assets/StarHealthAssureInsurancePolicy-Policy-wording.pdf";
 import brochurePdf from "../../assets/Brochure_Star_Comprehensive_Insurance_Policy_V_15_Web_633bcfcaaf.pdf";
 import { PREMIUM_CHART, PRODUCTS } from "./productData";
+import { formatDate } from "../../utils/date";
 
 const MOCK_DOC_META = {
   policyWordingsFile: { url: policyWordingsPdf, name: "StarHealthAssure_PolicyWordings_V2_2022.pdf", size: "2.4 MB", pages: 20 },
@@ -23,14 +24,17 @@ const TOPUP_POLICIES = PRODUCTS.filter(p => p.policyType === "Top Up Policy" || 
 const IC_LIST = [
   "Star Health Insurance",
   "HDFC ERGO",
+  "HDFC ERGO General Insurance Company Limited",
   "ICICI Lombard",
   "Bajaj Allianz",
   "New India Assurance",
   "LIC",
   "HDFC Life",
   "SBI Life",
+  "SBI General Insurance Company Limited",
   "Reliance General",
   "Tata AIG",
+  "Go Digit General Insurance Limited",
 ];
 const POLICY_TOC = [
   {
@@ -140,6 +144,7 @@ export default function ProductForm({
   setPremium,
   productId,
   initialMembers,
+  initialGst = "0",
   onSubmit,
   onCancel,
   submitLabel = "Save Product",
@@ -151,18 +156,38 @@ export default function ProductForm({
   const [tocDraft, setTocDraft] = useState({ title: '', content: '' });
   const [coveredMembers, setCoveredMembers] = useState(() => new Set(initialMembers?.length ? initialMembers : ["Self"]));
   const [handicapFlags, setHandicapFlags] = useState({});
-  const [childCount, setChildCount] = useState(0);
-  const [childHandicaps, setChildHandicaps] = useState([]);
+  const [childCount, setChildCount] = useState(() =>
+    (initialMembers ?? []).filter(m => /^Child \d+/.test(m)).length
+  );
+  const [childHandicaps, setChildHandicaps] = useState(() => {
+    const children = (initialMembers ?? []).filter(m => /^Child \d+/.test(m));
+    return children.map(m => m.includes("(Handicap)"));
+  });
   const [sumInsuredList, setSumInsuredList] = useState(() => {
     const rows = PREMIUM_CHART[productId] ?? [];
     if (rows.length === 0) return [{ id: Date.now(), value: '' }];
     return rows.map((r, i) => ({ id: i + 1, value: String(r.sumInsured) }));
   });
-  const [gst, setGst] = useState('0');
-  const [premiumMatrix, setPremiumMatrix] = useState({});
+  const [gst, setGst] = useState(initialGst);
+  const [premiumMatrix, setPremiumMatrix] = useState(() => {
+    const rows = PREMIUM_CHART[productId] ?? [];
+    if (rows.length === 0) return {};
+    const bandId = 1;
+    const band = {};
+    rows.forEach((r, i) => {
+      const siId = i + 1;
+      if (r.selfOnly != null)
+        band['Self'] = { ...(band['Self'] ?? {}), [siId]: String(r.selfOnly) };
+      if (r.selfSpouse != null)
+        band['Self+Spouse'] = { ...(band['Self+Spouse'] ?? {}), [siId]: String(r.selfSpouse) };
+      if (r.selfSpouse2Children != null)
+        band['Self+Spouse+Child 1+Child 2'] = { ...(band['Self+Spouse+Child 1+Child 2'] ?? {}), [siId]: String(r.selfSpouse2Children) };
+    });
+    return { [bandId]: band };
+  });
   const [removedCombos, setRemovedCombos] = useState(new Set());
   const [linkBasePolicy, setLinkBasePolicy] = useState(!!form.basePolicyId);
-  const [ageBands, setAgeBands] = useState(() => [{ id: Date.now(), from: '', to: '' }]);
+  const [ageBands, setAgeBands] = useState(() => [{ id: 1, from: '', to: '' }]);
   const [activeAgeBandId, setActiveAgeBandId] = useState(null);
 
   const [docState, setDocState] = useState({
@@ -245,7 +270,7 @@ export default function ProductForm({
           name: mock.name,
           size: mock.size,
           pages: mock.pages,
-          date: new Date().toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" }),
+          date: formatDate(new Date().toLocaleDateString("en-CA")),
         },
       },
     }));

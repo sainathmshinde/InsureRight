@@ -1,4 +1,4 @@
-import { Field, Input, Select, Textarea, UploadBox, SectionBlock } from '../../components/Field'
+import { Field, Input, DateInput, Select, Textarea, UploadBox, SectionBlock } from '../../components/Field'
 
 export default function BrokerForm({ form, set, setFile, onSubmit, onCancel, submitLabel = 'Save Broker' }) {
   return (
@@ -24,7 +24,7 @@ export default function BrokerForm({ form, set, setFile, onSubmit, onCancel, sub
             <Input placeholder="IRDAI-XXXX-XXXX" value={form.licenseNumber} onChange={set('licenseNumber')} required />
           </Field>
           <Field label="License Validity Date" required>
-            <Input type="date" value={form.licenseValidity} onChange={set('licenseValidity')} required />
+            <DateInput value={form.licenseValidity} onChange={set('licenseValidity')} required />
           </Field>
           <Field label="GST Number">
             <Input placeholder="22AAAAA0000A1Z5" value={form.gstNumber} onChange={set('gstNumber')} />
@@ -134,10 +134,10 @@ export default function BrokerForm({ form, set, setFile, onSubmit, onCancel, sub
             <Textarea placeholder="Enter compliance notes..." value={form.complianceNotes} onChange={set('complianceNotes')} />
           </Field>
           <Field label="Agreement Start Date">
-            <Input type="date" value={form.agreementStart} onChange={set('agreementStart')} />
+            <DateInput value={form.agreementStart} onChange={set('agreementStart')} />
           </Field>
           <Field label="Agreement End Date">
-            <Input type="date" value={form.agreementEnd} onChange={set('agreementEnd')} />
+            <DateInput value={form.agreementEnd} onChange={set('agreementEnd')} />
           </Field>
           <Field label="Status">
             <Select value={form.status} onChange={set('status')}>

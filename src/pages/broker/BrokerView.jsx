@@ -3,6 +3,7 @@ import { useNavigate, useParams } from 'react-router-dom'
 import { useAuth } from '../../context/AuthContext'
 import { BrokerIcon } from '../../icons'
 import { BROKER_MAP } from './brokerData'
+import { formatDate } from '../../utils/date'
 
 const tabs = ['Basic Info', 'KYC', 'Contact & Address', 'Bank Info', 'Agreement']
 
@@ -85,7 +86,7 @@ export default function BrokerView() {
               <Row label="Company Name"       value={b.companyName} />
               <Row label="Broker Type"        value={b.brokerType} />
               <Row label="IRDAI License No."  value={b.licenseNumber} />
-              <Row label="License Validity"   value={b.licenseValidity} />
+              <Row label="License Validity"   value={formatDate(b.licenseValidity)} />
               <Row label="GST Number"         value={b.gstNumber} />
             </div>
           )}
@@ -119,8 +120,8 @@ export default function BrokerView() {
           )}
           {tab === 4 && (
             <div>
-              <Row label="Agreement Start"    value={b.agreementStart} />
-              <Row label="Agreement End"      value={b.agreementEnd} />
+              <Row label="Agreement Start"    value={formatDate(b.agreementStart)} />
+              <Row label="Agreement End"      value={formatDate(b.agreementEnd)} />
               <Row label="Compliance Notes"   value={b.complianceNotes} />
               <Row label="Status"             value={b.status} />
             </div>

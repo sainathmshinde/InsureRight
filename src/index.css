@@ -367,7 +367,7 @@ label {
   cursor: not-allowed;
 }
 
-/* ─── Date Input (DD/MMM/YYYY display) ───── */
+/* ─── Date Input (DD-MMM-YYYY display) ───── */
 .date-field-wrap {
   position: relative;
   width: 100%;

@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { MemberIcon } from '../../icons'
 import { ORGANISATIONS, ASSOCIATIONS } from './orgAssocData'
+import { formatDate } from '../../utils/date'
 
 export const MOCK = {
   1: {
@@ -379,7 +380,7 @@ export default function Member360() {
                 <Row label="EMP ID / PF No."  value={personal?.empId} />
                 <Row label="Mobile"           value={c.mobile} />
                 <Row label="Email"            value={c.email} />
-                <Row label="Date of Birth"    value={c.dob} />
+                <Row label="Date of Birth"    value={formatDate(c.dob)} />
                 <Row label="Gender"           value={c.gender} />
                 <Row label="Organisation"     value={org?.name} />
                 <Row label="Association"      value={assoc?.name} />
@@ -421,7 +422,7 @@ export default function Member360() {
                 <tbody>
                   {c.payments.map(p => (
                     <tr key={p.txnId}>
-                      <td>{p.date}</td>
+                      <td>{formatDate(p.date)}</td>
                       <td style={{ fontWeight: 500 }}>₹{p.amount.toLocaleString('en-IN')}</td>
                       <td><span className="badge badge-blue">{p.mode}</span></td>
                       <td style={{ fontFamily: 'monospace', fontSize: 13.5 }}>{p.txnId}</td>
@@ -444,7 +445,7 @@ export default function Member360() {
                   <div>
                     <div style={{ display: 'flex', gap: 8, alignItems: 'center', marginBottom: 4 }}>
                       <span className="badge badge-purple">{i.type}</span>
-                      <span style={{ fontSize: 12, color: 'var(--text-3)' }}>{i.date}</span>
+                      <span style={{ fontSize: 12, color: 'var(--text-3)' }}>{formatDate(i.date)}</span>
                     </div>
                     <div style={{ fontSize: 13.5, color: 'var(--text)' }}>{i.note}</div>
                   </div>

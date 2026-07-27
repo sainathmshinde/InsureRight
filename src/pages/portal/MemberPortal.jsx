@@ -1,10 +1,11 @@
 ﻿import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../../context/AuthContext'
+import { useMembers } from '../../context/MemberContext'
 import { POLICY_MOCK } from '../policy/PolicyList'
 import { PRODUCTS, PREMIUM_CHART, POLICY_TYPE_ICON } from '../product/productData'
-import { getChartData, applyDiscount } from '../campaign/campaignShared'
 import { getActivePromoCampaigns } from '../campaign/campaignStore'
+import { formatDate } from '../../utils/date'
 
 /* ─── data ─────────────────────────────────────────────── */
 
@@ -196,149 +197,32 @@ function DealsCarousel({ products, navigate }) {
   )
 }
 
-/* ─── Campaign Promo Carousel ───────────────────────────── */
-function CampaignPromoCard({ campaign, navigate }) {
-  const products = campaign.selectedProducts
-    .map((id) => PRODUCTS.find((p) => p.id === id))
-    .filter(Boolean)
-  const base = products.find((p) => !p.linkedBaseId)
-  const topups = base ? products.filter((p) => p.linkedBaseId === base.id) : []
-  const { minP } = base ? getChartData(base.id) : { minP: null }
-  const discountedMinP = minP != null ? applyDiscount(minP, campaign.offerType, campaign.offerValue) : null
-
+/* ─── Campaign Banner — single current campaign, no carousel ───────────── */
+function CampaignBanner({ campaign, navigate }) {
   const goToOffer = () => navigate(`/policy/buy?campaignId=${campaign.id}`)
 
   return (
-    <div
-      onClick={goToOffer}
-      style={{
-        width: CARD_W, flexShrink: 0,
-        background: '#fff', border: '1.5px solid #c7d2fe',
-        borderRadius: 14, overflow: 'hidden', cursor: 'pointer',
-        display: 'flex', flexDirection: 'column',
-        transition: 'transform .18s, box-shadow .18s',
-      }}
-      onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-4px)'; e.currentTarget.style.boxShadow = '0 12px 32px rgba(79,70,229,.22)' }}
-      onMouseLeave={e => { e.currentTarget.style.transform = 'none'; e.currentTarget.style.boxShadow = 'none' }}
-    >
-      {/* promo image — the creative uploaded on campaign create/edit */}
-      <div style={{ width: '100%', height: 150, overflow: 'hidden', flexShrink: 0, background: '#eef2ff' }}>
-        <img src={campaign.campaignImage} alt={campaign.name}
-          style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center', display: 'block' }} />
-      </div>
-
-      <div style={{ padding: '14px 16px', flex: 1, display: 'flex', flexDirection: 'column', gap: 10 }}>
-        <div style={{ fontSize: 10.5, fontWeight: 700, color: '#4f46e5', textTransform: 'uppercase', letterSpacing: '.5px' }}>🎉 Special Campaign</div>
-        <div style={{ fontSize: 14, fontWeight: 800, color: '#1a1628', lineHeight: 1.3 }}>{campaign.name}</div>
-
-        {base && (
-          <div style={{ background: '#eef2ff', borderRadius: 8, padding: '8px 10px' }}>
-            <div style={{ fontSize: 11.5, color: '#312e81', lineHeight: 1.4 }}>
-              Buy <strong>{base.name}</strong>
-              {discountedMinP != null && (
-                <> &amp; get <strong>{campaign.offerType === 'Percent' ? `${campaign.offerValue}%` : `₹${campaign.offerValue}`} off</strong> its premium</>
-              )}
-            </div>
-            {minP != null && (
-              <div style={{ marginTop: 4, display: 'flex', alignItems: 'center', gap: 6 }}>
-                {discountedMinP != null ? (
-                  <>
-                    <span style={{ fontSize: 11.5, color: '#94a3b8', textDecoration: 'line-through' }}>₹{minP.toLocaleString('en-IN')}</span>
-                    <span style={{ fontSize: 14, fontWeight: 800, color: '#15803d' }}>₹{discountedMinP.toLocaleString('en-IN')}/yr</span>
-                  </>
-                ) : (
-                  <span style={{ fontSize: 14, fontWeight: 800, color: '#1a1628' }}>₹{minP.toLocaleString('en-IN')}/yr</span>
-                )}
-              </div>
-            )}
-          </div>
-        )}
-
-        {topups.length > 0 && (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 5 }}>
-            {topups.map((t) => (
-              <div key={t.id} style={{ fontSize: 11, color: '#166534', background: '#f0fdf4', border: '1px solid #bbf7d0', borderRadius: 6, padding: '5px 8px', lineHeight: 1.4 }}>
-                🏷️ + <strong>{t.name}</strong> → {t.bundleDiscount
-                  ? (t.bundleDiscount.type === 'Percent' ? `${t.bundleDiscount.value}% off` : `₹${t.bundleDiscount.value} off`)
-                  : 'bundle offer'} base premium
-              </div>
-            ))}
-          </div>
-        )}
-      </div>
-
-      <div style={{ borderTop: '1px solid #e0e7ff', padding: '11px 16px', display: 'flex', justifyContent: 'center', background: '#fff', flexShrink: 0 }}>
-        <button
-          onClick={e => { e.stopPropagation(); goToOffer() }}
-          style={{ padding: '7px 20px', borderRadius: 9, border: 'none', background: '#4f46e5', color: '#fff', fontWeight: 700, fontSize: 12.5, cursor: 'pointer', fontFamily: 'inherit' }}
-        >
-          View Offer &amp; Buy →
-        </button>
-      </div>
-    </div>
-  )
-}
-
-function CampaignDealsCarousel({ campaigns, navigate }) {
-  const [paused, setPaused] = useState(false)
-  const repeated = [...campaigns, ...campaigns]
-  const setWidth = campaigns.length * (CARD_W + CARD_GAP)
-  const duration = campaigns.length * 5
-
-  return (
-    <div style={{ marginBottom: 28 }}>
-      <style>{`
-        @keyframes campaignMarquee {
-          0%   { transform: translateX(0) }
-          100% { transform: translateX(-${setWidth}px) }
-        }
-        .campaign-deals-track {
-          display: flex;
-          gap: ${CARD_GAP}px;
-          width: max-content;
-          animation: campaignMarquee ${duration}s linear infinite;
-        }
-        .campaign-deals-track.paused { animation-play-state: paused; }
-      `}</style>
-
-      {/* Header */}
-      <div style={{ display:'flex', justifyContent:'space-between', alignItems:'flex-end', marginBottom:16 }}>
-        <div>
-          <div style={{ fontSize:18, fontWeight:800, color:'#1a1628' }}>Featured Campaigns</div>
-          <div style={{ fontSize:13, color:'#64748b', marginTop:3 }}>
-            Limited-time bundle offers · Tap an offer to buy
-          </div>
-        </div>
-      </div>
-
-      {/* Scroll window */}
+    <div style={{ marginBottom: 28, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 10 }}>
       <div
-        style={{ overflow:'hidden', borderRadius:14, position:'relative' }}
-        onMouseEnter={() => setPaused(true)}
-        onMouseLeave={() => setPaused(false)}
+        onClick={goToOffer}
+        title={`View ${campaign.name} & buy`}
+        style={{
+          width: '100%', maxWidth: 900, cursor: 'pointer',
+          borderRadius: 14, overflow: 'hidden', border: '1.5px solid #c7d2fe',
+          boxShadow: '0 4px 20px rgba(79,70,229,.14)',
+          transition: 'transform .18s, box-shadow .18s',
+        }}
+        onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-3px)'; e.currentTarget.style.boxShadow = '0 14px 34px rgba(79,70,229,.24)' }}
+        onMouseLeave={e => { e.currentTarget.style.transform = 'none'; e.currentTarget.style.boxShadow = '0 4px 20px rgba(79,70,229,.14)' }}
       >
-        <div style={{ position:'absolute', left:0, top:0, bottom:0, width:60, background:'linear-gradient(to right, var(--bg, #f5f4f9), transparent)', zIndex:2, pointerEvents:'none' }} />
-        <div style={{ position:'absolute', right:0, top:0, bottom:0, width:60, background:'linear-gradient(to left, var(--bg, #f5f4f9), transparent)', zIndex:2, pointerEvents:'none' }} />
-
-        <div className={`campaign-deals-track${paused ? ' paused' : ''}`}>
-          {repeated.map((campaign, i) => (
-            <CampaignPromoCard key={`${campaign.id}-${i}`} campaign={campaign} navigate={navigate} />
-          ))}
-        </div>
+        <img src={campaign.campaignImage} alt={campaign.name}
+          style={{ width: '100%', height: 'auto', display: 'block' }} />
       </div>
-
-      <div style={{ textAlign:'center', marginTop:10, fontSize:11.5, color:'#c4b5fd' }}>
-        Hover to pause · Click any card to explore
-      </div>
+      <div style={{ fontSize: 12, color: '#6b7fa0' }}>Tap the banner to view this offer and buy</div>
     </div>
   )
 }
 
-function fmtDate(iso) {
-  if (!iso) return '—'
-  const [y, m, d] = iso.split('-')
-  return `${d} ${['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][+m-1]} ${y}`
-}
 function daysUntil(iso) {
   if (!iso) return null
   return Math.ceil((new Date(iso) - new Date()) / 86400000)
@@ -349,10 +233,12 @@ function Stars({ n }) {
 
 /* ─── component ─────────────────────────────────────────── */
 export default function MemberPortal() {
-  const { user }   = useAuth()
-  const navigate   = useNavigate()
-  const myPolicies = POLICY_MOCK.filter(p => p.memberId === user?.id)
-  const [promoCampaigns] = useState(() => getActivePromoCampaigns())
+  const { user }    = useAuth()
+  const { members } = useMembers()
+  const navigate    = useNavigate()
+  const myPolicies  = POLICY_MOCK.filter(p => p.memberId === user?.id)
+  const myMemberRecord = members.find(m => m.email === user?.email)
+  const [promoCampaigns] = useState(() => getActivePromoCampaigns(myMemberRecord?.associationId))
   const [helpOpen, setHelpOpen]       = useState(false)
   const [helpReason, setHelpReason]   = useState('')
   const [helpSubmitted, setHelpSubmitted] = useState(false)
@@ -361,10 +247,10 @@ export default function MemberPortal() {
     <div style={{ display: 'flex', flexDirection: 'column', gap: 0 }}>
 
       {/* ══════════════════════════════════════════════════
-          FEATURED DEALS — CAROUSEL
+          FEATURED DEALS
       ══════════════════════════════════════════════════ */}
       {promoCampaigns.length > 0
-        ? <CampaignDealsCarousel campaigns={promoCampaigns} navigate={navigate} />
+        ? <CampaignBanner campaign={promoCampaigns[0]} navigate={navigate} />
         : <DealsCarousel products={HEALTH_PRODUCTS} navigate={navigate} />}
 
       {/* ══════════════════════════════════════════════════
@@ -405,7 +291,7 @@ export default function MemberPortal() {
                     </span>
                   </div>
                   <div className="cp-pol-details" style={{ display:'grid', gridTemplateColumns:'repeat(4,1fr)', gap:10 }}>
-                    {[['Type',p.type],['Sum Insured',p.sumInsured],['Premium',`₹${p.premium?.toLocaleString()}/yr`],['Valid Until',fmtDate(p.endDate)]].map(([k,v]) => (
+                    {[['Type',p.type],['Sum Insured',p.sumInsured],['Premium',`₹${p.premium?.toLocaleString()}/yr`],['Valid Until',formatDate(p.endDate)]].map(([k,v]) => (
                       <div key={k}>
                         <div style={{ fontSize:10.5, color:'#64748b', marginBottom:2 }}>{k}</div>
                         <div style={{ fontSize:12.5, fontWeight:600, color:'#1a1628' }}>{v}</div>

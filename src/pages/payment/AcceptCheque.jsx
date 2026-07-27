@@ -818,7 +818,7 @@ function ChequeDetailModal({ cheque, onClose, onAccept, onReject }) {
             <DetailRow label="Bank" value={cheque.bank} />
             <DetailRow label="Branch" value={cheque.branch} />
             <DetailRow label="Cheque Number" value={cheque.chequeNo} />
-            <DetailRow label="Cheque Date" value={cheque.chequeDate} />
+            <DetailRow label="Cheque Date" value={formatDate(cheque.chequeDate)} />
             <DetailRow label="Date Initiated" value={formatDate(cheque.initiatedDate)} />
             <DetailRow label="Initiated By" value={cheque.initiatedBy} />
           </div>

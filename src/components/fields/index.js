@@ -1,5 +1,6 @@
 export { Field }       from './Field'
 export { Input }       from './Input'
+export { DateInput }   from './DateInput'
 export { Select }      from './Select'
 export { Textarea }    from './Textarea'
 export { UploadBox }   from './UploadBox'

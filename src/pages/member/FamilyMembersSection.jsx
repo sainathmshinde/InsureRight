@@ -1,5 +1,6 @@
 import { useState } from 'react'
-import { Field, Input, Select } from '../../components/Field'
+import { Field, Input, DateInput, Select } from '../../components/Field'
+import { formatDate } from '../../utils/date'
 
 const MEMBER_TYPES = [
   { value: 'Spouse',         label: 'Spouse',          icon: '💑' },
@@ -57,7 +58,7 @@ export default function FamilyMembersSection({ members = [], onChange }) {
                 <div style={{ flex: 1, minWidth: 0 }}>
                   <div style={{ fontWeight: 600, fontSize: 13.5, color: 'var(--text)' }}>{m.name}</div>
                   <div style={{ fontSize: 12, color: 'var(--text-3)', marginTop: 2 }}>
-                    {m.type}{m.gender ? ` · ${m.gender}` : ''}{age !== null ? ` · Age: ${age} yrs` : ''}{m.dob ? ` (${m.dob})` : ''}
+                    {m.type}{m.gender ? ` · ${m.gender}` : ''}{age !== null ? ` · Age: ${age} yrs` : ''}{m.dob ? ` (${formatDate(m.dob)})` : ''}
                   </div>
                 </div>
                 <button type="button" onClick={() => startEdit(m)} title="Edit" style={{ background: 'linear-gradient(180deg,#1565d8,#104ea6)', border: 'none', borderRadius: 6, cursor: 'pointer', padding: '5px 6px', color: '#fff', display: 'inline-flex', alignItems: 'center', boxShadow: '0 2px 6px rgba(168,85,247,.30)', flexShrink: 0 }}><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"/></svg></button>
@@ -92,7 +93,7 @@ export default function FamilyMembersSection({ members = [], onChange }) {
               <Input placeholder="Member full name" value={draft.name} onChange={setD('name')} />
             </Field>
             <Field label="Date of Birth">
-              <Input type="date" value={draft.dob} onChange={setD('dob')} max={new Date().toISOString().split('T')[0]} />
+              <DateInput value={draft.dob} onChange={setD('dob')} max={new Date().toISOString().split('T')[0]} />
             </Field>
             <Field label="Gender">
               <Select value={draft.gender} onChange={setD('gender')}>

@@ -10,7 +10,6 @@ import {
 import {
   PageHeader,
   FormActions,
-  Toggle,
   CheckboxGroup,
 } from "../../components/UI";
 import { CampaignIcon } from "../../icons";
@@ -19,7 +18,6 @@ import {
   CampaignDiscountSection,
   AudienceSection,
   PromoCreativeSection,
-  AssignEmployeesSection,
   CampaignPreviewModal,
   toggleProductWithLinks,
 } from "./campaignShared";
@@ -93,7 +91,6 @@ export default function CampaignCreate() {
   const set = (f) => (e) => setForm((p) => ({ ...p, [f]: e.target.value }));
   const setDate = (f) => (e) =>
     setForm((p) => ({ ...p, [f]: fromInputDate(e.target.value) }));
-  const setBool = (f) => (val) => setForm((p) => ({ ...p, [f]: val }));
 
   const startDateISO = toInputDate(form.startDate);
   const endDateISO = toInputDate(form.endDate);
@@ -148,6 +145,10 @@ export default function CampaignCreate() {
       offerValue: form.offerValue,
       campaignImage,
       isActive: true,
+      startDate: startDateISO,
+      endDate: endDateISO,
+      segment: form.segment,
+      selectedAssociations: form.selectedAssociations,
     });
     navigate("/campaign");
   };
@@ -244,28 +245,6 @@ export default function CampaignCreate() {
             </SectionBlock>
 
             <PromoCreativeSection form={form} setForm={setForm} />
-
-            <AssignEmployeesSection
-              assignedCalling={assignedCalling}
-              assignedSales={assignedSales}
-              toggleCalling={toggleCalling}
-              toggleSales={toggleSales}
-            />
-
-            <SectionBlock icon="📊" title="Tracking">
-              <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-                <Toggle
-                  checked={form.clickTracking}
-                  onChange={setBool("clickTracking")}
-                  label="Enable Click Tracking (UTM / link tracking)"
-                />
-                <Toggle
-                  checked={form.conversionTracking}
-                  onChange={setBool("conversionTracking")}
-                  label="Enable Conversion Tracking (policy issued after campaign click)"
-                />
-              </div>
-            </SectionBlock>
 
             <FormActions
               onCancel={() => navigate("/campaign")}

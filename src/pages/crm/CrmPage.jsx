@@ -5,6 +5,7 @@ import { CRMIcon } from '../../icons'
 import { useAuth } from '../../context/AuthContext'
 import { OPERATORS as KMD_AGENTS } from '../agent/agentData'
 import { CAMPAIGNS, INITIAL_LEADS } from './crmData'
+import { formatDate } from '../../utils/date'
 
 const SALES_AGENTS       = KMD_AGENTS.filter(a => a.agentType === 'sales')
 const ENROLLMENT_STATUSES = ['Enrolled', 'Pending']
@@ -133,7 +134,7 @@ export default function CrmPage() {
               <div style={{ display: 'flex', gap: 20, flexWrap: 'wrap' }}>
                 <div>
                   <div style={{ fontSize: 10.5, color: 'var(--text-3)' }}>Enrollment Date</div>
-                  <div style={{ fontSize: 13.5, fontWeight: 600 }}>{lead.enrollmentDate || '—'}</div>
+                  <div style={{ fontSize: 13.5, fontWeight: 600 }}>{lead.enrollmentDate ? formatDate(lead.enrollmentDate) : '—'}</div>
                 </div>
                 {showAssignedTo && (
                   <div>
@@ -176,7 +177,7 @@ export default function CrmPage() {
                 <td>{lead.mobile}</td>
                 {showCampaign   && <td style={{ color: 'var(--text-3)', fontSize: 12 }}>{campaignName(lead.campaignId)}</td>}
                 <td><Badge bg={enrollBg(lead.enrollmentStatus)} color={enrollClr(lead.enrollmentStatus)}>{lead.enrollmentStatus}</Badge></td>
-                <td>{lead.enrollmentDate || '—'}</td>
+                <td>{lead.enrollmentDate ? formatDate(lead.enrollmentDate) : '—'}</td>
                 <td><Badge bg={purchBg(lead.purchaseStatus)} color={purchClr(lead.purchaseStatus)}>{lead.purchaseStatus}</Badge></td>
                 {showAssignedTo && <td style={{ fontSize: 13, color: 'var(--text-3)' }}>{KMD_AGENTS.find(a => a.id === lead.salesAssignedTo)?.name ?? '—'}</td>}
                 <td>

@@ -7,6 +7,7 @@ import { PolicyIcon, DownloadPolicyIcon } from '../../icons'
 import { useAuth } from '../../context/AuthContext'
 import { POLICY_TYPE_COLOR } from '../product/productData'
 import { PAYMENT_STATUSES } from '../../constants/paymentStatus'
+import { formatDate } from '../../utils/date'
 
 const _PP = [
   ['OPD Policy-2025-26','SBI General Insurance','OPD',5,'Campaign OPD and DIGIT PAYMENT PROTECTION'],
@@ -312,7 +313,7 @@ export default function PolicyList() {
                       </div>
                       <div>
                         <div style={{ fontSize: 10.5, color: 'var(--text-3)', marginBottom: 2 }}>Valid Until</div>
-                        <div style={{ fontWeight: 500, fontSize: 13.5 }}>{row.endDate || '—'}</div>
+                        <div style={{ fontWeight: 500, fontSize: 13.5 }}>{row.endDate ? formatDate(row.endDate) : '—'}</div>
                       </div>
                       {row.paymentMode && (
                         <div>

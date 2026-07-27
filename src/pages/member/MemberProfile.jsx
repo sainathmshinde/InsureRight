@@ -6,6 +6,7 @@ import { UserIcon } from '../../icons'
 import { TYPE_ICON } from './FamilyMembersSection'
 import { MOCK, DOCS, PERSONAL, DocCard } from './Member360'
 import { ORGANISATIONS, ASSOCIATIONS } from './orgAssocData'
+import { formatDate } from '../../utils/date'
 
 function calcAge(dob) {
   if (!dob) return null
@@ -128,7 +129,7 @@ export default function MemberProfile() {
                     <div style={{ flex:1, minWidth:0 }}>
                       <div style={{ fontWeight:600, fontSize:13.5, color:'var(--text)' }}>{m.name}</div>
                       <div style={{ fontSize:12, color:'var(--text-3)', marginTop:2 }}>
-                        {m.type}{m.gender ? ` · ${m.gender}` : ''}{age !== null ? ` · Age: ${age} yrs` : ''}{m.dob ? ` (${m.dob})` : ''}
+                        {m.type}{m.gender ? ` · ${m.gender}` : ''}{age !== null ? ` · Age: ${age} yrs` : ''}{m.dob ? ` (${formatDate(m.dob)})` : ''}
                         {m.preExisting ? <span style={{ color:'#d97706', marginLeft:6 }}>⚠ {m.preExisting}</span> : null}
                       </div>
                     </div>
@@ -222,7 +223,7 @@ export default function MemberProfile() {
                 <tbody>
                   {c?.payments?.length > 0 ? c.payments.map(p => (
                     <tr key={p.txnId}>
-                      <td>{p.date}</td>
+                      <td>{formatDate(p.date)}</td>
                       <td style={{ fontWeight:500 }}>₹{p.amount.toLocaleString('en-IN')}</td>
                       <td><span className="badge badge-blue">{p.mode}</span></td>
                       <td style={{ fontFamily:'monospace', fontSize:12.5 }}>{p.txnId}</td>
@@ -247,7 +248,7 @@ export default function MemberProfile() {
                   <div>
                     <div style={{ display:'flex', gap:8, alignItems:'center', marginBottom:4 }}>
                       <span className="badge badge-purple">{i.type}</span>
-                      <span style={{ fontSize:12, color:'var(--text-3)' }}>{i.date}</span>
+                      <span style={{ fontSize:12, color:'var(--text-3)' }}>{formatDate(i.date)}</span>
                     </div>
                     <div style={{ fontSize:13.5, color:'var(--text)' }}>{i.note}</div>
                   </div>

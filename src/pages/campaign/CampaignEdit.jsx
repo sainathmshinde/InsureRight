@@ -35,13 +35,13 @@ const BASE = {
 };
 
 const MOCK_DATA = {
-  1:  { ...BASE, name: "Campaign 1",                                startDate: "2024-09-20", endDate: "2025-07-29", selectedProducts: [42, 48, 50], callingIds: [2],    salesIds: [1, 5] },
-  5:  { ...BASE, name: "Campaign OPD and DIGIT PAYMENT PROTECTION", startDate: "2025-01-31", endDate: "2025-03-31", selectedProducts: [7, 8],       callingIds: [4], salesIds: [1] },
-  6:  { ...BASE, name: "BPP Campaign",                              startDate: "2025-02-19", endDate: "2025-03-24", selectedProducts: [9, 10],      callingIds: [2, 9], salesIds: [8] },
-  7:  { ...BASE, name: "Test Campaign",                              startDate: "2025-08-03", endDate: "2025-08-29", selectedProducts: [46, 47],     callingIds: [], salesIds: [1] },
-  8:  { ...BASE, name: "SBI_STP_Campaign",                          startDate: "2025-09-18", endDate: "2026-03-10", selectedProducts: [42, 38],      callingIds: [4], salesIds: [5] },
-  11: { ...BASE, name: "BPP Campaign_2026-2027",                    startDate: "2026-03-16", endDate: "2026-05-31", selectedProducts: [44, 45],      callingIds: [2, 9], salesIds: [8] },
-  12: { ...BASE, name: "Standalone campaign",                        startDate: "2026-02-28", endDate: "2026-04-29", selectedProducts: [46],          callingIds: [2], salesIds: [1] },
+  1:  { ...BASE, name: "Campaign 1",                startDate: "2024-09-20", endDate: "2025-07-29", selectedProducts: [42, 48],     callingIds: [2],    salesIds: [1, 5] },
+  5:  { ...BASE, name: "Campaign OPD and DIGIT PAYMENT PROTECTION", startDate: "2025-01-31", endDate: "2025-03-31", selectedProducts: [6, 49], callingIds: [4], salesIds: [1] },
+  6:  { ...BASE, name: "BPP Campaign",               startDate: "2025-02-19", endDate: "2025-03-24", selectedProducts: [60, 61],     callingIds: [2, 9], salesIds: [8] },
+  7:  { ...BASE, name: "Test Campaign",              startDate: "2025-08-03", endDate: "2025-08-29", selectedProducts: [3],          callingIds: [],     salesIds: [1] },
+  8:  { ...BASE, name: "SBI_STP_Campaign",           startDate: "2025-09-18", endDate: "2026-03-10", selectedProducts: [42, 38],     callingIds: [4],    salesIds: [5] },
+  11: { ...BASE, name: "BPP Campaign_2026-2027",     startDate: "2026-03-16", endDate: "2026-05-31", selectedProducts: [42, 38, 48], callingIds: [2, 9], salesIds: [8] },
+  12: { ...BASE, name: "Standalone campaign",        startDate: "2026-02-28", endDate: "2026-04-29", selectedProducts: [38],         callingIds: [2],    salesIds: [1] },
 };
 
 const DEFAULT = {
@@ -120,6 +120,10 @@ function CampaignEditForm({ id }) {
       offerValue: form.offerValue,
       campaignImage,
       isActive: true,
+      startDate: form.startDate,
+      endDate: form.endDate,
+      segment: form.segment,
+      selectedAssociations: form.selectedAssociations,
     });
     navigate("/campaign");
   };

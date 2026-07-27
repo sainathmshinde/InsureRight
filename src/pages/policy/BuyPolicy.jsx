@@ -3,7 +3,7 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 import Pagination from "../../components/Pagination";
 import usePagination from "../../components/usePagination";
 import { useAuth } from "../../context/AuthContext";
-import { Field, Input, Select, Textarea } from "../../components/fields";
+import { Field, Input, DateInput, Select, Textarea } from "../../components/fields";
 import {
   StatusBadge,
   CheckboxGroup,
@@ -14,7 +14,7 @@ import {
   PaymentIcon,
   MemberIcon,
 } from "../../icons";
-import { PRODUCTS, PRODUCTS_BY_TYPE, POLICY_TYPE_ICON, PREMIUM_CHART, PRODUCT_DETAILS } from "../product/productData";
+import { PRODUCTS, PRODUCTS_BY_TYPE, PREMIUM_CHART, PRODUCT_DETAILS } from "../product/productData";
 import policyWordingsPdf from "../../assets/StarHealthAssureInsurancePolicy-Policy-wording.pdf";
 import brochurePdf from "../../assets/Brochure_Star_Comprehensive_Insurance_Policy_V_15_Web_633bcfcaaf.pdf";
 import { OPERATORS as KMD_AGENTS } from "../agent/agentData";
@@ -22,6 +22,7 @@ import { INITIAL_LEADS, CAMPAIGNS } from "../crm/crmData";
 import { applyDiscount } from "../campaign/campaignShared";
 import { getPromoCampaignById } from "../campaign/campaignStore";
 import { POLICY_MOCK } from "./PolicyList";
+import { formatDate } from "../../utils/date";
 import { ASSOCIATIONS, ORGANISATIONS } from "../member/orgAssocData";
 
 // ── Provider colour coding — shared between product cards & policy details ──
@@ -731,6 +732,19 @@ export default function BuyPolicy() {
       ? prev.filter(x => x.id !== p.id)
       : [...prev, { ...p, ...psel(p.id) }]);
 
+  // A base policy's own premium earns its linked top-up's bundleDiscount only
+  // once both are actually in the cart together — not just browsed side by side.
+  const bundleDiscountFor = (item) => {
+    if (item.linkedBaseId) return null; // discount applies to the base, not the top-up itself
+    const linkedTopup = cart.find(x => x.linkedBaseId === item.id && x.bundleDiscount);
+    return linkedTopup?.bundleDiscount ?? null;
+  };
+  const withBundleDiscount = (rawPremium, item) => {
+    const discount = bundleDiscountFor(item);
+    if (!discount || rawPremium == null) return { raw: rawPremium, discounted: null, discount: null };
+    return { raw: rawPremium, discounted: applyDiscount(rawPremium, discount.type, discount.value), discount };
+  };
+
   const availableProducts = useMemo(() => {
     if (!insuranceType) return [];
     // An explicit ?campaignId= scopes the catalogue for any role; otherwise
@@ -748,6 +762,19 @@ export default function BuyPolicy() {
       (PRODUCT_DETAILS[p.id] ? 1 : 0) + ((PREMIUM_CHART[p.id]?.length ?? 0) > 0 ? 1 : 0);
     return [...pool].sort((a, b) => score(b) - score(a));
   }, [insuranceType, agentCampaignProductIds, campaignProductIds]);
+
+  // Standalone bundle-offer banner (shown above the product grid, not on any
+  // one card) — only when a base policy and its linked, discount-bearing
+  // top-up are both present in the current catalogue view.
+  const bundleOffer = useMemo(() => {
+    for (const p of availableProducts) {
+      if (p.linkedBaseId && p.bundleDiscount) {
+        const base = availableProducts.find(x => x.id === p.linkedBaseId);
+        if (base) return { base, topup: p, discount: p.bundleDiscount };
+      }
+    }
+    return null;
+  }, [availableProducts]);
 
   // Member search filter — sales operators already scoped to their assigned members
   const filteredMembers = useMemo(() => {
@@ -814,7 +841,7 @@ export default function BuyPolicy() {
       product:     p.name,
       provider:    p.provider,
       member:    selectedMember?.name,
-      premium:     p.premium,
+      premium:     withBundleDiscount(p.premium, p).discounted ?? p.premium,
     })));
     next();
   };
@@ -1046,9 +1073,29 @@ export default function BuyPolicy() {
                         </div>
                         <div>
                           <div style={{ fontSize: 12, fontWeight: 500, color: "#6d747a", textTransform: "uppercase", letterSpacing: ".6px", marginBottom: 4 }}>Premium</div>
-                          <div style={{ fontSize: 15, fontWeight: 600, color: "#24304a" }}>
-                            {sel.premium != null ? <>₹{sel.premium.toLocaleString("en-IN")} <span style={{ fontSize: 12, fontWeight: 400, color: "#6d747a" }}>/yr</span></> : "—"}
-                          </div>
+                          {(() => {
+                            const bd = withBundleDiscount(sel.premium, p);
+                            if (bd.raw == null) return <div style={{ fontSize: 15, fontWeight: 600, color: "#24304a" }}>—</div>;
+                            if (bd.discounted == null) {
+                              return (
+                                <div style={{ fontSize: 15, fontWeight: 600, color: "#24304a" }}>
+                                  ₹{bd.raw.toLocaleString("en-IN")} <span style={{ fontSize: 12, fontWeight: 400, color: "#6d747a" }}>/yr</span>
+                                </div>
+                              );
+                            }
+                            return (
+                              <div>
+                                <span style={{ fontSize: 12, color: "#94a3b8", textDecoration: "line-through" }}>₹{bd.raw.toLocaleString("en-IN")}</span>
+                                <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                                  <span style={{ fontSize: 15, fontWeight: 600, color: "#15803d" }}>₹{bd.discounted.toLocaleString("en-IN")}</span>
+                                  <span style={{ fontSize: 12, fontWeight: 400, color: "#6d747a" }}>/yr</span>
+                                  <span style={{ fontSize: 10, fontWeight: 700, background: "#dcfce7", color: "#15803d", border: "1px solid #86efac", borderRadius: 99, padding: "1px 7px" }}>
+                                    {bd.discount.type === "Percent" ? `${bd.discount.value}% off` : `₹${bd.discount.value} off`}
+                                  </span>
+                                </div>
+                              </div>
+                            );
+                          })()}
                         </div>
                       </div>
                     </div>
@@ -1189,9 +1236,7 @@ export default function BuyPolicy() {
                                     disabled={isSelf}
                                     style={{ fontSize: 13.5, padding: "6px 9px", width: "100%", borderColor: missingName ? "#f59e0b" : undefined }}
                                   />
-                                  <input
-                                    type="date"
-                                    className="field-input"
+                                  <DateInput
                                     value={m?.dob ?? ""}
                                     onChange={e => updateMember(type, "dob", e.target.value)}
                                     disabled={isSelf}
@@ -1402,10 +1447,16 @@ export default function BuyPolicy() {
                     </div>
                     <div style={{ display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap" }}>
                       <span style={{ fontSize: 24, fontWeight: 800, color: "#fff" }}>
-                        ₹{cart.reduce((s, x) => s + (psel(x.id).premium ?? 0), 0).toLocaleString("en-IN")}
+                        ₹{cart.reduce((s, x) => {
+                          const bd = withBundleDiscount(psel(x.id).premium, x);
+                          return s + (bd.discounted ?? bd.raw ?? 0);
+                        }, 0).toLocaleString("en-IN")}
                       </span>
                       <span style={{ fontSize: 13, color: "rgba(255,255,255,.94)" }}>
-                        {cart.map(x => `${x.name.split(" ")[0]}: ₹${(psel(x.id).premium ?? 0).toLocaleString("en-IN")}`).join("  +  ")}
+                        {cart.map(x => {
+                          const bd = withBundleDiscount(psel(x.id).premium, x);
+                          return `${x.name.split(" ")[0]}: ₹${(bd.discounted ?? bd.raw ?? 0).toLocaleString("en-IN")}`;
+                        }).join("  +  ")}
                       </span>
                     </div>
                   </div>
@@ -1467,6 +1518,20 @@ export default function BuyPolicy() {
               <div style={{ fontSize: 13 }}>No products are assigned to your campaigns</div>
             </div>
           ) : (
+            <>
+              {bundleOffer && (
+                <div style={{
+                  background: "linear-gradient(90deg,#f59e0b,#ea580c)",
+                  color: "#fff", fontWeight: 800, fontSize: 14, letterSpacing: ".2px",
+                  padding: "13px 20px", borderRadius: 10, marginBottom: 20,
+                  display: "flex", alignItems: "center", justifyContent: "center", gap: 8,
+                  textAlign: "center", boxShadow: "0 4px 14px rgba(234,88,12,.3)",
+                }}>
+                  🔥 Buy {bundleOffer.topup.name} along with {bundleOffer.base.name} and get{" "}
+                  {bundleOffer.discount.type === "Percent" ? `${bundleOffer.discount.value}%` : `₹${bundleOffer.discount.value}`}{" "}
+                  off the base policy's premium!
+                </div>
+              )}
             <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(340px, 1fr))", gap: 24 }}>
               {availableProducts.map(p => {
                 const inCart      = !!cart.find(x => x.id === p.id);
@@ -1612,6 +1677,7 @@ export default function BuyPolicy() {
                 );
               })}
             </div>
+            </>
           )}
 
           {/* Sticky footer */}
@@ -1910,16 +1976,34 @@ export default function BuyPolicy() {
                   }}>
                     <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 8 }}>
                       <div style={{ display: "flex", gap: 8, alignItems: "flex-start", minWidth: 0 }}>
-                        <span style={{ fontSize: 18, flexShrink: 0, marginTop: 1 }}>{POLICY_TYPE_ICON[p.policyType] ?? "📋"}</span>
                         <div style={{ minWidth: 0 }}>
-                          <div style={{ fontWeight: 700, fontSize: 13, lineHeight: 1.3, color: "#7c3aed" }}>{p.name}</div>
+                          <div style={{ fontWeight: 700, fontSize: 13, lineHeight: 1.3, color: "#000" }}>{p.name}</div>
                           <div style={{ fontSize: 13, color: "var(--text-3)", marginTop: 2 }}>{p.provider} · <span style={{ fontFamily: "monospace" }}>{p.code}</span></div>
                         </div>
                       </div>
-                      <span style={{ fontWeight: 700, fontSize: 14, color: "var(--text)", flexShrink: 0 }}>
-                        {p.premium != null ? `₹${p.premium.toLocaleString("en-IN")}` : "—"}
+                      <span style={{ fontWeight: 700, fontSize: 14, color: "var(--text)", flexShrink: 0, textAlign: "right" }}>
+                        {(() => {
+                          const bd = withBundleDiscount(p.premium, p);
+                          if (bd.raw == null) return "—";
+                          if (bd.discounted == null) return `₹${bd.raw.toLocaleString("en-IN")}`;
+                          return (
+                            <>
+                              <span style={{ fontSize: 12, fontWeight: 400, color: "var(--text-3)", textDecoration: "line-through", marginRight: 6 }}>
+                                ₹{bd.raw.toLocaleString("en-IN")}
+                              </span>
+                              <span style={{ color: "#15803d" }}>₹{bd.discounted.toLocaleString("en-IN")}</span>
+                            </>
+                          );
+                        })()}
                       </span>
                     </div>
+                    {withBundleDiscount(p.premium, p).discount && (
+                      <div style={{ marginTop: 4 }}>
+                        <span style={{ fontSize: 10, fontWeight: 700, background: "#dcfce7", color: "#15803d", border: "1px solid #86efac", borderRadius: 99, padding: "1px 7px" }}>
+                          🏷️ {withBundleDiscount(p.premium, p).discount.type === "Percent" ? `${withBundleDiscount(p.premium, p).discount.value}% off` : `₹${withBundleDiscount(p.premium, p).discount.value} off`} for bundling
+                        </span>
+                      </div>
+                    )}
                     <div style={{ display: "flex", gap: 8, marginTop: 6, flexWrap: "wrap" }}>
                       {p.sumInsured && (
                         <span style={{ fontSize: 13, background: "#f3f4f6", border: "1px solid #e5e7eb", borderRadius: 5, padding: "2px 7px", color: "#374151", fontWeight: 500 }}>
@@ -1979,7 +2063,7 @@ export default function BuyPolicy() {
                             {m.name || <span style={{ color: "var(--text-3)", fontStyle: "italic", fontWeight: 400 }}>Name not entered</span>}
                           </div>
                           {m.dob && (
-                            <div style={{ fontSize: 13, color: "var(--text-3)", marginTop: 1 }}>DOB: {m.dob}</div>
+                            <div style={{ fontSize: 13, color: "var(--text-3)", marginTop: 1 }}>DOB: {formatDate(m.dob)}</div>
                           )}
                         </div>
                         <div style={{ textAlign: "right", flexShrink: 0 }}>
@@ -2081,7 +2165,11 @@ export default function BuyPolicy() {
                   padding: "5px 0", fontSize: 13.5, color: "var(--text-2)",
                 }}>
                   <span style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", maxWidth: "60%" }}>{p.name}</span>
-                  <span>{p.premium != null ? `₹${p.premium.toLocaleString("en-IN")}` : "—"}</span>
+                  <span>{(() => {
+                    const bd = withBundleDiscount(p.premium, p);
+                    if (bd.raw == null) return "—";
+                    return `₹${(bd.discounted ?? bd.raw).toLocaleString("en-IN")}`;
+                  })()}</span>
                 </div>
               ))}
 
@@ -2092,7 +2180,10 @@ export default function BuyPolicy() {
               }}>
                 <span style={{ fontSize: 14, fontWeight: 700 }}>Total Premium</span>
                 <span style={{ fontSize: 20, fontWeight: 800, color: "var(--brand)" }}>
-                  ₹{cart.reduce((s, x) => s + (x.premium ?? 0), 0).toLocaleString("en-IN")}
+                  ₹{cart.reduce((s, x) => {
+                    const bd = withBundleDiscount(x.premium, x);
+                    return s + (bd.discounted ?? bd.raw ?? 0);
+                  }, 0).toLocaleString("en-IN")}
                 </span>
               </div>
             </div>
@@ -2144,7 +2235,10 @@ export default function BuyPolicy() {
 
               {/* ── OFFLINE ── */}
               {payMode === "Offline" && (() => {
-                const totalPremium = cart.reduce((s, x) => s + (x.premium ?? 0), 0);
+                const totalPremium = cart.reduce((s, x) => {
+                  const bd = withBundleDiscount(x.premium, x);
+                  return s + (bd.discounted ?? bd.raw ?? 0);
+                }, 0);
                 const memberAssoc = ASSOCIATIONS.find(a => a.id === selectedMember?.associationId);
 
                 return (
@@ -2195,7 +2289,7 @@ export default function BuyPolicy() {
                             <Input placeholder="e.g. SBIN0001234" value={chequeIfsc} onChange={e => setChequeIfsc(e.target.value)} />
                           </Field>
                           <Field label="Date" required>
-                            <Input type="date" value={chequeDate} onChange={e => setChequeDate(e.target.value)} />
+                            <DateInput value={chequeDate} onChange={e => setChequeDate(e.target.value)} />
                           </Field>
                           <Field label="Association Name">
                             <Input value={memberAssoc?.name ?? "—"} readOnly style={{ background: "var(--surface-2)", color: "var(--text-2)" }} />
@@ -2274,7 +2368,7 @@ export default function BuyPolicy() {
                             <Input placeholder="UTR / Txn reference" value={neftTxnNo} onChange={e => setNeftTxnNo(e.target.value)} />
                           </Field>
                           <Field label="Date" required>
-                            <Input type="date" value={neftDate} onChange={e => setNeftDate(e.target.value)} />
+                            <DateInput value={neftDate} onChange={e => setNeftDate(e.target.value)} />
                           </Field>
                           <Field label="Amount">
                             <Input value={`₹${totalPremium.toLocaleString("en-IN")}`} readOnly style={{ background: "var(--surface-2)", color: "var(--text-2)" }} />

@@ -8,6 +8,7 @@ import { useAuth } from '../../context/AuthContext'
 import { useMembers, INITIAL_MEMBERS } from '../../context/MemberContext'
 import { ASSOCIATIONS } from './orgAssocData'
 import { formatDate } from '../../utils/date'
+import { getActivePromoCampaigns } from '../campaign/campaignStore'
 
 const CAMPAIGNS = [
   { id: 1,  name: 'Campaign 1' },
@@ -28,6 +29,13 @@ export default function MemberList() {
   const [kycFilter,       setKycFilter]       = useState("");
   const [campaignFilter,  setCampaignFilter]  = useState(searchParams.get('campaignId') ?? "");
   const [engagedFilter,   setEngagedFilter]   = useState(searchParams.get('engaged')    ?? "");
+  const [campaignPrompt,  setCampaignPrompt]  = useState(null); // { member, campaign }
+
+  const handleBuyPolicy = (member) => {
+    const [campaign] = getActivePromoCampaigns(member.associationId);
+    if (campaign) setCampaignPrompt({ member, campaign });
+    else navigate(`/policy/buy?memberId=${member.id}`);
+  };
 
   const scopedData =
     user?.role === "agent"
@@ -76,7 +84,7 @@ export default function MemberList() {
         <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
           <button
             title="Buy Policy"
-            onClick={() => navigate(`/policy/buy?memberId=${row.id}`)}
+            onClick={() => handleBuyPolicy(row)}
             style={S.iconBtn}
           >
             <CartIcon size={14} color="var(--text-2)" />
@@ -211,11 +219,76 @@ export default function MemberList() {
           />
         </div>
       </div>
+
+      {campaignPrompt && (
+        <>
+          <div onClick={() => setCampaignPrompt(null)} style={S.overlay} />
+          <div style={S.promptCard}>
+            <div style={S.promptHeader}>
+              <span style={{ fontSize: 15, fontWeight: 800, color: '#1a1628' }}>
+                🎉 {campaignPrompt.member.name} qualifies for a campaign offer
+              </span>
+              <button onClick={() => setCampaignPrompt(null)} style={S.closeBtn}>×</button>
+            </div>
+            <div style={{ padding: 20, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 14 }}>
+              <div
+                onClick={() => navigate(`/policy/buy?memberId=${campaignPrompt.member.id}&campaignId=${campaignPrompt.campaign.id}`)}
+                style={S.bannerFrame}
+              >
+                <img
+                  src={campaignPrompt.campaign.campaignImage}
+                  alt={campaignPrompt.campaign.name}
+                  style={{ width: '100%', display: 'block' }}
+                />
+              </div>
+              <div style={{ fontSize: 13, color: '#6b7fa0', textAlign: 'center', lineHeight: 1.5 }}>
+                {campaignPrompt.member.name} is eligible for <strong>{campaignPrompt.campaign.name}</strong> — tap the banner to buy with this offer applied.
+              </div>
+              <div style={{ display: 'flex', gap: 10 }}>
+                <button
+                  className="btn btn-ghost"
+                  onClick={() => navigate(`/policy/buy?memberId=${campaignPrompt.member.id}`)}
+                >
+                  Continue without offer
+                </button>
+                <button
+                  className="btn btn-primary"
+                  onClick={() => navigate(`/policy/buy?memberId=${campaignPrompt.member.id}&campaignId=${campaignPrompt.campaign.id}`)}
+                >
+                  View Offer &amp; Buy →
+                </button>
+              </div>
+            </div>
+          </div>
+        </>
+      )}
     </div>
   );
 }
 
 const S = {
+  overlay: {
+    position: 'fixed', inset: 0, background: 'rgba(0,0,0,.45)', zIndex: 1000,
+  },
+  promptCard: {
+    position: 'fixed', top: '50%', left: '50%', transform: 'translate(-50%,-50%)',
+    background: '#fff', borderRadius: 16, boxShadow: '0 24px 60px rgba(0,0,0,.25)',
+    width: '90%', maxWidth: 560, zIndex: 1001, overflow: 'hidden',
+  },
+  promptHeader: {
+    padding: '18px 22px', borderBottom: '1.5px solid #f0edf8',
+    display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 10,
+  },
+  closeBtn: {
+    width: 30, height: 30, borderRadius: 8, border: '1.5px solid var(--border)',
+    background: '#faf9fc', cursor: 'pointer', fontSize: 16,
+    display: 'flex', alignItems: 'center', justifyContent: 'center',
+    color: 'var(--text-2)', flexShrink: 0,
+  },
+  bannerFrame: {
+    width: '100%', cursor: 'pointer', borderRadius: 12, overflow: 'hidden',
+    border: '1.5px solid #c7d2fe', boxShadow: '0 4px 20px rgba(79,70,229,.14)',
+  },
   iconBtn: {
     display: 'inline-flex',
     alignItems: 'center',

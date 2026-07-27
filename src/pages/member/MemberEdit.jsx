@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { Field, Input, Select, SectionBlock, UploadBox } from "../../components/Field";
+import { Field, Input, DateInput, Select, SectionBlock, UploadBox } from "../../components/Field";
 import { EditIcon } from "../../icons";
 import { useAuth } from "../../context/AuthContext";
 import { useMembers } from "../../context/MemberContext";
@@ -477,8 +477,7 @@ export default function MemberEdit() {
                   />
                 </Field>
                 <Field label="Date of Birth">
-                  <Input
-                    type="date"
+                  <DateInput
                     value={form.dob || ""}
                     onChange={set("dob")}
                   />

@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { useMembers } from '../../context/MemberContext'
 import { KYCIcon } from '../../icons'
+import { formatDate } from '../../utils/date'
 
 const doc = (type, params) =>
   `/documents/preview.html?type=${type}&${new URLSearchParams(params)}`
@@ -25,12 +26,6 @@ const MOCK_KYC = {
     aadhaarFile: doc('aadhaar', { name: 'Ritu Singh', number: '1234 9876 5432', dob: '18/05/1996', gender: 'Female' }),
     panFile:     doc('pan',     { name: 'Ritu Singh', number: 'KKKRS1234N',     dob: '18/05/1996', gender: 'Female' }),
   },
-}
-
-function fmtDob(dob) {
-  if (!dob) return '—'
-  const [y, m, d] = dob.split('-')
-  return `${d}/${m}/${y}`
 }
 
 function InfoRow({ label, value }) {
@@ -186,7 +181,7 @@ export default function KYCReview() {
             <InfoRow label="Full Name"   value={cust.name} />
             <InfoRow label="Mobile"      value={cust.mobile} />
             <InfoRow label="Email"       value={cust.email} />
-            <InfoRow label="Date of Birth" value={fmtDob(cust.dob)} />
+            <InfoRow label="Date of Birth" value={formatDate(cust.dob)} />
             <InfoRow label="Gender"      value={cust.gender} />
             <InfoRow label="Aadhaar No." value={cust.aadhaar} />
             <InfoRow label="PAN No."     value={cust.pan} />

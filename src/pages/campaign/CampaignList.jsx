@@ -4,16 +4,17 @@ import Pagination from '../../components/Pagination'
 import usePagination from '../../components/usePagination'
 import { Table, PageHeader, StatusBadge, Button, EmptyState } from '../../components/UI'
 import { CampaignIcon, CalendarIcon } from '../../icons'
-import { formatDate as fmtDate } from '../../utils/date'
+import { formatDate as fmtDate, isCampaignOpen } from '../../utils/date'
+import { getPromoCampaigns, deletePromoCampaign } from './campaignStore'
 
-const MOCK = [
-  { id: 1,  name: 'Campaign 1',                                startDate: '2024-09-20', endDate: '2025-07-29', isCampaignOpen: true,  isActive: true, documentName: null,                     templateName: null,                  sentStatus: null },
-  { id: 5,  name: 'Campaign OPD and DIGIT PAYMENT PROTECTION', startDate: '2025-01-31', endDate: '2025-03-31', isCampaignOpen: true,  isActive: true, documentName: null,                     templateName: null,                  sentStatus: null },
-  { id: 6,  name: 'BPP Campaign',                              startDate: '2025-02-19', endDate: '2025-03-24', isCampaignOpen: true,  isActive: true, documentName: 'cyber_opd_new_design.pdf', templateName: 'cyber_opd_new_design', sentStatus: null },
-  { id: 7,  name: 'Test Campaign',                              startDate: '2025-08-03', endDate: '2025-08-29', isCampaignOpen: false, isActive: true, documentName: null,                     templateName: null,                  sentStatus: 0    },
-  { id: 8,  name: 'SBI_STP_Campaign',                          startDate: '2025-09-18', endDate: '2026-03-10', isCampaignOpen: true,  isActive: true, documentName: null,                     templateName: null,                  sentStatus: 0    },
-  { id: 11, name: 'BPP Campaign_2026-2027',                    startDate: '2026-03-16', endDate: '2026-05-31', isCampaignOpen: true,  isActive: true, documentName: null,                     templateName: null,                  sentStatus: 0    },
-  { id: 12, name: 'Standalone campaign',                        startDate: '2026-02-28', endDate: '2026-04-29', isCampaignOpen: true,  isActive: true, documentName: null,                     templateName: null,                  sentStatus: 0    },
+const RAW_MOCK = [
+  { id: 1,  name: 'Campaign 1',                                startDate: '2024-09-20', endDate: '2025-07-29', isActive: true, documentName: null,                     templateName: null,                  sentStatus: null },
+  { id: 5,  name: 'Campaign OPD and DIGIT PAYMENT PROTECTION', startDate: '2025-01-31', endDate: '2025-03-31', isActive: true, documentName: null,                     templateName: null,                  sentStatus: null },
+  { id: 6,  name: 'BPP Campaign',                              startDate: '2025-02-19', endDate: '2025-03-24', isActive: true, documentName: 'cyber_opd_new_design.pdf', templateName: 'cyber_opd_new_design', sentStatus: null },
+  { id: 7,  name: 'Test Campaign',                              startDate: '2025-08-03', endDate: '2025-08-29', isActive: true, documentName: null,                     templateName: null,                  sentStatus: 0    },
+  { id: 8,  name: 'SBI_STP_Campaign',                          startDate: '2025-09-18', endDate: '2026-03-10', isActive: true, documentName: null,                     templateName: null,                  sentStatus: 0    },
+  { id: 11, name: 'BPP Campaign_2026-2027',                    startDate: '2026-03-16', endDate: '2026-05-31', isActive: true, documentName: null,                     templateName: null,                  sentStatus: 0    },
+  { id: 12, name: 'Standalone campaign',                        startDate: '2026-02-28', endDate: '2026-04-29', isActive: true, documentName: null,                     templateName: null,                  sentStatus: 0    },
 ]
 
 function computeStatus(row) {
@@ -25,15 +26,43 @@ function computeStatus(row) {
   return 'Active'
 }
 
-const MOCK_WITH_STATUS = MOCK.map(r => ({ ...r, status: computeStatus(r) }))
+// Campaigns created/edited through the Add/Edit Campaign UI are persisted in
+// campaignStore.js (localStorage) — merge those in here (skipping any id
+// already covered by RAW_MOCK) so a newly added campaign actually shows up
+// in this list, not just on the member dashboard.
+function buildRows() {
+  const stored = getPromoCampaigns()
+  const created = stored
+    .filter(c => !RAW_MOCK.some(m => m.id === c.id))
+    .map(c => ({
+      id: c.id,
+      name: c.name,
+      startDate: c.startDate ?? '',
+      endDate: c.endDate ?? '',
+      isActive: c.isActive ?? true,
+      documentName: null,
+      templateName: null,
+      sentStatus: null,
+    }))
+  return [...RAW_MOCK, ...created]
+    .map(c => ({ ...c, isCampaignOpen: isCampaignOpen(c.endDate) }))
+    .map(r => ({ ...r, status: computeStatus(r) }))
+}
 
 export default function CampaignList() {
   const navigate = useNavigate()
+  const [rows, setRows]           = useState(buildRows)
   const [search, setSearch]       = useState('')
   const [statusFilter, setStatus] = useState('')
   const [openFilter, setOpen]     = useState('')
 
-  const filtered = MOCK_WITH_STATUS.filter(c => {
+  const handleDelete = (id) => {
+    if (!window.confirm('Delete this campaign? This cannot be undone.')) return
+    deletePromoCampaign(id)
+    setRows(prev => prev.filter(r => r.id !== id))
+  }
+
+  const filtered = rows.filter(c => {
     const q = search.toLowerCase()
     return (
       c.name.toLowerCase().includes(q) &&
@@ -67,7 +96,10 @@ export default function CampaignList() {
     { key: 'status', label: 'Status', render: row => <StatusBadge status={row.status} /> },
     { key: 'actions', label: 'Actions',
       render: row => (
-        <button type="button" onClick={() => navigate(`/campaign/${row.id}/edit`)} title="Edit" style={{ background: 'linear-gradient(180deg,#1565d8,#104ea6)', border: 'none', borderRadius: 6, cursor: 'pointer', padding: '5px 6px', color: '#fff', display: 'inline-flex', alignItems: 'center', boxShadow: '0 2px 6px rgba(168,85,247,.30)' }}><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"/></svg></button>
+        <div style={{ display: 'flex', gap: 6 }}>
+          <button type="button" onClick={() => navigate(`/campaign/${row.id}/edit`)} title="Edit" style={{ background: 'linear-gradient(180deg,#1565d8,#104ea6)', border: 'none', borderRadius: 6, cursor: 'pointer', padding: '5px 6px', color: '#fff', display: 'inline-flex', alignItems: 'center', boxShadow: '0 2px 6px rgba(168,85,247,.30)' }}><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"/></svg></button>
+          <button type="button" onClick={() => handleDelete(row.id)} title="Delete" style={{ background: 'linear-gradient(180deg,#ef4444,#dc2626)', border: 'none', borderRadius: 6, cursor: 'pointer', padding: '5px 6px', color: '#fff', display: 'inline-flex', alignItems: 'center', boxShadow: '0 2px 6px rgba(220,38,38,.30)' }}><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg></button>
+        </div>
       )},
   ]
 
