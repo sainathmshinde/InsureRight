@@ -23,6 +23,7 @@ import {
   CampaignPreviewModal,
   toggleProductWithLinks,
 } from "./campaignShared";
+import { fileToDataUrl, savePromoCampaign } from "./campaignStore";
 
 const BASE = {
   segment: "ALL", salesPersonId: "",
@@ -102,10 +103,23 @@ function CampaignEditForm({ id }) {
     setPreviewOpen(true);
   };
 
-  const handleConfirmUpdate = () => {
+  const handleConfirmUpdate = async () => {
     console.log("Update Campaign:", id, form, {
       assignedCalling: [...assignedCalling],
       assignedSales: [...assignedSales],
+    });
+    const campaignImage =
+      form.campaignImage instanceof File
+        ? await fileToDataUrl(form.campaignImage)
+        : null;
+    savePromoCampaign({
+      id: Number(id),
+      name: form.name,
+      selectedProducts: form.selectedProducts,
+      offerType: form.offerType,
+      offerValue: form.offerValue,
+      campaignImage,
+      isActive: true,
     });
     navigate("/campaign");
   };

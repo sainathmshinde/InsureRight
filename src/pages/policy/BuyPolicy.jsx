@@ -19,6 +19,8 @@ import policyWordingsPdf from "../../assets/StarHealthAssureInsurancePolicy-Poli
 import brochurePdf from "../../assets/Brochure_Star_Comprehensive_Insurance_Policy_V_15_Web_633bcfcaaf.pdf";
 import { OPERATORS as KMD_AGENTS } from "../agent/agentData";
 import { INITIAL_LEADS, CAMPAIGNS } from "../crm/crmData";
+import { applyDiscount } from "../campaign/campaignShared";
+import { getPromoCampaignById } from "../campaign/campaignStore";
 import { POLICY_MOCK } from "./PolicyList";
 import { ASSOCIATIONS, ORGANISATIONS } from "../member/orgAssocData";
 
@@ -447,6 +449,18 @@ export default function BuyPolicy() {
   // Pre-select member when navigated from member list via ?memberId=X
   const [searchParams] = useSearchParams();
   const preselectedId = searchParams.get("memberId");
+
+  // Landed here from a dashboard campaign promo card via ?campaignId= —
+  // scopes the catalogue to just that campaign's products, for any role.
+  const campaignIdParam = searchParams.get("campaignId");
+  const promoCampaign = useMemo(
+    () => (campaignIdParam ? getPromoCampaignById(campaignIdParam) : null),
+    [campaignIdParam],
+  );
+  const campaignProductIds = useMemo(
+    () => (promoCampaign ? new Set(promoCampaign.selectedProducts) : null),
+    [promoCampaign],
+  );
   const preselectedMember = (!isMember && preselectedId)
     ? (MEMBERS.find((c) => c.id === Number(preselectedId)) ?? null)
     : null;
@@ -719,18 +733,21 @@ export default function BuyPolicy() {
 
   const availableProducts = useMemo(() => {
     if (!insuranceType) return [];
-    const allCampaignProducts = agentCampaignProductIds
-      ? PRODUCTS.filter(p => agentCampaignProductIds.has(p.id))
+    // An explicit ?campaignId= scopes the catalogue for any role; otherwise
+    // fall back to the agent's campaign-assignment scoping.
+    const effectiveProductIds = campaignProductIds ?? agentCampaignProductIds;
+    const allCampaignProducts = effectiveProductIds
+      ? PRODUCTS.filter(p => effectiveProductIds.has(p.id))
       : PRODUCTS;
     const pool = insuranceType === "Health"
       ? allCampaignProducts
-      : (agentCampaignProductIds
-          ? (PRODUCTS_BY_TYPE[insuranceType] ?? []).filter(p => agentCampaignProductIds.has(p.id))
+      : (effectiveProductIds
+          ? (PRODUCTS_BY_TYPE[insuranceType] ?? []).filter(p => effectiveProductIds.has(p.id))
           : (PRODUCTS_BY_TYPE[insuranceType] ?? []));
     const score = p =>
       (PRODUCT_DETAILS[p.id] ? 1 : 0) + ((PREMIUM_CHART[p.id]?.length ?? 0) > 0 ? 1 : 0);
     return [...pool].sort((a, b) => score(b) - score(a));
-  }, [insuranceType, agentCampaignProductIds]);
+  }, [insuranceType, agentCampaignProductIds, campaignProductIds]);
 
   // Member search filter — sales operators already scoped to their assigned members
   const filteredMembers = useMemo(() => {
@@ -1460,6 +1477,20 @@ export default function BuyPolicy() {
                 const minPremium  = allPremiums.length > 0 ? Math.min(...allPremiums) : null;
                 const covKeys     = ['selfOnly','selfSpouse','selfSpouse2Children'].filter(k => firstRow?.[k] != null);
                 const providerColor = TYPE_COLORS[p.policyType] ?? '#33b5e5';
+
+                // Campaign offer only discounts a base policy's premium, and only once
+                // its linked top-up is also part of this campaign — same rule used on
+                // the campaign builder's product cards (campaignShared.jsx).
+                const linkedBaseProduct = p.linkedBaseId ? PRODUCTS.find(x => x.id === p.linkedBaseId) : null;
+                const topupsOfP  = PRODUCTS.filter(x => x.linkedBaseId === p.id);
+                const bundlePresent = campaignProductIds ? topupsOfP.some(t => campaignProductIds.has(t.id)) : false;
+                const campaignDiscountEligible = !!promoCampaign && !linkedBaseProduct && (topupsOfP.length === 0 || bundlePresent);
+                const discountedMinPremium = campaignDiscountEligible && minPremium
+                  ? applyDiscount(minPremium, promoCampaign.offerType, promoCampaign.offerValue)
+                  : null;
+                const topupBundleDiscount = linkedBaseProduct && p.bundleDiscount && campaignProductIds?.has(linkedBaseProduct.id)
+                  ? p.bundleDiscount
+                  : null;
                 return (
                   <div key={p.id}
                     onClick={() => toggleCart(p)}
@@ -1522,10 +1553,33 @@ export default function BuyPolicy() {
                               <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#6d747a" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="9" /><path d="M12 7v10M9 9.5c0-1 .9-1.5 2-1.5s2.5.5 2.5 1.7c0 1.9-4.5 1.2-4.5 3.4 0 1.2 1.4 1.9 2.5 1.9s2-.6 2-1.6" /></svg>
                               <span style={{ fontSize: 12, fontWeight: 500, color: "#6d747a", textTransform: "uppercase", letterSpacing: ".6px" }}>Premium starts</span>
                             </div>
-                            <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-                              <span style={{ fontSize: 18, fontWeight: 600, color: "#24304a", letterSpacing: "-.18px" }}>₹ {minPremium.toLocaleString("en-IN")}</span>
-                              <span style={{ fontSize: 14, color: "#6d747a" }}>/yr</span>
-                            </div>
+                            {discountedMinPremium != null ? (
+                              <div>
+                                <span style={{ fontSize: 13, color: "#94a3b8", textDecoration: "line-through" }}>
+                                  ₹ {minPremium.toLocaleString("en-IN")} /yr
+                                </span>
+                                <div style={{ display: "flex", alignItems: "center", gap: 6, marginTop: 2 }}>
+                                  <span style={{ fontSize: 18, fontWeight: 600, color: "#15803d", letterSpacing: "-.18px" }}>
+                                    ₹ {discountedMinPremium.toLocaleString("en-IN")}
+                                  </span>
+                                  <span style={{ fontSize: 14, color: "#6d747a" }}>/yr</span>
+                                  <span style={{ fontSize: 10.5, fontWeight: 700, background: "#dcfce7",
+                                    color: "#15803d", border: "1px solid #86efac", borderRadius: 99, padding: "2px 8px" }}>
+                                    {promoCampaign.offerType === "Percent" ? `${promoCampaign.offerValue}% off` : `₹${promoCampaign.offerValue} off`}
+                                  </span>
+                                </div>
+                              </div>
+                            ) : (
+                              <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                                <span style={{ fontSize: 18, fontWeight: 600, color: "#24304a", letterSpacing: "-.18px" }}>₹ {minPremium.toLocaleString("en-IN")}</span>
+                                <span style={{ fontSize: 14, color: "#6d747a" }}>/yr</span>
+                              </div>
+                            )}
+                            {topupBundleDiscount && (
+                              <div style={{ fontSize: 10.5, color: "#166534", marginTop: 4 }}>
+                                🏷️ {topupBundleDiscount.type === "Percent" ? `${topupBundleDiscount.value}%` : `₹${topupBundleDiscount.value}`} off {linkedBaseProduct.name}'s premium when bundled
+                              </div>
+                            )}
                           </div>
                         )}
                       </div>

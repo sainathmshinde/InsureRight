@@ -1,0 +1,76 @@
+<svg width="1200" height="560" viewBox="0 0 1200 560" xmlns="http://www.w3.org/2000/svg">
+  <title>SBI Base Policy — Linked Top-Up Bundle Offer</title>
+  <defs>
+    <style>
+      .serif { font-family: Georgia, "Times New Roman", serif; }
+      .sans  { font-family: -apple-system, "Helvetica Neue", Arial, sans-serif; }
+      .num   { font-variant-numeric: tabular-nums; }
+      .eyebrow { font-size: 15px; font-weight: 700; letter-spacing: 2.6px; fill: #175cd3; }
+    </style>
+  </defs>
+
+  <!-- ground -->
+  <rect x="0" y="0" width="1200" height="560" fill="#f4f7fb" />
+  <rect x="740" y="0" width="6" height="560" fill="#175cd3" />
+  <rect x="746" y="0" width="454" height="560" fill="#0b2f66" />
+
+  <!-- ══ LEFT — the ledger of linked discounts ══ -->
+
+  <!-- shield mark -->
+  <path d="M 64 60 L 96 60 L 96 92 Q 96 116 80 128 Q 64 116 64 92 Z"
+        fill="none" stroke="#175cd3" stroke-width="2.5" stroke-linejoin="round" />
+  <path d="M 72 88 L 78 96 L 90 78" fill="none" stroke="#175cd3" stroke-width="2.5"
+        stroke-linecap="round" stroke-linejoin="round" />
+
+  <text x="116" y="78" class="sans eyebrow">LINKED BUNDLE OFFER</text>
+
+  <text x="64" y="170" class="serif" font-size="54" font-weight="700" fill="#0b2f66">SBI Base Policy</text>
+  <text x="64" y="204" class="sans" font-size="20" fill="#47607e">Complete health cover · ₹5L sum insured</text>
+
+  <line x1="64" y1="234" x2="700" y2="234" stroke="#d7e2f0" stroke-width="1.5" />
+
+  <!-- row 1 : SBI Arogya Plus -->
+  <g transform="translate(64,262)">
+    <rect x="0" y="4" width="34" height="34" rx="4" fill="#175cd3" transform="rotate(45 17 21)" />
+    <circle cx="9" cy="12" r="3" fill="#f4f7fb" />
+    <text x="56" y="20" class="sans" font-size="21" font-weight="700" fill="#0b2f66">SBI Arogya Plus — Top Up Health Plan</text>
+    <text x="56" y="44" class="sans" font-size="14.5" fill="#6b7fa0">Linked top-up · extends cover above the base sum insured</text>
+
+    <rect x="512" y="-4" width="124" height="36" rx="18" fill="#e3f4ea" />
+    <text x="574" y="20" text-anchor="middle" class="sans num" font-size="18" font-weight="800" fill="#167a4d">15% OFF</text>
+    <text x="574" y="52" text-anchor="middle" class="sans" font-size="12.5" fill="#6b7fa0">on Base Policy premium</text>
+  </g>
+
+  <line x1="64" y1="350" x2="700" y2="350" stroke="#d7e2f0" stroke-width="1.5" stroke-dasharray="2 5" />
+
+  <!-- row 2 : SBI Super Saver Top Up -->
+  <g transform="translate(64,378)">
+    <rect x="0" y="4" width="34" height="34" rx="4" fill="#175cd3" transform="rotate(45 17 21)" />
+    <circle cx="9" cy="12" r="3" fill="#f4f7fb" />
+    <text x="56" y="20" class="sans" font-size="21" font-weight="700" fill="#0b2f66">SBI Super Saver Top Up</text>
+    <text x="56" y="44" class="sans" font-size="14.5" fill="#6b7fa0">Linked top-up · a flat premium credit on the base plan</text>
+
+    <rect x="512" y="-4" width="124" height="36" rx="18" fill="#e3f4ea" />
+    <text x="574" y="20" text-anchor="middle" class="sans num" font-size="18" font-weight="800" fill="#167a4d">₹500 OFF</text>
+    <text x="574" y="52" text-anchor="middle" class="sans" font-size="12.5" fill="#6b7fa0">on Base Policy premium</text>
+  </g>
+
+  <text x="64" y="512" class="sans" font-size="13" fill="#8ea0ba">Discount applies to your SBI Base Policy premium when bought together with the linked top-up · subject to active campaign terms</text>
+
+  <!-- ══ RIGHT — headline price + CTA ══ -->
+
+  <text x="796" y="88" class="sans" font-size="14" font-weight="700" letter-spacing="2px" fill="rgba(255,255,255,.6)">YOU PAY</text>
+
+  <text x="796" y="126" class="sans num" font-size="19" fill="rgba(255,255,255,.55)" text-decoration="line-through">₹31,053 /yr</text>
+
+  <text x="796" y="200" class="sans num" font-size="72" font-weight="800" fill="#ffffff">₹26,395</text>
+  <text x="796" y="228" class="sans" font-size="15" fill="rgba(255,255,255,.65)">*with SBI Arogya Plus Top Up</text>
+
+  <line x1="796" y1="264" x2="1144" y2="264" stroke="rgba(255,255,255,.16)" stroke-width="1.5" />
+
+  <text x="796" y="300" class="sans" font-size="13" font-weight="700" letter-spacing="1.5px" fill="rgba(255,255,255,.6)">SUM INSURED</text>
+  <text x="796" y="330" class="sans num" font-size="26" font-weight="700" fill="#ffffff">₹5,00,000</text>
+
+  <rect x="796" y="456" width="348" height="60" rx="8" fill="#175cd3" />
+  <text x="970" y="493" text-anchor="middle" class="sans" font-size="19" font-weight="700" fill="#ffffff">Buy the Bundle →</text>
+</svg>

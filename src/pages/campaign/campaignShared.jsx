@@ -848,20 +848,22 @@ export function AudienceSection({ form, setForm }) {
   const [selectedUserIds, setSelectedUserIds] = useState(new Set());
 
   const handleFilterUsers = () => {
-    const results = MOCK_USERS.filter((u) => {
-      if ((form.segment === "By Sales Person" || form.segment === "ALL") && form.salesPersonId) {
+    // "ALL" means every user, regardless of any other field's leftover value —
+    // the per-segment dropdowns are hidden once ALL is selected (see below).
+    const results = form.segment === "ALL" ? MOCK_USERS : MOCK_USERS.filter((u) => {
+      if (form.segment === "By Sales Person" && form.salesPersonId) {
         const userSalesId = SALES_AGENTS[(u.id - 1) % SALES_AGENTS.length].id;
         if (userSalesId !== Number(form.salesPersonId)) return false;
       }
-      if (form.segment === "By Age" || form.segment === "ALL") {
+      if (form.segment === "By Age") {
         const min = form.ageMin ? Number(form.ageMin) : 0;
         const max = form.ageMax ? Number(form.ageMax) : 999;
         if (u.age < min || u.age > max) return false;
       }
-      if ((form.segment === "By Location" || form.segment === "ALL") && form.state) {
+      if (form.segment === "By Location" && form.state) {
         if (u.state !== form.state) return false;
       }
-      if ((form.segment === "By Corporate" || form.segment === "ALL") && form.selectedAssociations.length > 0) {
+      if (form.segment === "By Corporate" && form.selectedAssociations.length > 0) {
         const userAssocId = ASSOCIATIONS[(u.id - 1) % ASSOCIATIONS.length].id;
         if (!form.selectedAssociations.includes(userAssocId)) return false;
       }
@@ -937,7 +939,7 @@ export function AudienceSection({ form, setForm }) {
             </Select>
           </Field>
 
-          {(form.segment === "By Sales Person" || form.segment === "ALL") && (
+          {form.segment === "By Sales Person" && (
             <Field label="Sales Person">
               <SearchableSelect
                 value={form.salesPersonId}
@@ -948,7 +950,7 @@ export function AudienceSection({ form, setForm }) {
             </Field>
           )}
 
-          {(form.segment === "By Age" || form.segment === "ALL") && (
+          {form.segment === "By Age" && (
             <Field label="Age Range">
               <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
                 <Input type="number" min="0" max="120" placeholder="Min" value={form.ageMin} onChange={set("ageMin")} style={{ width: "50%" }} />
@@ -958,7 +960,7 @@ export function AudienceSection({ form, setForm }) {
             </Field>
           )}
 
-          {(form.segment === "By Location" || form.segment === "ALL") && (
+          {form.segment === "By Location" && (
             <Field label="State">
               <SearchableSelect
                 value={form.state}
@@ -969,7 +971,7 @@ export function AudienceSection({ form, setForm }) {
             </Field>
           )}
 
-          {(form.segment === "By Corporate" || form.segment === "ALL") && (
+          {form.segment === "By Corporate" && (
             <Field label="Corporate / Association" className="col-span-3">
               <div>
                 {form.selectedAssociations.length > 0 && (

@@ -23,6 +23,7 @@ import {
   CampaignPreviewModal,
   toggleProductWithLinks,
 } from "./campaignShared";
+import { fileToDataUrl, savePromoCampaign } from "./campaignStore";
 
 const INITIAL = {
   name: "",
@@ -130,10 +131,23 @@ export default function CampaignCreate() {
     setPreviewOpen(true);
   };
 
-  const handleConfirmCreate = () => {
+  const handleConfirmCreate = async () => {
     console.log("Create Campaign:", form, {
       assignedCalling: [...assignedCalling],
       assignedSales: [...assignedSales],
+    });
+    const campaignImage =
+      form.campaignImage instanceof File
+        ? await fileToDataUrl(form.campaignImage)
+        : null;
+    savePromoCampaign({
+      id: Date.now(),
+      name: form.name,
+      selectedProducts: form.selectedProducts,
+      offerType: form.offerType,
+      offerValue: form.offerValue,
+      campaignImage,
+      isActive: true,
     });
     navigate("/campaign");
   };
