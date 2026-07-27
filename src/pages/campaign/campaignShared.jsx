@@ -1177,44 +1177,27 @@ export function PromoCreativeSection({ form, setForm, bare = false, readOnly = f
   const body = (
     <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 20 }}>
       <Field label="Promotional Image" style={{ textAlign: "center" }}>
-        <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 12 }}>
-          <div style={{
-            width: 220, height: 140, borderRadius: 10, overflow: "hidden", flexShrink: 0,
-            background: "var(--brand-light)",
-            border: campaignImagePreview ? "1px solid var(--border)" : "2px dashed var(--brand)",
-            display: "flex", alignItems: "center", justifyContent: "center",
-          }}>
-            {campaignImagePreview
-              ? <img src={campaignImagePreview} alt="Campaign creative" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
-              : <span style={{ fontSize: 32 }}>🖼️</span>}
+        {readOnly ? (
+          <div style={{ fontSize: 12, color: "var(--text-3)" }}>
+            {campaignImagePreview ? "Image uploaded" : "No image uploaded"}
           </div>
-          {readOnly ? (
-            !campaignImagePreview && (
-              <div style={{ fontSize: 12, color: "var(--text-3)" }}>No image uploaded</div>
-            )
-          ) : (
-            <>
-              <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                <label style={{ cursor: "pointer", display: "inline-block" }}>
-                  <input type="file" accept="image/*" style={{ display: "none" }}
-                    onChange={(e) => setForm((p) => ({ ...p, campaignImage: e.target.files[0] ?? null }))} />
-                  <span className="btn btn-secondary" style={{ pointerEvents: "none" }}>
-                    {campaignImagePreview ? "🔄 Change Image" : "📷 Upload Image"}
-                  </span>
-                </label>
-                {form.campaignImage && (
-                  <button type="button" className="btn btn-ghost"
-                    onClick={() => setForm((p) => ({ ...p, campaignImage: null }))}>
-                    Remove
-                  </button>
-                )}
-              </div>
-              <div style={{ fontSize: 12, color: "var(--text-3)" }}>
-                JPG or PNG · Shown on the WhatsApp &amp; Email previews below
-              </div>
-            </>
-          )}
-        </div>
+        ) : (
+          <div style={{ display: "flex", alignItems: "center", gap: 8, justifyContent: "center" }}>
+            <label style={{ cursor: "pointer", display: "inline-block" }}>
+              <input type="file" accept="image/*" style={{ display: "none" }}
+                onChange={(e) => setForm((p) => ({ ...p, campaignImage: e.target.files[0] ?? null }))} />
+              <span className="btn btn-secondary" style={{ pointerEvents: "none" }}>
+                {campaignImagePreview ? "🔄 Change Image" : "📷 Upload Image"}
+              </span>
+            </label>
+            {form.campaignImage && (
+              <button type="button" className="btn btn-ghost"
+                onClick={() => setForm((p) => ({ ...p, campaignImage: null }))}>
+                Remove
+              </button>
+            )}
+          </div>
+        )}
       </Field>
 
       {(form.channels.includes("WhatsApp (Meta API)") || form.channels.includes("Email")) ? (

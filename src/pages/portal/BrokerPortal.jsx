@@ -300,19 +300,13 @@ function DonutChart({ title, segments, note, style, hidePercent }) {
             x="50"
             y="46"
             textAnchor="middle"
-            fontSize="11"
+            fontSize="8"
             fontWeight="700"
             fill="#24304a"
           >
             {total.toLocaleString("en-IN")}
           </text>
-          <text
-            x="50"
-            y="58"
-            textAnchor="middle"
-            fontSize="8"
-            fill="#6d747a"
-          >
+          <text x="50" y="58" textAnchor="middle" fontSize="8" fill="#6d747a">
             Total
           </text>
         </svg>
@@ -372,20 +366,37 @@ function DonutChart({ title, segments, note, style, hidePercent }) {
                     <span style={{ color: "#6d747a", fontWeight: 500 }}>
                       {arc.label}
                       {clickable && (
-                        <span style={{ color: arc.color, marginLeft: 3 }}>↗</span>
+                        <span style={{ color: arc.color, marginLeft: 3 }}>
+                          ↗
+                        </span>
                       )}
                     </span>
                     {!hidePercent && (
-                      <span style={{ color: "#24304a", fontWeight: 600, flexShrink: 0 }}>
+                      <span
+                        style={{
+                          color: "#24304a",
+                          fontWeight: 600,
+                          flexShrink: 0,
+                        }}
+                      >
                         {Math.round(arc.pct * 100)}%
                       </span>
                     )}
                   </div>
-                  <div style={{ fontSize: 13, color: "#6d747a", fontWeight: 500, marginTop: 2 }}>
+                  <div
+                    style={{
+                      fontSize: 13,
+                      color: "#6d747a",
+                      fontWeight: 500,
+                      marginTop: 2,
+                    }}
+                  >
                     {arc.value.toLocaleString("en-IN")}
                   </div>
                   {premiumStr && (
-                    <div style={{ fontSize: 13, color: "#6d747a", marginTop: 1 }}>
+                    <div
+                      style={{ fontSize: 13, color: "#6d747a", marginTop: 1 }}
+                    >
                       {premiumStr}
                     </div>
                   )}
@@ -393,8 +404,8 @@ function DonutChart({ title, segments, note, style, hidePercent }) {
               </div>
             );
           })}
-          </div>
         </div>
+      </div>
       {note && (
         <div
           style={{
@@ -411,7 +422,6 @@ function DonutChart({ title, segments, note, style, hidePercent }) {
     </div>
   );
 }
-
 
 // ── Main component ─────────────────────────────────────────────────────────────
 export default function BrokerPortal() {
@@ -590,12 +600,21 @@ export default function BrokerPortal() {
 
           {/* Stats + Quick Actions row */}
           {(() => {
-            const paymentInitiated = mis.policyPurchased + mis.paymentPending + mis.paymentRejected;
-            const paymentNotInitiated = Math.max(0, mis.engagedMember - paymentInitiated);
+            const paymentInitiated =
+              mis.policyPurchased + mis.paymentPending + mis.paymentRejected;
+            const paymentNotInitiated = Math.max(
+              0,
+              mis.engagedMember - paymentInitiated,
+            );
             return (
               <div
                 className="bd-stats-row"
-                style={{ display: "flex", gap: 12, alignItems: "stretch", marginBottom: 12 }}
+                style={{
+                  display: "flex",
+                  gap: 12,
+                  alignItems: "stretch",
+                  marginBottom: 12,
+                }}
               >
                 <div
                   style={{
@@ -684,7 +703,9 @@ export default function BrokerPortal() {
                   >
                     Quick Actions
                   </div>
-                  <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+                  <div
+                    style={{ display: "flex", flexDirection: "column", gap: 8 }}
+                  >
                     {QUICK_ACTIONS.map((a) => (
                       <button
                         key={a.label}
@@ -706,7 +727,17 @@ export default function BrokerPortal() {
                           fontFamily: "inherit",
                         }}
                       >
-                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#1565d8" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
+                        <svg
+                          width="12"
+                          height="12"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="#1565d8"
+                          strokeWidth="2.5"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          style={{ flexShrink: 0 }}
+                        >
                           <line x1="12" y1="5" x2="12" y2="19" />
                           <line x1="5" y1="12" x2="19" y2="12" />
                         </svg>
@@ -721,7 +752,12 @@ export default function BrokerPortal() {
 
           <div
             className="bd-stats-row"
-            style={{ display: "flex", gap: 12, alignItems: "stretch", marginBottom: 12 }}
+            style={{
+              display: "flex",
+              gap: 12,
+              alignItems: "stretch",
+              marginBottom: 12,
+            }}
           >
             <div
               style={{
@@ -787,10 +823,8 @@ export default function BrokerPortal() {
             </div>
             <div style={{ width: 210, flexShrink: 0 }} />
           </div>
-
         </div>
       </div>
-
     </div>
   );
 }
