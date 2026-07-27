@@ -7,6 +7,7 @@ import Pagination from "../../components/Pagination";
 import usePagination from "../../components/usePagination";
 import { PAYMENT_STATUS_META } from "../../constants/paymentStatus";
 import { useRefunds } from "../../context/RefundContext";
+import { formatDate } from "../../utils/date";
 
 const CAMPAIGNS = [
   { id: 1, name: "Campaign 1" },
@@ -222,7 +223,7 @@ function PendingPickerModal({
                 <tr style={{ background: "#fffef0" }}>
                   {isCheque && <>
                     <td style={{ ...refCellStyle, fontFamily: "monospace", fontWeight: 600 }}>{up.chequeNumber ?? "—"}</td>
-                    <td style={refCellStyle}>{up.chequeDate ?? "—"}</td>
+                    <td style={refCellStyle}>{up.chequeDate ? formatDate(up.chequeDate) : "—"}</td>
                   </>}
                   {isNeft && <>
                     <td style={{ ...refCellStyle, fontFamily: "monospace", fontWeight: 600 }}>{up.transactionId ?? "—"}</td>
@@ -303,7 +304,7 @@ function PendingPickerModal({
                           <td style={{ fontWeight: 600, color: nameMatch ? "#15803d" : "#1e293b" }}>{p.memberName}{nameMatch && <span style={{ marginLeft: 4 }} title="Name matches uploaded record">✓</span>}</td>
                           {isCheque && <>
                             <td style={{ fontFamily: "monospace", fontWeight: 600, color: chequeMatch ? "#15803d" : "inherit" }}>{p.chequeNumber ?? "—"}{chequeMatch && <span style={{ marginLeft: 4 }} title="Cheque number matches uploaded record">✓</span>}</td>
-                            <td style={{ whiteSpace: "nowrap" }}>{p.chequeDate ?? "—"}</td>
+                            <td style={{ whiteSpace: "nowrap" }}>{p.chequeDate ? formatDate(p.chequeDate) : "—"}</td>
                           </>}
                           {isNeft && <>
                             <td style={{ fontFamily: "monospace", fontWeight: 600, color: txnMatch ? "#15803d" : "#0369a1" }}>{p.transactionId ?? "—"}{txnMatch && <span style={{ marginLeft: 4 }} title="Transaction number matches uploaded record">✓</span>}</td>
@@ -364,7 +365,7 @@ function MatchComparisonModal({
                 <TxnDetailRow label="Member Name" value={pr.memberName} />
                 {isCheque && <>
                   <TxnDetailRow label="Cheque Number" value={pr.chequeNumber} />
-                  <TxnDetailRow label="Cheque Date" value={pr.chequeDate} />
+                  <TxnDetailRow label="Cheque Date" value={formatDate(pr.chequeDate)} />
                 </>}
                 {isNeft && <>
                   <TxnDetailRow label="Transaction ID" value={pr.transactionId} />
@@ -378,7 +379,7 @@ function MatchComparisonModal({
               <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
                 {isCheque && <>
                   <TxnDetailRow label="Cheque Number" value={up.chequeNumber} mismatch={(up.chequeNumber ?? "") !== (pr.chequeNumber ?? "")} />
-                  <TxnDetailRow label="Cheque Date" value={up.chequeDate} mismatch={(up.chequeDate ?? "") !== (pr.chequeDate ?? "")} />
+                  <TxnDetailRow label="Cheque Date" value={formatDate(up.chequeDate)} mismatch={(up.chequeDate ?? "") !== (pr.chequeDate ?? "")} />
                 </>}
                 {isNeft && <>
                   <TxnDetailRow label="Transaction ID" value={up.transactionId} mismatch={(up.transactionId ?? "") !== (pr.transactionId ?? "")} />
@@ -471,7 +472,7 @@ function TransactionDetailModal({ system: rec, uploaded: up, onClose }) {
             <TxnDetailRow label="Bank" value={rec.bankName} />
             {isCheque && <>
               <TxnDetailRow label="Cheque Number" value={rec.chequeNumber} />
-              <TxnDetailRow label="Cheque Date" value={rec.chequeDate} />
+              <TxnDetailRow label="Cheque Date" value={formatDate(rec.chequeDate)} />
               <TxnDetailRow label="In Favour Of" value={rec.inFavourOf} />
               <TxnDetailRow label="Deposit Location" value={rec.chequeDepositLocation} />
               <TxnDetailRow label="IFSC Code" value={rec.ifscCode} />
@@ -497,7 +498,7 @@ function TransactionDetailModal({ system: rec, uploaded: up, onClose }) {
             <TxnDetailRow label="IC Status" value={up.uploadedStatus} />
             {isCheque && <>
               <TxnDetailRow label="Cheque Number" value={up.chequeNumber} mismatch={up.chequeNumber !== rec.chequeNumber} />
-              <TxnDetailRow label="Cheque Date" value={up.chequeDate} mismatch={up.chequeDate !== rec.chequeDate} />
+              <TxnDetailRow label="Cheque Date" value={formatDate(up.chequeDate)} mismatch={up.chequeDate !== rec.chequeDate} />
             </>}
             {!isCheque && <>
               <TxnDetailRow label="Transaction ID" value={up.transactionId} mismatch={up.transactionId !== rec.transactionId} />
@@ -1171,7 +1172,7 @@ export default function Reconciliation() {
                         <td style={{ fontWeight: 500 }}>{rec.memberName}</td>
                         {payTypeFilter === "Cheque" && <>
                           <td style={{ fontFamily: "monospace", fontWeight: 600 }}>{rec.chequeNumber ?? "—"}</td>
-                          <td style={{ whiteSpace: "nowrap" }}>{rec.chequeDate ?? "—"}</td>
+                          <td style={{ whiteSpace: "nowrap" }}>{rec.chequeDate ? formatDate(rec.chequeDate) : "—"}</td>
                         </>}
                         {payTypeFilter === "NEFT" && <>
                           <td style={{ fontFamily: "monospace", fontWeight: 600, color: "#0369a1" }}>{rec.transactionId ?? "—"}</td>
@@ -1257,13 +1258,13 @@ export default function Reconciliation() {
                           <td style={{ fontFamily: "monospace", fontSize: 11.5, color: "#7c3aed" }}>{rec.proposalId}</td>
                           <td style={{ fontWeight: 500 }}>{rec.memberName}</td>
                           <td style={{ background: "#f0f7ff", fontFamily: "monospace", fontWeight: 600 }}>{rec.chequeNumber}</td>
-                          <td style={{ background: "#f0f7ff", whiteSpace: "nowrap" }}>{rec.chequeDate}</td>
+                          <td style={{ background: "#f0f7ff", whiteSpace: "nowrap" }}>{formatDate(rec.chequeDate)}</td>
                           <td style={{ background: "#f0f7ff", fontWeight: 600 }}>{fmt(rec.premium)}</td>
                           <td style={{ background: "#fffef0", fontFamily: "monospace", fontWeight: 600, color: up.chequeNumber !== rec.chequeNumber ? "#dc2626" : "inherit" }}>
                             {up.chequeNumber}{up.chequeNumber !== rec.chequeNumber && <span title="Mismatch" style={{ marginLeft: 4 }}>⚠</span>}
                           </td>
                           <td style={{ background: "#fffef0", whiteSpace: "nowrap", color: up.chequeDate !== rec.chequeDate ? "#dc2626" : "inherit" }}>
-                            {up.chequeDate}{up.chequeDate !== rec.chequeDate && <span title="Mismatch" style={{ marginLeft: 4 }}>⚠</span>}
+                            {formatDate(up.chequeDate)}{up.chequeDate !== rec.chequeDate && <span title="Mismatch" style={{ marginLeft: 4 }}>⚠</span>}
                           </td>
                           <td style={{ background: "#fffef0", fontWeight: 600, color: up.premium !== rec.premium ? "#dc2626" : "inherit" }}>
                             {fmt(up.premium)}{up.premium !== rec.premium && <span title="Mismatch" style={{ marginLeft: 4 }}>⚠</span>}
@@ -1390,7 +1391,7 @@ export default function Reconciliation() {
                           <tr key={up.proposalId} style={{ background: mm?.action === "accept" ? "#f0fdf4" : mm?.action === "reject" ? "#fff5f5" : "#fff5f5", borderLeft: mm?.action === "accept" ? "3px solid #16a34a" : mm?.action === "reject" ? "3px solid #dc2626" : "none" }}>
                             {isCheque && <>
                               <td style={{ fontFamily: "monospace", fontWeight: 600 }}>{up.chequeNumber ?? "—"}</td>
-                              <td style={{ whiteSpace: "nowrap" }}>{up.chequeDate ?? "—"}</td>
+                              <td style={{ whiteSpace: "nowrap" }}>{up.chequeDate ? formatDate(up.chequeDate) : "—"}</td>
                             </>}
                             {isNeft && <>
                               <td style={{ fontFamily: "monospace", fontWeight: 600, color: "#0369a1" }}>{up.transactionId ?? "—"}</td>
@@ -1436,7 +1437,7 @@ export default function Reconciliation() {
                             <tr key={`${up.proposalId}-matched`} style={{ background: "#f0f7ff", borderLeft: "3px solid #93c5fd" }}>
                               {isCheque && <>
                                 <td style={{ fontFamily: "monospace", fontWeight: 600, color: "#1e40af", fontSize: 11.5 }}>{matchedPendingRec.chequeNumber ?? "—"}</td>
-                                <td style={{ whiteSpace: "nowrap", color: "#1e40af", fontSize: 11.5 }}>{matchedPendingRec.chequeDate ?? "—"}</td>
+                                <td style={{ whiteSpace: "nowrap", color: "#1e40af", fontSize: 11.5 }}>{matchedPendingRec.chequeDate ? formatDate(matchedPendingRec.chequeDate) : "—"}</td>
                               </>}
                               {isNeft && <>
                                 <td style={{ fontFamily: "monospace", fontWeight: 600, color: "#1e40af", fontSize: 11.5 }}>{matchedPendingRec.transactionId ?? "—"}</td>
@@ -1886,7 +1887,7 @@ export default function Reconciliation() {
                         <td style={{ color: "#64748b" }}>{p.mobile}</td>
                         <td style={{ fontFamily: "monospace", fontWeight: 600 }}>{p.chequeNumber ?? "—"}</td>
                         <td>{p.bankName ?? "—"}</td>
-                        <td style={{ whiteSpace: "nowrap" }}>{p.chequeDate ?? "—"}</td>
+                        <td style={{ whiteSpace: "nowrap" }}>{p.chequeDate ? formatDate(p.chequeDate) : "—"}</td>
                         <td style={{ maxWidth: 160, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{p.inFavourOf ?? "—"}</td>
                         <td style={{ maxWidth: 160, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{p.chequeDepositLocation ?? "—"}</td>
                         <td style={{ fontFamily: "monospace", fontSize: 12 }}>{p.ifscCode ?? "—"}</td>

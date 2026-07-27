@@ -2,6 +2,7 @@ import { useState } from "react";
 import { PageHeader, Button } from "../../components/UI";
 import { PaymentIcon } from "../../icons";
 import { PAYMENT_STATUS_META, PAYMENT_STATUS_SHORT_LABEL } from "../../constants/paymentStatus";
+import { formatDate } from "../../utils/date";
 
 const METHOD_META = {
   Cheque: { color: "#7c3aed", bg: "#f5f3ff", icon: "🏦" },
@@ -465,7 +466,7 @@ function PaymentModal({ payment, onClose, onAccept, onReject }) {
             <DetailRow label="Policy Number" value={payment.policyNo} />
             <DetailRow label="Product" value={payment.product} />
             <DetailRow label="Campaign" value={payment.campaignName} />
-            <DetailRow label="Date Initiated" value={payment.initiatedDate} />
+            <DetailRow label="Date Initiated" value={formatDate(payment.initiatedDate)} />
             <DetailRow label="Initiated By" value={payment.initiatedBy} />
             <DetailRow label="Bank" value={payment.bank} />
             {payment.branch && (
@@ -1157,7 +1158,7 @@ export default function UpdatePayment() {
                           </span>
                         </td>
                         <td style={{ fontWeight: 600 }}>{fmt(p.amount)}</td>
-                        <td style={{ color: "#64748b" }}>{p.initiatedDate}</td>
+                        <td style={{ color: "#64748b" }}>{formatDate(p.initiatedDate)}</td>
                         <td
                           style={{
                             fontFamily: "monospace",

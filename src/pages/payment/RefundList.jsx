@@ -4,6 +4,7 @@ import { RefundIcon, UploadIcon, SearchIcon } from "../../icons";
 import Pagination from "../../components/Pagination";
 import usePagination from "../../components/usePagination";
 import { useRefunds } from "../../context/RefundContext";
+import { formatDate } from "../../utils/date";
 
 const STATUS_COLORS = {
   Pending:   { bg: "#fffbeb", color: "#92400e", border: "#fcd34d" },
@@ -127,7 +128,7 @@ export default function RefundList() {
                           {r.paymentType}
                         </span>
                       </td>
-                      <td style={{ whiteSpace: "nowrap", color: "#64748b" }}>{r.requestDate}</td>
+                      <td style={{ whiteSpace: "nowrap", color: "#64748b" }}>{formatDate(r.requestDate)}</td>
                       <td><StatusBadge status={r.status} /></td>
                     </tr>
                   ))

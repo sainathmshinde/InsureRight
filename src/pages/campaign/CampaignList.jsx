@@ -4,6 +4,7 @@ import Pagination from '../../components/Pagination'
 import usePagination from '../../components/usePagination'
 import { Table, PageHeader, StatusBadge, Button, EmptyState } from '../../components/UI'
 import { CampaignIcon, CalendarIcon } from '../../icons'
+import { formatDate as fmtDate } from '../../utils/date'
 
 const MOCK = [
   { id: 1,  name: 'Campaign 1',                                startDate: '2024-09-20', endDate: '2025-07-29', isCampaignOpen: true,  isActive: true, documentName: null,                     templateName: null,                  sentStatus: null },
@@ -49,7 +50,7 @@ export default function CampaignList() {
       render: row => (
         <div style={{ display: 'flex', alignItems: 'center', gap: 5, fontSize: 13.5, color: 'var(--text-2)', whiteSpace: 'nowrap' }}>
           <CalendarIcon size={13} color="var(--text-3)" />
-          {row.startDate} → {row.endDate}
+          {fmtDate(row.startDate)} → {fmtDate(row.endDate)}
         </div>
       )},
     { key: 'isCampaignOpen', label: 'Open',

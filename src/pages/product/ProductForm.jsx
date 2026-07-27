@@ -864,7 +864,7 @@ export default function ProductForm({
       </SectionBlock>
 
       {/* ── GST ───────────────────────────────── */}
-      <SectionBlock icon="🧾" title="GST">
+      <SectionBlock icon="🧾" title="GST on Premium">
         <Field label="GST %">
           <Select value={gst} onChange={e => setGst(e.target.value)} style={{ maxWidth: 200 }}>
             <option value="0">0% GST</option>

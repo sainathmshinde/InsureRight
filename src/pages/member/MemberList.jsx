@@ -7,6 +7,7 @@ import { MemberIcon, EditIcon, ViewIcon, CartIcon, UploadIcon, SearchIcon } from
 import { useAuth } from '../../context/AuthContext'
 import { useMembers, INITIAL_MEMBERS } from '../../context/MemberContext'
 import { ASSOCIATIONS } from './orgAssocData'
+import { formatDate } from '../../utils/date'
 
 const CAMPAIGNS = [
   { id: 1,  name: 'Campaign 1' },
@@ -51,7 +52,7 @@ export default function MemberList() {
     { key: 'mobile',   label: 'Mobile' },
     { key: 'email',    label: 'Email',    style: { color: 'var(--blue)' } },
     { key: 'gender',   label: 'Gender' },
-    { key: 'dob',      label: 'DOB' },
+    { key: 'dob',      label: 'DOB',      render: row => formatDate(row.dob) },
     { key: 'association', label: 'Association',
       render: row => {
         const assoc = ASSOCIATIONS.find(a => a.id === row.associationId)

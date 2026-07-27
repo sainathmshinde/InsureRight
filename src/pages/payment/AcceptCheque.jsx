@@ -4,6 +4,7 @@ import Pagination from "../../components/Pagination";
 import usePagination from "../../components/usePagination";
 import { ChequeIcon, UploadIcon, SearchIcon } from "../../icons";
 import { PAYMENT_STATUS_SHORT_LABEL } from "../../constants/paymentStatus";
+import { formatDate } from "../../utils/date";
 
 const CAMPAIGNS = [
   { id: 1, name: "Campaign 1" },
@@ -818,7 +819,7 @@ function ChequeDetailModal({ cheque, onClose, onAccept, onReject }) {
             <DetailRow label="Branch" value={cheque.branch} />
             <DetailRow label="Cheque Number" value={cheque.chequeNo} />
             <DetailRow label="Cheque Date" value={cheque.chequeDate} />
-            <DetailRow label="Date Initiated" value={cheque.initiatedDate} />
+            <DetailRow label="Date Initiated" value={formatDate(cheque.initiatedDate)} />
             <DetailRow label="Initiated By" value={cheque.initiatedBy} />
           </div>
 
@@ -1305,7 +1306,7 @@ export default function AcceptCheque() {
                       </td>
                       <td>{c.bank}</td>
                       <td style={{ fontWeight: 600 }}>{fmt(c.amount)}</td>
-                      <td style={{ color: "#64748b" }}>{c.initiatedDate}</td>
+                      <td style={{ color: "#64748b" }}>{formatDate(c.initiatedDate)}</td>
                       <td>
                         <span
                           style={{
