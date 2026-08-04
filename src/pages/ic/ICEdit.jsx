@@ -3,11 +3,35 @@ import { useNavigate, useParams } from 'react-router-dom'
 import { Field, Input, Select, SectionBlock } from '../../components/Field'
 import { EditIcon } from '../../icons'
 import { IC_MAP } from './icData'
+import { BranchModal, ContactModal, BranchLocationSection, ContactInfoSection } from './ICBranchContact'
 
 export default function ICEdit() {
   const { id } = useParams()
   const navigate = useNavigate()
-  const [form, setForm] = useState(IC_MAP[Number(id)] ?? {})
+  const [form, setForm] = useState(() => {
+    const existing = IC_MAP[Number(id)] ?? {}
+    if (existing.branches) return { ...existing, contacts: existing.contacts ?? [] }
+
+    // Legacy records only carry a single branch city + single contact person —
+    // migrate those into the new multi-branch/multi-contact shape.
+    const mainBranchId = Date.now()
+    const migratedBranches = existing.branch
+      ? [{ id: mainBranchId, branchName: existing.branch, address1: '', address2: '', city: existing.branch, stateId: '', pinCode: '', country: 'India' }]
+      : []
+    const migratedContacts = existing.contactPerson
+      ? [{
+          id: mainBranchId + 1,
+          branchId: mainBranchId,
+          firstName: existing.contactPerson,
+          lastName: '',
+          phone: existing.phone ?? '',
+          email: existing.contactEmail ?? existing.email ?? '',
+        }]
+      : []
+    return { ...existing, branches: migratedBranches, contacts: migratedContacts }
+  })
+  const [showBranchModal, setShowBranchModal] = useState(false)
+  const [showContactModal, setShowContactModal] = useState(false)
   const set = f => e => setForm(p => ({ ...p, [f]: e.target.value }))
 
   const handleSubmit = e => {
@@ -43,39 +67,34 @@ export default function ICEdit() {
                 <Field label="IC Code" required>
                   <Input placeholder="e.g. SHI" value={form.code || ''} onChange={set('code')} required />
                 </Field>
-                <Field label="Branch">
-                  <Input placeholder="e.g. Mumbai" value={form.branch || ''} onChange={set('branch')} />
-                </Field>
-                <Field label="Contact Person">
-                  <Input placeholder="Primary contact name" value={form.contactPerson || ''} onChange={set('contactPerson')} />
-                </Field>
                 <Field label="Email" required>
                   <Input type="email" placeholder="api@example.com" value={form.email || ''} onChange={set('email')} required />
-                </Field>
-                <Field label="Phone">
-                  <Input type="tel" placeholder="+91 XXXXX XXXXX" value={form.phone || ''} onChange={set('phone')} />
-                </Field>
-                <Field label="Status">
-                  <Select value={form.status || 'Active'} onChange={set('status')}>
-                    <option>Active</option>
-                    <option>Inactive</option>
-                  </Select>
                 </Field>
               </div>
             </SectionBlock>
 
-            <SectionBlock icon="🔌" title="API Credentials">
-              <div className="form-grid-3">
-                <Field label="API Base URL" required>
-                  <Input type="url" placeholder="https://api.example.com/v1" value={form.apiBaseUrl || ''} onChange={set('apiBaseUrl')} required />
-                </Field>
-                <Field label="API Key" required>
-                  <Input placeholder="Enter API key" value={form.apiKey || ''} onChange={set('apiKey')} required />
-                </Field>
-                <Field label="API Secret" required>
-                  <Input type="password" placeholder="Enter API secret" value={form.apiSecret || ''} onChange={set('apiSecret')} required />
-                </Field>
+            <SectionBlock icon="🏬" title="Branches/Location">
+              <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 12 }}>
+                <button type="button" className="btn btn-secondary" onClick={() => setShowBranchModal(true)}>
+                  + Add Branch/Location
+                </button>
               </div>
+              <BranchLocationSection form={form} setForm={setForm} />
+            </SectionBlock>
+
+            <SectionBlock icon="📇" title="Contact Info">
+              <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 12 }}>
+                <button
+                  type="button"
+                  className="btn btn-secondary"
+                  disabled={form.branches.length === 0}
+                  title={form.branches.length === 0 ? 'Add a branch/location first' : undefined}
+                  onClick={() => setShowContactModal(true)}
+                >
+                  + Add Contact
+                </button>
+              </div>
+              <ContactInfoSection form={form} setForm={setForm} />
             </SectionBlock>
 
             <div className="actions-row">
@@ -85,6 +104,21 @@ export default function ICEdit() {
           </form>
         </div>
       </div>
+
+      {showBranchModal && (
+        <BranchModal
+          onClose={() => setShowBranchModal(false)}
+          onSave={branch => setForm(p => ({ ...p, branches: [...p.branches, { id: Date.now(), ...branch }] }))}
+        />
+      )}
+
+      {showContactModal && (
+        <ContactModal
+          branches={form.branches}
+          onClose={() => setShowContactModal(false)}
+          onSave={contact => setForm(p => ({ ...p, contacts: [...p.contacts, { id: Date.now(), ...contact }] }))}
+        />
+      )}
     </div>
   )
 }

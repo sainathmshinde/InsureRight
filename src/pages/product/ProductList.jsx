@@ -2,8 +2,8 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import Pagination from '../../components/Pagination'
 import usePagination from '../../components/usePagination'
-import { PageHeader, Button, EmptyState } from '../../components/UI'
-import { ProductIcon } from '../../icons'
+import { PageHeader, Button, EmptyState, RowActionButton } from '../../components/UI'
+import { ProductIcon, EditIcon, DeleteIcon } from '../../icons'
 import { PRODUCTS, POLICY_TYPES, PREMIUM_CHART, POLICY_TYPE_ICON, getProductLinks } from './productData'
 
 const TYPE_COLORS = {
@@ -23,10 +23,17 @@ function fmtSI(v) {
 
 export default function ProductList() {
   const navigate = useNavigate()
+  const [rows, setRows] = useState(PRODUCTS)
   const [search, setSearch] = useState('')
   const [typeFilter, setType] = useState('')
 
-  const filtered = PRODUCTS.filter(p => {
+  const handleDelete = p => {
+    if (window.confirm(`Delete product "${p.name}"? This cannot be undone.`)) {
+      setRows(prev => prev.filter(r => r.id !== p.id))
+    }
+  }
+
+  const filtered = rows.filter(p => {
     const q = search.toLowerCase()
     return (
       (p.name.toLowerCase().includes(q) ||
@@ -38,7 +45,7 @@ export default function ProductList() {
 
   const pg = usePagination(filtered, 12)
   const handle = setter => v => { setter(v); pg.reset() }
-  const uniqueTypes = [...new Set(PRODUCTS.map(p => p.policyType))]
+  const uniqueTypes = [...new Set(rows.map(p => p.policyType))]
 
   return (
     <div>
@@ -175,15 +182,9 @@ export default function ProductList() {
                       )}
 
                       {/* Footer */}
-                      <div style={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', gap: 2, paddingTop: 4, marginTop: 'auto' }}>
-                        <button
-                          type="button"
-                          onClick={() => navigate(`/product/${p.id}/edit`)}
-                          style={{ fontSize: 15, fontWeight: 600, border: 'none', color: '#3b5bfd', background: 'transparent', padding: 0, cursor: 'pointer', fontFamily: 'inherit', display: 'flex', alignItems: 'center', gap: 5 }}
-                        >
-                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#3b5bfd" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"/></svg>
-                          Edit Product
-                        </button>
+                      <div style={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', gap: 6, paddingTop: 4, marginTop: 'auto' }}>
+                        <RowActionButton title="Edit Product" icon={EditIcon} onClick={() => navigate(`/product/${p.id}/edit`)} />
+                        <RowActionButton title="Delete" icon={DeleteIcon} variant="delete" onClick={() => handleDelete(p)} />
                       </div>
                     </div>
                   </div>

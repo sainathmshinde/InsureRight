@@ -11,7 +11,7 @@ import { FormActions } from "../../components/UI";
 import { DocumentViewerModal } from "../../components/fields/DocumentViewerModal";
 import policyWordingsPdf from "../../assets/StarHealthAssureInsurancePolicy-Policy-wording.pdf";
 import brochurePdf from "../../assets/Brochure_Star_Comprehensive_Insurance_Policy_V_15_Web_633bcfcaaf.pdf";
-import { PREMIUM_CHART, PRODUCTS } from "./productData";
+import { PREMIUM_CHART, PRODUCTS, AGE_BAND_LABELS } from "./productData";
 import { formatDate } from "../../utils/date";
 
 const MOCK_DOC_META = {
@@ -163,19 +163,27 @@ export default function ProductForm({
     const children = (initialMembers ?? []).filter(m => /^Child \d+/.test(m));
     return children.map(m => m.includes("(Handicap)"));
   });
+  // Sum Assured is the set of *distinct* sumInsured values in the chart —
+  // a product priced by age band repeats each sumInsured once per band, so
+  // grouping by value (not by raw row) keeps this list to the real tiers.
   const [sumInsuredList, setSumInsuredList] = useState(() => {
     const rows = PREMIUM_CHART[productId] ?? [];
     if (rows.length === 0) return [{ id: Date.now(), value: '' }];
-    return rows.map((r, i) => ({ id: i + 1, value: String(r.sumInsured) }));
+    const uniqueSI = [...new Set(rows.map(r => r.sumInsured))];
+    return uniqueSI.map((si, i) => ({ id: i + 1, value: String(si) }));
   });
   const [gst, setGst] = useState(initialGst);
   const [premiumMatrix, setPremiumMatrix] = useState(() => {
     const rows = PREMIUM_CHART[productId] ?? [];
     if (rows.length === 0) return {};
-    const bandId = 1;
-    const band = {};
-    rows.forEach((r, i) => {
-      const siId = i + 1;
+    const uniqueSI = [...new Set(rows.map(r => r.sumInsured))];
+    const siIdFor = (si) => uniqueSI.indexOf(si) + 1;
+    const hasBands = rows.some(r => r.ageBandId != null);
+    const matrix = {};
+    rows.forEach(r => {
+      const bandId = hasBands ? r.ageBandId : 1;
+      const siId = siIdFor(r.sumInsured);
+      const band = matrix[bandId] ?? (matrix[bandId] = {});
       if (r.selfOnly != null)
         band['Self'] = { ...(band['Self'] ?? {}), [siId]: String(r.selfOnly) };
       if (r.selfSpouse != null)
@@ -183,11 +191,24 @@ export default function ProductForm({
       if (r.selfSpouse2Children != null)
         band['Self+Spouse+Child 1+Child 2'] = { ...(band['Self+Spouse+Child 1+Child 2'] ?? {}), [siId]: String(r.selfSpouse2Children) };
     });
-    return { [bandId]: band };
+    return matrix;
   });
   const [removedCombos, setRemovedCombos] = useState(new Set());
   const [linkBasePolicy, setLinkBasePolicy] = useState(!!form.basePolicyId);
-  const [ageBands, setAgeBands] = useState(() => [{ id: 1, from: '', to: '' }]);
+  // One row per distinct ageBandId in the chart. From/To come from
+  // AGE_BAND_LABELS when the product defines them; otherwise they start
+  // blank for the admin to fill in (the chart itself only stores the band id).
+  const [ageBands, setAgeBands] = useState(() => {
+    const rows = PREMIUM_CHART[productId] ?? [];
+    const bandIds = [...new Set(rows.map(r => r.ageBandId).filter(v => v != null))];
+    if (bandIds.length === 0) return [{ id: 1, from: '', to: '' }];
+    const labels = AGE_BAND_LABELS[productId];
+    return bandIds.map(bandId => ({
+      id: bandId,
+      from: labels?.[bandId]?.from ?? '',
+      to: labels?.[bandId]?.to ?? '',
+    }));
+  });
   const [activeAgeBandId, setActiveAgeBandId] = useState(null);
 
   const [docState, setDocState] = useState({
@@ -319,12 +340,6 @@ export default function ProductForm({
               <option>Individual</option>
               <option>Family</option>
               <option>Group</option>
-            </Select>
-          </Field>
-          <Field label="Status">
-            <Select value={form.status} onChange={set("status")}>
-              <option>Active</option>
-              <option>Inactive</option>
             </Select>
           </Field>
           <Field label="Policy Type" required>

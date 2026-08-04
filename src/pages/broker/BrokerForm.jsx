@@ -139,12 +139,6 @@ export default function BrokerForm({ form, set, setFile, onSubmit, onCancel, sub
           <Field label="Agreement End Date">
             <DateInput value={form.agreementEnd} onChange={set('agreementEnd')} />
           </Field>
-          <Field label="Status">
-            <Select value={form.status} onChange={set('status')}>
-              <option>Active</option>
-              <option>Inactive</option>
-            </Select>
-          </Field>
         </div>
       </SectionBlock>
 

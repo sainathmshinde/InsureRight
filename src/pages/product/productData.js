@@ -28,20 +28,13 @@ export const POLICY_TYPE_ICON = {
   'Other':              '📋',
 }
 
-// Product catalogue — 3 Base Policies + 5 Top-Up/Super Top-Up policies.
+// Product catalogue — 2 Base Policies + 4 Top-Up/Super Top-Up policies.
 const ALL_PRODUCTS = [
   {
     id: 3,
     name: 'Go Digit Super Top Up Policy',
     provider: 'Go Digit General Insurance Limited',
     policyTypeId: 6,
-    disclaimer: null,
-  },
-  {
-    id: 6,
-    name: 'LIC Health Shield Base Policy',
-    provider: 'LIC',
-    policyTypeId: 1,
     disclaimer: null,
   },
   {
@@ -68,15 +61,6 @@ const ALL_PRODUCTS = [
     bundleDiscount: { type: 'Percent', value: 15 },
   },
   {
-    id: 49,
-    name: 'LIC Health Shield Top Up',
-    provider: 'LIC',
-    policyTypeId: 2,
-    disclaimer: null,
-    linkedBaseId: 6,
-    bundleDiscount: { type: 'Percent', value: 12 },
-  },
-  {
     id: 60,
     name: 'HDFC Ergo Family Health Base Policy',
     provider: 'HDFC ERGO General Insurance Company Limited',
@@ -91,6 +75,13 @@ const ALL_PRODUCTS = [
     disclaimer: null,
     linkedBaseId: 60,
     bundleDiscount: { type: 'Flat', value: 500 },
+  },
+  {
+    id: 70,
+    name: 'Star Health Group Mediclaim Policy',
+    provider: 'Star Health Insurance',
+    policyTypeId: 5,
+    disclaimer: 'I hereby declare, on my behalf and on behalf of my Family, that the above particulars given by me are true and complete in all respects to the best of my knowledge and that I am authorized to propose on behalf of my Family. I understand that the information provided by me will form the basis of the insurance policy, and that the policy will come into force only after full receipt of the premium chargeable and the application is in order. I agree to the terms and conditions of the Policy and have understood the same.',
   },
 ]
 
@@ -135,12 +126,6 @@ export const PREMIUM_CHART = {
     { sumInsured: 900000,  selfOnly: 53078,  selfSpouse: 91470 },
     { sumInsured: 1000000, selfOnly: 64092,  selfSpouse: 107569 },
   ],
-  6: [
-    { sumInsured: 100000, selfOnly: 3200,  selfSpouse: 5400 },
-    { sumInsured: 200000, selfOnly: 5100,  selfSpouse: 8700 },
-    { sumInsured: 300000, selfOnly: 7300,  selfSpouse: 12400 },
-    { sumInsured: 500000, selfOnly: 11800, selfSpouse: 19900 },
-  ],
   38: [
     { sumInsured: 100000, selfOnly: 3484,  selfSpouse: 5923 },
     { sumInsured: 200000, selfOnly: 5575,  selfSpouse: 9481 },
@@ -159,11 +144,6 @@ export const PREMIUM_CHART = {
     { sumInsured: 1500000, selfOnly: 10800, selfSpouse: 17300 },
     { sumInsured: 2000000, selfOnly: 14200, selfSpouse: 22700 },
   ],
-  49: [
-    { sumInsured: 500000,  selfOnly: 3800, selfSpouse: 6100 },
-    { sumInsured: 1000000, selfOnly: 6700, selfSpouse: 10700 },
-    { sumInsured: 1500000, selfOnly: 9600, selfSpouse: 15400 },
-  ],
   60: [
     { sumInsured: 300000,  selfOnly: 6200,  selfSpouse: 9800 },
     { sumInsured: 500000,  selfOnly: 9500,  selfSpouse: 15200 },
@@ -176,6 +156,77 @@ export const PREMIUM_CHART = {
     { sumInsured: 1500000, selfOnly: 10200, selfSpouse: 16300 },
     { sumInsured: 2000000, selfOnly: 13400, selfSpouse: 21500 },
   ],
+  // Age-banded group premium — 11 age bands × 4 sum insured tiers.
+  // ageBandId → age range: 1=0-20, 2=21-35, 3=36-45, 4=46-50, 5=51-55,
+  // 6=56-60, 7=61-65, 8=66-70, 9=71-75, 10=76-80, 11=Above 80.
+  // selfSpouse2Children also covers the "Self+Spouse+1 Child" combo — the
+  // source rate card prices both the same.
+  70: [
+    { sumInsured: 300000,  ageBandId: 1,  selfOnly: 3353,  selfSpouse: 5700,   selfSpouse2Children: 9053   },
+    { sumInsured: 300000,  ageBandId: 2,  selfOnly: 5550,  selfSpouse: 9435,   selfSpouse2Children: 12788  },
+    { sumInsured: 300000,  ageBandId: 3,  selfOnly: 6948,  selfSpouse: 11812,  selfSpouse2Children: 15165  },
+    { sumInsured: 300000,  ageBandId: 4,  selfOnly: 14357, selfSpouse: 24408,  selfSpouse2Children: 27761  },
+    { sumInsured: 300000,  ageBandId: 5,  selfOnly: 17379, selfSpouse: 29545,  selfSpouse2Children: 32898  },
+    { sumInsured: 300000,  ageBandId: 6,  selfOnly: 27777, selfSpouse: 47221,  selfSpouse2Children: 50574  },
+    { sumInsured: 300000,  ageBandId: 7,  selfOnly: 39409, selfSpouse: 66995,  selfSpouse2Children: 70348  },
+    { sumInsured: 300000,  ageBandId: 8,  selfOnly: 49392, selfSpouse: 83966,  selfSpouse2Children: 87319  },
+    { sumInsured: 300000,  ageBandId: 9,  selfOnly: 56624, selfSpouse: 96260,  selfSpouse2Children: 99613  },
+    { sumInsured: 300000,  ageBandId: 10, selfOnly: 60250, selfSpouse: 102424, selfSpouse2Children: 105777 },
+    { sumInsured: 300000,  ageBandId: 11, selfOnly: 64257, selfSpouse: 109237, selfSpouse2Children: 112590 },
+    { sumInsured: 500000,  ageBandId: 1,  selfOnly: 4632,  selfSpouse: 7874,   selfSpouse2Children: 12506  },
+    { sumInsured: 500000,  ageBandId: 2,  selfOnly: 6793,  selfSpouse: 11548,  selfSpouse2Children: 16180  },
+    { sumInsured: 500000,  ageBandId: 3,  selfOnly: 9513,  selfSpouse: 16172,  selfSpouse2Children: 20804  },
+    { sumInsured: 500000,  ageBandId: 4,  selfOnly: 20295, selfSpouse: 34501,  selfSpouse2Children: 39133  },
+    { sumInsured: 500000,  ageBandId: 5,  selfOnly: 24580, selfSpouse: 41786,  selfSpouse2Children: 46418  },
+    { sumInsured: 500000,  ageBandId: 6,  selfOnly: 38362, selfSpouse: 65215,  selfSpouse2Children: 69847  },
+    { sumInsured: 500000,  ageBandId: 7,  selfOnly: 50635, selfSpouse: 86080,  selfSpouse2Children: 90712  },
+    { sumInsured: 500000,  ageBandId: 8,  selfOnly: 63254, selfSpouse: 107532, selfSpouse2Children: 112164 },
+    { sumInsured: 500000,  ageBandId: 9,  selfOnly: 71264, selfSpouse: 121148, selfSpouse2Children: 125780 },
+    { sumInsured: 500000,  ageBandId: 10, selfOnly: 75635, selfSpouse: 128579, selfSpouse2Children: 133211 },
+    { sumInsured: 500000,  ageBandId: 11, selfOnly: 80849, selfSpouse: 137443, selfSpouse2Children: 142075 },
+    { sumInsured: 700000,  ageBandId: 1,  selfOnly: 5809,   selfSpouse: 9875,   selfSpouse2Children: 15684  },
+    { sumInsured: 700000,  ageBandId: 2,  selfOnly: 8742,   selfSpouse: 14861,  selfSpouse2Children: 20670  },
+    { sumInsured: 700000,  ageBandId: 3,  selfOnly: 12741,  selfSpouse: 21660,  selfSpouse2Children: 27469  },
+    { sumInsured: 700000,  ageBandId: 4,  selfOnly: 30374,  selfSpouse: 51635,  selfSpouse2Children: 57444  },
+    { sumInsured: 700000,  ageBandId: 5,  selfOnly: 36221,  selfSpouse: 61576,  selfSpouse2Children: 67385  },
+    { sumInsured: 700000,  ageBandId: 6,  selfOnly: 54275,  selfSpouse: 92268,  selfSpouse2Children: 98077  },
+    { sumInsured: 700000,  ageBandId: 7,  selfOnly: 70907,  selfSpouse: 120543, selfSpouse2Children: 126352 },
+    { sumInsured: 700000,  ageBandId: 8,  selfOnly: 90938,  selfSpouse: 154594, selfSpouse2Children: 160403 },
+    { sumInsured: 700000,  ageBandId: 9,  selfOnly: 101583, selfSpouse: 172691, selfSpouse2Children: 178500 },
+    { sumInsured: 700000,  ageBandId: 10, selfOnly: 106450, selfSpouse: 180965, selfSpouse2Children: 186774 },
+    { sumInsured: 700000,  ageBandId: 11, selfOnly: 114407, selfSpouse: 194492, selfSpouse2Children: 200301 },
+    { sumInsured: 1000000, ageBandId: 1,  selfOnly: 7148,   selfSpouse: 12152,  selfSpouse2Children: 19300  },
+    { sumInsured: 1000000, ageBandId: 2,  selfOnly: 10848,  selfSpouse: 18442,  selfSpouse2Children: 25590  },
+    { sumInsured: 1000000, ageBandId: 3,  selfOnly: 16790,  selfSpouse: 28543,  selfSpouse2Children: 35691  },
+    { sumInsured: 1000000, ageBandId: 4,  selfOnly: 40347,  selfSpouse: 68590,  selfSpouse2Children: 75738  },
+    { sumInsured: 1000000, ageBandId: 5,  selfOnly: 47895,  selfSpouse: 81421,  selfSpouse2Children: 88569  },
+    { sumInsured: 1000000, ageBandId: 6,  selfOnly: 69068,  selfSpouse: 117415, selfSpouse2Children: 124563 },
+    { sumInsured: 1000000, ageBandId: 7,  selfOnly: 88134,  selfSpouse: 149827, selfSpouse2Children: 156975 },
+    { sumInsured: 1000000, ageBandId: 8,  selfOnly: 111903, selfSpouse: 190234, selfSpouse2Children: 197382 },
+    { sumInsured: 1000000, ageBandId: 9,  selfOnly: 123264, selfSpouse: 209548, selfSpouse2Children: 216696 },
+    { sumInsured: 1000000, ageBandId: 10, selfOnly: 128682, selfSpouse: 218759, selfSpouse2Children: 225907 },
+    { sumInsured: 1000000, ageBandId: 11, selfOnly: 137438, selfSpouse: 233645, selfSpouse2Children: 240793 },
+  ],
+}
+
+// Human-readable "From – To" labels for a product's age bands, keyed by
+// productId then ageBandId — PREMIUM_CHART only stores the opaque band id,
+// so this is what lets Edit Product show the actual age range instead of a
+// blank "Band N" placeholder.
+export const AGE_BAND_LABELS = {
+  70: {
+    1:  { from: '0',  to: '20' },
+    2:  { from: '21', to: '35' },
+    3:  { from: '36', to: '45' },
+    4:  { from: '46', to: '50' },
+    5:  { from: '51', to: '55' },
+    6:  { from: '56', to: '60' },
+    7:  { from: '61', to: '65' },
+    8:  { from: '66', to: '70' },
+    9:  { from: '71', to: '75' },
+    10: { from: '76', to: '80' },
+    11: { from: '81', to: '' }, // "Above 80" — open-ended
+  },
 }
 
 // Rich brochure content keyed by productId — shown in "View Details" modal.
@@ -203,31 +254,6 @@ export const PRODUCT_DETAILS = {
       { label: 'Premium From', value: '₹2,430/yr', icon: '💰' },
       { label: 'Coverage', value: 'Self + Spouse', icon: '👥' },
       { label: 'Insurer', value: 'Go Digit', icon: '🏢' },
-    ],
-  },
-  6: {
-    tagline: 'LIC Health Shield — Trusted Protection for Your Family',
-    eligibilityCriteria: 'Available to individuals and family members aged 18–65 years. Dependent children can be covered from 91 days to 25 years. Lifetime renewability guaranteed.',
-    waitingPeriods: 'Initial waiting period of 30 days (waived for accidents). Pre-existing diseases covered after 24 months. Specific illnesses such as cataract, hernia and joint replacement covered after 12 months.',
-    copayment: 'No copayment for members below 60 years. 10% copay applies for members aged 60 years and above.',
-    maternityBenefits: 'Not covered as standard — can be added as an optional rider covering normal and caesarean delivery after a 9-month waiting period.',
-    description: 'LIC\'s Health Shield Base Policy brings the trust of India\'s largest life insurer to health cover, with sum insured from ₹1L to ₹5L, wide hospital network access and a straightforward claims process — a dependable foundation for individual or family health protection.',
-    target: ['Individuals and families aged 18 – 65', 'First-time health insurance buyers', 'Those wanting LIC-backed insurance reliability'],
-    benefits: [
-      '₹1L – ₹5L sum insured options',
-      'Cashless access at 4,500+ network hospitals',
-      'Annual health check-up included',
-      'No-claim bonus: 20% per year, up to 50%',
-      'Day care procedures covered',
-      'AYUSH treatments included',
-    ],
-    covered: ['In-patient hospitalisation', 'Day care procedures (listed)', 'Pre-hospitalisation (30 days)', 'Post-hospitalisation (60 days)', 'Ambulance charges', 'AYUSH treatment'],
-    notCovered: ['Pre-existing diseases (2 years)', 'Cosmetic surgery', 'Dental unless accidental', 'Maternity (unless added as rider)', 'Obesity treatment', 'Self-inflicted injuries'],
-    highlights: [
-      { label: 'Sum Insured', value: '₹1L – ₹5L', icon: '🛡️' },
-      { label: 'Premium From', value: '₹3,200/yr', icon: '💰' },
-      { label: 'Coverage', value: 'Self / Couple', icon: '👥' },
-      { label: 'Insurer', value: 'LIC', icon: '🏢' },
     ],
   },
   38: {
@@ -327,51 +353,6 @@ export const PRODUCT_DETAILS = {
       { label: 'Pairs With',     value: 'KMD-042',      icon: '🔗' },
     ],
   },
-  49: {
-    tagline: 'Smart Top-Up — Pairs with LIC Health Shield Base Policy',
-    eligibilityCriteria: 'Available to existing LIC Health Shield Base Policy (KMD-006) holders aged 18–65 years. Spouse and up to 2 children can be included.',
-    waitingPeriods: 'Initial waiting period of 30 days (waived for accidents). Pre-existing diseases covered after 24 months.',
-    copayment: 'No copayment for members below 60 years. 10% copay for members aged 60 years and above.',
-    maternityBenefits: 'Maternity expenses are not covered under this top-up policy.',
-    description: 'LIC Health Shield Top Up is engineered to pair with the LIC Health Shield Base Policy (KMD-006). Once your base plan limit is exhausted, it activates seamlessly — adding ₹5L to ₹15L of hospitalisation coverage at a fraction of the standalone cost.',
-    target: [
-      'LIC Health Shield Base Policy holders wanting higher total coverage',
-      'Members seeking ₹6L – ₹20L combined hospitalisation cover',
-      'Families wanting maximum protection at minimal extra cost',
-      'First-time top-up buyers who already hold an LIC base plan',
-    ],
-    benefits: [
-      'Activates only after LIC Health Shield Base Policy (KMD-006) is exhausted',
-      'Sum insured options: ₹5L, ₹10L and ₹15L',
-      'Covers self, spouse, and up to 2 children',
-      'In-patient and day care hospitalisation covered',
-      'Pre-hospitalisation (30 days) & post-hospitalisation (60 days)',
-      'Cashless access at 4,500+ network hospitals',
-      'Annual renewal with continuity benefit bonus',
-    ],
-    covered: [
-      'Hospitalisation beyond LIC Health Shield Base Policy limit',
-      'ICU and critical care charges',
-      'Surgical and procedure expenses',
-      'Day care treatments (listed)',
-      'Pre-hospitalisation (30 days)',
-      'Post-hospitalisation (60 days)',
-      'Ambulance charges',
-    ],
-    notCovered: [
-      'Expenses below the base policy deductible',
-      'OPD consultations',
-      'Pre-existing diseases (first year)',
-      'Cosmetic or plastic surgery',
-      'Dental treatment (unless accidental)',
-      'Self-inflicted injuries or war events',
-    ],
-    highlights: [
-      { label: 'Sum Insured',    value: '₹5L – ₹15L', icon: '🛡️' },
-      { label: 'Premium From',   value: '₹3,800/yr',   icon: '💰' },
-      { label: 'Pairs With',     value: 'KMD-006',      icon: '🔗' },
-    ],
-  },
   60: {
     tagline: 'HDFC ERGO Family Health — Comprehensive Cover, Trusted Name',
     eligibilityCriteria: 'Available to individuals and family members aged 18–65 years. Dependent children can be covered from 91 days to 25 years. Lifetime renewability guaranteed.',
@@ -440,6 +421,52 @@ export const PRODUCT_DETAILS = {
       { label: 'Sum Insured',    value: '₹5L – ₹20L', icon: '🛡️' },
       { label: 'Premium From',   value: '₹4,000/yr',   icon: '💰' },
       { label: 'Pairs With',     value: 'KMD-060',      icon: '🔗' },
+    ],
+  },
+  70: {
+    tagline: 'Group Mediclaim for Bank Retiree Associations — Priced Fairly by Age',
+    eligibilityCriteria: 'Available to members of enrolled bank retiree associations of all ages (0 to 80+ years), along with spouse and up to 2 dependent children. Premium is banded across 11 age groups so younger members are not overcharged for the cover older members need.',
+    waitingPeriods: 'Initial waiting period of 30 days (waived for accidents). Pre-existing diseases covered after 12 months under group continuity. Specific illnesses such as cataract, hernia and joint replacement covered after 90 days.',
+    copayment: 'No copayment for members below age band 6 (60 years). 10% copay applies for members in age band 6 and above, capped at ₹15,000 per claim.',
+    maternityBenefits: 'Available as an optional rider for members in age bands 1–3 (up to 45 years) — normal delivery covered up to ₹25,000 and caesarean up to ₹35,000, after a 9-month waiting period.',
+    description: 'Star Health\'s Group Mediclaim Policy is purpose-built for bank retiree associations, spreading cost fairly across 11 age bands (0–20 through Above 80) instead of one flat premium for everyone. Younger, healthier members pay less; older members still get full access to the same ₹3L–₹10L sum insured options and cashless network — the same model used by BPP-style association covers, now age-aware.',
+    target: [
+      'Bank retiree association members across all age groups',
+      'Associations wanting fair, age-appropriate group pricing',
+      'Members aged 66+ who are priced out of flat-premium group covers',
+      'Families wanting to enrol together under one association policy',
+    ],
+    benefits: [
+      '11 age bands (0–20 through Above 80) for fair, age-appropriate pricing',
+      'Sum insured options: ₹3L, ₹5L, ₹7L and ₹10L',
+      'Covers self, spouse and up to 2 children under one policy',
+      'In-patient hospitalisation and 540+ day care procedures covered',
+      'Pre-hospitalisation (30 days) & post-hospitalisation (60 days)',
+      'Cashless access at 14,000+ Star Health network hospitals',
+      'No upper age limit for renewal — lifetime association continuity',
+    ],
+    covered: [
+      'In-patient hospitalisation across all age bands',
+      'ICU and critical care charges',
+      'Day care treatments (540+ listed)',
+      'Pre-hospitalisation (30 days)',
+      'Post-hospitalisation (60 days)',
+      'Ambulance charges',
+      'AYUSH treatments',
+    ],
+    notCovered: [
+      'Pre-existing diseases (first year)',
+      'Cosmetic or plastic surgery',
+      'Dental treatment (unless accidental)',
+      'Maternity (unless added as rider, age bands 1–3 only)',
+      'Self-inflicted injuries or war events',
+      'Experimental or unproven treatments',
+    ],
+    highlights: [
+      { label: 'Sum Insured',  value: '₹3L – ₹10L',  icon: '🛡️' },
+      { label: 'Premium From', value: '₹3,353/yr',   icon: '💰' },
+      { label: 'Age Bands',    value: '11 bands',     icon: '📊' },
+      { label: 'Insurer',      value: 'Star Health',  icon: '🏢' },
     ],
   },
 }

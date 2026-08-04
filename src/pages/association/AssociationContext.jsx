@@ -15,8 +15,12 @@ export function AssociationProvider({ children }) {
     setAssociations(prev => prev.map(a => a.id === id ? { ...a, ...data } : a))
   }
 
+  const deleteAssociation = (id) => {
+    setAssociations(prev => prev.filter(a => a.id !== id))
+  }
+
   return (
-    <AssociationContext.Provider value={{ associations, addAssociation, updateAssociation }}>
+    <AssociationContext.Provider value={{ associations, addAssociation, updateAssociation, deleteAssociation }}>
       {children}
     </AssociationContext.Provider>
   )

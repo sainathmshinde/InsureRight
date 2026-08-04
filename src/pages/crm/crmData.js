@@ -2,7 +2,7 @@ import { isCampaignOpen } from '../../utils/date'
 
 const RAW_CAMPAIGNS = [
   { id: 1,  name: 'Campaign 1',                    startDate: '2024-09-20', endDate: '2025-07-29', isActive: true, assignedAgents: [1, 2, 5],    productIds: [42, 48]         },
-  { id: 5,  name: 'Campaign OPD and DIGIT PAYMENT PROTECTION', startDate: '2025-01-31', endDate: '2025-03-31', isActive: true, assignedAgents: [1, 2, 4], productIds: [6, 49] },
+  { id: 5,  name: 'Campaign OPD and DIGIT PAYMENT PROTECTION', startDate: '2025-01-31', endDate: '2025-03-31', isActive: true, assignedAgents: [1, 2, 4], productIds: [60, 61] },
   { id: 6,  name: 'BPP Campaign',                   startDate: '2025-02-19', endDate: '2025-03-24', isActive: true, assignedAgents: [2, 8, 9],    productIds: [60, 61]         },
   { id: 7,  name: 'Test Campaign',                  startDate: '2025-08-03', endDate: '2025-08-29', isActive: true, assignedAgents: [1],          productIds: [3]              },
   { id: 8,  name: 'SBI_STP_Campaign',                startDate: '2025-09-18', endDate: '2026-03-10', isActive: true, assignedAgents: [4, 5],       productIds: [42, 38]         },

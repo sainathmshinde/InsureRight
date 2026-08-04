@@ -2,8 +2,8 @@ import { useState } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import Pagination from '../../components/Pagination'
 import usePagination from '../../components/usePagination'
-import { Table, PageHeader, KYCBadge, Button, EmptyState } from '../../components/UI'
-import { MemberIcon, EditIcon, ViewIcon, CartIcon, UploadIcon, SearchIcon } from '../../icons'
+import { Table, PageHeader, KYCBadge, Button, EmptyState, RowActionButton } from '../../components/UI'
+import { MemberIcon, EditIcon, ViewIcon, CartIcon, UploadIcon, SearchIcon, DeleteIcon } from '../../icons'
 import { useAuth } from '../../context/AuthContext'
 import { useMembers, INITIAL_MEMBERS } from '../../context/MemberContext'
 import { ASSOCIATIONS } from './orgAssocData'
@@ -24,7 +24,7 @@ export default function MemberList() {
   const navigate = useNavigate();
   const [searchParams]  = useSearchParams();
   const { user } = useAuth();
-  const { members } = useMembers();
+  const { members, deleteMember } = useMembers();
   const [search,          setSearch]          = useState("");
   const [kycFilter,       setKycFilter]       = useState("");
   const [campaignFilter,  setCampaignFilter]  = useState(searchParams.get('campaignId') ?? "");
@@ -35,6 +35,12 @@ export default function MemberList() {
     const [campaign] = getActivePromoCampaigns(member.associationId);
     if (campaign) setCampaignPrompt({ member, campaign });
     else navigate(`/policy/buy?memberId=${member.id}`);
+  };
+
+  const handleDelete = (member) => {
+    if (window.confirm(`Delete member "${member.name}"? This cannot be undone.`)) {
+      deleteMember(member.id);
+    }
   };
 
   const scopedData =
@@ -82,27 +88,10 @@ export default function MemberList() {
       label: "Actions",
       render: (row) => (
         <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
-          <button
-            title="Buy Policy"
-            onClick={() => handleBuyPolicy(row)}
-            style={S.iconBtn}
-          >
-            <CartIcon size={14} color="var(--text-2)" />
-          </button>
-          <button
-            title="View 360°"
-            onClick={() => navigate(`/member/${row.id}/360`)}
-            style={S.iconBtn}
-          >
-            <ViewIcon size={14} color="var(--text-2)" />
-          </button>
-          <button
-            title="Edit"
-            onClick={() => navigate(`/member/${row.id}/edit`)}
-            style={S.iconBtn}
-          >
-            <EditIcon size={14} color="var(--text-2)" />
-          </button>
+          <RowActionButton title="Buy Policy" icon={CartIcon} onClick={() => handleBuyPolicy(row)} />
+          <RowActionButton title="View 360°" icon={ViewIcon} onClick={() => navigate(`/member/${row.id}/360`)} />
+          <RowActionButton title="Edit" icon={EditIcon} onClick={() => navigate(`/member/${row.id}/edit`)} />
+          <RowActionButton title="Delete" icon={DeleteIcon} variant="delete" onClick={() => handleDelete(row)} />
         </div>
       ),
     },
@@ -288,18 +277,6 @@ const S = {
   bannerFrame: {
     width: '100%', cursor: 'pointer', borderRadius: 12, overflow: 'hidden',
     border: '1.5px solid #c7d2fe', boxShadow: '0 4px 20px rgba(79,70,229,.14)',
-  },
-  iconBtn: {
-    display: 'inline-flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    width: 30,
-    height: 30,
-    borderRadius: 8,
-    border: '1px solid var(--border)',
-    cursor: 'pointer',
-    background: '#fff',
-    flexShrink: 0,
   },
   searchIcon: {
     position: 'absolute',

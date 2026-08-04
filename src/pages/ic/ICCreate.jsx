@@ -1,23 +1,25 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Field, Input, Select, SectionBlock } from "../../components/Field";
+import { BranchModal, ContactModal, BranchLocationSection, ContactInfoSection } from "./ICBranchContact";
 
 const INITIAL = {
   icName: "",
   code: "",
-  branch: "",
-  contactPerson: "",
   email: "",
-  phone: "",
   apiBaseUrl: "",
   apiKey: "",
   apiSecret: "",
   status: "Active",
+  branches: [],
+  contacts: [],
 };
 
 export default function ICCreate() {
   const navigate = useNavigate();
   const [form, setForm] = useState(INITIAL);
+  const [showBranchModal, setShowBranchModal] = useState(false);
+  const [showContactModal, setShowContactModal] = useState(false);
   const set = (f) => (e) => setForm((p) => ({ ...p, [f]: e.target.value }));
 
   const handleSubmit = (e) => {
@@ -64,20 +66,6 @@ export default function ICCreate() {
                     required
                   />
                 </Field>
-                <Field label="Branch">
-                  <Input
-                    placeholder="e.g. Mumbai"
-                    value={form.branch}
-                    onChange={set("branch")}
-                  />
-                </Field>
-                <Field label="Contact Person">
-                  <Input
-                    placeholder="Primary contact name"
-                    value={form.contactPerson}
-                    onChange={set("contactPerson")}
-                  />
-                </Field>
                 <Field label="Email" required>
                   <Input
                     type="email"
@@ -87,23 +75,32 @@ export default function ICCreate() {
                     required
                   />
                 </Field>
-                <Field label="Phone">
-                  <Input
-                    type="tel"
-                    placeholder="+91 XXXXX XXXXX"
-                    value={form.phone}
-                    onChange={set("phone")}
-                  />
-                </Field>
-                <Field label="Status">
-                  <Select value={form.status} onChange={set("status")}>
-                    <option>Active</option>
-                    <option>Inactive</option>
-                  </Select>
-                </Field>
               </div>
             </SectionBlock>
 
+            <SectionBlock icon="🏬" title="Branches/Location">
+              <div style={{ display: "flex", justifyContent: "flex-end", marginBottom: 12 }}>
+                <button type="button" className="btn btn-secondary" onClick={() => setShowBranchModal(true)}>
+                  + Add Branch/Location
+                </button>
+              </div>
+              <BranchLocationSection form={form} setForm={setForm} />
+            </SectionBlock>
+
+            <SectionBlock icon="📇" title="Contact Info">
+              <div style={{ display: "flex", justifyContent: "flex-end", marginBottom: 12 }}>
+                <button
+                  type="button"
+                  className="btn btn-secondary"
+                  disabled={form.branches.length === 0}
+                  title={form.branches.length === 0 ? "Add a branch/location first" : undefined}
+                  onClick={() => setShowContactModal(true)}
+                >
+                  + Add Contact
+                </button>
+              </div>
+              <ContactInfoSection form={form} setForm={setForm} />
+            </SectionBlock>
 
             <div className="actions-row">
               <button
@@ -120,6 +117,21 @@ export default function ICCreate() {
           </form>
         </div>
       </div>
+
+      {showBranchModal && (
+        <BranchModal
+          onClose={() => setShowBranchModal(false)}
+          onSave={(branch) => setForm((p) => ({ ...p, branches: [...p.branches, { id: Date.now(), ...branch }] }))}
+        />
+      )}
+
+      {showContactModal && (
+        <ContactModal
+          branches={form.branches}
+          onClose={() => setShowContactModal(false)}
+          onSave={(contact) => setForm((p) => ({ ...p, contacts: [...p.contacts, { id: Date.now(), ...contact }] }))}
+        />
+      )}
     </div>
   );
 }

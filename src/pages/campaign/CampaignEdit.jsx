@@ -23,7 +23,7 @@ import {
   CampaignPreviewModal,
   toggleProductWithLinks,
 } from "./campaignShared";
-import { fileToDataUrl, savePromoCampaign } from "./campaignStore";
+import { fileToDataUrl, savePromoCampaign, getPromoCampaignById } from "./campaignStore";
 
 const BASE = {
   segment: "ALL", salesPersonId: "",
@@ -36,7 +36,7 @@ const BASE = {
 
 const MOCK_DATA = {
   1:  { ...BASE, name: "Campaign 1",                startDate: "2024-09-20", endDate: "2025-07-29", selectedProducts: [42, 48],     callingIds: [2],    salesIds: [1, 5] },
-  5:  { ...BASE, name: "Campaign OPD and DIGIT PAYMENT PROTECTION", startDate: "2025-01-31", endDate: "2025-03-31", selectedProducts: [6, 49], callingIds: [4], salesIds: [1] },
+  5:  { ...BASE, name: "Campaign OPD and DIGIT PAYMENT PROTECTION", startDate: "2025-01-31", endDate: "2025-03-31", selectedProducts: [60, 61], callingIds: [4], salesIds: [1] },
   6:  { ...BASE, name: "BPP Campaign",               startDate: "2025-02-19", endDate: "2025-03-24", selectedProducts: [60, 61],     callingIds: [2, 9], salesIds: [8] },
   7:  { ...BASE, name: "Test Campaign",              startDate: "2025-08-03", endDate: "2025-08-29", selectedProducts: [3],          callingIds: [],     salesIds: [1] },
   8:  { ...BASE, name: "SBI_STP_Campaign",           startDate: "2025-09-18", endDate: "2026-03-10", selectedProducts: [42, 38],     callingIds: [4],    salesIds: [5] },
@@ -63,7 +63,11 @@ export default function CampaignEdit() {
 
 function CampaignEditForm({ id }) {
   const navigate = useNavigate();
-  const saved = MOCK_DATA[id] ?? DEFAULT;
+  // MOCK_DATA only covers the 7 seed campaigns — anything created through
+  // Add Campaign gets a Date.now() id and lives in campaignStore (localStorage)
+  // instead, so fall back there before giving up to a blank DEFAULT form.
+  const stored = MOCK_DATA[id] ?? getPromoCampaignById(id);
+  const saved = stored ? { ...BASE, ...stored } : DEFAULT;
 
   const [form, setForm] = useState(saved);
   const set = (f) => (e) => setForm((p) => ({ ...p, [f]: e.target.value }));

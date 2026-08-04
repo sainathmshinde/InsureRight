@@ -60,8 +60,12 @@ export function MemberProvider({ children }) {
     )
   }
 
+  const deleteMember = (id) => {
+    setMembers(prev => prev.filter(c => c.id !== Number(id)))
+  }
+
   return (
-    <MemberContext.Provider value={{ members, updateKycStatus }}>
+    <MemberContext.Provider value={{ members, updateKycStatus, deleteMember }}>
       {children}
     </MemberContext.Provider>
   )

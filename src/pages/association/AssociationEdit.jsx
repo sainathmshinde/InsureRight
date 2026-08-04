@@ -60,8 +60,17 @@ export default function AssociationEdit() {
   })
   const [showBranchModal, setShowBranchModal] = useState(false)
   const [showContactModal, setShowContactModal] = useState(false)
+  const [orgPick, setOrgPick] = useState('')
 
   const set = f => e => setForm(p => ({ ...p, [f]: e.target.value }))
+
+  const addOrganisation = () => {
+    if (!orgPick) return
+    setForm(p => ({ ...p, organisationIds: [...p.organisationIds, Number(orgPick)] }))
+    setOrgPick('')
+  }
+  const removeOrganisation = id =>
+    setForm(p => ({ ...p, organisationIds: p.organisationIds.filter(x => x !== id) }))
 
   const PARENT_ASSOCIATION_NAMES = ['BOIPARA-Federation', 'AIBRF-ALL INDIA BANK RETIREES FEDERATION']
   const parentOptions = associations.filter(a =>
@@ -111,14 +120,31 @@ export default function AssociationEdit() {
             {/* Organisation */}
             <SectionBlock icon="🏢" title="Organisation">
               <div className="form-grid-3">
-                <Field label="Organisation">
-                  <Select
-                    value={form.organisationIds[0] ?? ''}
-                    onChange={e => setForm(p => ({ ...p, organisationIds: e.target.value ? [Number(e.target.value)] : [] }))}
-                  >
-                    <option value="">Select organisation</option>
-                    {ORGANISATIONS.map(o => <option key={o.id} value={o.id}>{o.name}</option>)}
-                  </Select>
+                <Field label="Organisation" className="col-span-3">
+                  <div style={{ display: 'flex', gap: 10, alignItems: 'center', width: '50%' }}>
+                    <Select value={orgPick} onChange={e => setOrgPick(e.target.value)} style={{ flex: 1, minWidth: 0 }}>
+                      <option value="">Select organisation</option>
+                      {ORGANISATIONS.filter(o => !form.organisationIds.includes(o.id)).map(o => (
+                        <option key={o.id} value={o.id}>{o.name}</option>
+                      ))}
+                    </Select>
+                    <button type="button" className="btn btn-secondary" disabled={!orgPick} onClick={addOrganisation} style={{ flexShrink: 0 }}>
+                      + Add
+                    </button>
+                  </div>
+                  {form.organisationIds.length > 0 && (
+                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginTop: 10 }}>
+                      {form.organisationIds.map(orgId => {
+                        const org = ORGANISATIONS.find(o => o.id === orgId)
+                        return (
+                          <span key={orgId} style={{ display: 'inline-flex', alignItems: 'center', gap: 5, background: 'var(--brand-light)', color: 'var(--brand)', border: '1px solid var(--brand-mid)', borderRadius: 20, padding: '3px 10px 3px 12px', fontSize: 13.5, fontWeight: 500, maxWidth: '100%' }}>
+                            <span style={{ whiteSpace: 'normal', wordBreak: 'break-word' }}>{org?.name ?? orgId}</span>
+                            <button type="button" onClick={() => removeOrganisation(orgId)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--brand)', fontSize: 14, lineHeight: 1, padding: 0, flexShrink: 0 }}>×</button>
+                          </span>
+                        )
+                      })}
+                    </div>
+                  )}
                 </Field>
               </div>
             </SectionBlock>

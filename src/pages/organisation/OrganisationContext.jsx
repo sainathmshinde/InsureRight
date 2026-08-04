@@ -15,8 +15,12 @@ export function OrganisationProvider({ children }) {
     setOrganisations(prev => prev.map(o => o.id === id ? { ...o, ...data } : o))
   }
 
+  const deleteOrganisation = (id) => {
+    setOrganisations(prev => prev.filter(o => o.id !== id))
+  }
+
   return (
-    <OrganisationContext.Provider value={{ organisations, addOrganisation, updateOrganisation }}>
+    <OrganisationContext.Provider value={{ organisations, addOrganisation, updateOrganisation, deleteOrganisation }}>
       {children}
     </OrganisationContext.Provider>
   )

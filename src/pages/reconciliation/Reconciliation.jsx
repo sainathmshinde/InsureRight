@@ -498,10 +498,12 @@ function TransactionDetailModal({ system: rec, uploaded: up, onClose }) {
             <TxnDetailRow label="Premium Amount" value={fmt(up.premium)} mismatch={up.premium !== rec.premium} />
             <TxnDetailRow label="IC Status" value={up.uploadedStatus} />
             {isCheque && <>
+              <TxnDetailRow label="Bank" value={up.bankName} mismatch={up.bankName !== rec.bankName} />
               <TxnDetailRow label="Cheque Number" value={up.chequeNumber} mismatch={up.chequeNumber !== rec.chequeNumber} />
               <TxnDetailRow label="Cheque Date" value={formatDate(up.chequeDate)} mismatch={up.chequeDate !== rec.chequeDate} />
             </>}
             {!isCheque && <>
+              <TxnDetailRow label="Member Name" value={up.memberName} mismatch={up.memberName !== rec.memberName} />
               <TxnDetailRow label="Transaction ID" value={up.transactionId} mismatch={up.transactionId !== rec.transactionId} />
               <TxnDetailRow label="NEFT Date" value={formatDate(up.neftDate)} mismatch={up.neftDate !== rec.neftDate} />
             </>}
@@ -622,6 +624,7 @@ function buildUploadedRows(records) {
     };
 
     if (r.paymentType === "Cheque") {
+      base.bankName = r.bankName;
       base.chequeNumber = chequeNumDiff
         ? String(Number(r.chequeNumber) + 1)
         : r.chequeNumber;
@@ -662,6 +665,7 @@ function buildUploadedRows(records) {
       uploadedStatus: "Payment received (completed)",
     };
     if (pt === "Cheque") {
+      row.bankName = BANKS[idx % BANKS.length];
       row.chequeNumber = String(800000 + idx);
       row.chequeDate = `2026-${String((k % 12) + 1).padStart(2, "0")}-${String((k % 28) + 1).padStart(2, "0")}`;
       row.clearingDate = `2026-${String((k % 12) + 1).padStart(2, "0")}-${String(((k + 3) % 28) + 1).padStart(2, "0")}`;
@@ -1233,14 +1237,16 @@ export default function Reconciliation() {
                   <tr>
                     <th rowSpan={2} style={{ verticalAlign: "bottom", position: "sticky", top: 0, background: "#fff", zIndex: 3 }}>Order ID</th>
                     <th rowSpan={2} style={{ verticalAlign: "bottom", position: "sticky", top: 0, background: "#fff", zIndex: 3 }}>Member</th>
-                    <th colSpan={3} style={{ textAlign: "center", position: "sticky", top: 0, background: "#eff6ff", color: "#1d4ed8", borderBottom: "2px solid #93c5fd", zIndex: 3 }}>System Record</th>
-                    <th colSpan={3} style={{ textAlign: "center", position: "sticky", top: 0, background: "#fefce8", color: "#a16207", borderBottom: "2px solid #fde047", zIndex: 3 }}>Uploaded Record</th>
+                    <th colSpan={4} style={{ textAlign: "center", position: "sticky", top: 0, background: "#eff6ff", color: "#1d4ed8", borderBottom: "2px solid #93c5fd", zIndex: 3 }}>System Record</th>
+                    <th colSpan={4} style={{ textAlign: "center", position: "sticky", top: 0, background: "#fefce8", color: "#a16207", borderBottom: "2px solid #fde047", zIndex: 3 }}>Uploaded Record</th>
                     <th rowSpan={2} style={{ verticalAlign: "bottom", minWidth: 230, position: "sticky", top: 0, background: "#fff", zIndex: 3 }}>Action</th>
                   </tr>
                   <tr>
+                    <th style={{ position: "sticky", top: 36, background: "#eff6ff", color: "#1e40af", fontSize: 13, zIndex: 3 }}>Bank</th>
                     <th style={{ position: "sticky", top: 36, background: "#eff6ff", color: "#1e40af", fontSize: 13, zIndex: 3 }}>Cheque No.</th>
                     <th style={{ position: "sticky", top: 36, background: "#eff6ff", color: "#1e40af", fontSize: 13, zIndex: 3 }}>Cheque Date</th>
                     <th style={{ position: "sticky", top: 36, background: "#eff6ff", color: "#1e40af", fontSize: 13, zIndex: 3 }}>Amount</th>
+                    <th style={{ position: "sticky", top: 36, background: "#fefce8", color: "#92400e", fontSize: 13, zIndex: 3 }}>Bank</th>
                     <th style={{ position: "sticky", top: 36, background: "#fefce8", color: "#92400e", fontSize: 13, zIndex: 3 }}>Cheque No.</th>
                     <th style={{ position: "sticky", top: 36, background: "#fefce8", color: "#92400e", fontSize: 13, zIndex: 3 }}>Cheque Date</th>
                     <th style={{ position: "sticky", top: 36, background: "#fefce8", color: "#92400e", fontSize: 13, zIndex: 3 }}>Amount</th>
@@ -1248,15 +1254,19 @@ export default function Reconciliation() {
                 </thead>
                 <tbody>
                   {matchedRecords.length === 0 ? (
-                    <tr><td colSpan={9} style={{ textAlign: "center", padding: "32px 0", color: "#64748b" }}>No matched records</td></tr>
+                    <tr><td colSpan={11} style={{ textAlign: "center", padding: "32px 0", color: "#64748b" }}>No matched records</td></tr>
                   ) : (
                     matchedRecords.map(({ system: rec, uploaded: up }) => (
                         <tr key={rec.id} style={{ background: "#fff" }}>
                           <td style={{ fontFamily: "monospace", fontSize: 11.5, color: "#7c3aed" }}>{rec.proposalId}</td>
                           <td style={{ fontWeight: 500 }}>{rec.memberName}</td>
+                          <td style={{ background: "#f0f7ff" }}>{rec.bankName ?? "—"}</td>
                           <td style={{ background: "#f0f7ff", fontFamily: "monospace", fontWeight: 600 }}>{rec.chequeNumber}</td>
                           <td style={{ background: "#f0f7ff", whiteSpace: "nowrap" }}>{formatDate(rec.chequeDate)}</td>
                           <td style={{ background: "#f0f7ff", fontWeight: 600 }}>{fmt(rec.premium)}</td>
+                          <td style={{ background: "#fffef0", color: up.bankName !== rec.bankName ? "#dc2626" : "inherit" }}>
+                            {up.bankName ?? "—"}{up.bankName !== rec.bankName && <span title="Mismatch" style={{ marginLeft: 4 }}>⚠</span>}
+                          </td>
                           <td style={{ background: "#fffef0", fontFamily: "monospace", fontWeight: 600, color: up.chequeNumber !== rec.chequeNumber ? "#dc2626" : "inherit" }}>
                             {up.chequeNumber}{up.chequeNumber !== rec.chequeNumber && <span title="Mismatch" style={{ marginLeft: 4 }}>⚠</span>}
                           </td>
@@ -1284,13 +1294,14 @@ export default function Reconciliation() {
                     <th rowSpan={2} style={{ verticalAlign: "bottom", position: "sticky", top: 0, background: "#fff", zIndex: 3 }}>Order ID</th>
                     <th rowSpan={2} style={{ verticalAlign: "bottom", position: "sticky", top: 0, background: "#fff", zIndex: 3 }}>Member</th>
                     <th colSpan={3} style={{ textAlign: "center", position: "sticky", top: 0, background: "#eff6ff", color: "#1d4ed8", borderBottom: "2px solid #93c5fd", zIndex: 3 }}>System Record</th>
-                    <th colSpan={3} style={{ textAlign: "center", position: "sticky", top: 0, background: "#fefce8", color: "#a16207", borderBottom: "2px solid #fde047", zIndex: 3 }}>Uploaded Record</th>
+                    <th colSpan={4} style={{ textAlign: "center", position: "sticky", top: 0, background: "#fefce8", color: "#a16207", borderBottom: "2px solid #fde047", zIndex: 3 }}>Uploaded Record</th>
                     <th rowSpan={2} style={{ verticalAlign: "bottom", minWidth: 160, position: "sticky", top: 0, background: "#fff", zIndex: 3 }}>Action</th>
                   </tr>
                   <tr>
                     <th style={{ position: "sticky", top: 36, background: "#eff6ff", color: "#1e40af", fontSize: 13, zIndex: 3 }}>Transaction No.</th>
                     <th style={{ position: "sticky", top: 36, background: "#eff6ff", color: "#1e40af", fontSize: 13, zIndex: 3 }}>Transaction Date</th>
                     <th style={{ position: "sticky", top: 36, background: "#eff6ff", color: "#1e40af", fontSize: 13, zIndex: 3 }}>Amount</th>
+                    <th style={{ position: "sticky", top: 36, background: "#fefce8", color: "#92400e", fontSize: 13, zIndex: 3 }}>Member Name</th>
                     <th style={{ position: "sticky", top: 36, background: "#fefce8", color: "#92400e", fontSize: 13, zIndex: 3 }}>Transaction No.</th>
                     <th style={{ position: "sticky", top: 36, background: "#fefce8", color: "#92400e", fontSize: 13, zIndex: 3 }}>Transaction Date</th>
                     <th style={{ position: "sticky", top: 36, background: "#fefce8", color: "#92400e", fontSize: 13, zIndex: 3 }}>Amount</th>
@@ -1298,7 +1309,7 @@ export default function Reconciliation() {
                 </thead>
                 <tbody>
                   {matchedRecords.length === 0 ? (
-                    <tr><td colSpan={9} style={{ textAlign: "center", padding: "32px 0", color: "#64748b" }}>No matched records</td></tr>
+                    <tr><td colSpan={10} style={{ textAlign: "center", padding: "32px 0", color: "#64748b" }}>No matched records</td></tr>
                   ) : (
                     matchedRecords.map(({ system: rec, uploaded: up }) => (
                         <tr key={rec.id} style={{ background: "#fff" }}>
@@ -1307,6 +1318,9 @@ export default function Reconciliation() {
                           <td style={{ background: "#f0f7ff", fontFamily: "monospace", fontWeight: 600, color: "#0369a1" }}>{rec.transactionId}</td>
                           <td style={{ background: "#f0f7ff", whiteSpace: "nowrap" }}>{formatDate(rec.neftDate)}</td>
                           <td style={{ background: "#f0f7ff", fontWeight: 600 }}>{fmt(rec.premium)}</td>
+                          <td style={{ background: "#fffef0", color: up.memberName !== rec.memberName ? "#dc2626" : "inherit" }}>
+                            {up.memberName ?? "—"}{up.memberName !== rec.memberName && <span title="Mismatch" style={{ marginLeft: 4 }}>⚠</span>}
+                          </td>
                           <td style={{ background: "#fffef0", fontFamily: "monospace", fontWeight: 600, color: up.transactionId !== rec.transactionId ? "#dc2626" : "#0369a1" }}>
                             {up.transactionId ?? "—"}{up.transactionId !== rec.transactionId && <span title="Mismatch" style={{ marginLeft: 4 }}>⚠</span>}
                           </td>

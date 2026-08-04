@@ -2,16 +2,22 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import Pagination from '../../components/Pagination'
 import usePagination from '../../components/usePagination'
-import { Table, PageHeader, Button, EmptyState } from '../../components/UI'
-import { GroupIcon, UploadIcon, SearchIcon } from '../../icons'
+import { Table, PageHeader, Button, EmptyState, RowActionButton } from '../../components/UI'
+import { GroupIcon, UploadIcon, SearchIcon, EditIcon, DeleteIcon } from '../../icons'
 import { useAssociations } from './AssociationContext'
 import { ORGANISATIONS } from '../member/orgAssocData'
 
 export default function AssociationList() {
   const navigate = useNavigate()
-  const { associations } = useAssociations()
+  const { associations, deleteAssociation } = useAssociations()
   const [search, setSearch]     = useState('')
   const [orgFilter, setOrgFilter] = useState('')
+
+  const handleDelete = a => {
+    if (window.confirm(`Delete association "${a.name}"? This cannot be undone.`)) {
+      deleteAssociation(a.id)
+    }
+  }
 
   const getCity = a => a.city ?? a.branches?.[0]?.city ?? ''
 
@@ -54,7 +60,10 @@ export default function AssociationList() {
     },
     { key: 'actions', label: 'Actions',
       render: row => (
-        <button type="button" onClick={() => navigate(`/association/${row.id}/edit`)} title="Edit" style={{ background: 'linear-gradient(180deg,#1565d8,#104ea6)', border: 'none', borderRadius: 6, cursor: 'pointer', padding: '5px 6px', color: '#fff', display: 'inline-flex', alignItems: 'center', boxShadow: '0 2px 6px rgba(21,101,216,.30)' }}><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"/></svg></button>
+        <div style={{ display: 'flex', gap: 6 }}>
+          <RowActionButton title="Edit" icon={EditIcon} onClick={() => navigate(`/association/${row.id}/edit`)} />
+          <RowActionButton title="Delete" icon={DeleteIcon} variant="delete" onClick={() => handleDelete(row)} />
+        </div>
       )
     },
   ]

@@ -2,13 +2,13 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import Pagination from '../../components/Pagination'
 import usePagination from '../../components/usePagination'
-import { Table, PageHeader, Button, EmptyState } from '../../components/UI'
-import { BankIcon, UploadIcon, SearchIcon } from '../../icons'
+import { Table, PageHeader, Button, EmptyState, RowActionButton } from '../../components/UI'
+import { BankIcon, UploadIcon, SearchIcon, EditIcon, DeleteIcon } from '../../icons'
 import { useOrganisations } from './OrganisationContext'
 
 export default function OrganisationList() {
   const navigate = useNavigate()
-  const { organisations } = useOrganisations()
+  const { organisations, deleteOrganisation } = useOrganisations()
   const [search, setSearch]       = useState('')
 
   const filtered = organisations.filter(o =>
@@ -17,12 +17,21 @@ export default function OrganisationList() {
   const pg     = usePagination(filtered, 10)
   const handle = setter => v => { setter(v); pg.reset() }
 
+  const handleDelete = (row) => {
+    if (window.confirm(`Delete organisation "${row.name}"? This cannot be undone.`)) {
+      deleteOrganisation(row.id)
+    }
+  }
+
   const columns = [
     { key: 'name',        label: 'Name',        style: { fontWeight: 500 } },
     { key: 'description', label: 'Description', style: { color: 'var(--text-2)', fontSize: 13 } },
     { key: 'actions', label: 'Actions',
       render: row => (
-        <button type="button" onClick={() => navigate(`/organisation/${row.id}/edit`)} title="Edit" style={{ background: 'linear-gradient(180deg,#1565d8,#104ea6)', border: 'none', borderRadius: 6, cursor: 'pointer', padding: '5px 6px', color: '#fff', display: 'inline-flex', alignItems: 'center', boxShadow: '0 2px 6px rgba(21,101,216,.30)' }}><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"/></svg></button>
+        <div style={{ display: 'flex', gap: 6 }}>
+          <RowActionButton title="Edit" icon={EditIcon} onClick={() => navigate(`/organisation/${row.id}/edit`)} />
+          <RowActionButton title="Delete" icon={DeleteIcon} variant="delete" onClick={() => handleDelete(row)} />
+        </div>
       )
     },
   ]

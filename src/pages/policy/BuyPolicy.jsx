@@ -572,6 +572,7 @@ export default function BuyPolicy() {
   const [nominees, setNominees] = useState([{ id: 1, name: '', relation: '', age: '', share: '100' }]);
   const [termsAccepted, setTermsAccepted] = useState(false);
   const nomineesTotal = nominees.reduce((s, n) => s + (Number(n.share) || 0), 0);
+  const [reviewError, setReviewError] = useState("");
 
   // Step 6 — result
   const [policyResults, setPolicyResults] = useState([]);
@@ -1426,7 +1427,58 @@ export default function BuyPolicy() {
           {/* Sticky total + continue footer */}
           {(() => {
             const hasPremium = cart.some(x => psel(x.id).premium != null);
+
+            // A product is "incomplete" if no coverage/sum-insured has been
+            // picked yet, or a required family member (per the chosen
+            // coverage) is missing name/DOB — checked across the whole cart,
+            // not just whichever accordion panel happens to be open.
+            const incompleteProducts = cart.filter(p => {
+              const sel = psel(p.id);
+              if (sel.premium == null) return true;
+              const needed = (COV_MEMBERS[sel.coverage] ?? []).filter(t => t !== "Self");
+              return needed.some(t => {
+                const m = members.find(x => x.type === t);
+                return !m?.name || !m?.dob;
+              });
+            });
+
+            const incompleteNominees = nominees.some(
+              n => !n.name?.trim() || !n.relation || !n.age
+            );
+
+            const handleReviewClick = () => {
+              if (incompleteProducts.length > 0) {
+                setExpandedProductId(incompleteProducts[0].id);
+                setReviewError(
+                  `Please select coverage and fill in all member details for ${incompleteProducts.map(p => p.name).join(", ")} before continuing.`
+                );
+                return;
+              }
+              if (incompleteNominees) {
+                setExpandedProductId(cart[0]?.id ?? null);
+                setReviewError("Please fill in name, relationship and age for every nominee before continuing.");
+                return;
+              }
+              if (nomineesTotal !== 100) {
+                setExpandedProductId(cart[0]?.id ?? null);
+                setReviewError("Nominee share must total 100% before continuing.");
+                return;
+              }
+              if (!proposal.declaration || !termsAccepted) {
+                setReviewError("Please accept both declarations before continuing.");
+                return;
+              }
+              setReviewError("");
+              setStep(3);
+            };
+
             return (
+              <>
+              {reviewError && (
+                <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 10, fontSize: 13.5, fontWeight: 600, color: "#92400e", background: "#fffbeb", border: "1.5px solid #f59e0b", borderRadius: 8, padding: "10px 14px" }}>
+                  ⚠ {reviewError}
+                </div>
+              )}
               <div style={{
                 position: "sticky", bottom: 0, zIndex: 20, marginTop: 8,
                 background: hasPremium
@@ -1467,15 +1519,8 @@ export default function BuyPolicy() {
                 )}
                 <button
                   className="btn btn-primary"
-                  disabled={cart.length === 0 || nomineesTotal !== 100 || !proposal.declaration || !termsAccepted}
-                  onClick={() => setStep(3)}
-                  title={
-                    nomineesTotal !== 100
-                      ? "Nominee share must total 100% before continuing"
-                      : (!proposal.declaration || !termsAccepted)
-                        ? "Please accept both declarations before continuing"
-                        : undefined
-                  }
+                  disabled={cart.length === 0}
+                  onClick={handleReviewClick}
                   style={{
                     flexShrink: 0, minWidth: 200,
                     ...(hasPremium ? {
@@ -1487,6 +1532,7 @@ export default function BuyPolicy() {
                   Review and make payment
                 </button>
               </div>
+              </>
             );
           })()}
         </div>

@@ -2,11 +2,11 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Pagination from "../../components/Pagination";
 import usePagination from "../../components/usePagination";
-import { Table, PageHeader, Button, EmptyState } from "../../components/UI";
-import { AgentIcon, UploadIcon, SearchIcon } from "../../icons";
+import { Table, PageHeader, Button, EmptyState, RowActionButton } from "../../components/UI";
+import { AgentIcon, UploadIcon, SearchIcon, EditIcon, DeleteIcon } from "../../icons";
 import { OPERATORS } from "./agentData";
 
-const MOCK = OPERATORS.map((a) => ({
+const INITIAL_MOCK = OPERATORS.map((a) => ({
   id:        a.id,
   name:      a.name,
   mobile:    a.mobile,
@@ -77,14 +77,21 @@ function SortTh({ label, colKey, sortKey, sortDir, onSort }) {
 export default function AgentList() {
   const navigate = useNavigate();
 
+  const [rows,         setRows]         = useState(INITIAL_MOCK);
   const [search,       setSearch]       = useState("");
   const [desigFilter,  setDesigFilter]  = useState("");
   const [statusFilter, setStatusFilter] = useState("");
   const [sortKey,      setSortKey]      = useState("name");
   const [sortDir,      setSortDir]      = useState("asc");
 
+  const handleDelete = (row) => {
+    if (window.confirm(`Delete employee "${row.name}"? This cannot be undone.`)) {
+      setRows((prev) => prev.filter((r) => r.id !== row.id));
+    }
+  };
+
   // 1. Filter
-  const filtered = MOCK.filter((a) => {
+  const filtered = rows.filter((a) => {
     if (search) {
       const q = search.toLowerCase();
       const hit = a.name.toLowerCase().includes(q)
@@ -187,23 +194,10 @@ export default function AgentList() {
       headerStyle: { textAlign: "right" },
       style: { textAlign: "right" },
       render: (row) => (
-        <button
-          type="button"
-          onClick={() => navigate(`/agent/${row.id}/edit`)}
-          title="Edit"
-          style={{
-            background: "linear-gradient(180deg,#1565d8,#104ea6)",
-            border: "none", borderRadius: 6, cursor: "pointer",
-            padding: "5px 6px", color: "#fff",
-            display: "inline-flex", alignItems: "center",
-            boxShadow: "0 2px 6px rgba(21,101,216,.30)",
-          }}
-        >
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
-            stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-            <path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z" />
-          </svg>
-        </button>
+        <div style={{ display: "flex", gap: 6, justifyContent: "flex-end" }}>
+          <RowActionButton title="Edit" icon={EditIcon} onClick={() => navigate(`/agent/${row.id}/edit`)} />
+          <RowActionButton title="Delete" icon={DeleteIcon} variant="delete" onClick={() => handleDelete(row)} />
+        </div>
       ),
     },
   ];

@@ -171,12 +171,34 @@ export default function MemberEdit() {
   const { user } = useAuth();
 
   const isProfile = !id;
-  const profileData = isProfile
-    ? (Object.values(MOCK_DATA).find(m => m.email === user?.email) ?? Object.values(MOCK_DATA)[0] ?? {})
-    : {};
-  const rawInitial = isProfile
-    ? { ...profileData, ...authUserToMember(user) }
+  const { members: allMembers, updateKycStatus } = useMembers();
+  // Resolve the context member for both id-based edit and profile (email) mode —
+  // this is the live, real record (works for all members, not just the first 12
+  // that have hand-authored MOCK_DATA below).
+  const contextMember = isProfile
+    ? allMembers.find(c => c.email === user?.email)
+    : allMembers.find(c => c.id === Number(id));
+
+  // MOCK_DATA only has hand-authored supplemental fields (KYC docs, address,
+  // family, nominee) for the first 12 members — it's overlaid *underneath*
+  // the live context data, never used as the source of identity fields, so
+  // members 13+ (id 33-248) still load with their real name/mobile/etc.
+  const mockExtra = isProfile
+    ? (Object.values(MOCK_DATA).find(m => m.email === user?.email) ?? {})
     : (MOCK_DATA[id] ?? {});
+  const contextToForm = (c) => c ? {
+    name: c.name,
+    mobile: c.mobile,
+    email: c.email,
+    dob: c.dob,
+    gender: c.gender,
+    kycStatus: c.kyc,
+    organisationId: c.organisationId,
+    associationId: c.associationId,
+  } : {};
+  const rawInitial = isProfile
+    ? { ...mockExtra, ...contextToForm(contextMember), ...authUserToMember(user) }
+    : { ...mockExtra, ...contextToForm(contextMember) };
   const splitName = (raw) => {
     const parts = (raw.name || "").trim().split(" ");
     return { firstName: parts[0] || "", lastName: parts.slice(1).join(" ") || "" };
@@ -186,11 +208,6 @@ export default function MemberEdit() {
     ...(!rawInitial.firstName ? splitName(rawInitial) : {}),
     empId: rawInitial.empId || "",
   };
-  const { members: allMembers, updateKycStatus } = useMembers();
-  // Resolve the context member for both id-based edit and profile (email) mode
-  const contextMember = isProfile
-    ? allMembers.find(c => c.email === user?.email)
-    : allMembers.find(c => c.id === Number(id));
 
   const [form, setForm] = useState(initial);
   const [members, setMembers] = useState(initial.familyMembers ?? []);
