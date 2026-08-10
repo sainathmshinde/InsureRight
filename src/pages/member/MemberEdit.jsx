@@ -200,13 +200,19 @@ export default function MemberEdit() {
     ? { ...mockExtra, ...contextToForm(contextMember), ...authUserToMember(user) }
     : { ...mockExtra, ...contextToForm(contextMember) };
   const splitName = (raw) => {
-    const parts = (raw.name || "").trim().split(" ");
-    return { firstName: parts[0] || "", lastName: parts.slice(1).join(" ") || "" };
+    const parts = (raw.name || "").trim().split(/\s+/).filter(Boolean);
+    if (parts.length === 0) return { firstName: "", middleName: "", lastName: "" };
+    if (parts.length === 1) return { firstName: parts[0], middleName: "", lastName: "" };
+    if (parts.length === 2) return { firstName: parts[0], middleName: "", lastName: parts[1] };
+    return { firstName: parts[0], middleName: parts.slice(1, -1).join(" "), lastName: parts[parts.length - 1] };
   };
   const initial = {
     ...rawInitial,
     ...(!rawInitial.firstName ? splitName(rawInitial) : {}),
     empId: rawInitial.empId || "",
+    address1: rawInitial.address1 ?? rawInitial.address ?? "",
+    address2: rawInitial.address2 ?? "",
+    country: rawInitial.country ?? "India",
   };
 
   const [form, setForm] = useState(initial);
@@ -251,7 +257,7 @@ export default function MemberEdit() {
       };
       if (docType === 'aadhaar') {
         Object.assign(fill, {
-          address: form.address || '24, Shivaji Park, Dadar',
+          address1: form.address1 || '24, Shivaji Park, Dadar',
           city: form.city || 'Mumbai',
           state: form.state || 'Maharashtra',
           pincode: form.pincode || '400028',
@@ -454,13 +460,20 @@ export default function MemberEdit() {
                   <div style={{ fontSize: 12, color: 'var(--text-3)', marginTop: 6 }}>JPG or PNG · Max 2 MB</div>
                 </div>
               </div>
-              <div className="form-grid-3">
+              <div className="form-grid-3" style={{ marginBottom: 18 }}>
                 <Field label="First Name" required>
                   <Input
                     placeholder="First name"
                     value={form.firstName || ""}
                     onChange={set("firstName")}
                     required
+                  />
+                </Field>
+                <Field label="Middle Name">
+                  <Input
+                    placeholder="Middle name"
+                    value={form.middleName || ""}
+                    onChange={set("middleName")}
                   />
                 </Field>
                 <Field label="Last Name" required>
@@ -471,16 +484,12 @@ export default function MemberEdit() {
                     required
                   />
                 </Field>
-                <Field label="EMP ID / PF No.">
-                  <Input
-                    placeholder="e.g. EMP-001 or PF123456"
-                    value={form.empId || ""}
-                    onChange={set("empId")}
-                  />
-                </Field>
-                <Field label="Mobile" required style={{ gridColumnStart: 1 }}>
+              </div>
+              <div className="form-grid-3" style={{ marginBottom: 18 }}>
+                <Field label="Mobile" required>
                   <Input
                     type="tel"
+                    placeholder="+91 XXXXX XXXXX"
                     value={form.mobile || ""}
                     onChange={set("mobile")}
                     required
@@ -489,14 +498,18 @@ export default function MemberEdit() {
                 <Field label="Email">
                   <Input
                     type="email"
+                    placeholder="member@email.com"
                     value={form.email || ""}
                     onChange={set("email")}
                   />
                 </Field>
-                <Field label="Date of Birth">
+              </div>
+              <div className="form-grid-3" style={{ marginBottom: 18 }}>
+                <Field label="Date of Birth" required>
                   <DateInput
                     value={form.dob || ""}
                     onChange={set("dob")}
+                    required
                   />
                 </Field>
                 <Field label="Gender">
@@ -506,6 +519,15 @@ export default function MemberEdit() {
                     <option>Female</option>
                     <option>Other</option>
                   </Select>
+                </Field>
+              </div>
+              <div className="form-grid-3">
+                <Field label="EMP ID / PF No.">
+                  <Input
+                    placeholder="e.g. EMP-001 or PF123456"
+                    value={form.empId || ""}
+                    onChange={set("empId")}
+                  />
                 </Field>
                 <Field label="Organisation">
                   <Select
@@ -533,13 +555,26 @@ export default function MemberEdit() {
 
             {/* Address */}
             <SectionBlock icon="📍" title="Address">
-              <div className="form-grid-3">
-                <Field label="Address">
-                  <Input value={form.address || ""} onChange={set("address")} />
+              <div className="form-grid-3" style={{ marginBottom: 18 }}>
+                <Field label="Address Line 1">
+                  <Input
+                    placeholder="Street / Building"
+                    value={form.address1 || ""}
+                    onChange={set("address1")}
+                  />
+                </Field>
+                <Field label="Address Line 2">
+                  <Input
+                    placeholder="Area / Locality"
+                    value={form.address2 || ""}
+                    onChange={set("address2")}
+                  />
                 </Field>
                 <Field label="City">
                   <Input value={form.city || ""} onChange={set("city")} />
                 </Field>
+              </div>
+              <div className="form-grid-3">
                 <Field label="State">
                   <Select value={form.state || ""} onChange={set("state")}>
                     <option value="">Select state</option>
@@ -557,12 +592,18 @@ export default function MemberEdit() {
                     ))}
                   </Select>
                 </Field>
-                <Field label="Pincode">
+                <Field label="PIN Code">
                   <Input
+                    placeholder="400001"
                     maxLength={6}
                     value={form.pincode || ""}
                     onChange={set("pincode")}
                   />
+                </Field>
+                <Field label="Country">
+                  <Select value={form.country || "India"} onChange={set("country")}>
+                    <option>India</option>
+                  </Select>
                 </Field>
               </div>
             </SectionBlock>

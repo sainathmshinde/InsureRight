@@ -15,6 +15,7 @@ const RAW_MOCK = [
   { id: 8,  name: 'SBI_STP_Campaign',                          startDate: '2025-09-18', endDate: '2026-03-10', isActive: true, documentName: null,                     templateName: null,                  sentStatus: 0    },
   { id: 11, name: 'BPP Campaign_2026-2027',                    startDate: '2026-03-16', endDate: '2026-05-31', isActive: true, documentName: null,                     templateName: null,                  sentStatus: 0    },
   { id: 12, name: 'Standalone campaign',                        startDate: '2026-02-28', endDate: '2026-04-29', isActive: true, documentName: null,                     templateName: null,                  sentStatus: 0    },
+  { id: 13, name: 'Test Campaign',                              startDate: '2026-07-01', endDate: '2026-09-30', isActive: true, documentName: null,                     templateName: null,                  sentStatus: 0    },
 ]
 
 function computeStatus(row) {
@@ -62,14 +63,16 @@ export default function CampaignList() {
     setRows(prev => prev.filter(r => r.id !== id))
   }
 
-  const filtered = rows.filter(c => {
-    const q = search.toLowerCase()
-    return (
-      c.name.toLowerCase().includes(q) &&
-      (statusFilter ? c.status === statusFilter : true) &&
-      (openFilter   ? String(c.isCampaignOpen) === openFilter : true)
-    )
-  })
+  const filtered = rows
+    .filter(c => {
+      const q = search.toLowerCase()
+      return (
+        c.name.toLowerCase().includes(q) &&
+        (statusFilter ? c.status === statusFilter : true) &&
+        (openFilter   ? String(c.isCampaignOpen) === openFilter : true)
+      )
+    })
+    .sort((a, b) => Number(b.isCampaignOpen) - Number(a.isCampaignOpen))
   const pg     = usePagination(filtered, 10)
   const handle = setter => v => { setter(v); pg.reset() }
 

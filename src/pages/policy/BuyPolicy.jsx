@@ -1706,7 +1706,7 @@ export default function BuyPolicy() {
 
                       {/* Footer */}
                       <div
-                        style={{ display: "flex", justifyContent: "flex-end", alignItems: "center", gap: 2, paddingTop: 4, marginTop: "auto" }}
+                        style={{ display: "flex", justifyContent: "flex-start", alignItems: "center", gap: 2, paddingTop: 4, marginTop: "auto" }}
                         onClick={e => e.stopPropagation()}
                       >
                         <button

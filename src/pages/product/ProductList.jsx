@@ -3,8 +3,9 @@ import { useNavigate } from 'react-router-dom'
 import Pagination from '../../components/Pagination'
 import usePagination from '../../components/usePagination'
 import { PageHeader, Button, EmptyState, RowActionButton } from '../../components/UI'
-import { ProductIcon, EditIcon, DeleteIcon } from '../../icons'
+import { ProductIcon, ChevronRightIcon, EditIcon, DeleteIcon } from '../../icons'
 import { PRODUCTS, POLICY_TYPES, PREMIUM_CHART, POLICY_TYPE_ICON, getProductLinks } from './productData'
+import { ProductDetailModal } from '../campaign/campaignShared'
 
 const TYPE_COLORS = {
   'Base Policy':        { color: '#1d4ed8', bg: '#dbeafe', border: '#93c5fd' },
@@ -26,6 +27,7 @@ export default function ProductList() {
   const [rows, setRows] = useState(PRODUCTS)
   const [search, setSearch] = useState('')
   const [typeFilter, setType] = useState('')
+  const [viewProduct, setViewProduct] = useState(null)
 
   const handleDelete = p => {
     if (window.confirm(`Delete product "${p.name}"? This cannot be undone.`)) {
@@ -182,9 +184,19 @@ export default function ProductList() {
                       )}
 
                       {/* Footer */}
-                      <div style={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', gap: 6, paddingTop: 4, marginTop: 'auto' }}>
-                        <RowActionButton title="Edit Product" icon={EditIcon} onClick={() => navigate(`/product/${p.id}/edit`)} />
-                        <RowActionButton title="Delete" icon={DeleteIcon} variant="delete" onClick={() => handleDelete(p)} />
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 6, paddingTop: 4, marginTop: 'auto' }}>
+                        <button
+                          type="button"
+                          onClick={() => setViewProduct(p)}
+                          style={{ display: 'inline-flex', alignItems: 'center', gap: 2, background: 'none', border: 'none', cursor: 'pointer', padding: 0, fontSize: 14, fontWeight: 600, color: 'var(--brand)' }}
+                        >
+                          View Info
+                          <ChevronRightIcon size={16} color="var(--brand)" />
+                        </button>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                          <RowActionButton title="Edit Product" icon={EditIcon} onClick={() => navigate(`/product/${p.id}/edit`)} />
+                          <RowActionButton title="Delete" icon={DeleteIcon} variant="delete" onClick={() => handleDelete(p)} />
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -196,6 +208,10 @@ export default function ProductList() {
           <Pagination total={pg.total} page={pg.page} perPage={pg.perPage} onPage={pg.onPage} onPerPage={pg.onPerPage} />
         </div>
       </div>
+
+      {viewProduct && (
+        <ProductDetailModal product={viewProduct} onClose={() => setViewProduct(null)} />
+      )}
     </div>
   )
 }

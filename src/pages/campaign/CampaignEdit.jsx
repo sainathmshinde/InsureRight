@@ -10,7 +10,6 @@ import {
 import {
   PageHeader,
   FormActions,
-  Toggle,
   CheckboxGroup,
 } from "../../components/UI";
 import { CampaignIcon } from "../../icons";
@@ -19,7 +18,6 @@ import {
   CampaignDiscountSection,
   AudienceSection,
   PromoCreativeSection,
-  AssignEmployeesSection,
   CampaignPreviewModal,
   toggleProductWithLinks,
 } from "./campaignShared";
@@ -30,7 +28,7 @@ const BASE = {
   ageMin: "", ageMax: "", state: "",
   selectedProducts: [], selectedAssociations: [], discountRules: "",
   offerType: "Percent", offerValue: "", channels: [], messageTemplate: "",
-  whatsappTemplateId: "", campaignImage: null, clickTracking: false, conversionTracking: false,
+  whatsappTemplateId: "", campaignImage: null,
   callingIds: [], salesIds: [],
 };
 
@@ -42,6 +40,7 @@ const MOCK_DATA = {
   8:  { ...BASE, name: "SBI_STP_Campaign",           startDate: "2025-09-18", endDate: "2026-03-10", selectedProducts: [42, 38],     callingIds: [4],    salesIds: [5] },
   11: { ...BASE, name: "BPP Campaign_2026-2027",     startDate: "2026-03-16", endDate: "2026-05-31", selectedProducts: [42, 38, 48], callingIds: [2, 9], salesIds: [8] },
   12: { ...BASE, name: "Standalone campaign",        startDate: "2026-02-28", endDate: "2026-04-29", selectedProducts: [38],         callingIds: [2],    salesIds: [1] },
+  13: { ...BASE, name: "Test Campaign",              startDate: "2026-07-01", endDate: "2026-09-30", selectedProducts: [42, 48],     callingIds: [],     salesIds: [] },
 };
 
 const DEFAULT = {
@@ -49,8 +48,8 @@ const DEFAULT = {
   segment: "ALL", salesPersonId: "", ageMin: "", ageMax: "", state: "",
   selectedProducts: [], selectedAssociations: [],
   discountRules: "", offerType: "Flat", offerValue: "", channels: [],
-  messageTemplate: "", whatsappTemplateId: "", campaignImage: null, clickTracking: false,
-  conversionTracking: false, callingIds: [], salesIds: [],
+  messageTemplate: "", whatsappTemplateId: "", campaignImage: null,
+  callingIds: [], salesIds: [],
 };
 
 export default function CampaignEdit() {
@@ -71,7 +70,6 @@ function CampaignEditForm({ id }) {
 
   const [form, setForm] = useState(saved);
   const set = (f) => (e) => setForm((p) => ({ ...p, [f]: e.target.value }));
-  const setBool = (f) => (val) => setForm((p) => ({ ...p, [f]: val }));
 
   const dateError =
     form.startDate && form.endDate && form.endDate < form.startDate
@@ -202,20 +200,6 @@ function CampaignEditForm({ id }) {
             </SectionBlock>
 
             <PromoCreativeSection form={form} setForm={setForm} />
-
-            <AssignEmployeesSection
-              assignedCalling={assignedCalling}
-              assignedSales={assignedSales}
-              toggleCalling={toggleCalling}
-              toggleSales={toggleSales}
-            />
-
-            <SectionBlock icon="📊" title="Tracking">
-              <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-                <Toggle checked={form.clickTracking} onChange={setBool("clickTracking")} label="Enable Click Tracking (UTM / link tracking)" />
-                <Toggle checked={form.conversionTracking} onChange={setBool("conversionTracking")} label="Enable Conversion Tracking (policy issued after campaign click)" />
-              </div>
-            </SectionBlock>
 
             <FormActions onCancel={() => navigate("/campaign")} submitLabel="Preview Campaign" />
           </form>

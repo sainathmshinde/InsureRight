@@ -717,11 +717,6 @@ export default function Reconciliation() {
   const [pendingDateFrom, setPendingDateFrom] = useState("");
   const [pendingDateTo, setPendingDateTo] = useState("");
   const [viewTransaction, setViewTransaction] = useState(null); // { system, uploaded }
-  const [countAdj, setCountAdj] = useState({
-    acceptedPending: 0,
-    acceptedFailed: 0,
-    movedToFailed: 0,
-  });
 
   const handleApply = () => setCampaignFilter(topCampaign);
 
@@ -741,11 +736,6 @@ export default function Reconciliation() {
   });
 
   const pg = usePagination(filtered, 10);
-  const counts = {
-    All: 462 - countAdj.acceptedPending - countAdj.acceptedFailed,
-    PendingPayment: 82 - countAdj.acceptedPending - countAdj.movedToFailed,
-    PaymentFailed: 380 - countAdj.acceptedFailed + countAdj.movedToFailed,
-  };
 
   // ── start reconcile ────────────────────────────────────────────────────────
   const startReconcile = () => {
@@ -775,22 +765,6 @@ export default function Reconciliation() {
     setRowReasons((prev) => ({ ...prev, [id]: reason }));
 
   const handleFinalize = () => {
-    const acceptedPending = reconcileBase.filter(
-      (r) => rowActions[r.id] === "accept" && r.paymentStatus === "Pending payment",
-    ).length;
-    const acceptedFailed = reconcileBase.filter(
-      (r) => rowActions[r.id] === "accept" && r.paymentStatus === "Payment Failed",
-    ).length;
-    const movedToFailed = reconcileBase.filter(
-      (r) => rowActions[r.id] === "reject" && r.paymentStatus === "Pending payment",
-    ).length;
-
-    setCountAdj((prev) => ({
-      acceptedPending: prev.acceptedPending + acceptedPending,
-      acceptedFailed: prev.acceptedFailed + acceptedFailed,
-      movedToFailed: prev.movedToFailed + movedToFailed,
-    }));
-
     setListData((prev) =>
       prev
         .map((p) => {
@@ -1651,86 +1625,6 @@ export default function Reconciliation() {
             </button>
           </div>
         </div>
-      </div>
-
-      {/* Summary cards */}
-      <div
-        style={{
-          display: "grid",
-          gridTemplateColumns: "repeat(auto-fill,minmax(200px,1fr))",
-          gap: 14,
-          marginBottom: 24,
-        }}
-      >
-        {[
-          {
-            label: "Total",
-            count: counts.All,
-            amount: "₹1,61,70,000",
-            color: "#7c3aed",
-            border: "#ddd6fe",
-          },
-          {
-            label: "Pending Payment",
-            count: counts.PendingPayment,
-            amount: "₹28,70,000",
-            color: "#a05c00",
-            border: "#fcd34d",
-          },
-          {
-            label: "Payment Failed",
-            count: counts.PaymentFailed,
-            amount: "₹1,33,00,000",
-            color: "#dc2626",
-            border: "#fca5a5",
-          },
-        ].map((s) => (
-          <div
-            key={s.label}
-            style={{
-              background: "#fff",
-              border: `1.5px solid ${s.border}`,
-              borderRadius: 12,
-              padding: "16px 18px",
-              borderTop: `3px solid ${s.color}`,
-            }}
-          >
-            <div
-              style={{
-                display: "flex",
-                alignItems: "baseline",
-                gap: 10,
-                justifyContent: "space-between",
-              }}
-            >
-              <div
-                style={{
-                  fontSize: 28,
-                  fontWeight: 800,
-                  color: s.color,
-                  lineHeight: 1,
-                }}
-              >
-                {s.count}
-              </div>
-              <div style={{ fontSize: 13, fontWeight: 700, color: s.color }}>
-                {s.amount}
-              </div>
-            </div>
-            <div
-              style={{
-                fontSize: 13,
-                fontWeight: 700,
-                color: "#64748b",
-                marginTop: 6,
-                textTransform: "uppercase",
-                letterSpacing: ".4px",
-              }}
-            >
-              {s.label} Transactions
-            </div>
-          </div>
-        ))}
       </div>
 
       <div className="card">
