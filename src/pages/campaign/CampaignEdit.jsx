@@ -22,6 +22,8 @@ import {
   toggleProductWithLinks,
 } from "./campaignShared";
 import { fileToDataUrl, savePromoCampaign, getPromoCampaignById } from "./campaignStore";
+import { useFormValidation } from "../../hooks/useFormValidation";
+import { useToast } from "../../context/ToastContext";
 
 const BASE = {
   segment: "ALL", salesPersonId: "",
@@ -62,6 +64,7 @@ export default function CampaignEdit() {
 
 function CampaignEditForm({ id }) {
   const navigate = useNavigate();
+  const toast = useToast();
   // MOCK_DATA only covers the 7 seed campaigns — anything created through
   // Add Campaign gets a Date.now() id and lives in campaignStore (localStorage)
   // instead, so fall back there before giving up to a blank DEFAULT form.
@@ -71,10 +74,21 @@ function CampaignEditForm({ id }) {
   const [form, setForm] = useState(saved);
   const set = (f) => (e) => setForm((p) => ({ ...p, [f]: e.target.value }));
 
-  const dateError =
-    form.startDate && form.endDate && form.endDate < form.startDate
-      ? "End date cannot be before start date"
-      : "";
+  const fv = useFormValidation(form, {
+    name: { required: true, label: "Campaign Name" },
+    startDate: { required: true, label: "Start Date" },
+    endDate: {
+      required: true,
+      label: "End Date",
+      validate: (val) =>
+        form.startDate && val && val < form.startDate
+          ? "End date cannot be before start date"
+          : "",
+    },
+    ...(form.channels.length > 0
+      ? { messageTemplate: { required: "Message template is required when a channel is selected" } }
+      : {}),
+  });
 
   const [assignedCalling, setAssignedCalling] = useState(new Set(saved.callingIds));
   const [assignedSales, setAssignedSales] = useState(new Set(saved.salesIds));
@@ -101,7 +115,10 @@ function CampaignEditForm({ id }) {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (dateError) return;
+    if (!fv.validateAll()) {
+      toast.error("Please fix the highlighted fields before continuing.");
+      return;
+    }
     setPreviewOpen(true);
   };
 
@@ -127,6 +144,7 @@ function CampaignEditForm({ id }) {
       segment: form.segment,
       selectedAssociations: form.selectedAssociations,
     });
+    toast.success("Campaign updated successfully.");
     navigate("/campaign");
   };
 
@@ -144,23 +162,23 @@ function CampaignEditForm({ id }) {
 
       <div className="card">
         <div className="card-body">
-          <form onSubmit={handleSubmit}>
+          <form onSubmit={handleSubmit} noValidate>
             <SectionBlock icon="📢" title="Campaign Information">
               <div className="form-grid-3">
-                <Field label="Campaign Name" required>
-                  <Input placeholder="Campaign name" value={form.name} onChange={set("name")} required />
+                <Field label="Campaign Name" required error={fv.fieldProps("name").error}>
+                  <Input placeholder="Campaign name" value={form.name} onChange={set("name")} required {...fv.fieldProps("name")} />
                 </Field>
-                <Field label="Start Date" required>
-                  <DateInput value={form.startDate} onChange={set("startDate")} required />
+                <Field label="Start Date" required error={fv.fieldProps("startDate").error}>
+                  <DateInput value={form.startDate} onChange={set("startDate")} required {...fv.fieldProps("startDate")} />
                 </Field>
-                <Field label="End Date" required>
+                <Field label="End Date" required error={fv.fieldProps("endDate").error}>
                   <DateInput
                     value={form.endDate}
                     onChange={set("endDate")}
                     min={form.startDate || undefined}
                     required
+                    {...fv.fieldProps("endDate")}
                   />
-                  {dateError && <div className="field-error-text">{dateError}</div>}
                 </Field>
               </div>
             </SectionBlock>
@@ -185,12 +203,13 @@ function CampaignEditForm({ id }) {
 
             <SectionBlock icon="✍️" title="Message Content">
               <div className="form-grid-3">
-                <Field label="Message Template" required={form.channels.length > 0}>
+                <Field label="Message Template" required={form.channels.length > 0} error={fv.fieldProps("messageTemplate").error}>
                   <Textarea
                     placeholder="Hi {member_name}, your health cover from {ic_name} is due for renewal…"
                     value={form.messageTemplate}
                     onChange={set("messageTemplate")}
                     style={{ minHeight: 100 }}
+                    {...fv.fieldProps("messageTemplate")}
                   />
                 </Field>
                 <Field label="WhatsApp Template ID">

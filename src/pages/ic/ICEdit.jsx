@@ -4,10 +4,13 @@ import { Field, Input, Select, SectionBlock } from '../../components/Field'
 import { EditIcon } from '../../icons'
 import { IC_MAP } from './icData'
 import { BranchModal, ContactModal, BranchLocationSection, ContactInfoSection } from './ICBranchContact'
+import { useFormValidation } from '../../hooks/useFormValidation'
+import { useToast } from '../../context/ToastContext'
 
 export default function ICEdit() {
   const { id } = useParams()
   const navigate = useNavigate()
+  const toast = useToast()
   const [form, setForm] = useState(() => {
     const existing = IC_MAP[Number(id)] ?? {}
     if (existing.branches) return { ...existing, contacts: existing.contacts ?? [] }
@@ -34,9 +37,20 @@ export default function ICEdit() {
   const [showContactModal, setShowContactModal] = useState(false)
   const set = f => e => setForm(p => ({ ...p, [f]: e.target.value }))
 
+  const fv = useFormValidation(form, {
+    icName: { required: true, label: 'IC Name' },
+    code: { required: true, label: 'IC Code' },
+    email: { required: true, label: 'Email' },
+  })
+
   const handleSubmit = e => {
     e.preventDefault()
+    if (!fv.validateAll()) {
+      toast.error('Please fix the highlighted fields before continuing.')
+      return
+    }
     console.log('Update IC:', id, form)
+    toast.success('Insurance Company updated successfully.')
     navigate('/ic')
   }
 
@@ -58,17 +72,17 @@ export default function ICEdit() {
 
       <div className="card">
         <div className="card-body">
-          <form onSubmit={handleSubmit}>
+          <form onSubmit={handleSubmit} noValidate>
             <SectionBlock icon="🏦" title="IC Master Information">
               <div className="form-grid-3">
-                <Field label="IC Name" required>
-                  <Input placeholder="IC Name" value={form.icName || ''} onChange={set('icName')} required />
+                <Field label="IC Name" required error={fv.fieldProps('icName').error}>
+                  <Input placeholder="IC Name" value={form.icName || ''} onChange={set('icName')} required {...fv.fieldProps('icName')} />
                 </Field>
-                <Field label="IC Code" required>
-                  <Input placeholder="e.g. SHI" value={form.code || ''} onChange={set('code')} required />
+                <Field label="IC Code" required error={fv.fieldProps('code').error}>
+                  <Input placeholder="e.g. SHI" value={form.code || ''} onChange={set('code')} required {...fv.fieldProps('code')} />
                 </Field>
-                <Field label="Email" required>
-                  <Input type="email" placeholder="api@example.com" value={form.email || ''} onChange={set('email')} required />
+                <Field label="Email" required error={fv.fieldProps('email').error}>
+                  <Input type="email" placeholder="api@example.com" value={form.email || ''} onChange={set('email')} required {...fv.fieldProps('email')} />
                 </Field>
               </div>
             </SectionBlock>

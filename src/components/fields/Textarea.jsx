@@ -1,3 +1,10 @@
-export function Textarea({ ...props }) {
-  return <textarea className="field-textarea" rows={3} {...props} />
+export function Textarea({ error, className = "", ...props }) {
+  return (
+    <textarea
+      className={`field-textarea${error ? " field-input-error" : ""}${className ? ` ${className}` : ""}`}
+      rows={3}
+      aria-invalid={!!error}
+      {...props}
+    />
+  )
 }

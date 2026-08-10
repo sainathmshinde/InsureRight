@@ -6,6 +6,8 @@ import { useAuth } from "../../context/AuthContext";
 import { useMembers } from "../../context/MemberContext";
 import FamilyMembersSection from "./FamilyMembersSection";
 import { ORGANISATIONS, ASSOCIATIONS } from "./orgAssocData";
+import { useFormValidation } from "../../hooks/useFormValidation";
+import { useToast } from "../../context/ToastContext";
 
 const doc = (type, params) =>
   `/documents/preview.html?type=${type}&${new URLSearchParams(params)}`;
@@ -168,6 +170,7 @@ function authUserToMember(u) {
 export default function MemberEdit() {
   const { id } = useParams();
   const navigate = useNavigate();
+  const toast = useToast();
   const { user } = useAuth();
 
   const isProfile = !id;
@@ -216,6 +219,14 @@ export default function MemberEdit() {
   };
 
   const [form, setForm] = useState(initial);
+
+  const fv = useFormValidation(form, {
+    firstName: { required: true, label: "First Name" },
+    lastName: { required: true, label: "Last Name" },
+    mobile: { required: true, label: "Mobile" },
+    dob: { required: true, label: "Date of Birth" },
+  });
+
   const [members, setMembers] = useState(initial.familyMembers ?? []);
   const [kycFetching, setKycFetching] = useState(null);
   const [kycFetched, setKycFetched] = useState(null);
@@ -271,7 +282,12 @@ export default function MemberEdit() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    if (!fv.validateAll()) {
+      toast.error("Please fix the highlighted fields before continuing.");
+      return;
+    }
     console.log(isProfile ? "Update member profile:" : "Update member:", form);
+    toast.success("Member updated successfully.");
     navigate(isProfile ? "/profile" : "/member");
   };
 
@@ -308,7 +324,7 @@ export default function MemberEdit() {
 
       <div className="card">
         <div className="card-body">
-          <form onSubmit={handleSubmit}>
+          <form onSubmit={handleSubmit} noValidate>
             {/* KYC Documents — FIRST */}
             <SectionBlock icon="🪪" title="KYC Documents">
               {kycFetched && (
@@ -461,12 +477,13 @@ export default function MemberEdit() {
                 </div>
               </div>
               <div className="form-grid-3" style={{ marginBottom: 18 }}>
-                <Field label="First Name" required>
+                <Field label="First Name" required error={fv.fieldProps("firstName").error}>
                   <Input
                     placeholder="First name"
                     value={form.firstName || ""}
                     onChange={set("firstName")}
                     required
+                    {...fv.fieldProps("firstName")}
                   />
                 </Field>
                 <Field label="Middle Name">
@@ -476,23 +493,25 @@ export default function MemberEdit() {
                     onChange={set("middleName")}
                   />
                 </Field>
-                <Field label="Last Name" required>
+                <Field label="Last Name" required error={fv.fieldProps("lastName").error}>
                   <Input
                     placeholder="Last name"
                     value={form.lastName || ""}
                     onChange={set("lastName")}
                     required
+                    {...fv.fieldProps("lastName")}
                   />
                 </Field>
               </div>
               <div className="form-grid-3" style={{ marginBottom: 18 }}>
-                <Field label="Mobile" required>
+                <Field label="Mobile" required error={fv.fieldProps("mobile").error}>
                   <Input
                     type="tel"
                     placeholder="+91 XXXXX XXXXX"
                     value={form.mobile || ""}
                     onChange={set("mobile")}
                     required
+                    {...fv.fieldProps("mobile")}
                   />
                 </Field>
                 <Field label="Email">
@@ -505,11 +524,12 @@ export default function MemberEdit() {
                 </Field>
               </div>
               <div className="form-grid-3" style={{ marginBottom: 18 }}>
-                <Field label="Date of Birth" required>
+                <Field label="Date of Birth" required error={fv.fieldProps("dob").error}>
                   <DateInput
                     value={form.dob || ""}
                     onChange={set("dob")}
                     required
+                    {...fv.fieldProps("dob")}
                   />
                 </Field>
                 <Field label="Gender">

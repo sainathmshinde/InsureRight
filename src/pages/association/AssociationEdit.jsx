@@ -3,10 +3,13 @@ import { useNavigate, useParams } from 'react-router-dom'
 import { Field, Input, Select, SectionBlock } from '../../components/Field'
 import { useAssociations } from './AssociationContext'
 import { ORGANISATIONS, STATES } from '../member/orgAssocData'
+import { useFormValidation } from '../../hooks/useFormValidation'
+import { useToast } from '../../context/ToastContext'
 
 export default function AssociationEdit() {
   const { id } = useParams()
   const navigate = useNavigate()
+  const toast = useToast()
   const { associations, addAssociation, updateAssociation } = useAssociations()
 
   const isCreate = !id
@@ -64,6 +67,16 @@ export default function AssociationEdit() {
 
   const set = f => e => setForm(p => ({ ...p, [f]: e.target.value }))
 
+  const fv = useFormValidation(form, {
+    name: { required: true, label: 'Association Name' },
+    bankName: { required: true, label: 'Bank Name' },
+    branchName: { required: true, label: 'Branch Name' },
+    accountName: { required: true, label: 'Account Name' },
+    accountNumber: { required: true, label: 'Account Number' },
+    ifscCode: { required: true, label: 'IFSC Code' },
+    micrCode: { required: true, label: 'MICR Code' },
+  })
+
   const addOrganisation = () => {
     if (!orgPick) return
     setForm(p => ({ ...p, organisationIds: [...p.organisationIds, Number(orgPick)] }))
@@ -79,6 +92,10 @@ export default function AssociationEdit() {
 
   const handleSubmit = e => {
     e.preventDefault()
+    if (!fv.validateAll()) {
+      toast.error('Please fix the highlighted fields before continuing.')
+      return
+    }
     const payload = {
       ...form,
       orgId:    form.organisationIds[0] ?? null,
@@ -89,6 +106,7 @@ export default function AssociationEdit() {
     } else {
       updateAssociation(Number(id), payload)
     }
+    toast.success(isCreate ? 'Association created successfully.' : 'Association updated successfully.')
     navigate('/association')
   }
 
@@ -115,7 +133,7 @@ export default function AssociationEdit() {
 
       <div className="card">
         <div className="card-body">
-          <form onSubmit={handleSubmit}>
+          <form onSubmit={handleSubmit} noValidate>
 
             {/* Organisation */}
             <SectionBlock icon="🏢" title="Organisation">
@@ -152,12 +170,13 @@ export default function AssociationEdit() {
             {/* Basic Info */}
             <SectionBlock icon="🤝" title="Association Info">
               <div className="form-grid-3">
-                <Field label="Association Name" required>
+                <Field label="Association Name" required error={fv.fieldProps('name').error}>
                   <Input
                     placeholder="Full association name"
                     value={form.name}
                     onChange={set('name')}
                     required
+                    {...fv.fieldProps('name')}
                   />
                 </Field>
                 <Field label="Select Parent Association">
@@ -286,25 +305,25 @@ export default function AssociationEdit() {
                 </Field>
               </div>
               <div className="form-grid-3" style={{ marginBottom: 18 }}>
-                <Field label="Bank Name" required>
-                  <Input placeholder="e.g. HDFC Bank" value={form.bankName} onChange={set('bankName')} required />
+                <Field label="Bank Name" required error={fv.fieldProps('bankName').error}>
+                  <Input placeholder="e.g. HDFC Bank" value={form.bankName} onChange={set('bankName')} required {...fv.fieldProps('bankName')} />
                 </Field>
-                <Field label="Branch Name" required>
-                  <Input placeholder="e.g. Andheri West" value={form.branchName} onChange={set('branchName')} required />
+                <Field label="Branch Name" required error={fv.fieldProps('branchName').error}>
+                  <Input placeholder="e.g. Andheri West" value={form.branchName} onChange={set('branchName')} required {...fv.fieldProps('branchName')} />
                 </Field>
-                <Field label="Account Name" required>
-                  <Input placeholder="Name as per bank records" value={form.accountName} onChange={set('accountName')} required />
+                <Field label="Account Name" required error={fv.fieldProps('accountName').error}>
+                  <Input placeholder="Name as per bank records" value={form.accountName} onChange={set('accountName')} required {...fv.fieldProps('accountName')} />
                 </Field>
               </div>
               <div className="form-grid-3">
-                <Field label="Account Number" required>
-                  <Input placeholder="Enter account number" value={form.accountNumber} onChange={set('accountNumber')} required />
+                <Field label="Account Number" required error={fv.fieldProps('accountNumber').error}>
+                  <Input placeholder="Enter account number" value={form.accountNumber} onChange={set('accountNumber')} required {...fv.fieldProps('accountNumber')} />
                 </Field>
-                <Field label="IFSC Code" required>
-                  <Input placeholder="HDFC0001234" value={form.ifscCode} onChange={set('ifscCode')} required />
+                <Field label="IFSC Code" required error={fv.fieldProps('ifscCode').error}>
+                  <Input placeholder="HDFC0001234" value={form.ifscCode} onChange={set('ifscCode')} required {...fv.fieldProps('ifscCode')} />
                 </Field>
-                <Field label="MICR Code" required>
-                  <Input placeholder="400240002" value={form.micrCode} onChange={set('micrCode')} required />
+                <Field label="MICR Code" required error={fv.fieldProps('micrCode').error}>
+                  <Input placeholder="400240002" value={form.micrCode} onChange={set('micrCode')} required {...fv.fieldProps('micrCode')} />
                 </Field>
               </div>
             </SectionBlock>
@@ -338,12 +357,26 @@ export default function AssociationEdit() {
 }
 
 function ContactModal({ branches = [], onClose, onSave }) {
+  const toast = useToast()
   const [draft, setDraft] = useState({ branchId: '', firstName: '', lastName: '', phone: '', email: '' })
   const setD = f => e => setDraft(p => ({ ...p, [f]: e.target.value }))
 
+  const fv = useFormValidation(draft, {
+    branchId: { required: true, label: 'Branch/Location' },
+    firstName: { required: true, label: 'First Name' },
+    lastName: { required: true, label: 'Last Name' },
+    phone: { required: true, label: 'Phone Number' },
+    email: { required: true, label: 'Email' },
+  })
+
   const handleSave = e => {
     e.preventDefault()
+    if (!fv.validateAll()) {
+      toast.error('Please fix the highlighted fields before continuing.')
+      return
+    }
     onSave({ ...draft, branchId: Number(draft.branchId) })
+    toast.success('Contact added successfully.')
     onClose()
   }
 
@@ -358,25 +391,25 @@ function ContactModal({ branches = [], onClose, onSave }) {
           <button type="button" onClick={onClose} style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 18, color: 'var(--text-3)', lineHeight: 1 }}>✕</button>
         </div>
         <div className="card-body">
-          <form onSubmit={handleSave}>
+          <form onSubmit={handleSave} noValidate>
             <div className="form-grid">
-              <Field label="Select Branch/Location" required className="col-span-2">
-                <Select value={draft.branchId} onChange={setD('branchId')} required>
+              <Field label="Select Branch/Location" required className="col-span-2" error={fv.fieldProps('branchId').error}>
+                <Select value={draft.branchId} onChange={setD('branchId')} required {...fv.fieldProps('branchId')}>
                   <option value="">Select branch/location</option>
                   {branches.map(b => <option key={b.id} value={b.id}>{b.branchName}</option>)}
                 </Select>
               </Field>
-              <Field label="First Name" required>
-                <Input value={draft.firstName} onChange={setD('firstName')} required />
+              <Field label="First Name" required error={fv.fieldProps('firstName').error}>
+                <Input value={draft.firstName} onChange={setD('firstName')} required {...fv.fieldProps('firstName')} />
               </Field>
-              <Field label="Last Name" required>
-                <Input value={draft.lastName} onChange={setD('lastName')} required />
+              <Field label="Last Name" required error={fv.fieldProps('lastName').error}>
+                <Input value={draft.lastName} onChange={setD('lastName')} required {...fv.fieldProps('lastName')} />
               </Field>
-              <Field label="Phone Number" required>
-                <Input type="tel" placeholder="+91 XXXXX XXXXX" value={draft.phone} onChange={setD('phone')} required />
+              <Field label="Phone Number" required error={fv.fieldProps('phone').error}>
+                <Input type="tel" placeholder="+91 XXXXX XXXXX" value={draft.phone} onChange={setD('phone')} required {...fv.fieldProps('phone')} />
               </Field>
-              <Field label="Email" required>
-                <Input type="email" placeholder="contact@email.com" value={draft.email} onChange={setD('email')} required />
+              <Field label="Email" required error={fv.fieldProps('email').error}>
+                <Input type="email" placeholder="contact@email.com" value={draft.email} onChange={setD('email')} required {...fv.fieldProps('email')} />
               </Field>
             </div>
             <div className="actions-row">
@@ -391,14 +424,24 @@ function ContactModal({ branches = [], onClose, onSave }) {
 }
 
 function BranchModal({ onClose, onSave }) {
+  const toast = useToast()
   const [draft, setDraft] = useState({
     branchName: '', address1: '', address2: '', city: '', stateId: '', pinCode: '', country: 'India',
   })
   const setD = f => e => setDraft(p => ({ ...p, [f]: e.target.value }))
 
+  const fv = useFormValidation(draft, {
+    branchName: { required: true, label: 'Branch/Location Name' },
+  })
+
   const handleSave = e => {
     e.preventDefault()
+    if (!fv.validateAll()) {
+      toast.error('Please fix the highlighted fields before continuing.')
+      return
+    }
     onSave(draft)
+    toast.success('Branch added successfully.')
     onClose()
   }
 
@@ -413,10 +456,10 @@ function BranchModal({ onClose, onSave }) {
           <button type="button" onClick={onClose} style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 18, color: 'var(--text-3)', lineHeight: 1 }}>✕</button>
         </div>
         <div className="card-body">
-          <form onSubmit={handleSave}>
+          <form onSubmit={handleSave} noValidate>
             <div className="form-grid-3" style={{ marginBottom: 18 }}>
-              <Field label="Branch/Location Name" required>
-                <Input placeholder="e.g. Mumbai Branch" value={draft.branchName} onChange={setD('branchName')} required />
+              <Field label="Branch/Location Name" required error={fv.fieldProps('branchName').error}>
+                <Input placeholder="e.g. Mumbai Branch" value={draft.branchName} onChange={setD('branchName')} required {...fv.fieldProps('branchName')} />
               </Field>
               <Field label="Address Line 1">
                 <Input placeholder="Street / Building" value={draft.address1} onChange={setD('address1')} />

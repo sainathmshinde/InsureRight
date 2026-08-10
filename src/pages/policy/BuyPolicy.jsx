@@ -4,6 +4,8 @@ import Pagination from "../../components/Pagination";
 import usePagination from "../../components/usePagination";
 import { useAuth } from "../../context/AuthContext";
 import { Field, Input, DateInput, Select, Textarea } from "../../components/fields";
+import { useFormValidation } from "../../hooks/useFormValidation";
+import { useToast } from "../../context/ToastContext";
 import {
   StatusBadge,
   CheckboxGroup,
@@ -568,6 +570,29 @@ export default function BuyPolicy() {
   const [neftDate,       setNeftDate]       = useState("");
   const [neftPhoto,      setNeftPhoto]      = useState(null);
 
+  // Payment-step validation — only the fields for the currently active
+  // offline payment sub-form (Cheque or NEFT) are required.
+  const toast = useToast();
+  const paymentForm = {
+    chequeNo, chequeBankName, chequeIfsc, chequeDate,
+    neftBankName, neftBranch, neftAccName, neftAccNo, neftIfsc, neftTxnNo, neftDate,
+  };
+  const paymentRules = payMode !== "Offline" ? {} : payType === "Cheque" ? {
+    chequeNo:       { required: true, label: "Cheque Number" },
+    chequeBankName: { required: true, label: "Bank Name (on cheque)" },
+    chequeIfsc:     { required: true, label: "IFSC Code" },
+    chequeDate:     { required: true, label: "Date" },
+  } : {
+    neftBankName: { required: true, label: "Bank Name" },
+    neftBranch:   { required: true, label: "Branch Name" },
+    neftAccName:  { required: true, label: "Account Name" },
+    neftAccNo:    { required: true, label: "Account Number" },
+    neftIfsc:     { required: true, label: "IFSC Code" },
+    neftTxnNo:    { required: true, label: "Transaction Number" },
+    neftDate:     { required: true, label: "Date" },
+  };
+  const fv = useFormValidation(paymentForm, paymentRules);
+
   // Step 2 — nominees & terms (moved up from Proposal step)
   const [nominees, setNominees] = useState([{ id: 1, name: '', relation: '', age: '', share: '100' }]);
   const [termsAccepted, setTermsAccepted] = useState(false);
@@ -834,6 +859,10 @@ export default function BuyPolicy() {
 
   // Finalize payment — generate one proposal per cart item (policy pending issuance)
   const submitPayment = () => {
+    if (!fv.validateAll()) {
+      toast.error("Please fill in all required payment details.");
+      return;
+    }
     const rand4 = () => Math.floor(Math.random() * 9000 + 1000);
     const rand6 = () => Math.floor(Math.random() * 900000 + 100000);
     setPolicyResults(cart.map(p => ({
@@ -2319,23 +2348,23 @@ export default function BuyPolicy() {
                     {payType === "Cheque" && (
                       <div>
                         <div className="form-grid-3">
-                          <Field label="Cheque Number" required>
-                            <Input placeholder="e.g. 001234" value={chequeNo} onChange={e => setChequeNo(e.target.value)} />
+                          <Field label="Cheque Number" required error={fv.fieldProps("chequeNo").error}>
+                            <Input placeholder="e.g. 001234" value={chequeNo} onChange={e => setChequeNo(e.target.value)} required {...fv.fieldProps("chequeNo")} />
                           </Field>
                           <Field label="Amount">
                             <Input value={`₹${totalPremium.toLocaleString("en-IN")}`} readOnly style={{ background: "var(--surface-2)", color: "var(--text-2)" }} />
                           </Field>
-                          <Field label="Bank Name (on cheque)" required>
-                            <Input placeholder="e.g. State Bank of India" value={chequeBankName} onChange={e => setChequeBankName(e.target.value)} />
+                          <Field label="Bank Name (on cheque)" required error={fv.fieldProps("chequeBankName").error}>
+                            <Input placeholder="e.g. State Bank of India" value={chequeBankName} onChange={e => setChequeBankName(e.target.value)} required {...fv.fieldProps("chequeBankName")} />
                           </Field>
                           <Field label="MICR Code">
                             <Input placeholder="9-digit MICR" maxLength={9} value={chequeMicr} onChange={e => setChequeMicr(e.target.value)} />
                           </Field>
-                          <Field label="IFSC Code" required>
-                            <Input placeholder="e.g. SBIN0001234" value={chequeIfsc} onChange={e => setChequeIfsc(e.target.value)} />
+                          <Field label="IFSC Code" required error={fv.fieldProps("chequeIfsc").error}>
+                            <Input placeholder="e.g. SBIN0001234" value={chequeIfsc} onChange={e => setChequeIfsc(e.target.value)} required {...fv.fieldProps("chequeIfsc")} />
                           </Field>
-                          <Field label="Date" required>
-                            <DateInput value={chequeDate} onChange={e => setChequeDate(e.target.value)} />
+                          <Field label="Date" required error={fv.fieldProps("chequeDate").error}>
+                            <DateInput value={chequeDate} onChange={e => setChequeDate(e.target.value)} required {...fv.fieldProps("chequeDate")} />
                           </Field>
                           <Field label="Association Name">
                             <Input value={memberAssoc?.name ?? "—"} readOnly style={{ background: "var(--surface-2)", color: "var(--text-2)" }} />
@@ -2395,26 +2424,26 @@ export default function BuyPolicy() {
                           ))}
                         </div>
                         <div className="form-grid-3">
-                          <Field label="Bank Name" required>
-                            <Input placeholder="Your bank name" value={neftBankName} onChange={e => setNeftBankName(e.target.value)} />
+                          <Field label="Bank Name" required error={fv.fieldProps("neftBankName").error}>
+                            <Input placeholder="Your bank name" value={neftBankName} onChange={e => setNeftBankName(e.target.value)} required {...fv.fieldProps("neftBankName")} />
                           </Field>
-                          <Field label="Branch Name" required>
-                            <Input placeholder="Branch" value={neftBranch} onChange={e => setNeftBranch(e.target.value)} />
+                          <Field label="Branch Name" required error={fv.fieldProps("neftBranch").error}>
+                            <Input placeholder="Branch" value={neftBranch} onChange={e => setNeftBranch(e.target.value)} required {...fv.fieldProps("neftBranch")} />
                           </Field>
-                          <Field label="Account Name" required>
-                            <Input placeholder="Account holder name" value={neftAccName} onChange={e => setNeftAccName(e.target.value)} />
+                          <Field label="Account Name" required error={fv.fieldProps("neftAccName").error}>
+                            <Input placeholder="Account holder name" value={neftAccName} onChange={e => setNeftAccName(e.target.value)} required {...fv.fieldProps("neftAccName")} />
                           </Field>
-                          <Field label="Account Number" required>
-                            <Input placeholder="Account number" value={neftAccNo} onChange={e => setNeftAccNo(e.target.value)} />
+                          <Field label="Account Number" required error={fv.fieldProps("neftAccNo").error}>
+                            <Input placeholder="Account number" value={neftAccNo} onChange={e => setNeftAccNo(e.target.value)} required {...fv.fieldProps("neftAccNo")} />
                           </Field>
-                          <Field label="IFSC Code" required>
-                            <Input placeholder="e.g. KKBK0000957" value={neftIfsc} onChange={e => setNeftIfsc(e.target.value)} />
+                          <Field label="IFSC Code" required error={fv.fieldProps("neftIfsc").error}>
+                            <Input placeholder="e.g. KKBK0000957" value={neftIfsc} onChange={e => setNeftIfsc(e.target.value)} required {...fv.fieldProps("neftIfsc")} />
                           </Field>
-                          <Field label="Transaction Number" required>
-                            <Input placeholder="UTR / Txn reference" value={neftTxnNo} onChange={e => setNeftTxnNo(e.target.value)} />
+                          <Field label="Transaction Number" required error={fv.fieldProps("neftTxnNo").error}>
+                            <Input placeholder="UTR / Txn reference" value={neftTxnNo} onChange={e => setNeftTxnNo(e.target.value)} required {...fv.fieldProps("neftTxnNo")} />
                           </Field>
-                          <Field label="Date" required>
-                            <DateInput value={neftDate} onChange={e => setNeftDate(e.target.value)} />
+                          <Field label="Date" required error={fv.fieldProps("neftDate").error}>
+                            <DateInput value={neftDate} onChange={e => setNeftDate(e.target.value)} required {...fv.fieldProps("neftDate")} />
                           </Field>
                           <Field label="Amount">
                             <Input value={`₹${totalPremium.toLocaleString("en-IN")}`} readOnly style={{ background: "var(--surface-2)", color: "var(--text-2)" }} />

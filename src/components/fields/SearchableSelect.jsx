@@ -2,7 +2,7 @@ import { useState, useRef, useEffect } from "react";
 
 // Single-select dropdown with a search box — for fields backed by a long list
 // (employees, states, …) where scrolling a plain <select> is slow.
-export function SearchableSelect({ value, onChange, options, placeholder = "Select…", disabled = false, required }) {
+export function SearchableSelect({ value, onChange, options, placeholder = "Select…", disabled = false, required, error, onBlur, onFocus }) {
   const [open, setOpen] = useState(false);
   const [search, setSearch] = useState("");
   const [dropStyle, setDropStyle] = useState({});
@@ -16,6 +16,7 @@ export function SearchableSelect({ value, onChange, options, placeholder = "Sele
       if (wrapRef.current && !wrapRef.current.contains(e.target)) {
         setOpen(false);
         setSearch("");
+        onBlur?.();
       }
     };
     document.addEventListener("mousedown", handler);
@@ -47,6 +48,9 @@ export function SearchableSelect({ value, onChange, options, placeholder = "Sele
     if (!open && btnRef.current) {
       const r = btnRef.current.getBoundingClientRect();
       setDropStyle({ top: r.bottom + 4, left: r.left, width: r.width });
+      onFocus?.();
+    } else if (open) {
+      onBlur?.();
     }
     setOpen((o) => !o);
   };
@@ -55,6 +59,7 @@ export function SearchableSelect({ value, onChange, options, placeholder = "Sele
     onChange(val);
     setOpen(false);
     setSearch("");
+    onBlur?.();
   };
 
   const filtered = options.filter((o) => o.label.toLowerCase().includes(search.toLowerCase()));
@@ -67,7 +72,8 @@ export function SearchableSelect({ value, onChange, options, placeholder = "Sele
         type="button"
         disabled={disabled}
         onClick={handleOpen}
-        className="field-input"
+        className={`field-input${error && !open ? " field-input-error" : ""}`}
+        aria-invalid={!!error}
         style={{
           display: "flex", alignItems: "center", justifyContent: "space-between",
           width: "100%", cursor: disabled ? "not-allowed" : "pointer", textAlign: "left",

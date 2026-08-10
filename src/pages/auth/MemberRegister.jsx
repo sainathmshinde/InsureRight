@@ -3,6 +3,8 @@ import { useNavigate, Link } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import kmdLogo from "../../assets/kmd-logo.svg";
 import { ORGANISATIONS, ASSOCIATIONS } from "../member/orgAssocData";
+import { useFormValidation } from "../../hooks/useFormValidation";
+import { useToast } from "../../context/ToastContext";
 
 // ── 4-box OTP input ───────────────────────────────────────────────────────────
 function OtpInput({ value, onChange }) {
@@ -69,36 +71,46 @@ const INIT = { firstName: "", lastName: "", email: "", mobile: "", organisationI
 export default function MemberRegister() {
   const { registerMember } = useAuth();
   const navigate = useNavigate();
+  const toast = useToast();
 
   const [form, setForm] = useState(INIT);
   const [otpSent, setOtpSent] = useState(false);
   const [otp, setOtp]     = useState("");
-  const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
 
-  const set = k => e => { setForm(p => ({ ...p, [k]: e.target.value })); setErrors(p => ({ ...p, [k]: "" })); };
+  const set = k => e => setForm(p => ({ ...p, [k]: e.target.value }));
   const mobileVerified = otpSent && otp.length === 4;
 
+  const fv = useFormValidation(form, {
+    firstName: { required: "First name is required" },
+    lastName: { required: "Last name is required" },
+    email: {
+      validate: (value) =>
+        value && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value) ? "Enter a valid email" : "",
+    },
+    mobile: {
+      required: "Enter a valid 10-digit mobile number",
+      validate: (value) => {
+        if (!/^[6-9]\d{9}$/.test(value)) return "Enter a valid 10-digit mobile number";
+        if (!mobileVerified) return "Please verify your mobile number with OTP";
+        return "";
+      },
+    },
+  });
+
   const handleGetOtp = () => {
-    if (!/^[6-9]\d{9}$/.test(form.mobile)) { setErrors(p => ({ ...p, mobile: "Enter a valid 10-digit mobile number" })); return; }
+    fv.fieldProps("mobile").onBlur();
+    if (!/^[6-9]\d{9}$/.test(form.mobile)) return;
     setOtpSent(true);
     setOtp("");
   };
 
-  const validate = () => {
-    const e = {};
-    if (!form.firstName.trim()) e.firstName = "First name is required";
-    if (!form.lastName.trim())  e.lastName  = "Last name is required";
-    if (form.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) e.email = "Enter a valid email";
-    if (!/^[6-9]\d{9}$/.test(form.mobile)) e.mobile = "Enter a valid 10-digit mobile number";
-    else if (!mobileVerified) e.mobile = "Please verify your mobile number with OTP";
-    setErrors(e);
-    return Object.keys(e).length === 0;
-  };
-
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (!validate()) return;
+    if (!fv.validateAll()) {
+      toast.error("Please fix the highlighted fields before continuing.");
+      return;
+    }
     setLoading(true);
     setTimeout(() => {
       const r = registerMember({
@@ -109,7 +121,12 @@ export default function MemberRegister() {
         associationId: form.associationId,
       });
       setLoading(false);
-      if (r.ok) navigate("/member-portal", { replace: true });
+      if (r.ok) {
+        toast.success("Registration successful — welcome!");
+        navigate("/member-portal", { replace: true });
+      } else {
+        toast.error(r.error || "Registration failed. Please try again.");
+      }
     }, 600);
   };
 
@@ -127,24 +144,24 @@ export default function MemberRegister() {
         <h1 style={S.title}>Register</h1>
         <p style={S.sub}>Enter your information to create an account</p>
 
-        <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+        <form onSubmit={handleSubmit} noValidate style={{ display: "flex", flexDirection: "column", gap: 16 }}>
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
             <div>
               <label style={S.lbl}>First Name <span style={S.req}>*</span></label>
-              <input style={S.inp} placeholder="Enter First Name" value={form.firstName} onChange={set("firstName")} />
-              {errors.firstName && <div style={S.err}>{errors.firstName}</div>}
+              <input style={S.inp} placeholder="Enter First Name" value={form.firstName} onChange={set("firstName")} onBlur={fv.fieldProps("firstName").onBlur} />
+              {fv.fieldProps("firstName").error && <div style={S.err}>{fv.fieldProps("firstName").error}</div>}
             </div>
             <div>
               <label style={S.lbl}>Last Name <span style={S.req}>*</span></label>
-              <input style={S.inp} placeholder="Enter Last Name" value={form.lastName} onChange={set("lastName")} />
-              {errors.lastName && <div style={S.err}>{errors.lastName}</div>}
+              <input style={S.inp} placeholder="Enter Last Name" value={form.lastName} onChange={set("lastName")} onBlur={fv.fieldProps("lastName").onBlur} />
+              {fv.fieldProps("lastName").error && <div style={S.err}>{fv.fieldProps("lastName").error}</div>}
             </div>
           </div>
 
           <div>
             <label style={S.lbl}>Email</label>
-            <input type="email" style={S.inp} placeholder="Enter Email" value={form.email} onChange={set("email")} />
-            {errors.email && <div style={S.err}>{errors.email}</div>}
+            <input type="email" style={S.inp} placeholder="Enter Email" value={form.email} onChange={set("email")} onBlur={fv.fieldProps("email").onBlur} />
+            {fv.fieldProps("email").error && <div style={S.err}>{fv.fieldProps("email").error}</div>}
           </div>
 
           <div>
@@ -155,9 +172,10 @@ export default function MemberRegister() {
               style={{ ...S.inp, ...(otpSent ? { background: "#f1f5f9" } : {}) }}
               placeholder="Enter Mobile Number"
               value={form.mobile}
-              onChange={e => { setForm(p => ({ ...p, mobile: e.target.value.replace(/\D/g, "").slice(0, 10) })); setErrors(p => ({ ...p, mobile: "" })); }}
+              onChange={e => setForm(p => ({ ...p, mobile: e.target.value.replace(/\D/g, "").slice(0, 10) }))}
+              onBlur={fv.fieldProps("mobile").onBlur}
             />
-            {errors.mobile && <div style={S.err}>{errors.mobile}</div>}
+            {fv.fieldProps("mobile").error && <div style={S.err}>{fv.fieldProps("mobile").error}</div>}
 
             {otpSent && !mobileVerified && (
               <div style={{ marginTop: 12 }}>

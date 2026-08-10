@@ -1,14 +1,30 @@
 import { useState } from 'react'
 import { Field, Input, Select } from '../../components/Field'
 import { STATES } from '../member/orgAssocData'
+import { useFormValidation } from '../../hooks/useFormValidation'
+import { useToast } from '../../context/ToastContext'
 
 export function ContactModal({ branches = [], onClose, onSave }) {
+  const toast = useToast()
   const [draft, setDraft] = useState({ branchId: '', firstName: '', lastName: '', phone: '', email: '' })
   const setD = f => e => setDraft(p => ({ ...p, [f]: e.target.value }))
 
+  const fv = useFormValidation(draft, {
+    branchId: { required: true, label: 'Branch/Location' },
+    firstName: { required: true, label: 'First Name' },
+    lastName: { required: true, label: 'Last Name' },
+    phone: { required: true, label: 'Phone Number' },
+    email: { required: true, label: 'Email' },
+  })
+
   const handleSave = e => {
     e.preventDefault()
+    if (!fv.validateAll()) {
+      toast.error('Please fix the highlighted fields before continuing.')
+      return
+    }
     onSave({ ...draft, branchId: Number(draft.branchId) })
+    toast.success('Contact added successfully.')
     onClose()
   }
 
@@ -23,25 +39,25 @@ export function ContactModal({ branches = [], onClose, onSave }) {
           <button type="button" onClick={onClose} style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 18, color: 'var(--text-3)', lineHeight: 1 }}>✕</button>
         </div>
         <div className="card-body">
-          <form onSubmit={handleSave}>
+          <form onSubmit={handleSave} noValidate>
             <div className="form-grid">
-              <Field label="Select Branch/Location" required className="col-span-2">
-                <Select value={draft.branchId} onChange={setD('branchId')} required>
+              <Field label="Select Branch/Location" required className="col-span-2" error={fv.fieldProps('branchId').error}>
+                <Select value={draft.branchId} onChange={setD('branchId')} required {...fv.fieldProps('branchId')}>
                   <option value="">Select branch/location</option>
                   {branches.map(b => <option key={b.id} value={b.id}>{b.branchName}</option>)}
                 </Select>
               </Field>
-              <Field label="First Name" required>
-                <Input value={draft.firstName} onChange={setD('firstName')} required />
+              <Field label="First Name" required error={fv.fieldProps('firstName').error}>
+                <Input value={draft.firstName} onChange={setD('firstName')} required {...fv.fieldProps('firstName')} />
               </Field>
-              <Field label="Last Name" required>
-                <Input value={draft.lastName} onChange={setD('lastName')} required />
+              <Field label="Last Name" required error={fv.fieldProps('lastName').error}>
+                <Input value={draft.lastName} onChange={setD('lastName')} required {...fv.fieldProps('lastName')} />
               </Field>
-              <Field label="Phone Number" required>
-                <Input type="tel" placeholder="+91 XXXXX XXXXX" value={draft.phone} onChange={setD('phone')} required />
+              <Field label="Phone Number" required error={fv.fieldProps('phone').error}>
+                <Input type="tel" placeholder="+91 XXXXX XXXXX" value={draft.phone} onChange={setD('phone')} required {...fv.fieldProps('phone')} />
               </Field>
-              <Field label="Email" required>
-                <Input type="email" placeholder="contact@email.com" value={draft.email} onChange={setD('email')} required />
+              <Field label="Email" required error={fv.fieldProps('email').error}>
+                <Input type="email" placeholder="contact@email.com" value={draft.email} onChange={setD('email')} required {...fv.fieldProps('email')} />
               </Field>
             </div>
             <div className="actions-row">
@@ -56,14 +72,24 @@ export function ContactModal({ branches = [], onClose, onSave }) {
 }
 
 export function BranchModal({ onClose, onSave }) {
+  const toast = useToast()
   const [draft, setDraft] = useState({
     branchName: '', address1: '', address2: '', city: '', stateId: '', pinCode: '', country: 'India',
   })
   const setD = f => e => setDraft(p => ({ ...p, [f]: e.target.value }))
 
+  const fv = useFormValidation(draft, {
+    branchName: { required: true, label: 'Branch/Location Name' },
+  })
+
   const handleSave = e => {
     e.preventDefault()
+    if (!fv.validateAll()) {
+      toast.error('Please fix the highlighted fields before continuing.')
+      return
+    }
     onSave(draft)
+    toast.success('Branch added successfully.')
     onClose()
   }
 
@@ -78,10 +104,10 @@ export function BranchModal({ onClose, onSave }) {
           <button type="button" onClick={onClose} style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 18, color: 'var(--text-3)', lineHeight: 1 }}>✕</button>
         </div>
         <div className="card-body">
-          <form onSubmit={handleSave}>
+          <form onSubmit={handleSave} noValidate>
             <div className="form-grid-3" style={{ marginBottom: 18 }}>
-              <Field label="Branch/Location Name" required>
-                <Input placeholder="e.g. Mumbai Branch" value={draft.branchName} onChange={setD('branchName')} required />
+              <Field label="Branch/Location Name" required error={fv.fieldProps('branchName').error}>
+                <Input placeholder="e.g. Mumbai Branch" value={draft.branchName} onChange={setD('branchName')} required {...fv.fieldProps('branchName')} />
               </Field>
               <Field label="Address Line 1">
                 <Input placeholder="Street / Building" value={draft.address1} onChange={setD('address1')} />

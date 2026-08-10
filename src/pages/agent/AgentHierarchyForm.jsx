@@ -6,6 +6,8 @@ import {
   DESIG_LABEL, EMPLOYEES, EMP_MAP,
   getHierarchyRule, addHierarchyRule, updateHierarchyRule,
 } from "./agentHierarchyData";
+import { useFormValidation } from "../../hooks/useFormValidation";
+import { useToast } from "../../context/ToastContext";
 
 const empLabel = (emp) => emp ? `${emp.name} (${DESIG_LABEL[emp.designation] ?? emp.designation})` : "";
 
@@ -199,6 +201,7 @@ const EMPTY_FORM = { reportingEmpId: "", reporteeEmpIds: [] };
 
 export default function AgentHierarchyForm() {
   const navigate   = useNavigate();
+  const toast      = useToast();
   const { ruleId } = useParams();
   const isEdit     = !!ruleId;
   const existing   = isEdit ? getHierarchyRule(Number(ruleId)) : null;
@@ -211,12 +214,20 @@ export default function AgentHierarchyForm() {
 
   const reporteeOptions = EMPLOYEES.filter(e => e.id !== form.reportingEmpId);
 
+  const fv = useFormValidation(form, {
+    reportingEmpId: { required: true, label: "Reporting Manager" },
+  });
+
   const isValid = form.reportingEmpId && form.reporteeEmpIds.length > 0;
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (!isValid) return;
+    if (!fv.validateAll() || !isValid) {
+      toast.error("Please fix the highlighted fields before continuing.");
+      return;
+    }
     isEdit ? updateHierarchyRule(Number(ruleId), form) : addHierarchyRule(form);
+    toast.success("Hierarchy rule saved successfully.");
     navigate("/agent/hierarchy");
   };
 
@@ -239,7 +250,7 @@ export default function AgentHierarchyForm() {
         </button>
       </div>
 
-      <form onSubmit={handleSubmit}>
+      <form onSubmit={handleSubmit} noValidate>
         {/* ── Single card ─────────────────────────────────────────────────── */}
         <div className="card" style={{ marginBottom: 20 }}>
           <div className="card-body">
@@ -276,7 +287,7 @@ export default function AgentHierarchyForm() {
                   Reporting (Manager)
                 </div>
 
-                <Field label="Select the Reporting Manager" required>
+                <Field label="Select the Reporting Manager" required error={fv.fieldProps("reportingEmpId").error}>
                   <SearchableSelect
                     value={form.reportingEmpId}
                     onChange={(val) => {
@@ -290,6 +301,7 @@ export default function AgentHierarchyForm() {
                     options={EMPLOYEES.map(e => ({ value: e.id, label: empLabel(e) }))}
                     placeholder="Select employee"
                     required
+                    {...fv.fieldProps("reportingEmpId")}
                   />
                 </Field>
 

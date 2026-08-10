@@ -1,4 +1,4 @@
-export function Field({ label, required, children, className, style }) {
+export function Field({ label, required, error, children, className, style }) {
   return (
     <div className={`field${className ? ` ${className}` : ''}`} style={style}>
       {label && (
@@ -7,6 +7,7 @@ export function Field({ label, required, children, className, style }) {
         </label>
       )}
       {children}
+      {error && <div className="field-error-text">{error}</div>}
     </div>
   )
 }

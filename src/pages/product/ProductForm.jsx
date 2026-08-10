@@ -13,6 +13,8 @@ import policyWordingsPdf from "../../assets/StarHealthAssureInsurancePolicy-Poli
 import brochurePdf from "../../assets/Brochure_Star_Comprehensive_Insurance_Policy_V_15_Web_633bcfcaaf.pdf";
 import { PREMIUM_CHART, PRODUCTS, AGE_BAND_LABELS } from "./productData";
 import { formatDate } from "../../utils/date";
+import { useFormValidation } from "../../hooks/useFormValidation";
+import { useToast } from "../../context/ToastContext";
 
 const MOCK_DOC_META = {
   policyWordingsFile: { url: policyWordingsPdf, name: "StarHealthAssure_PolicyWordings_V2_2022.pdf", size: "2.4 MB", pages: 20 },
@@ -149,6 +151,25 @@ export default function ProductForm({
   onCancel,
   submitLabel = "Save Product",
 }) {
+  const toast = useToast();
+  const fv = useFormValidation(form, {
+    productName: { required: true, label: "Product Name" },
+    productCode: { required: true, label: "Product Code" },
+    icName: { required: true, label: "Insurance Company (IC)" },
+    category: { required: true, label: "Category" },
+    policyType: { required: true, label: "Policy Type" },
+  });
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    if (!fv.validateAll()) {
+      toast.error("Please fill in all required fields.");
+      return;
+    }
+    toast.success(productId ? "Product updated successfully." : "Product created successfully.");
+    onSubmit(e);
+  };
+
   const [activeToc, setActiveToc] = useState(null);
   const [viewingDoc, setViewingDoc] = useState(null);
   const [policyToc, setPolicyToc] = useState(POLICY_TOC);
@@ -299,16 +320,17 @@ export default function ProductForm({
   };
 
   return (
-    <form onSubmit={onSubmit}>
+    <form onSubmit={handleSubmit} noValidate>
       {/* ── 1. Basic Information ──────────────────── */}
       <SectionBlock icon="📦" title="Basic Information">
         <div className="form-grid-3">
-          <Field label="Product Name" required>
+          <Field label="Product Name" required error={fv.fieldProps("productName").error}>
             <Input
               placeholder="e.g. Star Comprehensive Health"
               value={form.productName}
               onChange={set("productName")}
               required
+              {...fv.fieldProps("productName")}
             />
           </Field>
           <Field label="Product Description">
@@ -318,32 +340,33 @@ export default function ProductForm({
               onChange={set("productDescription")}
             />
           </Field>
-          <Field label="Product Code" required>
+          <Field label="Product Code" required error={fv.fieldProps("productCode").error}>
             <Input
               placeholder="e.g. SHI-HC-001"
               value={form.productCode}
               onChange={set("productCode")}
               required
+              {...fv.fieldProps("productCode")}
             />
           </Field>
-          <Field label="Insurance Company (IC)" required>
-            <Select value={form.icName} onChange={set("icName")} required>
+          <Field label="Insurance Company (IC)" required error={fv.fieldProps("icName").error}>
+            <Select value={form.icName} onChange={set("icName")} required {...fv.fieldProps("icName")}>
               <option value="">Select IC</option>
               {IC_LIST.map((ic) => (
                 <option key={ic}>{ic}</option>
               ))}
             </Select>
           </Field>
-          <Field label="Category" required>
-            <Select value={form.category} onChange={set("category")} required>
+          <Field label="Category" required error={fv.fieldProps("category").error}>
+            <Select value={form.category} onChange={set("category")} required {...fv.fieldProps("category")}>
               <option value="">Select category</option>
               <option>Individual</option>
               <option>Family</option>
               <option>Group</option>
             </Select>
           </Field>
-          <Field label="Policy Type" required>
-            <Select value={form.policyType} onChange={set("policyType")} required>
+          <Field label="Policy Type" required error={fv.fieldProps("policyType").error}>
+            <Select value={form.policyType} onChange={set("policyType")} required {...fv.fieldProps("policyType")}>
               <option>Base</option>
               <option>Top-up</option>
               <option>Super Top-up</option>

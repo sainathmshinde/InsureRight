@@ -2,10 +2,13 @@ import { useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { Field, Input, SectionBlock } from '../../components/Field'
 import { useOrganisations } from './OrganisationContext'
+import { useFormValidation } from '../../hooks/useFormValidation'
+import { useToast } from '../../context/ToastContext'
 
 export default function OrganisationEdit() {
   const { id } = useParams()
   const navigate = useNavigate()
+  const toast = useToast()
   const { organisations, addOrganisation, updateOrganisation } = useOrganisations()
 
   const isCreate = !id
@@ -14,13 +17,22 @@ export default function OrganisationEdit() {
   const [form, setForm] = useState(existing ?? { name: '', description: '', isActive: true })
   const set = f => e => setForm(p => ({ ...p, [f]: e.target.value }))
 
+  const fv = useFormValidation(form, {
+    name: { required: true, label: 'Organisation Name' },
+  })
+
   const handleSubmit = e => {
     e.preventDefault()
+    if (!fv.validateAll()) {
+      toast.error('Please fix the highlighted fields before continuing.')
+      return
+    }
     if (isCreate) {
       addOrganisation(form)
     } else {
       updateOrganisation(Number(id), form)
     }
+    toast.success(isCreate ? 'Organisation created successfully.' : 'Organisation updated successfully.')
     navigate('/organisation')
   }
 
@@ -47,15 +59,16 @@ export default function OrganisationEdit() {
 
       <div className="card">
         <div className="card-body">
-          <form onSubmit={handleSubmit}>
+          <form onSubmit={handleSubmit} noValidate>
             <SectionBlock icon="🏦" title="Organisation Info">
               <div className="form-grid-3">
-                <Field label="Organisation Name" required>
+                <Field label="Organisation Name" required error={fv.fieldProps('name').error}>
                   <Input
                     placeholder="e.g. STATE BANK OF INDIA"
                     value={form.name}
                     onChange={set('name')}
                     required
+                    {...fv.fieldProps('name')}
                   />
                 </Field>
                 <Field label="Description">

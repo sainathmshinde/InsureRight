@@ -10,6 +10,8 @@ import {
 } from "../../components/Field";
 import { MemberIcon } from "../../icons";
 import { ORGANISATIONS, ASSOCIATIONS } from "./orgAssocData";
+import { useFormValidation } from "../../hooks/useFormValidation";
+import { useToast } from "../../context/ToastContext";
 
 const INITIAL = {
   firstName: "",
@@ -47,9 +49,21 @@ const MOCK_OCR = {
 
 export default function MemberCreate() {
   const navigate = useNavigate();
+  const toast = useToast();
   const [form, setForm] = useState(INITIAL);
   const [kycFetching, setKycFetching] = useState(null);
   const [kycFetched, setKycFetched] = useState(null);
+
+  const fv = useFormValidation(form, {
+    firstName: { required: true, label: "First Name" },
+    lastName: { required: true, label: "Last Name" },
+    mobile: { required: true, label: "Mobile" },
+    dob: { required: true, label: "Date of Birth" },
+    address1: { required: true, label: "Address Line 1" },
+    city: { required: true, label: "City" },
+    state: { required: true, label: "State" },
+    pincode: { required: true, label: "PIN Code" },
+  });
 
   const [photoPreview, setPhotoPreview] = useState(null)
   useEffect(() => {
@@ -78,11 +92,16 @@ export default function MemberCreate() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    if (!fv.validateAll()) {
+      toast.error("Please fix the highlighted fields before continuing.");
+      return;
+    }
     const name = [form.firstName, form.middleName, form.lastName]
       .map((s) => s.trim())
       .filter(Boolean)
       .join(" ");
     console.log("Create member:", { ...form, name });
+    toast.success("Member created successfully.");
     navigate("/member");
   };
 
@@ -105,7 +124,7 @@ export default function MemberCreate() {
 
       <div className="card">
         <div className="card-body">
-          <form onSubmit={handleSubmit}>
+          <form onSubmit={handleSubmit} noValidate>
             {/* KYC — FIRST */}
             <SectionBlock icon="🪪" title="KYC">
               {kycFetched && (
@@ -189,12 +208,13 @@ export default function MemberCreate() {
                 </div>
               </div>
               <div className="form-grid-3" style={{ marginBottom: 18 }}>
-                <Field label="First Name" required>
+                <Field label="First Name" required error={fv.fieldProps("firstName").error}>
                   <Input
                     placeholder="First name"
                     value={form.firstName}
                     onChange={set("firstName")}
                     required
+                    {...fv.fieldProps("firstName")}
                   />
                 </Field>
                 <Field label="Middle Name">
@@ -204,23 +224,25 @@ export default function MemberCreate() {
                     onChange={set("middleName")}
                   />
                 </Field>
-                <Field label="Last Name" required>
+                <Field label="Last Name" required error={fv.fieldProps("lastName").error}>
                   <Input
                     placeholder="Last name"
                     value={form.lastName}
                     onChange={set("lastName")}
                     required
+                    {...fv.fieldProps("lastName")}
                   />
                 </Field>
               </div>
               <div className="form-grid-3" style={{ marginBottom: 18 }}>
-                <Field label="Mobile" required>
+                <Field label="Mobile" required error={fv.fieldProps("mobile").error}>
                   <Input
                     type="tel"
                     placeholder="+91 XXXXX XXXXX"
                     value={form.mobile}
                     onChange={set("mobile")}
                     required
+                    {...fv.fieldProps("mobile")}
                   />
                 </Field>
                 <Field label="Email">
@@ -233,8 +255,8 @@ export default function MemberCreate() {
                 </Field>
               </div>
               <div className="form-grid-3" style={{ marginBottom: 18 }}>
-                <Field label="Date of Birth" required>
-                  <DateInput value={form.dob} onChange={set("dob")} required />
+                <Field label="Date of Birth" required error={fv.fieldProps("dob").error}>
+                  <DateInput value={form.dob} onChange={set("dob")} required {...fv.fieldProps("dob")} />
                 </Field>
                 <Field label="Gender">
                   <Select value={form.gender} onChange={set("gender")}>
@@ -280,12 +302,13 @@ export default function MemberCreate() {
             {/* Address */}
             <SectionBlock icon="📍" title="Address (Auto-filled from Aadhaar)">
               <div className="form-grid-3" style={{ marginBottom: 18 }}>
-                <Field label="Address Line 1" required>
+                <Field label="Address Line 1" required error={fv.fieldProps("address1").error}>
                   <Input
                     placeholder="Street / Building"
                     value={form.address1}
                     onChange={set("address1")}
                     required
+                    {...fv.fieldProps("address1")}
                   />
                 </Field>
                 <Field label="Address Line 2">
@@ -295,18 +318,19 @@ export default function MemberCreate() {
                     onChange={set("address2")}
                   />
                 </Field>
-                <Field label="City" required>
+                <Field label="City" required error={fv.fieldProps("city").error}>
                   <Input
                     placeholder="City"
                     value={form.city}
                     onChange={set("city")}
                     required
+                    {...fv.fieldProps("city")}
                   />
                 </Field>
               </div>
               <div className="form-grid-3">
-                <Field label="State" required>
-                  <Select value={form.state} onChange={set("state")} required>
+                <Field label="State" required error={fv.fieldProps("state").error}>
+                  <Select value={form.state} onChange={set("state")} required {...fv.fieldProps("state")}>
                     <option value="">Select state</option>
                     {[
                       "Maharashtra",
@@ -322,13 +346,14 @@ export default function MemberCreate() {
                     ))}
                   </Select>
                 </Field>
-                <Field label="PIN Code" required>
+                <Field label="PIN Code" required error={fv.fieldProps("pincode").error}>
                   <Input
                     placeholder="400001"
                     maxLength={6}
                     value={form.pincode}
                     onChange={set("pincode")}
                     required
+                    {...fv.fieldProps("pincode")}
                   />
                 </Field>
                 <Field label="Country">

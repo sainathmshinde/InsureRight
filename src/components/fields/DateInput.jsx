@@ -25,6 +25,7 @@ export function DateInput({
   value,
   onChange,
   required,
+  error,
   className = "",
   ...props
 }) {
@@ -32,10 +33,11 @@ export function DateInput({
     <div className="date-field-wrap">
       <input
         type="date"
-        className={`field-input date-field-native ${className}`.trim()}
+        className={`field-input date-field-native ${error ? "field-input-error " : ""}${className}`.trim()}
         value={value || ""}
         onChange={onChange}
         required={required}
+        aria-invalid={!!error}
         {...props}
       />
       <span className="date-field-display">

@@ -1,6 +1,7 @@
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider, useAuth } from "./context/AuthContext";
 import { MemberProvider } from "./context/MemberContext";
+import { ToastProvider } from "./context/ToastContext";
 import Layout from "./components/Layout";
 import ProtectedRoute from "./components/ProtectedRoute";
 import RoleGuard from "./components/RoleGuard";
@@ -11,6 +12,9 @@ import MemberRegister from "./pages/auth/MemberRegister";
 
 // Dashboard
 import Dashboard from "./pages/dashboard/Dashboard";
+
+// Demo
+import ToastDemo from "./pages/demo/ToastDemo";
 
 // Broker pages
 import BrokerList   from "./pages/broker/BrokerList";
@@ -98,6 +102,7 @@ function ProfileEdit() {
 export default function App() {
   return (
     <BrowserRouter>
+      <ToastProvider>
       <AuthProvider>
       <OrganisationProvider>
       <AssociationProvider>
@@ -127,6 +132,9 @@ export default function App() {
 
               {/* ── DASHBOARD (all roles) ── */}
               <Route path="dashboard" element={<Dashboard />} />
+
+              {/* ── DEMO (all roles) ── */}
+              <Route path="toast-demo" element={<ToastDemo />} />
 
               {/* ── PROFILE (role-aware) ── */}
               <Route path="profile">
@@ -228,6 +236,7 @@ export default function App() {
       </AssociationProvider>
       </OrganisationProvider>
       </AuthProvider>
+      </ToastProvider>
     </BrowserRouter>
   );
 }

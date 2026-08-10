@@ -22,6 +22,8 @@ import {
   toggleProductWithLinks,
 } from "./campaignShared";
 import { fileToDataUrl, savePromoCampaign } from "./campaignStore";
+import { useFormValidation } from "../../hooks/useFormValidation";
+import { useToast } from "../../context/ToastContext";
 
 const INITIAL = {
   name: "",
@@ -87,6 +89,7 @@ const fromInputDate = (v) => {
 
 export default function CampaignCreate() {
   const navigate = useNavigate();
+  const toast = useToast();
   const [form, setForm] = useState(INITIAL);
   const set = (f) => (e) => setForm((p) => ({ ...p, [f]: e.target.value }));
   const setDate = (f) => (e) =>
@@ -94,10 +97,23 @@ export default function CampaignCreate() {
 
   const startDateISO = toInputDate(form.startDate);
   const endDateISO = toInputDate(form.endDate);
-  const dateError =
-    startDateISO && endDateISO && endDateISO < startDateISO
-      ? "End date cannot be before start date"
-      : "";
+
+  const fv = useFormValidation(form, {
+    name: { required: true, label: "Campaign Name" },
+    startDate: { required: true, label: "Start Date" },
+    endDate: {
+      required: true,
+      label: "End Date",
+      validate: (val) => {
+        const s = toInputDate(form.startDate);
+        const e = toInputDate(val);
+        return s && e && e < s ? "End date cannot be before start date" : "";
+      },
+    },
+    ...(form.channels.length > 0
+      ? { messageTemplate: { required: "Message template is required when a channel is selected" } }
+      : {}),
+  });
 
   const [assignedCalling, setAssignedCalling] = useState(new Set());
   const [assignedSales, setAssignedSales] = useState(new Set());
@@ -124,7 +140,10 @@ export default function CampaignCreate() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (dateError) return;
+    if (!fv.validateAll()) {
+      toast.error("Please fix the highlighted fields before continuing.");
+      return;
+    }
     setPreviewOpen(true);
   };
 
@@ -150,6 +169,7 @@ export default function CampaignCreate() {
       segment: form.segment,
       selectedAssociations: form.selectedAssociations,
     });
+    toast.success("Campaign created successfully.");
     navigate("/campaign");
   };
 
@@ -167,32 +187,34 @@ export default function CampaignCreate() {
 
       <div className="card">
         <div className="card-body">
-          <form onSubmit={handleSubmit}>
+          <form onSubmit={handleSubmit} noValidate>
             <SectionBlock icon="📢" title="Campaign Information">
               <div className="form-grid-3">
-                <Field label="Campaign Name" required>
+                <Field label="Campaign Name" required error={fv.fieldProps("name").error}>
                   <Input
                     placeholder="e.g. Summer Health Drive 2025"
                     value={form.name}
                     onChange={set("name")}
                     required
+                    {...fv.fieldProps("name")}
                   />
                 </Field>
-                <Field label="Start Date" required>
+                <Field label="Start Date" required error={fv.fieldProps("startDate").error}>
                   <DateInput
                     value={startDateISO}
                     onChange={setDate("startDate")}
                     required
+                    {...fv.fieldProps("startDate")}
                   />
                 </Field>
-                <Field label="End Date" required>
+                <Field label="End Date" required error={fv.fieldProps("endDate").error}>
                   <DateInput
                     value={endDateISO}
                     onChange={setDate("endDate")}
                     min={startDateISO || undefined}
                     required
+                    {...fv.fieldProps("endDate")}
                   />
-                  {dateError && <div className="field-error-text">{dateError}</div>}
                 </Field>
               </div>
             </SectionBlock>
@@ -225,12 +247,14 @@ export default function CampaignCreate() {
                 <Field
                   label="Message Template"
                   required={form.channels.length > 0}
+                  error={fv.fieldProps("messageTemplate").error}
                 >
                   <Textarea
                     placeholder="Hi {member_name}, your health cover from {ic_name} is due for renewal…"
                     value={form.messageTemplate}
                     onChange={set("messageTemplate")}
                     style={{ minHeight: 100 }}
+                    {...fv.fieldProps("messageTemplate")}
                   />
                 </Field>
                 <Field label="WhatsApp Template ID">
