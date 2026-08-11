@@ -11,7 +11,6 @@ import {
   CampaignIcon,
   CRMIcon,
   InsuranceCompanyIcon,
-  NotificationIcon,
   LogoutIcon,
   ReportIcon,
   DocumentIcon,
@@ -119,12 +118,6 @@ const BROKER_NAV = [
       { label: "IC Master", path: "/ic" },
       { label: "Add IC", path: "/ic/create" },
     ],
-  },
-  {
-    key: "toast-demo",
-    label: "Toast Demo",
-    icon: NotificationIcon,
-    children: [{ label: "Toast Demo", path: "/toast-demo" }],
   },
 ];
 

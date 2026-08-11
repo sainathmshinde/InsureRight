@@ -4,6 +4,7 @@ export const TOAST_POSITIONS = [
   "top-left",
   "top-center",
   "top-right",
+  "center-center",
   "bottom-left",
   "bottom-center",
   "bottom-right",

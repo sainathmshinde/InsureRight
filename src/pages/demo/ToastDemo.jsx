@@ -13,6 +13,7 @@ const POSITION_LABEL = {
   "top-left": "Top Left",
   "top-center": "Top Center",
   "top-right": "Top Right",
+  "center-center": "Center Center",
   "bottom-left": "Bottom Left",
   "bottom-center": "Bottom Center",
   "bottom-right": "Bottom Right",
