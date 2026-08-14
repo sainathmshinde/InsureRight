@@ -11,7 +11,7 @@ import { FormActions } from "../../components/UI";
 import { DocumentViewerModal } from "../../components/fields/DocumentViewerModal";
 import policyWordingsPdf from "../../assets/StarHealthAssureInsurancePolicy-Policy-wording.pdf";
 import brochurePdf from "../../assets/Brochure_Star_Comprehensive_Insurance_Policy_V_15_Web_633bcfcaaf.pdf";
-import { PREMIUM_CHART, PRODUCTS, AGE_BAND_LABELS } from "./productData";
+import { PREMIUM_CHART, AGE_BAND_LABELS, PRODUCTS } from "./productData";
 import { formatDate } from "../../utils/date";
 import { useFormValidation } from "../../hooks/useFormValidation";
 import { useToast } from "../../context/ToastContext";
@@ -21,7 +21,7 @@ const MOCK_DOC_META = {
   brochureFile: { url: brochurePdf, name: "Brochure_StarComprehensive_V18_2025.pdf", size: "1.1 MB", pages: 13 },
 };
 
-const TOPUP_POLICIES = PRODUCTS.filter(p => p.policyType === "Top Up Policy" || p.policyType === "Super Top Up");
+const BASE_POLICIES = PRODUCTS.filter(p => p.policyType === "Base Policy");
 
 const IC_LIST = [
   "Star Health Insurance",
@@ -157,7 +157,7 @@ export default function ProductForm({
     productCode: { required: true, label: "Product Code" },
     icName: { required: true, label: "Insurance Company (IC)" },
     category: { required: true, label: "Category" },
-    policyType: { required: true, label: "Policy Type" },
+    policyType: { required: true, label: "Product Type" },
   });
 
   const handleSubmit = (e) => {
@@ -200,11 +200,16 @@ export default function ProductForm({
     const uniqueSI = [...new Set(rows.map(r => r.sumInsured))];
     const siIdFor = (si) => uniqueSI.indexOf(si) + 1;
     const hasBands = rows.some(r => r.ageBandId != null);
+    // Historical PREMIUM_CHART rows predate the Threshold feature and carry no
+    // threshold of their own — file them under threshold id 1, which is also
+    // where `thresholds` defaults to, so they line up with currentGroupId.
+    const hasThresholdInit = (form.policyType === "Top-up" && form.linkBasePolicy === "Yes") || form.policyType === "Super Top-up";
     const matrix = {};
     rows.forEach(r => {
       const bandId = hasBands ? r.ageBandId : 1;
+      const groupKey = hasThresholdInit ? `1_${bandId}` : bandId;
       const siId = siIdFor(r.sumInsured);
-      const band = matrix[bandId] ?? (matrix[bandId] = {});
+      const band = matrix[groupKey] ?? (matrix[groupKey] = {});
       if (r.selfOnly != null)
         band['Self'] = { ...(band['Self'] ?? {}), [siId]: String(r.selfOnly) };
       if (r.selfSpouse != null)
@@ -214,8 +219,14 @@ export default function ProductForm({
     });
     return matrix;
   });
+  // Discount Configuration — value(s) only collected once a Discount Type is
+  // chosen. Shape depends on discountLevel: a flat value for "Product", or one
+  // entry per Sum Assured tier for "Sum Insured".
+  const [siDiscounts, setSiDiscounts] = useState({});
+  // "At Actual" discount type skips levels entirely — the admin types the final
+  // discounted premium straight into the Premium Chart, one cell at a time.
+  const [actualDiscountMatrix, setActualDiscountMatrix] = useState({});
   const [removedCombos, setRemovedCombos] = useState(new Set());
-  const [linkBasePolicy, setLinkBasePolicy] = useState(!!form.basePolicyId);
   // One row per distinct ageBandId in the chart. From/To come from
   // AGE_BAND_LABELS when the product defines them; otherwise they start
   // blank for the admin to fill in (the chart itself only stores the band id).
@@ -231,6 +242,18 @@ export default function ProductForm({
     }));
   });
   const [activeAgeBandId, setActiveAgeBandId] = useState(null);
+  // Threshold — only used for a Top-up linked to a Base policy. Seeded from
+  // the linked base's own Sum Assured values when one is selected; otherwise
+  // starts as a single blank row, same as Sum Assured.
+  const [thresholds, setThresholds] = useState(() => {
+    if (!form.linkedBaseId) return [{ id: 1, value: '' }];
+    const rows = PREMIUM_CHART[Number(form.linkedBaseId)] ?? [];
+    const uniqueSI = [...new Set(rows.map(r => r.sumInsured))];
+    return uniqueSI.length > 0
+      ? uniqueSI.map((si, i) => ({ id: i + 1, value: String(si) }))
+      : [{ id: 1, value: '' }];
+  });
+  const [activeThresholdId, setActiveThresholdId] = useState(null);
 
   const [docState, setDocState] = useState({
     policyWordingsFile: { status: "empty" },
@@ -273,9 +296,43 @@ export default function ProductForm({
   const visibleCombos = allCombos.filter(c => !removedCombos.has(c));
 
   const currentAgeBandId = ageBands.some(b => b.id === activeAgeBandId) ? activeAgeBandId : ageBands[0]?.id;
+  // Discount Configuration only applies to Base products — the Discount Type
+  // select itself is the enabler; leaving it on the "Select" placeholder means
+  // no discount is configured.
+  const showDiscount = form.policyType === "Base" && !!form.discountType;
+  const isLinkedTopup = form.policyType === "Top-up" && form.linkBasePolicy === "Yes";
+  // Threshold applies to a Top-up linked to a Base policy, or to any Super Top-up.
+  const hasThreshold = isLinkedTopup || form.policyType === "Super Top-up";
+  const currentThresholdId = thresholds.some(t => t.id === activeThresholdId) ? activeThresholdId : thresholds[0]?.id;
+  // Threshold and Age Band can both apply to the same product, so the premium
+  // chart keys on a composite of whichever axes are active — each combination
+  // of selected threshold + age band gets its own independent premium grid.
+  const currentGroupId = hasThreshold ? `${currentThresholdId}_${currentAgeBandId}` : currentAgeBandId;
 
   const updateCellPremium = (ageBandId, label, siId, value) =>
     setPremiumMatrix(prev => ({
+      ...prev,
+      [ageBandId]: {
+        ...(prev[ageBandId] ?? {}),
+        [label]: { ...(prev[ageBandId]?.[label] ?? {}), [siId]: value },
+      },
+    }));
+
+  // Derives the discounted rate for one premium cell from Discount Configuration —
+  // the discount value looked up depends on discountLevel (flat / per-SI).
+  // Not used for "At Actual", which is typed straight into the Premium Chart instead.
+  const computeDiscountedRate = (rate, siId) => {
+    if (!showDiscount || rate === '' || rate == null) return null;
+    const discountVal = form.discountLevel === "Sum Insured" ? siDiscounts[siId] : form.discountValue;
+    if (discountVal === '' || discountVal == null) return null;
+    const rateNum = parseFloat(rate) || 0;
+    const discNum = parseFloat(discountVal) || 0;
+    if (form.discountType === "Fixed") return Math.max(0, rateNum - discNum).toFixed(2);
+    return Math.max(0, rateNum - (rateNum * discNum) / 100).toFixed(2);
+  };
+
+  const updateCellActualDiscount = (ageBandId, label, siId, value) =>
+    setActualDiscountMatrix(prev => ({
       ...prev,
       [ageBandId]: {
         ...(prev[ageBandId] ?? {}),
@@ -324,6 +381,14 @@ export default function ProductForm({
       {/* ── 1. Basic Information ──────────────────── */}
       <SectionBlock icon="📦" title="Basic Information">
         <div className="form-grid-3">
+          <Field label="Insurance Company (IC)" required error={fv.fieldProps("icName").error}>
+            <Select value={form.icName} onChange={set("icName")} required {...fv.fieldProps("icName")}>
+              <option value="">Select IC</option>
+              {IC_LIST.map((ic) => (
+                <option key={ic}>{ic}</option>
+              ))}
+            </Select>
+          </Field>
           <Field label="Product Name" required error={fv.fieldProps("productName").error}>
             <Input
               placeholder="e.g. Star Comprehensive Health"
@@ -331,13 +396,6 @@ export default function ProductForm({
               onChange={set("productName")}
               required
               {...fv.fieldProps("productName")}
-            />
-          </Field>
-          <Field label="Product Description">
-            <Input
-              placeholder="Brief one-line description of the product"
-              value={form.productDescription}
-              onChange={set("productDescription")}
             />
           </Field>
           <Field label="Product Code" required error={fv.fieldProps("productCode").error}>
@@ -349,14 +407,6 @@ export default function ProductForm({
               {...fv.fieldProps("productCode")}
             />
           </Field>
-          <Field label="Insurance Company (IC)" required error={fv.fieldProps("icName").error}>
-            <Select value={form.icName} onChange={set("icName")} required {...fv.fieldProps("icName")}>
-              <option value="">Select IC</option>
-              {IC_LIST.map((ic) => (
-                <option key={ic}>{ic}</option>
-              ))}
-            </Select>
-          </Field>
           <Field label="Category" required error={fv.fieldProps("category").error}>
             <Select value={form.category} onChange={set("category")} required {...fv.fieldProps("category")}>
               <option value="">Select category</option>
@@ -365,7 +415,15 @@ export default function ProductForm({
               <option>Group</option>
             </Select>
           </Field>
-          <Field label="Policy Type" required error={fv.fieldProps("policyType").error}>
+          <Field label="Product Description" style={{ gridColumn: '1 / -1' }}>
+            <Textarea
+              placeholder="Brief description of the product"
+              value={form.productDescription}
+              onChange={set("productDescription")}
+              style={{ minHeight: 80 }}
+            />
+          </Field>
+          <Field label="Product Type" required error={fv.fieldProps("policyType").error}>
             <Select value={form.policyType} onChange={set("policyType")} required {...fv.fieldProps("policyType")}>
               <option>Base</option>
               <option>Top-up</option>
@@ -373,53 +431,83 @@ export default function ProductForm({
               <option>Comprehensive</option>
             </Select>
           </Field>
-          {form.policyType === "Base" && (
-            <>
-              <Field label=" " style={{ gridColumn: '1 / -1' }}>
-                <label style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 13.5, fontWeight: 500, color: 'var(--text)', cursor: 'pointer' }}>
-                  <input
-                    type="checkbox"
-                    checked={linkBasePolicy}
-                    onChange={e => {
-                      const checked = e.target.checked;
-                      setLinkBasePolicy(checked);
-                      if (!checked) {
-                        set("basePolicyId")({ target: { value: "" } });
-                        set("basePolicyDiscount")({ target: { value: "" } });
-                      }
-                    }}
-                  />
-                  Do you want to link with Topup policy?
-                </label>
-              </Field>
-              <Field label="Link to Topup Policy">
-                <Select
-                  value={form.basePolicyId}
-                  onChange={set("basePolicyId")}
-                  disabled={!linkBasePolicy}
-                >
-                  <option value="">Select Topup policy</option>
-                  {TOPUP_POLICIES.map(p => (
-                    <option key={p.id} value={p.id}>{p.name} ({p.code})</option>
-                  ))}
-                </Select>
-              </Field>
-              <Field label="Discount % on base policy premium">
-                <Input
-                  type="number"
-                  min="0"
-                  max="100"
-                  placeholder="e.g. 10"
-                  value={form.basePolicyDiscount}
-                  onChange={set("basePolicyDiscount")}
-                  disabled={!linkBasePolicy}
-                  style={{ maxWidth: 160 }}
-                />
-              </Field>
-            </>
+          {form.policyType === "Top-up" && (
+            <Field label="Do you want to link base Policy?">
+              <Select
+                value={form.linkBasePolicy || 'No'}
+                onChange={e => {
+                  set('linkBasePolicy')(e);
+                  if (e.target.value === 'No') {
+                    set('linkedBaseId')({ target: { value: '' } });
+                    setThresholds([{ id: Date.now(), value: '' }]);
+                  }
+                }}
+              >
+                <option value="No">No</option>
+                <option value="Yes">Yes</option>
+              </Select>
+            </Field>
+          )}
+          {form.policyType === "Top-up" && form.linkBasePolicy === "Yes" && (
+            <Field label="Select Base Policy" style={{ gridColumn: '1 / -1' }}>
+              <Select
+                value={form.linkedBaseId || ''}
+                onChange={e => {
+                  set('linkedBaseId')(e);
+                  const baseId = Number(e.target.value);
+                  const rows = PREMIUM_CHART[baseId] ?? [];
+                  const uniqueSI = [...new Set(rows.map(r => r.sumInsured))];
+                  setThresholds(
+                    uniqueSI.length > 0
+                      ? uniqueSI.map((si, i) => ({ id: i + 1, value: String(si) }))
+                      : [{ id: Date.now(), value: '' }]
+                  );
+                }}
+              >
+                <option value="">Select base policy</option>
+                {BASE_POLICIES.map(p => (
+                  <option key={p.id} value={p.id}>{p.name} ({p.code})</option>
+                ))}
+              </Select>
+            </Field>
           )}
         </div>
       </SectionBlock>
+
+      {/* ── Threshold (Top-up linked to a Base policy, or any Super Top-up) ── */}
+      {hasThreshold && (
+        <SectionBlock icon="🎯" title="Threshold">
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+            {thresholds.map((th, i) => (
+              <div key={th.id} style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                <span style={{ fontSize: 12, color: 'var(--text-3)', minWidth: 22, textAlign: 'right' }}>#{i + 1}</span>
+                <Input
+                  type="number"
+                  min="0"
+                  placeholder="e.g. 500000"
+                  value={th.value}
+                  onChange={e => setThresholds(prev => prev.map(t => t.id === th.id ? { ...t, value: e.target.value } : t))}
+                  style={{ maxWidth: 160, textAlign: 'right' }}
+                />
+                <button
+                  type="button"
+                  onClick={() => setThresholds(prev => prev.filter(t => t.id !== th.id))}
+                  disabled={thresholds.length === 1}
+                  style={{ background: 'none', border: 'none', cursor: thresholds.length === 1 ? 'not-allowed' : 'pointer', fontSize: 18, color: thresholds.length === 1 ? 'var(--border)' : 'var(--text-3)', lineHeight: 1, padding: '2px 4px' }}
+                >×</button>
+              </div>
+            ))}
+            <div>
+              <button
+                type="button"
+                className="btn btn-ghost"
+                style={{ fontSize: 13, padding: '5px 14px', marginTop: 4 }}
+                onClick={() => setThresholds(prev => [...prev, { id: Date.now(), value: '' }])}
+              >+ Add Threshold</button>
+            </div>
+          </div>
+        </SectionBlock>
+      )}
 
       {/* ── 2. Sum Assured ───────────────────────── */}
       <SectionBlock icon="💹" title="Sum Assured">
@@ -578,6 +666,76 @@ export default function ProductForm({
         </Field>
       </SectionBlock>
 
+      {/* ── Discount Configuration (Base products only) ─────────────────── */}
+      {form.policyType === "Base" && (
+      <SectionBlock icon="🏷️" title="Discount Configuration">
+        <div className="form-grid-3">
+          <Field label="Discount Type">
+            <Select value={form.discountType || ''} onChange={set('discountType')}>
+              <option value="">Select</option>
+              <option value="Percent">Percentage (%)</option>
+              <option value="Fixed">Fixed Amount</option>
+              <option value="At Actual">Premium Chart</option>
+            </Select>
+          </Field>
+          {form.discountType && form.discountType !== "At Actual" && (
+            <Field label="Discount Applicable On">
+              <Select value={form.discountLevel || 'Product'} onChange={set('discountLevel')}>
+                <option value="Product">Entire Product</option>
+                <option value="Sum Insured">Sum Insured</option>
+              </Select>
+            </Field>
+          )}
+        </div>
+
+        {form.discountType === "At Actual" && (
+          <p style={{ fontSize: 13, color: 'var(--text-3)', marginTop: 14, marginBottom: 0 }}>
+            Enter the discounted premium directly in the Premium Chart below.
+          </p>
+        )}
+
+        {form.discountType && form.discountType !== "At Actual" && form.discountLevel === "Product" && (
+          <div style={{ marginTop: 18 }}>
+            <Field label={`Discount Value${form.discountType === 'Percent' ? ' (%)' : ''}`}>
+              <Input
+                type="number"
+                min="0"
+                placeholder={form.discountType === 'Percent' ? 'e.g. 10' : 'e.g. 500'}
+                value={form.discountValue || ''}
+                onChange={set('discountValue')}
+                style={{ maxWidth: 200 }}
+              />
+            </Field>
+          </div>
+        )}
+
+        {form.discountType && form.discountType !== "At Actual" && form.discountLevel === "Sum Insured" && (
+          <div style={{ marginTop: 18, display: 'flex', flexDirection: 'column', gap: 10 }}>
+            {sumInsuredList.filter(si => si.value).length === 0 ? (
+              <p style={{ fontSize: 13, color: 'var(--text-3)', margin: 0 }}>
+                Add Sum Assured values in the Sum Assured section to configure a discount per tier.
+              </p>
+            ) : sumInsuredList.filter(si => si.value).map(si => (
+              <div key={si.id} style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                <span style={{ fontSize: 13.5, fontWeight: 600, color: 'var(--text)', minWidth: 120 }}>
+                  ₹{Number(si.value).toLocaleString('en-IN')}
+                </span>
+                <Input
+                  type="number"
+                  min="0"
+                  placeholder={form.discountType === 'Percent' ? 'e.g. 10' : 'e.g. 500'}
+                  value={siDiscounts[si.id] ?? ''}
+                  onChange={e => setSiDiscounts(prev => ({ ...prev, [si.id]: e.target.value }))}
+                  style={{ maxWidth: 160, textAlign: 'right' }}
+                />
+              </div>
+            ))}
+          </div>
+        )}
+
+      </SectionBlock>
+      )}
+
       {/* ── 4. Premium Chart ──────────────────── */}
       <SectionBlock icon="💰" title="Premium Chart">
         {selectedMembers.length === 0 ? (
@@ -590,6 +748,37 @@ export default function ProductForm({
           </p>
         ) : (
           <>
+          {hasThreshold && thresholds.length > 0 && (
+            <div style={{ marginBottom: 14 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
+                <span style={{ fontSize: 12.5, fontWeight: 600, color: 'var(--text-3)', textTransform: 'uppercase', letterSpacing: '.4px' }}>Threshold</span>
+                {thresholds.map((th, i) => {
+                  const active = currentThresholdId === th.id;
+                  const rangeLabel = th.value ? `₹${Number(th.value).toLocaleString('en-IN')}` : `Threshold ${i + 1}`;
+                  return (
+                    <button
+                      key={th.id}
+                      type="button"
+                      onClick={() => setActiveThresholdId(th.id)}
+                      style={{
+                        padding: '5px 12px', borderRadius: 20, fontSize: 12.5, fontWeight: 600,
+                        cursor: 'pointer', fontFamily: 'inherit',
+                        border: `1.5px solid ${active ? 'var(--brand)' : 'var(--border)'}`,
+                        background: active ? 'var(--brand-light)' : '#fff',
+                        color: active ? 'var(--brand)' : 'var(--text-2)',
+                      }}
+                    >{rangeLabel}</button>
+                  );
+                })}
+              </div>
+              {thresholds.length > 1 && (
+                <div style={{ fontSize: 12, color: 'var(--text-3)', marginTop: 6, display: 'flex', alignItems: 'center', gap: 5 }}>
+                  <span>ℹ️</span>
+                  Click a different threshold above to switch and enter premiums for that threshold — each threshold's values are saved separately.
+                </div>
+              )}
+            </div>
+          )}
           {ageBands.length > 0 && (
             <div style={{ marginBottom: 14 }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
@@ -627,8 +816,14 @@ export default function ProductForm({
                 <tr>
                   <th style={{ minWidth: 200, background: 'var(--surface-2)' }}>Family Combination</th>
                   {sumInsuredList.map((si, i) => (
-                    <th key={si.id} style={{ minWidth: 150, textAlign: 'center' }}>
+                    <th key={si.id} style={{ minWidth: showDiscount ? 260 : 150, textAlign: 'center' }}>
                       <div style={{ fontWeight: 700 }}>₹{si.value ? Number(si.value).toLocaleString('en-IN') : `SI ${i + 1}`}</div>
+                      {showDiscount && (
+                        <div style={{ display: 'flex', gap: 10, marginTop: 4 }}>
+                          <span style={{ flex: 1, fontSize: 13, fontWeight: 700, color: 'var(--text-2)', textTransform: 'uppercase', letterSpacing: '.3px' }}>Premium</span>
+                          <span style={{ flex: 1, fontSize: 13, fontWeight: 700, color: 'var(--text-2)', textTransform: 'uppercase', letterSpacing: '.3px' }}>Discounted Premium</span>
+                        </div>
+                      )}
                     </th>
                   ))}
                   <th style={{ width: 40 }}></th>
@@ -642,18 +837,46 @@ export default function ProductForm({
                       <td style={{ fontWeight: 500, background: 'var(--surface-2)', whiteSpace: 'nowrap', paddingRight: 12 }}>
                         {isHandicap && <span style={{ marginRight: 4 }}>♿</span>}{label}
                       </td>
-                      {sumInsuredList.map(si => (
-                        <td key={si.id}>
-                          <Input
-                            type="number"
-                            min="0"
-                            placeholder="0"
-                            value={premiumMatrix[currentAgeBandId]?.[label]?.[si.id] ?? ''}
-                            onChange={e => updateCellPremium(currentAgeBandId, label, si.id, e.target.value)}
-                            style={{ textAlign: 'right' }}
-                          />
-                        </td>
-                      ))}
+                      {sumInsuredList.map(si => {
+                        const rate = premiumMatrix[currentGroupId]?.[label]?.[si.id] ?? '';
+                        const isAtActual = form.discountType === "At Actual";
+                        const discountedRate = isAtActual
+                          ? (actualDiscountMatrix[currentGroupId]?.[label]?.[si.id] ?? '')
+                          : computeDiscountedRate(rate, si.id);
+                        return (
+                          <td key={si.id}>
+                            <div style={{ display: 'flex', gap: 10 }}>
+                              <Input
+                                type="number"
+                                min="0"
+                                placeholder="0"
+                                value={rate}
+                                onChange={e => updateCellPremium(currentGroupId, label, si.id, e.target.value)}
+                                style={{ textAlign: 'right', flex: 1 }}
+                              />
+                              {showDiscount && (
+                                isAtActual ? (
+                                  <Input
+                                    type="number"
+                                    min="0"
+                                    placeholder="0"
+                                    value={discountedRate}
+                                    onChange={e => updateCellActualDiscount(currentGroupId, label, si.id, e.target.value)}
+                                    style={{ textAlign: 'right', flex: 1 }}
+                                  />
+                                ) : (
+                                  <Input
+                                    type="text"
+                                    readOnly
+                                    value={discountedRate ?? '—'}
+                                    style={{ textAlign: 'right', flex: 1, background: 'var(--surface-2)', color: 'var(--text-2)' }}
+                                  />
+                                )
+                              )}
+                            </div>
+                          </td>
+                        );
+                      })}
                       <td style={{ textAlign: 'center' }}>
                         <button
                           type="button"

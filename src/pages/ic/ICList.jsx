@@ -5,6 +5,7 @@ import usePagination from '../../components/usePagination'
 import { Table, PageHeader, StatusBadge, Button, EmptyState, RowActionButton } from '../../components/UI'
 import { InsuranceCompanyIcon, EditIcon, DeleteIcon } from '../../icons'
 import { ICS } from './icData'
+import { useToast } from '../../context/ToastContext'
 
 const INITIAL_MOCK = ICS.map(ic => ({
   id:      ic.id,
@@ -18,12 +19,13 @@ const INITIAL_MOCK = ICS.map(ic => ({
 
 export default function ICList() {
   const navigate = useNavigate()
+  const toast = useToast()
   const [rows, setRows]           = useState(INITIAL_MOCK)
   const [search, setSearch]       = useState('')
   const [statusFilter, setStatus] = useState('')
 
-  const handleDelete = ic => {
-    if (window.confirm(`Delete insurance company "${ic.name}"? This cannot be undone.`)) {
+  const handleDelete = async ic => {
+    if (await toast.confirm(`Delete insurance company "${ic.name}"? This cannot be undone.`)) {
       setRows(prev => prev.filter(r => r.id !== ic.id))
     }
   }

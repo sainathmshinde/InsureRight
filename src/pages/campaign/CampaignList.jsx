@@ -6,6 +6,7 @@ import { Table, PageHeader, StatusBadge, Button, EmptyState, RowActionButton } f
 import { CampaignIcon, CalendarIcon, EditIcon, DeleteIcon } from '../../icons'
 import { formatDate as fmtDate, isCampaignOpen } from '../../utils/date'
 import { getPromoCampaigns, deletePromoCampaign } from './campaignStore'
+import { useToast } from '../../context/ToastContext'
 
 const RAW_MOCK = [
   { id: 1,  name: 'Campaign 1',                                startDate: '2024-09-20', endDate: '2025-07-29', isActive: true, documentName: null,                     templateName: null,                  sentStatus: null },
@@ -52,13 +53,14 @@ function buildRows() {
 
 export default function CampaignList() {
   const navigate = useNavigate()
+  const toast = useToast()
   const [rows, setRows]           = useState(buildRows)
   const [search, setSearch]       = useState('')
   const [statusFilter, setStatus] = useState('')
   const [openFilter, setOpen]     = useState('')
 
-  const handleDelete = (id) => {
-    if (!window.confirm('Delete this campaign? This cannot be undone.')) return
+  const handleDelete = async (id) => {
+    if (!(await toast.confirm('Delete this campaign? This cannot be undone.'))) return
     deletePromoCampaign(id)
     setRows(prev => prev.filter(r => r.id !== id))
   }

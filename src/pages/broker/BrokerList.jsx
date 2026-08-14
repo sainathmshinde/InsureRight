@@ -5,6 +5,7 @@ import usePagination from '../../components/usePagination'
 import { Table, PageHeader, StatusBadge, KYCBadge, Button, EmptyState, RowActionButton } from '../../components/UI'
 import { BrokerIcon, ViewIcon, EditIcon, DeleteIcon } from '../../icons'
 import { BROKERS } from './brokerData'
+import { useToast } from '../../context/ToastContext'
 
 const INITIAL_MOCK = BROKERS.map(b => ({
   id:      b.id,
@@ -18,13 +19,14 @@ const INITIAL_MOCK = BROKERS.map(b => ({
 
 export default function BrokerList() {
   const navigate = useNavigate()
+  const toast = useToast()
   const [rows, setRows]           = useState(INITIAL_MOCK)
   const [search, setSearch]       = useState('')
   const [typeFilter, setType]     = useState('')
   const [statusFilter, setStatus] = useState('')
 
-  const handleDelete = b => {
-    if (window.confirm(`Delete broker "${b.name}"? This cannot be undone.`)) {
+  const handleDelete = async b => {
+    if (await toast.confirm(`Delete broker "${b.name}"? This cannot be undone.`)) {
       setRows(prev => prev.filter(r => r.id !== b.id))
     }
   }

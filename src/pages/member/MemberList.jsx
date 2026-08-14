@@ -9,6 +9,7 @@ import { useMembers, INITIAL_MEMBERS } from '../../context/MemberContext'
 import { ASSOCIATIONS } from './orgAssocData'
 import { formatDate } from '../../utils/date'
 import { getActivePromoCampaigns } from '../campaign/campaignStore'
+import { useToast } from '../../context/ToastContext'
 
 const CAMPAIGNS = [
   { id: 1,  name: 'Campaign 1' },
@@ -22,6 +23,7 @@ const CAMPAIGNS = [
 
 export default function MemberList() {
   const navigate = useNavigate();
+  const toast = useToast();
   const [searchParams]  = useSearchParams();
   const { user } = useAuth();
   const { members, deleteMember } = useMembers();
@@ -37,8 +39,8 @@ export default function MemberList() {
     else navigate(`/policy/buy?memberId=${member.id}`);
   };
 
-  const handleDelete = (member) => {
-    if (window.confirm(`Delete member "${member.name}"? This cannot be undone.`)) {
+  const handleDelete = async (member) => {
+    if (await toast.confirm(`Delete member "${member.name}"? This cannot be undone.`)) {
       deleteMember(member.id);
     }
   };

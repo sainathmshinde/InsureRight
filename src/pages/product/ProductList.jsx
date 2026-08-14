@@ -6,6 +6,7 @@ import { PageHeader, Button, EmptyState, RowActionButton } from '../../component
 import { ProductIcon, ChevronRightIcon, EditIcon, DeleteIcon } from '../../icons'
 import { PRODUCTS, POLICY_TYPES, PREMIUM_CHART, POLICY_TYPE_ICON, getProductLinks } from './productData'
 import { ProductDetailModal } from '../campaign/campaignShared'
+import { useToast } from '../../context/ToastContext'
 
 const TYPE_COLORS = {
   'Base Policy':        { color: '#1d4ed8', bg: '#dbeafe', border: '#93c5fd' },
@@ -24,13 +25,14 @@ function fmtSI(v) {
 
 export default function ProductList() {
   const navigate = useNavigate()
+  const toast = useToast()
   const [rows, setRows] = useState(PRODUCTS)
   const [search, setSearch] = useState('')
   const [typeFilter, setType] = useState('')
   const [viewProduct, setViewProduct] = useState(null)
 
-  const handleDelete = p => {
-    if (window.confirm(`Delete product "${p.name}"? This cannot be undone.`)) {
+  const handleDelete = async p => {
+    if (await toast.confirm(`Delete product "${p.name}"? This cannot be undone.`)) {
       setRows(prev => prev.filter(r => r.id !== p.id))
     }
   }

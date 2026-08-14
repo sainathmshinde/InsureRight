@@ -5,9 +5,11 @@ import usePagination from '../../components/usePagination'
 import { Table, PageHeader, Button, EmptyState, RowActionButton } from '../../components/UI'
 import { BankIcon, UploadIcon, SearchIcon, EditIcon, DeleteIcon } from '../../icons'
 import { useOrganisations } from './OrganisationContext'
+import { useToast } from '../../context/ToastContext'
 
 export default function OrganisationList() {
   const navigate = useNavigate()
+  const toast = useToast()
   const { organisations, deleteOrganisation } = useOrganisations()
   const [search, setSearch]       = useState('')
 
@@ -17,8 +19,8 @@ export default function OrganisationList() {
   const pg     = usePagination(filtered, 10)
   const handle = setter => v => { setter(v); pg.reset() }
 
-  const handleDelete = (row) => {
-    if (window.confirm(`Delete organisation "${row.name}"? This cannot be undone.`)) {
+  const handleDelete = async (row) => {
+    if (await toast.confirm(`Delete organisation "${row.name}"? This cannot be undone.`)) {
       deleteOrganisation(row.id)
     }
   }

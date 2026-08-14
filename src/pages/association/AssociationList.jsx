@@ -6,15 +6,17 @@ import { Table, PageHeader, Button, EmptyState, RowActionButton } from '../../co
 import { GroupIcon, UploadIcon, SearchIcon, EditIcon, DeleteIcon } from '../../icons'
 import { useAssociations } from './AssociationContext'
 import { ORGANISATIONS } from '../member/orgAssocData'
+import { useToast } from '../../context/ToastContext'
 
 export default function AssociationList() {
   const navigate = useNavigate()
+  const toast = useToast()
   const { associations, deleteAssociation } = useAssociations()
   const [search, setSearch]     = useState('')
   const [orgFilter, setOrgFilter] = useState('')
 
-  const handleDelete = a => {
-    if (window.confirm(`Delete association "${a.name}"? This cannot be undone.`)) {
+  const handleDelete = async a => {
+    if (await toast.confirm(`Delete association "${a.name}"? This cannot be undone.`)) {
       deleteAssociation(a.id)
     }
   }

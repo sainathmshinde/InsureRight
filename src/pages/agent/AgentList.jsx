@@ -5,6 +5,7 @@ import usePagination from "../../components/usePagination";
 import { Table, PageHeader, Button, EmptyState, RowActionButton } from "../../components/UI";
 import { AgentIcon, UploadIcon, SearchIcon, EditIcon, DeleteIcon } from "../../icons";
 import { OPERATORS } from "./agentData";
+import { useToast } from "../../context/ToastContext";
 
 const INITIAL_MOCK = OPERATORS.map((a) => ({
   id:        a.id,
@@ -76,6 +77,7 @@ function SortTh({ label, colKey, sortKey, sortDir, onSort }) {
 
 export default function AgentList() {
   const navigate = useNavigate();
+  const toast = useToast();
 
   const [rows,         setRows]         = useState(INITIAL_MOCK);
   const [search,       setSearch]       = useState("");
@@ -84,8 +86,8 @@ export default function AgentList() {
   const [sortKey,      setSortKey]      = useState("name");
   const [sortDir,      setSortDir]      = useState("asc");
 
-  const handleDelete = (row) => {
-    if (window.confirm(`Delete employee "${row.name}"? This cannot be undone.`)) {
+  const handleDelete = async (row) => {
+    if (await toast.confirm(`Delete employee "${row.name}"? This cannot be undone.`)) {
       setRows((prev) => prev.filter((r) => r.id !== row.id));
     }
   };
